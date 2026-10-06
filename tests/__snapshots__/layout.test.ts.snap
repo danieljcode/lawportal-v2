@@ -1,0 +1,242 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`segments > stores the arraignment rows 1`] = `
+[
+  {
+    "items": [
+      {
+        "kind": "field",
+        "label": "Defendant name",
+      },
+    ],
+    "name": "Case details",
+  },
+  {
+    "items": [
+      {
+        "items": [
+          {
+            "kind": "field",
+            "label": "Charge",
+          },
+        ],
+        "kind": "block",
+        "name": "Counts",
+      },
+    ],
+    "name": "Charges",
+  },
+  {
+    "items": [
+      {
+        "items": [
+          {
+            "kind": "field",
+            "label": "Exhibit title",
+          },
+          {
+            "kind": "field",
+            "label": "Exhibit content (links, images, text)",
+          },
+        ],
+        "kind": "block",
+        "name": "Exhibits",
+      },
+    ],
+    "name": "Evidence",
+  },
+  {
+    "items": [
+      {
+        "kind": "checklist",
+        "rows": [
+          {
+            "check": "Capital Punishment",
+            "details": [],
+            "sub": false,
+            "text": "Capital Punishment",
+          },
+          {
+            "check": "Life imprisonment without parole",
+            "details": [],
+            "sub": false,
+            "text": "Life imprisonment without parole",
+          },
+          {
+            "check": "Life imprisonment with parole",
+            "details": [],
+            "sub": false,
+            "text": "Life imprisonment with parole",
+          },
+          {
+            "check": "Maximum statutory sentencing recommendation",
+            "details": [],
+            "sub": false,
+            "text": "Maximum statutory sentencing recommendation",
+          },
+          {
+            "check": "Time served",
+            "details": [],
+            "sub": false,
+            "text": "Time served",
+          },
+          {
+            "check": "Other sentence (tick)",
+            "details": [
+              "Other sentence",
+            ],
+            "sub": false,
+            "text": "Other:",
+          },
+        ],
+      },
+    ],
+    "name": "Sentencing",
+  },
+  {
+    "items": [
+      {
+        "kind": "checklist",
+        "rows": [
+          {
+            "check": "Uphold stationhouse bail",
+            "details": [
+              "Stationhouse bail amount",
+            ],
+            "sub": false,
+            "text": "Uphold Stationhouse Bail",
+          },
+          {
+            "check": "Impose bail",
+            "details": [
+              "Imposed bail amount",
+            ],
+            "sub": false,
+            "text": "Impose Bail",
+          },
+          {
+            "check": "Abstain from excessive use of alcohol and any use of a controlled…",
+            "details": [],
+            "sub": true,
+            "text": "Abstain from excessive use of alcohol and any use of a controlled substance without a prescription.",
+          },
+          {
+            "check": "Appear before the court on each date the case is assigned to call",
+            "details": [],
+            "sub": true,
+            "text": "Appear before the court on each date the case is assigned to call.",
+          },
+          {
+            "check": "Abstain from criminal activity while subject to the bail order",
+            "details": [],
+            "sub": true,
+            "text": "Abstain from criminal activity while subject to the bail order.",
+          },
+          {
+            "check": "Wear an ankle monitor at all times",
+            "details": [],
+            "sub": true,
+            "text": "Wear an ankle monitor at all times.",
+          },
+          {
+            "check": "Surrender any illegal or legally owned firearms to the respective…",
+            "details": [],
+            "sub": true,
+            "text": "Surrender any illegal or legally owned firearms to the respective agency.",
+          },
+          {
+            "check": "Possess and keep on at all times an active cell phone with its number…",
+            "details": [],
+            "sub": true,
+            "text": "Possess and keep on at all times an active cell phone with its number registered to Defendant.",
+          },
+          {
+            "check": "Refrain from contact with any victim/witness relating to this arrest",
+            "details": [],
+            "sub": true,
+            "text": "Refrain from contact with any victim/witness relating to this arrest.",
+          },
+          {
+            "check": "Refrain from associating with known gang members or violent felons",
+            "details": [],
+            "sub": true,
+            "text": "Refrain from associating with known gang members or violent felons.",
+          },
+          {
+            "check": "Other bail condition (tick)",
+            "details": [
+              "Other bail condition",
+            ],
+            "sub": true,
+            "text": "Other:",
+          },
+        ],
+      },
+    ],
+    "name": "Bail recommendations",
+  },
+  {
+    "items": [
+      {
+        "kind": "checklist",
+        "rows": [
+          {
+            "check": "Order Defendant's Detention",
+            "details": [],
+            "sub": false,
+            "text": "Order Defendant's Detention.",
+          },
+          {
+            "check": "The defendant is charged with a felony crime of violence and has over…",
+            "details": [],
+            "sub": true,
+            "text": "The defendant is charged with a felony crime of violence and has over 30 criminal points on record.",
+          },
+          {
+            "check": "The defendant is charged with an offense for which the maximum…",
+            "details": [],
+            "sub": true,
+            "text": "The defendant is charged with an offense for which the maximum sentence is life imprisonment or death.",
+          },
+          {
+            "check": "The defendant has a history of violating bail conditions",
+            "details": [],
+            "sub": true,
+            "text": "The defendant has a history of violating bail conditions.",
+          },
+          {
+            "check": "There exists a serious risk that the defendant will threaten, injure,…",
+            "details": [],
+            "sub": true,
+            "text": "There exists a serious risk that the defendant will threaten, injure, or intimidate a prospective witness.",
+          },
+          {
+            "check": "The People believe that no condition or combination of conditions…",
+            "details": [],
+            "sub": true,
+            "text": "The People believe that no condition or combination of conditions will reasonably assure the defendant's appearance as required and the safety of any person or the community.",
+          },
+          {
+            "check": "Other detention ground (tick)",
+            "details": [
+              "Other detention ground",
+            ],
+            "sub": true,
+            "text": "Other:",
+          },
+        ],
+      },
+    ],
+    "name": "Detention",
+  },
+  {
+    "items": [
+      {
+        "kind": "field",
+        "label": "Signed on",
+      },
+    ],
+    "name": "Verification",
+  },
+]
+`;

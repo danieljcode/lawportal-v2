@@ -1,0 +1,315 @@
+// The Characters dialog (FR9, INV §a #characters-dialog): the sync panel, the
+// storage note, the character list with its row actions, the New/Edit form,
+// and Export / Import.
+
+import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import { checkFileSize, EXPORT_FILENAME, exportText, importedMessage, importText } from "@/lib/characterFile";
+import { characterStore, FIELDS, hasDocket, titleKeepsDocket } from "@/lib/characters";
+import { docketStore } from "@/lib/dockets";
+import { portfolioStore } from "@/lib/portfolio";
+import { backend } from "@/lib/storage";
+import { S_STORAGE_LOCAL, S_STORAGE_MEMORY, S_STORAGE_SYNC } from "@/lib/strings";
+import * as sync from "@/lib/sync";
+import type { Character } from "@/lib/types";
+import Dialog from "./Dialog";
+import SyncPanel from "./SyncPanel";
+import { useDocketVersion, useSyncState } from "./useStore";
+
+export interface CharactersDialogProps {
+  open: boolean;
+  onClose(): void;
+  characters: Character[];
+  activeId: string | null;
+  /** Open the Dockets dialog for a character (closes this one). */
+  onDockets(charId: string): void;
+  /** Turn sync on as soon as the dialog opens (J.A.P. "Turn on sync"). */
+  autoSync?: boolean;
+  onAutoSyncDone?(): void;
+}
+
+export default function CharactersDialog(p: CharactersDialogProps) {
+  return (
+    <Dialog open={p.open} onClose={p.onClose} id="characters-dialog" titleId="characters-title" title="Characters">
+      <CharactersBody {...p} />
+    </Dialog>
+  );
+}
+
+type FormValues = Record<string, string | boolean>;
+
+interface Editing {
+  id: string | null;
+  values: FormValues;
+  /** The docket box follows the title until it is toggled by hand. */
+  followTitle: boolean;
+  error: string;
+}
+
+function startEdit(c: Character | null): Editing {
+  const values: FormValues = {};
+  for (const f of FIELDS) {
+    if (f.checkbox) {
+      values[f.key] = hasDocket(c);
+    } else if (f.selectOptions) {
+      const current = c && (c[f.key] as string | undefined);
+      const firstVal = f.selectOptions[0]?.split(":")[0] || "";
+      values[f.key] = current || firstVal;
+    } else {
+      values[f.key] = (c && (c[f.key] as string | undefined)) || "";
+    }
+  }
+  return { id: c ? c.id : null, values, followTitle: !c || c.docket === undefined, error: "" };
+}
+
+function CharactersBody({ characters, activeId, onDockets, autoSync, onAutoSyncDone }: CharactersDialogProps) {
+  const [editing, setEditing] = useState<Editing | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  useDocketVersion(); // the "Dockets (n)" counts follow docket changes
+  useSyncState(); // the storage note follows sync on/off
+
+  const store = characterStore();
+  const syncOn = !!sync.code();
+  const storageNote = backend() === "memory" ? S_STORAGE_MEMORY : syncOn ? S_STORAGE_SYNC : S_STORAGE_LOCAL;
+
+  const edit = (c: Character | null) => {
+    setEditing(startEdit(c));
+    // Focus the name field once the form has rendered.
+    requestAnimationFrame(() => document.getElementById("char-name")?.focus());
+  };
+
+  const setField = (key: string, value: string | boolean) => {
+    setEditing((e) => {
+      if (!e) return e;
+      const values = { ...e.values, [key]: value };
+      let followTitle = e.followTitle;
+      if (key === "docket") followTitle = false;
+      else if (key === "title" && followTitle) values.docket = titleKeepsDocket(String(value));
+      return { ...e, values, followTitle };
+    });
+  };
+
+  const save = (e: FormEvent) => {
+    e.preventDefault();
+    if (!editing) return;
+    try {
+      const saved = store.save({ ...editing.values, id: editing.id || undefined });
+      if (!store.activeId()) store.setActive(saved.id);
+      setEditing(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setEditing((x) => (x ? { ...x, error: message } : x));
+    }
+  };
+
+  const remove = (c: Character) => {
+    const n = docketStore().list(c.id).length;
+    const what = n ? " and their " + n + " docket entr" + (n === 1 ? "y" : "ies") : "";
+    if (!confirm("Delete " + c.name + what + "? This cannot be undone.")) return;
+    store.remove(c.id);
+    docketStore().removeAll(c.id);
+    portfolioStore().remove(c.id);
+    if (editing && editing.id === c.id) setEditing(null);
+  };
+
+  const exportFile = () => {
+    const blob = new Blob([exportText()], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = EXPORT_FILENAME;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  };
+
+  const importFile = async (e: ChangeEvent<HTMLInputElement>) => {
+    const input = e.target;
+    const file = input.files && input.files[0];
+    if (!file) return;
+    try {
+      checkFileSize(file.size);
+      const n = importText(await file.text());
+      alert(importedMessage(n));
+    } catch (err) {
+      alert("Could not import: " + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      input.value = "";
+    }
+  };
+
+  return (
+    <>
+      <SyncPanel autoEnable={autoSync} onAutoEnableDone={onAutoSyncDone} />
+      <p className="muted small" id="storage-note">
+        {storageNote}
+      </p>
+      <div className="char-layout">
+        <div>
+          <ul className="char-list" id="char-list">
+            {!characters.length && <li className="muted small">No characters yet.</li>}
+            {characters.map((c, i) => {
+              const isActive = c.id === activeId;
+              return (
+                <li key={c.id} className={isActive ? "current" : ""}>
+                  <div className="char-name">
+                    <strong>{c.name}</strong>
+                    {c.title && <span className="muted small">{c.title}</span>}
+                    {isActive && <span className="tag">active</span>}
+                  </div>
+                  <div className="char-actions">
+                    {!isActive && (
+                      <button type="button" className="mini" onClick={() => store.setActive(c.id)}>
+                        Use
+                      </button>
+                    )}
+                    <button type="button" className="mini" onClick={() => edit(c)}>
+                      Edit
+                    </button>
+                    {hasDocket(c) && (
+                      <button type="button" className="mini" onClick={() => onDockets(c.id)}>
+                        {"Dockets (" + docketStore().list(c.id).length + ")"}
+                      </button>
+                    )}
+                    <button type="button" className="mini" onClick={() => store.duplicate(c.id)}>
+                      Duplicate
+                    </button>
+                    <button
+                      type="button"
+                      className="mini"
+                      aria-label={"Move " + c.name + " up"}
+                      title="Move up"
+                      disabled={i === 0}
+                      onClick={() => store.move(c.id, -1)}
+                    >
+                      ↑
+                    </button>
+                    <button
+                      type="button"
+                      className="mini"
+                      aria-label={"Move " + c.name + " down"}
+                      title="Move down"
+                      disabled={i === characters.length - 1}
+                      onClick={() => store.move(c.id, 1)}
+                    >
+                      ↓
+                    </button>
+                    <button type="button" className="mini danger-quiet" onClick={() => remove(c)}>
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+          <div className="row">
+            <button type="button" className="btn primary" id="new-character" onClick={() => edit(null)}>
+              New character
+            </button>
+          </div>
+          <div className="row">
+            <button type="button" className="btn" id="export-characters" onClick={exportFile}>
+              Export
+            </button>
+            <button type="button" className="btn" id="import-button" onClick={() => fileRef.current?.click()}>
+              Import
+            </button>
+            <input
+              ref={fileRef}
+              type="file"
+              id="import-characters"
+              accept="application/json,.json"
+              aria-label="Import characters"
+              hidden
+              onChange={importFile}
+            />
+          </div>
+        </div>
+        {editing && (
+          <form id="char-form" className="char-form" noValidate onSubmit={save} aria-labelledby="char-form-title">
+            <h3 id="char-form-title">{editing.id ? "Edit " + (store.get(editing.id)?.name || "character") : "New character"}</h3>
+            <div id="char-fields">
+              {FIELDS.map((f) => {
+                const fid = "char-" + f.key;
+                const help = f.hint ? <p className="help" id={fid + "-help"}>{f.hint}</p> : null;
+                if (f.checkbox) {
+                  return (
+                    <div className="field" key={f.key}>
+                      <label className="field check" htmlFor={fid}>
+                        <input
+                          id={fid}
+                          name={f.key}
+                          type="checkbox"
+                          checked={!!editing.values[f.key]}
+                          aria-describedby={f.hint ? fid + "-help" : undefined}
+                          onChange={(e) => setField(f.key, e.target.checked)}
+                        />
+                        <span>{f.label}</span>
+                      </label>
+                      {help}
+                    </div>
+                  );
+                }
+                const common = {
+                  id: fid,
+                  name: f.key,
+                  value: String(editing.values[f.key] || ""),
+                  "aria-describedby": f.hint ? fid + "-help" : undefined,
+                };
+                if (f.selectOptions) {
+                  return (
+                    <div className="field" key={f.key}>
+                      <label htmlFor={fid}>{f.label}</label>
+                      <select
+                        {...common}
+                        onChange={(e) => setField(f.key, e.target.value)}
+                      >
+                        {f.selectOptions.map((o) => {
+                          const [val, label] = o.split(":");
+                          return (
+                            <option key={val} value={val}>
+                              {label}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      {help}
+                    </div>
+                  );
+                }
+                return (
+                  <div className="field" key={f.key}>
+                    <label htmlFor={fid}>{f.label + (f.required ? " *" : "")}</label>
+                    {f.multiline ? (
+                      <textarea {...common} rows={3} onChange={(e) => setField(f.key, e.target.value)} />
+                    ) : (
+                      <input
+                        {...common}
+                        type="text"
+                        required={f.required}
+                        aria-required={f.required || undefined}
+                        onChange={(e) => setField(f.key, e.target.value)}
+                      />
+                    )}
+                    {help}
+                  </div>
+                );
+              })}
+            </div>
+            <p className="error" id="char-error" role="alert">
+              {editing.error}
+            </p>
+            <div className="row">
+              <button className="btn primary" type="submit">
+                Save
+              </button>
+              <button className="btn" type="button" id="cancel-character" onClick={() => setEditing(null)}>
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </>
+  );
+}
