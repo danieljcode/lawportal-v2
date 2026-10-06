@@ -25,6 +25,7 @@ import type {
   Tree,
   Values,
 } from "./types";
+import type { ServerProfile } from "./servers";
 
 export const TYPES: readonly FieldType[] = [
   "text",
@@ -339,6 +340,34 @@ export function prefillValue(f: Field, now?: Date, lookup?: Lookup): string {
   const rule = dateRule(f.prefill);
   const base = rule.base === "today" ? todayUTC(when) : lookup ? lookup(rule.base) : undefined;
   return base ? addDays(base, rule.days) : "";
+}
+
+/**
+ * The display pattern for a case-number field, server-aware. Expands the field's
+ * `prefill` the same way `prefillValue` does (`^YY` → 2-digit server year,
+ * `<Label?A=x;B=y>` → the code for another field's current value) but, unlike
+ * `prefillValue`, when the `<Division?…>` lookup misses it falls back to the FIRST
+ * code listed in the token so the placeholder is never empty (an un-chosen
+ * Division still shows a concrete `…GJCR…`-style pattern). The expanded pattern is
+ * then passed through `server.caseNumberTransform` (gtaw keeps `GJ`; freestyle
+ * strips it). Returns "" when the field has no prefill (callers skip those).
+ */
+export function caseNumberPattern(f: Field, now: Date | undefined, server: ServerProfile, lookup?: Lookup): string {
+  if (!f.prefill) return "";
+  const when = now || new Date();
+  const expanded = f.prefill
+    .replace(/^YY/, String(when.getUTCFullYear()).slice(-2))
+    .replace(/<([^?>]+)\?([^>]*)>/g, (_m, label: string, map: string) => {
+      const pairs = map
+        .split(";")
+        .map((pair) => pair.split("="))
+        .filter((kv) => kv.length === 2);
+      const current = lookup ? lookup(label.trim()) : undefined;
+      const hit = pairs.find((kv) => kv[0].trim() === current);
+      // Lookup miss → the first listed code, so the pattern stays concrete.
+      return (hit ? hit[1] : pairs[0] ? pairs[0][1] : "").trim();
+    });
+  return server.caseNumberTransform(expanded);
 }
 
 /** Labels a field's prefill depends on, so it can be recomputed when they change. */

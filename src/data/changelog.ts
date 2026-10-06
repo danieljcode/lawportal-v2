@@ -15,6 +15,10 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  { date: "2026-10-08", title: "Case-number placeholders", items: [
+    { type: "new", text: "Case number inputs now start empty and show the server-aware pattern as a greyed-out placeholder; GTAW keeps GJ, FreestyleRP drops it." },
+    { type: "update", text: "Leaving a case number blank still renders the correct pattern in all outputs (forum preview, BBCode, Discord, .docx)." },
+  ]},
   { date: "2026-10-07", title: "Discord output", items: [
     { type: "new", text: "Discord tab: the filing as Discord markdown, split into messages of up to 2,000 characters (4,000 with Nitro), each with its own Copy button and character count." },
     { type: "new", text: "Dark Discord-style preview, part markers, and a choice of code-block or plain-line tables." },

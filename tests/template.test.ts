@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { ALL_FORMS, getForm } from "@/data";
 import {
   addDays,
+  caseNumberPattern,
   compile,
   dateRule,
   defaultItems,
@@ -15,6 +16,7 @@ import {
   render,
   todayUTC,
 } from "@/lib/template";
+import { getServerDate, SERVERS } from "@/lib/servers";
 import type { BlockEntry, CondEntry, Entry, Field } from "@/lib/types";
 
 /** The first field token of a one-token template. */
@@ -104,6 +106,60 @@ describe("prefill", () => {
 
   it("no prefill gives an empty string", () => {
     expect(prefillValue(field("{{Name}}"), NOW)).toBe("");
+  });
+});
+
+describe("caseNumberPattern", () => {
+  const gtaw = SERVERS.gtaw;
+  const freestyle = SERVERS.freestyle;
+  // Callers (FormView) pass an already server-offset `now` (getServerDate), so the
+  // 2-digit year comes from that date; the transform only adds/removes GJ.
+  const fsNow = (d: Date) => getServerDate(d, freestyle);
+
+  it("expands YY and keeps/strips GJ per server (static pattern)", () => {
+    const f = field("{{Case number=YYGJCR00XXX}}");
+    expect(caseNumberPattern(f, NOW, gtaw)).toBe("26GJCR00XXX");
+    expect(caseNumberPattern(f, fsNow(NOW), freestyle)).toBe("90CR00XXX");
+  });
+
+  it("leaves a no-GJ Supreme pattern unchanged except for the year (edge case)", () => {
+    const f = field("{{Case number=YYSCWC00XXX}}");
+    expect(caseNumberPattern(f, NOW, gtaw)).toBe("26SCWC00XXX");
+    expect(caseNumberPattern(f, fsNow(NOW), freestyle)).toBe("90SCWC00XXX");
+  });
+
+  it("uses the first <Division?…> code when no Division is chosen", () => {
+    const f = field("{{Case number=YYGJ<Division?CRIMINAL DIVISION=CR;CIVIL DIVISION=CC;TRAFFIC DIVISION=TC;SMALL CLAIMS DIVISION=SM>00XXX}}");
+    // No lookup → first code (CR), so the placeholder is never empty.
+    expect(caseNumberPattern(f, NOW, gtaw)).toBe("26GJCR00XXX");
+    expect(caseNumberPattern(f, fsNow(NOW), freestyle)).toBe("90CR00XXX");
+    // A chosen Division wins over the first code.
+    const civil = (l: string) => (l === "Division" ? "CIVIL DIVISION" : undefined);
+    expect(caseNumberPattern(f, NOW, gtaw, civil)).toBe("26GJCC00XXX");
+    expect(caseNumberPattern(f, fsNow(NOW), freestyle, civil)).toBe("90CC00XXX");
+    const traffic = () => "TRAFFIC DIVISION";
+    expect(caseNumberPattern(f, fsNow(NOW), freestyle, traffic)).toBe("90TC00XXX");
+  });
+
+  it("sources the pattern from the prefill, not the (noisy) fallback", () => {
+    // Fallback letters/placeholders differ from the prefill; the pattern follows the prefill.
+    const f = field("{{Case number=YYGJCR00XXX|##GJCR#####}}");
+    expect(caseNumberPattern(f, NOW, gtaw)).toBe("26GJCR00XXX");
+    expect(caseNumberPattern(f, fsNow(NOW), freestyle)).toBe("90CR00XXX");
+  });
+
+  it("tracks the year across the New-Year rollover (freestyle = year − 36)", () => {
+    const f = field("{{Case number=YYGJCR00XXX}}");
+    const endOf2026 = new Date("2026-12-31T23:00:00Z");
+    expect(caseNumberPattern(f, endOf2026, gtaw)).toBe("26GJCR00XXX");
+    expect(caseNumberPattern(f, fsNow(endOf2026), freestyle)).toBe("90CR00XXX");
+    const in2027 = new Date("2027-01-01T01:00:00Z");
+    expect(caseNumberPattern(f, in2027, gtaw)).toBe("27GJCR00XXX");
+    expect(caseNumberPattern(f, fsNow(in2027), freestyle)).toBe("91CR00XXX");
+  });
+
+  it("returns '' for a field with no prefill", () => {
+    expect(caseNumberPattern(field("{{Case number|__________}}"), NOW, gtaw)).toBe("");
   });
 });
 

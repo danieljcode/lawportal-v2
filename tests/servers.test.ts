@@ -9,6 +9,7 @@ import {
   mapCourtHtml,
   SERVER_ORDER,
   SERVERS,
+  stripGJ,
   type ServerProfile,
 } from "@/lib/servers";
 import { compile, render } from "@/lib/template";
@@ -84,7 +85,7 @@ describe("getServerDate", () => {
   it("normalises Feb 29 when the target year is not a leap year", () => {
     // 2026 is not a leap year, so a 2062 Feb 29 (offset +36 the other way is not
     // our case) — instead test a non-leap mapping directly via a custom profile.
-    const toNonLeap: ServerProfile = { id: "freestyle", name: "X", yearOffset: -2, courtNames: {} };
+    const toNonLeap: ServerProfile = { id: "freestyle", name: "X", yearOffset: -2, courtNames: {}, caseNumberTransform: (p) => p };
     const d = getServerDate(new Date("2024-02-29T00:00:00Z"), toNonLeap);
     // 2022 is not a leap year; native Date rolls Feb 29 -> Mar 1.
     expect(d.getUTCFullYear()).toBe(2022);
@@ -194,5 +195,34 @@ describe("mapCourtHtml (template HTML phrases)", () => {
     const html = render(compile(mapped), {});
     expect(html).not.toMatch(/SUPERIOR COURT OF THE STATE OF SAN ANDREAS/i);
     expect(html).toContain("SAN ANDREAS COURT");
+  });
+});
+
+describe("caseNumberTransform / stripGJ", () => {
+  it("gtaw is the identity (GJ = Greg Joplin, kept)", () => {
+    for (const p of ["26GJCR00XXX", "26GJCC00XXX", "26GJTC00XXX", "26GJSM00XXX", "26SCWC00XXX"]) {
+      expect(gtaw.caseNumberTransform(p)).toBe(p);
+    }
+  });
+
+  it("freestyle strips the GJ that follows the year across all division letters", () => {
+    expect(freestyle.caseNumberTransform("90GJCR00XXX")).toBe("90CR00XXX");
+    expect(freestyle.caseNumberTransform("90GJCC00XXX")).toBe("90CC00XXX");
+    expect(freestyle.caseNumberTransform("90GJTC00XXX")).toBe("90TC00XXX");
+    expect(freestyle.caseNumberTransform("90GJSM00XXX")).toBe("90SM00XXX");
+    // An "other"/unknown code is not special-cased: the GJ still goes, letters stay.
+    expect(freestyle.caseNumberTransform("90GJZZ00XXX")).toBe("90ZZ00XXX");
+  });
+
+  it("freestyle leaves patterns without a GJ after the year untouched (SCWC edge case)", () => {
+    expect(freestyle.caseNumberTransform("90SCWC00XXX")).toBe("90SCWC00XXX");
+    // GJ not immediately after the year is not stripped.
+    expect(freestyle.caseNumberTransform("90CRGJ00XXX")).toBe("90CRGJ00XXX");
+  });
+
+  it("stripGJ matches the freestyle transform and is case-insensitive on the GJ", () => {
+    expect(stripGJ("26GJCR00XXX")).toBe("26CR00XXX");
+    expect(stripGJ("26gjCR00XXX")).toBe("26CR00XXX");
+    expect(stripGJ("26SCWC00XXX")).toBe("26SCWC00XXX");
   });
 });

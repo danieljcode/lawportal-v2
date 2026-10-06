@@ -413,14 +413,14 @@ async function phaseServer(browser, theme, mode, ctx) {
   await page.selectOption("#active-character", CHAR_C.id);
   // Wait for the freestyle court phrase.
   await updated(page, ctx, "server freestyle civil-complaint court", ["SAN ANDREAS COURT"], ["SUPERIOR COURT OF THE STATE"]);
-  // Verify offset year prefix.
-  await updated(page, ctx, "server freestyle civil-complaint case prefix", [FREESTYLE_YY + "GJCC"]);
+  // Verify offset year prefix, with the GJ dropped on freestyle (no "GJ" after the year).
+  await updated(page, ctx, "server freestyle civil-complaint case prefix", [FREESTYLE_YY + "CC"], [FREESTYLE_YY + "GJCC"]);
 
-  // Form 2: criminal-case-schedule — has =today date and case number prefill.
+  // Form 2: criminal-case-schedule — has =today date and a case-number pattern.
   await resetProbe(page);
   await page.click(`#sidebar a[href="#criminal-case-schedule"]`);
-  // Should already be in freestyle mode (CHAR_C is still active).
-  await firstDisplay(page, ctx, "server freestyle criminal-case-schedule", [FREESTYLE_YY + "GJCR"]);
+  // Should already be in freestyle mode (CHAR_C is still active): offset year, no GJ.
+  await firstDisplay(page, ctx, "server freestyle criminal-case-schedule", [FREESTYLE_YY + "CR"], [FREESTYLE_YY + "GJCR"]);
 
   // Switch back to gtaw character.
   await page.selectOption("#active-character", CHAR_A.id);

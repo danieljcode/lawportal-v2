@@ -29,8 +29,8 @@ import {
 import { getServerDate, mapCourt, mapCourtHtml, type ServerProfile } from "@/lib/servers";
 import { defaultKV, readJson, writeJson } from "@/lib/storage";
 import { S_DISCLAIMER } from "@/lib/strings";
-import { compile, fields, render } from "@/lib/template";
-import type { Character, Docket, Entry, FormDef, Tree } from "@/lib/types";
+import { caseNumberPattern, compile, fields, render } from "@/lib/template";
+import type { Character, Docket, Entry, FormDef, Node, Tree } from "@/lib/types";
 import { FormContext, type FormCtx } from "./fields/FormContext";
 import Sections from "./fields/Sections";
 import { useDocketVersion } from "./useStore";
@@ -68,9 +68,36 @@ export interface DocketRequest {
 
 type Compiled = { tree: Tree; entries: Entry[]; error: null } | { tree: null; entries: Entry[]; error: string };
 
-function compileForm(form: FormDef, server: ServerProfile): Compiled {
+/**
+ * Rewrite every "Case number" field that carries a prefill so the editor box
+ * starts EMPTY while the server-aware pattern becomes the field's fallback. The
+ * fallback is what `render` emits for a blank field (so the pattern still appears
+ * in every output) and what `FieldInput` shows as the input placeholder. Dropping
+ * the prefill stops `applyPrefills` from pre-filling the value, so the box is
+ * visually empty until typed. GTAW keeps the `GJ` code; FreestyleRP strips it.
+ *
+ * Fields are shared by reference between the tree and `fields(tree)`, so mutating
+ * the field objects here is enough. Extra Templates use `{{Case number|____}}`
+ * with no prefill and are left untouched (they already start empty and carry no
+ * YY…GJ… pattern).
+ */
+function rewriteCaseNumbers(nodes: Node[], server: ServerProfile, now: Date): void {
+  for (const n of nodes) {
+    if (n.kind === "field") {
+      if (n.field.label === "Case number" && n.field.prefill) {
+        n.field.fallback = caseNumberPattern(n.field, now, server);
+        n.field.prefill = undefined;
+      }
+    } else if (n.kind === "block" || n.kind === "cond") {
+      rewriteCaseNumbers(n.children, server, now);
+    }
+  }
+}
+
+function compileForm(form: FormDef, server: ServerProfile, now: Date): Compiled {
   try {
     const tree = compile(mapCourtHtml(server, form.html));
+    rewriteCaseNumbers(tree.children, server, now);
     return { tree, entries: fields(tree), error: null };
   } catch (err) {
     console.error("[form] couldn't compile", form.id, err);
@@ -110,13 +137,15 @@ export default function FormView({
   docketRequest,
   onDocketBar,
 }: FormViewProps) {
-  const compiled = useMemo(() => compileForm(form, server), [form, server.id]);
-  const { tree, entries } = compiled;
-
   // The server-offset "now" fed to every date producer. Stable per render (new Date()
   // would thrash the ctx memo), recomputed only when the server changes — so it still
   // rolls over with the real calendar because the component re-renders over time.
   const now = useMemo(() => getServerDate(new Date(), server), [server.id]);
+
+  // `now` feeds the case-number placeholder/fallback pattern, so a server switch (and the
+  // natural New-Year re-render) recomputes it: GJ appears/disappears and the year updates.
+  const compiled = useMemo(() => compileForm(form, server, now), [form, server.id, now]);
+  const { tree, entries } = compiled;
 
   // R1: the opening state mirrors the reference openForm (draft → blocks → prefills → character fill).
   const [state, setState] = useState<FormState>(() =>

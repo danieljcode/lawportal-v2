@@ -221,12 +221,12 @@ describe("What's new", () => {
     expect(must("#changelog-list time").getAttribute("datetime")).toBe(CHANGELOG[0].date);
     expect([...document.querySelectorAll(".log-entry:first-child .log-type")].map((e) => e.textContent)).toEqual([
       "New",
-    ]);
-    expect([...document.querySelectorAll(".log-entry:nth-child(2) .log-type")].map((e) => e.textContent)).toEqual([
       "Updated",
     ]);
-    expect([...document.querySelectorAll(".log-entry:nth-child(3) .log-type")].map((e) => e.textContent)).toEqual([
+    expect([...document.querySelectorAll(".log-entry:nth-child(2) .log-type")].map((e) => e.textContent)).toEqual([
       "New",
+    ]);
+    expect([...document.querySelectorAll(".log-entry:nth-child(3) .log-type")].map((e) => e.textContent)).toEqual([
       "Updated",
     ]);
   });
