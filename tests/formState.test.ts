@@ -317,6 +317,15 @@ describe("dockets ↔ form", () => {
     expect(filled).toBe(6);
   });
 
+  it("docketToForm names our courthouse from the case number, and leaves an old GTAW one as filed (LP-68)", () => {
+    const entries = entriesOf("criminal-case-schedule");
+    const ours = docketToForm(entries, state(), docket({ caseNumber: "90SCCR00147" })).state;
+    expect(ours.values).toMatchObject({ "Case number": "90SCCR00147", Courthouse: "SUPERIOR COURT" });
+    const old = docketToForm(entries, state(), docket({ caseNumber: "26GJCR00147" })).state;
+    expect(old.values["Case number"]).toBe("26GJCR00147");
+    expect(old.values.Courthouse).toBeUndefined();
+  });
+
   it("formToDocketPatch builds the patch and closes judgement forms", () => {
     const j = getForm("criminal-judgement")!;
     const res = formToDocketPatch(j, fields(compile(j.html)), { "Case number": "26GJCR00147" });
