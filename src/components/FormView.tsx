@@ -74,22 +74,22 @@ type Compiled = { tree: Tree; entries: Entry[]; error: null } | { tree: null; en
  * fallback is what `render` emits for a blank field (so the pattern still appears
  * in every output) and what `FieldInput` shows as the input placeholder. Dropping
  * the prefill stops `applyPrefills` from pre-filling the value, so the box is
- * visually empty until typed. GTAW keeps the `GJ` code; FreestyleRP strips it.
+ * visually empty until typed. The pattern names our courthouse (src/lib/courts.ts), e.g. `90SCCR00XXX`.
  *
  * Fields are shared by reference between the tree and `fields(tree)`, so mutating
  * the field objects here is enough. Extra Templates use `{{Case number|____}}`
  * with no prefill and are left untouched (they already start empty and carry no
- * YY…GJ… pattern).
+ * YY… pattern).
  */
-function rewriteCaseNumbers(nodes: Node[], server: ServerProfile, now: Date): void {
+function rewriteCaseNumbers(nodes: Node[], now: Date): void {
   for (const n of nodes) {
     if (n.kind === "field") {
       if (n.field.label === "Case number" && n.field.prefill) {
-        n.field.fallback = caseNumberPattern(n.field, now, server);
+        n.field.fallback = caseNumberPattern(n.field, now);
         n.field.prefill = undefined;
       }
     } else if (n.kind === "block" || n.kind === "cond") {
-      rewriteCaseNumbers(n.children, server, now);
+      rewriteCaseNumbers(n.children, now);
     }
   }
 }
@@ -97,7 +97,7 @@ function rewriteCaseNumbers(nodes: Node[], server: ServerProfile, now: Date): vo
 function compileForm(form: FormDef, server: ServerProfile, now: Date): Compiled {
   try {
     const tree = compile(mapCourtHtml(server, form.html));
-    rewriteCaseNumbers(tree.children, server, now);
+    rewriteCaseNumbers(tree.children, now);
     return { tree, entries: fields(tree), error: null };
   } catch (err) {
     console.error("[form] couldn't compile", form.id, err);
@@ -143,7 +143,7 @@ export default function FormView({
   const now = useMemo(() => getServerDate(new Date(), server), [server.id]);
 
   // `now` feeds the case-number placeholder/fallback pattern, so a server switch (and the
-  // natural New-Year re-render) recomputes it: GJ appears/disappears and the year updates.
+  // natural New-Year re-render) recomputes it, so the year updates.
   const compiled = useMemo(() => compileForm(form, server, now), [form, server.id, now]);
   const { tree, entries } = compiled;
 

@@ -66,7 +66,8 @@ export default function FieldInput({ field: f, scope, path, prefix, inline }: Sc
       input = (
         <select id={id} value={value} aria-label={inline ? f.label : undefined} onChange={(e) => change(e.target.value)}>
           <option value="">{hint ? "— keep “" + hint.slice(0, 40) + "” —" : "—"}</option>
-          {f.options.map((o) => (
+          {/* A value from elsewhere (a loaded docket) that isn't an option is still shown, not blanked. */}
+          {(value && !f.options.includes(value) ? [...f.options, value] : f.options).map((o) => (
             <option key={o} value={o}>
               {o}
             </option>

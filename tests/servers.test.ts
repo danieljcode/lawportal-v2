@@ -9,9 +9,9 @@ import {
   mapCourtHtml,
   SERVER_ORDER,
   SERVERS,
-  stripGJ,
   type ServerProfile,
 } from "@/lib/servers";
+import { COURTHOUSES, courthouseFor, DEFAULT_COURTHOUSE, withCourthouse } from "@/lib/courts";
 import { compile, render } from "@/lib/template";
 import forms from "@/data/forms.json";
 import { EXTRA_FORMS } from "@/data/extra-forms";
@@ -85,7 +85,7 @@ describe("getServerDate", () => {
   it("normalises Feb 29 when the target year is not a leap year", () => {
     // 2026 is not a leap year, so a 2062 Feb 29 (offset +36 the other way is not
     // our case) — instead test a non-leap mapping directly via a custom profile.
-    const toNonLeap: ServerProfile = { id: "freestyle", name: "X", yearOffset: -2, courtNames: {}, caseNumberTransform: (p) => p };
+    const toNonLeap: ServerProfile = { id: "freestyle", name: "X", yearOffset: -2, courtNames: {} };
     const d = getServerDate(new Date("2024-02-29T00:00:00Z"), toNonLeap);
     // 2022 is not a leap year; native Date rolls Feb 29 -> Mar 1.
     expect(d.getUTCFullYear()).toBe(2022);
@@ -198,31 +198,28 @@ describe("mapCourtHtml (template HTML phrases)", () => {
   });
 });
 
-describe("caseNumberTransform / stripGJ", () => {
-  it("gtaw is the identity (GJ = Greg Joplin, kept)", () => {
-    for (const p of ["26GJCR00XXX", "26GJCC00XXX", "26GJTC00XXX", "26GJSM00XXX", "26SCWC00XXX"]) {
-      expect(gtaw.caseNumberTransform(p)).toBe(p);
-    }
+describe("courts (LP-68)", () => {
+  it("has one generic courthouse, Superior Court (SC), and nothing from GTAW", () => {
+    expect(COURTHOUSES).toEqual([{ code: "SC", name: "SUPERIOR COURT" }]);
+    expect(DEFAULT_COURTHOUSE.code).toBe("SC");
+    expect(JSON.stringify(COURTHOUSES)).not.toMatch(/JOPLIN|DAVIS|"GJ"|"VD"/);
   });
 
-  it("freestyle strips the GJ that follows the year across all division letters", () => {
-    expect(freestyle.caseNumberTransform("90GJCR00XXX")).toBe("90CR00XXX");
-    expect(freestyle.caseNumberTransform("90GJCC00XXX")).toBe("90CC00XXX");
-    expect(freestyle.caseNumberTransform("90GJTC00XXX")).toBe("90TC00XXX");
-    expect(freestyle.caseNumberTransform("90GJSM00XXX")).toBe("90SM00XXX");
-    // An "other"/unknown code is not special-cased: the GJ still goes, letters stay.
-    expect(freestyle.caseNumberTransform("90GJZZ00XXX")).toBe("90ZZ00XXX");
+  it("puts our courthouse in place of the forms' own code, for every division", () => {
+    for (const div of ["CR", "CC", "TC", "SM"]) expect(withCourthouse("YYGJ" + div + "00XXX")).toBe("YYSC" + div + "00XXX");
+    expect(withCourthouse("YYGJ<Division?A=CR>00XXX")).toBe("YYSC<Division?A=CR>00XXX");
   });
 
-  it("freestyle leaves patterns without a GJ after the year untouched (SCWC edge case)", () => {
-    expect(freestyle.caseNumberTransform("90SCWC00XXX")).toBe("90SCWC00XXX");
-    // GJ not immediately after the year is not stripped.
-    expect(freestyle.caseNumberTransform("90CRGJ00XXX")).toBe("90CRGJ00XXX");
+  it("leaves other courts' patterns alone", () => {
+    for (const p of ["YYSCWC00XXX", "YYAPCR#####", "YYLSTC#####", "YYARCC#####"]) expect(withCourthouse(p)).toBe(p);
   });
 
-  it("stripGJ matches the freestyle transform and is case-insensitive on the GJ", () => {
-    expect(stripGJ("26GJCR00XXX")).toBe("26CR00XXX");
-    expect(stripGJ("26gjCR00XXX")).toBe("26CR00XXX");
-    expect(stripGJ("26SCWC00XXX")).toBe("26SCWC00XXX");
+  it("names the courthouse in one of our case numbers, and not in an old GTAW one", () => {
+    expect(courthouseFor("90SCCR00147")?.name).toBe("SUPERIOR COURT");
+    expect(courthouseFor("90scCR00147")?.name).toBe("SUPERIOR COURT");
+    expect(courthouseFor("26GJCR00147")).toBeUndefined();
+    expect(courthouseFor("26VDCC00012")).toBeUndefined();
+    expect(courthouseFor("")).toBeUndefined();
+    expect(courthouseFor(undefined)).toBeUndefined();
   });
 });
