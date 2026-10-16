@@ -5,7 +5,7 @@ import { ALL_FORMS } from "@/data";
 import { fromHtml, pxToSize } from "@/lib/bbcode";
 import { compile, fields, render } from "@/lib/template";
 import { fixture } from "./fixtures";
-import { hasOracle, loadRefBBCode, refTemplate } from "./oracle";
+import { hasOracle, loadRefBBCode, paritySuite, refTemplate } from "./oracle";
 
 const parse = (html: string) => new DOMParser().parseFromString(html, "text/html");
 const bb = (html: string) => fromHtml(html, parse);
@@ -60,7 +60,7 @@ describe("fromHtml", () => {
   });
 });
 
-describe.skipIf(!hasOracle)("fromHtml parity with the reference", () => {
+describe.skipIf(!hasOracle)(paritySuite("fromHtml parity with the reference"), () => {
   for (const form of ALL_FORMS) {
     it(form.id, () => {
       const ref = loadRefBBCode();

@@ -9,5 +9,6 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["tests/**/*.test.ts", "tests/**/*.test.tsx"],
+    globalSetup: ["tests/reference-check.ts"],
   },
 });
