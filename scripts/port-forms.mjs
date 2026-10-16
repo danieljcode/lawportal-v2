@@ -1,6 +1,6 @@
 // One-off: port the directory forms from the reference client into src/data/forms.json.
 // DES §Data steps 1–4. The source is JSON after `window.FORMS =`, so it is parsed, never evaluated.
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { checkTemplateHtml } from "./template-safety.mjs";
@@ -15,6 +15,15 @@ const KEYS = ["id", "court", "section", "title", "html"];
 function fail(msg) {
   console.error(`port-forms: ${msg}`);
   process.exit(1);
+}
+
+if (!existsSync(source)) {
+  fail(
+    `the reference forms aren't here: ${path.relative(root, source)}\n` +
+      "  They're kept in the private repo danieljcode/lawportal-reference. With access, run:\n" +
+      "    git clone https://github.com/danieljcode/lawportal-reference.git .agents/reference/jsa\n" +
+      "  See README, Reference data.",
+  );
 }
 
 let text;

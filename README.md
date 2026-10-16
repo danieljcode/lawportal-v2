@@ -176,6 +176,22 @@ old forum hosts are unwrapped (the link text stays; see `scripts/scrub-links.mjs
 write if any template contains scripts, event handlers, non-http(s) links or other unsafe markup, and
 lists the offending form ids. Run `npm test` afterwards.
 
+## Reference data
+
+`npm run port-forms` and the parity tests use files from the
+[JSA Form Generator](https://forum.gta.world/en/topic/93922-court-petitions-directory/) by Awucard:
+`js_template.js`, `js_bbcode.js` and `js_forms.data.js`. They have no licence, so they aren't in this
+public repo. They're kept in the private repo `danieljcode/lawportal-reference` (files at its root).
+With access, put them where the scripts and tests look:
+
+```bash
+git clone https://github.com/danieljcode/lawportal-reference.git .agents/reference/jsa
+```
+
+`.agents/` is gitignored, so they're never committed here. Without them, `port-forms` stops with a
+message saying where to get them, and the parity suites are skipped: the run prints
+`[parity] skipped: reference data not found` and each skipped suite's name says so.
+
 ## Tests
 
 ```bash
@@ -193,8 +209,10 @@ stores, the sync API and client, the `.docx` converter, XSS escaping, template s
 (form view, preview, dialogs, Discord tab, J.A.P.).
 
 CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm test` and `npm run build` on Node 22 for every
-push and pull request. CI has no `.agents/` folder, so the reference-engine differential tests are
-skipped there and only run locally.
+push and pull request. When the repo secret `REFERENCE_TOKEN` is set (a read-only token for
+`danieljcode/lawportal-reference`), CI checks the reference data out into `.agents/reference/jsa/`
+and runs the parity tests too, with `LAWAPP_REQUIRE_REFERENCE=1` so a missing file fails the run
+instead of skipping. Pull requests from forks don't get the secret, so they skip the parity tests.
 
 ## Credits
 
