@@ -26,7 +26,7 @@ import {
   writeDraft,
   type FormState,
 } from "@/lib/formState";
-import { getServerDate, mapCourt, mapCourtHtml, type ServerProfile } from "@/lib/servers";
+import { getServerDate, type ServerProfile } from "@/lib/servers";
 import { defaultKV, readJson, writeJson } from "@/lib/storage";
 import { S_DISCLAIMER } from "@/lib/strings";
 import { caseNumberPattern, compile, fields, render } from "@/lib/template";
@@ -94,9 +94,9 @@ function rewriteCaseNumbers(nodes: Node[], now: Date): void {
   }
 }
 
-function compileForm(form: FormDef, server: ServerProfile, now: Date): Compiled {
+function compileForm(form: FormDef, now: Date): Compiled {
   try {
-    const tree = compile(mapCourtHtml(server, form.html));
+    const tree = compile(form.html);
     rewriteCaseNumbers(tree.children, now);
     return { tree, entries: fields(tree), error: null };
   } catch (err) {
@@ -144,7 +144,7 @@ export default function FormView({
 
   // `now` feeds the case-number placeholder/fallback pattern, so a server switch (and the
   // natural New-Year re-render) recomputes it, so the year updates.
-  const compiled = useMemo(() => compileForm(form, server, now), [form, server.id, now]);
+  const compiled = useMemo(() => compileForm(form, now), [form, now]);
   const { tree, entries } = compiled;
 
   // R1: the opening state mirrors the reference openForm (draft → blocks → prefills → character fill).
@@ -326,7 +326,7 @@ export default function FormView({
       <div className="form-head">
         <div>
           <p className="crumb muted" id="form-crumb">
-            {[mapCourt(server, form.court), form.section].filter(Boolean).join(" · ")}
+            {[form.court, form.section].filter(Boolean).join(" · ")}
           </p>
           <h2 id="form-title">{form.title}</h2>
         </div>

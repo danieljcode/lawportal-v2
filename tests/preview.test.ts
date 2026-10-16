@@ -19,8 +19,8 @@ import * as sync from "@/lib/sync";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
-const COURT = "SUPERIOR COURT OF THE STATE OF SAN ANDREAS";
-const COURT_LS = "SUPERIOR COURT OF THE STATE OF SAN ANDREAS, COUNTY OF LOS SANTOS";
+const COURT = "SAN ANDREAS COURT";
+const COURT_LS = "SAN ANDREAS COURT, COUNTY OF LOS SANTOS";
 
 let container: HTMLDivElement | null = null;
 let root: Root | null = null;
@@ -247,7 +247,7 @@ describe("forum preview with no frames and no input", () => {
     const id = saveCharacter("John Doe", "Attorney at Law");
     act(() => {
       characterStore().setActive(id);
-      docketStore().upsert(id, { caseNumber: "26GJCC00147", plaintiff: "Ann Smith" });
+      docketStore().upsert(id, { caseNumber: "90SCCC00147", plaintiff: "Ann Smith" });
     });
     history.replaceState(null, "", "#civil-complaint");
     mount();
@@ -258,7 +258,7 @@ describe("forum preview with no frames and no input", () => {
     );
     expect(use).toBeDefined();
     click(use!);
-    expectRendered(COURT, "26GJCC00147", "Ann Smith");
+    expectRendered(COURT, "90SCCC00147", "Ann Smith");
   });
 
   it("follows a Filing as character switch", () => {

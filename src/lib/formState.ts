@@ -8,7 +8,7 @@
 
 import type { BlockEntry, Character, CondEntry, Docket, Entry, Field, FormDef, Scalar, Values } from "./types";
 import { defaultItems, prefillDeps, prefillValue, todayUTC } from "./template";
-import { courthouseFor } from "./courts";
+import { courthouseFor, DIVISION_COURTS, GENERAL_COURT } from "./courts";
 import { DIVISION_CODES, divisionFor } from "./dockets";
 import { readJson, writeJson, type KV } from "./storage";
 
@@ -397,8 +397,8 @@ export function formToDocketPatch(
   if (filed) patch.filed = filed;
   // The case number's own code says which division it is; the form's court is only a fallback.
   const div = divisionFor({ caseNumber: num }) || str(values.Division);
-  if (div) patch.court = "Superior Court of San Andreas - " + titleWords(div);
-  else if (form.court !== "Miscellaneous" && form.court !== "Additional Templates") patch.court = form.court;
+  if (div) patch.court = DIVISION_COURTS[div] || form.court;
+  else if (form.court !== GENERAL_COURT && form.court !== "Additional Templates") patch.court = form.court;
   const judgement = str(values.Judgement) || str(values["Judgment date"]);
   const trial = str(values["Trial date"]);
   if (judgement) {

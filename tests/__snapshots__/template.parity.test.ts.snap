@@ -14,7 +14,7 @@ exports[`template engine snapshot > criminal-arraignment > empty, highlighted 1`
 <tr>
 <td>
 <p style="text-align:center">
-<strong><span style="font-size:28px">SUPERIOR&nbsp;COURT OF THE STATE OF SAN ANDREAS</span></strong>
+<strong><span style="font-size:28px">SAN ANDREAS COURT</span></strong>
 </p>
 <p style="text-align:center">
 <strong><span style="font-size:28px">COUNTY OF LOS SANTOS</span></strong>
@@ -256,7 +256,7 @@ exports[`template engine snapshot > criminal-arraignment > fixture A 1`] = `
 <tr>
 <td>
 <p style="text-align:center">
-<strong><span style="font-size:28px">SUPERIOR&nbsp;COURT OF THE STATE OF SAN ANDREAS</span></strong>
+<strong><span style="font-size:28px">SAN ANDREAS COURT</span></strong>
 </p>
 <p style="text-align:center">
 <strong><span style="font-size:28px">COUNTY OF LOS SANTOS</span></strong>
@@ -515,7 +515,7 @@ exports[`template engine snapshot > misc-bail-application > empty, highlighted 1
 <tr>
 <td>
 <p style="text-align:center">
-<strong><span style="font-size:28px">SUPERIOR&nbsp;COURT OF THE STATE OF SAN ANDREAS</span></strong>
+<strong><span style="font-size:28px">SAN ANDREAS COURT</span></strong>
 </p>
 <p style="text-align:center">
 <strong><span style="font-size:28px">COUNTY OF LOS SANTOS</span></strong>
@@ -577,7 +577,7 @@ exports[`template engine snapshot > misc-bail-application > empty, highlighted 1
 </td>
 <td>
 <p style="text-align:center">
-Court File: <mark class="unfilled" title="Case number">YYGJCR#####</mark>
+Court File: <mark class="unfilled" title="Case number">YYSCCR#####</mark>
 </p>
 <p style="text-align:center">
 &nbsp;
@@ -772,7 +772,7 @@ exports[`template engine snapshot > misc-bail-application > fixture A 1`] = `
 <tr>
 <td>
 <p style="text-align:center">
-<strong><span style="font-size:28px">SUPERIOR&nbsp;COURT OF THE STATE OF SAN ANDREAS</span></strong>
+<strong><span style="font-size:28px">SAN ANDREAS COURT</span></strong>
 </p>
 <p style="text-align:center">
 <strong><span style="font-size:28px">COUNTY OF LOS SANTOS</span></strong>
@@ -1027,7 +1027,7 @@ exports[`template engine snapshot > misc-order-decree > empty, highlighted 1`] =
 <tr>
 <td>
 <p style="text-align:center">
-<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><strong><span style="font-size:28px">SUPERIOR COURT OF THE STATE OF SAN ANDREAS</span></strong></span></span>
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><strong><span style="font-size:28px">SAN ANDREAS COURT</span></strong></span></span>
 </p>
 <p style="text-align:center">
 <span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><strong><span style="font-size:28px">COUNTY OF LOS SANTOS</span></strong></span></span>
@@ -1082,7 +1082,7 @@ exports[`template engine snapshot > misc-order-decree > empty, highlighted 1`] =
 </td>
 <td>
 <p style="text-align:center">
-<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000">Court File: <mark class="unfilled" title="Case number">YYGJXX#####</mark></span></span>
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000">Court File: <mark class="unfilled" title="Case number">YYSCXX#####</mark></span></span>
 </p>
 <p style="text-align:center">
 &nbsp;
@@ -1136,7 +1136,7 @@ exports[`template engine snapshot > misc-order-decree > empty, highlighted 1`] =
 <span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><em>/s/ <mark class="unfilled" title="Judge title">JUDGE</mark> <mark class="unfilled" title="Judge name">NAME</mark></em></span></span>
 </p>
 <p style="font-size:14px">
-<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000">Superior Court of the State of San Andreas<br />
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000">SAN ANDREAS COURT<br />
 County of Los Santos</span></span>
 </p>
 "
@@ -1152,7 +1152,7 @@ exports[`template engine snapshot > misc-order-decree > fixture A 1`] = `
 <tr>
 <td>
 <p style="text-align:center">
-<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><strong><span style="font-size:28px">SUPERIOR COURT OF THE STATE OF SAN ANDREAS</span></strong></span></span>
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><strong><span style="font-size:28px">SAN ANDREAS COURT</span></strong></span></span>
 </p>
 <p style="text-align:center">
 <span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><strong><span style="font-size:28px">COUNTY OF LOS SANTOS</span></strong></span></span>
@@ -1364,7 +1364,7 @@ X2 X&lt;&amp;&gt;&quot;1
 X2</em></span></span>
 </p>
 <p style="font-size:14px">
-<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000">Superior Court of the State of San Andreas<br />
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000">SAN ANDREAS COURT<br />
 County of Los Santos</span></span>
 </p>
 "

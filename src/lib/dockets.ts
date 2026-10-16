@@ -2,6 +2,7 @@
 // One JSON list per character under lawapp_dockets_<charId>; the key is
 // removed when the list is empty. Behaviour follows the reference js_dockets.js.
 
+import { DIVISION_COURTS } from "./courts";
 import type { Docket, DocketStatus } from "./types";
 import {
   createChannel,
@@ -51,12 +52,18 @@ export const DIVISION_CODES: Readonly<Record<string, string>> = {
   SM: "SMALL CLAIMS DIVISION",
 };
 
-/** A case's division: from the code in its number, otherwise from the court text saved on the docket. */
+/**
+ * A case's division: from the code in its number, otherwise from the court text
+ * saved on the docket, either a FreestyleRP court name ("San Andreas Criminal
+ * Court") or one saved before LP-69 ("…- Criminal Division").
+ */
 export function divisionFor(d: { caseNumber?: string; court?: string }): string | undefined {
   const m = /^\d{2}[A-Z]{2}(CR|CC|TC|SM)/i.exec(d.caseNumber || "");
   if (m) return DIVISION_CODES[m[1].toUpperCase()];
   const court = (d.court || "").toUpperCase();
-  return Object.values(DIVISION_CODES).find((name) => court.includes(name));
+  return Object.values(DIVISION_CODES).find(
+    (name) => court.includes(name) || court === (DIVISION_COURTS[name] || "").toUpperCase(),
+  );
 }
 
 const MAX_TEXT = 4000;
