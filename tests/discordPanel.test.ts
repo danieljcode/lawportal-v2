@@ -10,7 +10,7 @@ import * as sync from "@/lib/sync";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
-const COURT = "SUPERIOR COURT OF THE STATE OF SAN ANDREAS";
+const COURT = "SAN ANDREAS COURT";
 
 let container: HTMLDivElement | null = null;
 let root: Root | null = null;
@@ -105,7 +105,7 @@ describe("Discord tab", () => {
     expect(must("#dc-part-1 .dc-message").textContent).toContain(COURT);
     const raw = rawPart(1);
     expect(counts()[0].len).toBe(raw.length);
-    expect(raw).toContain("# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**");
+    expect(raw).toContain("# **SAN ANDREAS COURT**");
     expect(must("#dc-summary").textContent).toMatch(/^\d+ parts?, up to 2,000 characters each$/);
   });
 

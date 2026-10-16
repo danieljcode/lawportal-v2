@@ -2,9 +2,9 @@
 
 exports[`toDiscord on every form > appellate-judgement > empty, code tables 1`] = `
 "────────────────────
-**APPELLATE COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS APPELLATE COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
 **CASE NUMBER:** __YYAPCR##### / YYAPCC##### / YYAPTC#####__
 ────────────────────
@@ -39,9 +39,9 @@ __SIGNATURE__
 
 exports[`toDiscord on every form > appellate-judgement > empty, plain-line tables 1`] = `
 "────────────────────
-**APPELLATE COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS APPELLATE COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
 **CASE NUMBER:** __YYAPCR##### / YYAPCC##### / YYAPTC#####__
 ────────────────────
@@ -76,9 +76,9 @@ __SIGNATURE__
 
 exports[`toDiscord on every form > appellate-judgement > filled, code tables 1`] = `
 "────────────────────
-**APPELLATE COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS APPELLATE COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
 **CASE NUMBER:** __X\\<&>"1 X2__
 ────────────────────
@@ -129,7 +129,7 @@ exports[`toDiscord on every form > appellate-petition-for-appeal > empty, code t
 ────────────────────
 **I. CAUSES OF ACTION**
 
-In this Petition to the Appellate Court, **Appellant** alleges that an error in judgement has been undertaken by a ruling decreed by the Superior Court of San Andreas on **DAY/MONTH/YEAR** in regards to a **Insert Court Division (IE: Criminal, Civil, Traffic)** violation, that is henceforth requiring immediate judicial relief in regards to the following causes of action:
+In this Petition to the Appellate Court, **Appellant** alleges that an error in judgement has been undertaken by a ruling decreed by the SAN ANDREAS COURT on **DAY/MONTH/YEAR** in regards to a **Insert Court Division (IE: Criminal, Civil, Traffic)** violation, that is henceforth requiring immediate judicial relief in regards to the following causes of action:
 
 - [-] - Misinterpretation or Contradiction of Legal Principle
 - [-] - Misinterpretation or Contradiction of State Law or Judicial Precedent
@@ -180,7 +180,7 @@ Court File: YYAPCR##### / YYAPCC##### / YYAPTC#####
 ────────────────────
 **I. CAUSES OF ACTION**
 
-In this Petition to the Appellate Court, **Appellant** alleges that an error in judgement has been undertaken by a ruling decreed by the Superior Court of San Andreas on **DAY/MONTH/YEAR** in regards to a **Insert Court Division (IE: Criminal, Civil, Traffic)** violation, that is henceforth requiring immediate judicial relief in regards to the following causes of action:
+In this Petition to the Appellate Court, **Appellant** alleges that an error in judgement has been undertaken by a ruling decreed by the SAN ANDREAS COURT on **DAY/MONTH/YEAR** in regards to a **Insert Court Division (IE: Criminal, Civil, Traffic)** violation, that is henceforth requiring immediate judicial relief in regards to the following causes of action:
 
 - [-] - Misinterpretation or Contradiction of Legal Principle
 - [-] - Misinterpretation or Contradiction of State Law or Judicial Precedent
@@ -226,7 +226,7 @@ exports[`toDiscord on every form > appellate-petition-for-appeal > filled, code 
 ────────────────────
 **I. CAUSES OF ACTION**
 
-In this Petition to the Appellate Court, **Appellant** alleges that an error in judgement has been undertaken by a ruling decreed by the Superior Court of San Andreas on **02/JAN/2026** in regards to a **Criminal** violation, that is henceforth requiring immediate judicial relief in regards to the following causes of action:
+In this Petition to the Appellate Court, **Appellant** alleges that an error in judgement has been undertaken by a ruling decreed by the SAN ANDREAS COURT on **02/JAN/2026** in regards to a **Criminal** violation, that is henceforth requiring immediate judicial relief in regards to the following causes of action:
 
 - [X] - Misinterpretation or Contradiction of Legal Principle
 - [X] - Misinterpretation or Contradiction of State Law or Judicial Precedent
@@ -422,13 +422,13 @@ I, **X\\<&>"1 X2**, affirm that the above-stated facts are true and accurate to 
 `;
 
 exports[`toDiscord on every form > civil-complaint > empty, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # __COUNTY OF LOS SANTOS__
 # CIVIL DIVISION
 
 ────────────────────
 \`\`\`
-┌────────────────────┐  )  Court File: YYGJCC#####
+┌────────────────────┐  )  Court File: YYSCCC#####
 │ Firstname Lastname │  )
 │ (Plaintiff)        │  )  ┌─────────────────┐
 │                    │  )  │ CIVIL COMPLAINT │
@@ -483,7 +483,7 @@ I, **Insert Name**, affirm that the above-stated facts are true and accurate to 
 `;
 
 exports[`toDiscord on every form > civil-complaint > empty, plain-line tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # __COUNTY OF LOS SANTOS__
 # CIVIL DIVISION
 
@@ -496,7 +496,7 @@ Firstname Lastname
 Firstname Lastname
 **(Defendant)**
 ────────────────────
-Court File: YYGJCC#####
+Court File: YYSCCC#####
 
 ────────────────────
 **CIVIL COMPLAINT**
@@ -549,7 +549,7 @@ I, **Insert Name**, affirm that the above-stated facts are true and accurate to 
 `;
 
 exports[`toDiscord on every form > civil-complaint > filled, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # __COUNTY OF LOS SANTOS__
 # CIVIL DIVISION
 
@@ -636,11 +636,11 @@ I, **X\\<&>"1 X2**, affirm that the above-stated facts are true and accurate to 
 
 exports[`toDiscord on every form > civil-document-retrieval-subpoena > empty, code tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
-**CASE NUMBER:** __YYGJCC#####__
+**CASE NUMBER:** __YYSCCC#####__
 ────────────────────
 **PLAINTIFF/PETITIONER:** __FIRSTNAME LASTNAME__
 **DEFENDANT/RESPONDENT:** __FIRSTNAME LASTNAME__
@@ -674,11 +674,11 @@ __SIGNATURE__
 
 exports[`toDiscord on every form > civil-document-retrieval-subpoena > empty, plain-line tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
-**CASE NUMBER:** __YYGJCC#####__
+**CASE NUMBER:** __YYSCCC#####__
 ────────────────────
 **PLAINTIFF/PETITIONER:** __FIRSTNAME LASTNAME__
 **DEFENDANT/RESPONDENT:** __FIRSTNAME LASTNAME__
@@ -712,9 +712,9 @@ __SIGNATURE__
 
 exports[`toDiscord on every form > civil-document-retrieval-subpoena > filled, code tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
 **CASE NUMBER:** __X\\<&>"1 X2__
 ────────────────────
@@ -750,11 +750,11 @@ https://example.com/a.png
 
 exports[`toDiscord on every form > civil-judgement > empty, code tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
-**CASE NUMBER:** __YYGJCC#####__
+**CASE NUMBER:** __YYSCCC#####__
 ────────────────────
 **PLAINTIFF/PETITIONER:** __FIRSTNAME LASTNAME__
 **DEFENDANT/RESPONDENT:** __FIRSTNAME LASTNAME__
@@ -792,11 +792,11 @@ __SIGNATURE__
 
 exports[`toDiscord on every form > civil-judgement > empty, plain-line tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
-**CASE NUMBER:** __YYGJCC#####__
+**CASE NUMBER:** __YYSCCC#####__
 ────────────────────
 **PLAINTIFF/PETITIONER:** __FIRSTNAME LASTNAME__
 **DEFENDANT/RESPONDENT:** __FIRSTNAME LASTNAME__
@@ -834,9 +834,9 @@ __SIGNATURE__
 
 exports[`toDiscord on every form > civil-judgement > filled, code tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
 **CASE NUMBER:** __X\\<&>"1 X2__
 ────────────────────
@@ -875,7 +875,7 @@ https://example.com/a.png
 exports[`toDiscord on every form > civil-payment-form > empty, code tables 1`] = `
 "https://i.ibb.co/mySjy3G/150x150court.png
 
-### **Superior Court of San Andreas, County of Los Santos**
+### **SAN ANDREAS COURT, County of Los Santos**
 ### **Payment Submittal Notice**
 
 ────────────────────
@@ -883,7 +883,7 @@ exports[`toDiscord on every form > civil-payment-form > empty, code tables 1`] =
 ────────────────────
 
 **Date:** DD/MMM/YYYY
-**Case Number:** YYGJCC#####
+**Case Number:** YYSCCC#####
 **Case Name:** Plaintiff v. Defendant
 
 ────────────────────
@@ -905,7 +905,7 @@ exports[`toDiscord on every form > civil-payment-form > empty, code tables 1`] =
 exports[`toDiscord on every form > civil-payment-form > empty, plain-line tables 1`] = `
 "https://i.ibb.co/mySjy3G/150x150court.png
 
-### **Superior Court of San Andreas, County of Los Santos**
+### **SAN ANDREAS COURT, County of Los Santos**
 ### **Payment Submittal Notice**
 
 ────────────────────
@@ -913,7 +913,7 @@ exports[`toDiscord on every form > civil-payment-form > empty, plain-line tables
 ────────────────────
 
 **Date:** DD/MMM/YYYY
-**Case Number:** YYGJCC#####
+**Case Number:** YYSCCC#####
 **Case Name:** Plaintiff v. Defendant
 
 ────────────────────
@@ -935,7 +935,7 @@ exports[`toDiscord on every form > civil-payment-form > empty, plain-line tables
 exports[`toDiscord on every form > civil-payment-form > filled, code tables 1`] = `
 "https://i.ibb.co/mySjy3G/150x150court.png
 
-### **Superior Court of San Andreas, County of Los Santos**
+### **SAN ANDREAS COURT, County of Los Santos**
 ### **Payment Submittal Notice**
 
 ────────────────────
@@ -965,11 +965,11 @@ https://example.com/a.png"
 
 exports[`toDiscord on every form > civil-proof-of-service > empty, code tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
-**CASE NUMBER:** __YYGJCC#####__
+**CASE NUMBER:** __YYSCCC#####__
 ────────────────────
 **PLAINTIFF/PETITIONER:** __FIRSTNAME LASTNAME__
 **DEFENDANT/RESPONDENT:** __FIRSTNAME LASTNAME__
@@ -1025,11 +1025,11 @@ __SIGNATURE__
 
 exports[`toDiscord on every form > civil-proof-of-service > empty, plain-line tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
-**CASE NUMBER:** __YYGJCC#####__
+**CASE NUMBER:** __YYSCCC#####__
 ────────────────────
 **PLAINTIFF/PETITIONER:** __FIRSTNAME LASTNAME__
 **DEFENDANT/RESPONDENT:** __FIRSTNAME LASTNAME__
@@ -1085,9 +1085,9 @@ __SIGNATURE__
 
 exports[`toDiscord on every form > civil-proof-of-service > filled, code tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
 **CASE NUMBER:** __X\\<&>"1 X2__
 ────────────────────
@@ -1145,11 +1145,11 @@ https://example.com/a.png
 
 exports[`toDiscord on every form > civil-restraining-order > empty, code tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
-**CASE NUMBER:** __YYGJCC#####__
+**CASE NUMBER:** __YYSCCC#####__
 ────────────────────
 **PLAINTIFF/PETITIONER:** __FIRSTNAME LASTNAME__
 **DEFENDANT/RESPONDENT:** __FIRSTNAME LASTNAME__
@@ -1160,7 +1160,7 @@ COURTHOUSE NAME: __GREG E JOPLIN__
 
 **THE PEOPLE OF THE STATE OF SAN ANDREAS, TO WHOEVER IT MAY CONCERN:**
 
-The Superior Court of the State of San Andreas has issued an order restraining the aforementioned defendant from conducting the following:
+The SAN ANDREAS COURT has issued an order restraining the aforementioned defendant from conducting the following:
 
 - **No Contact Provision:** Prohibiting the defendant from calling, texting, emailing, stalking, attacking, hitting, or disturbing the plaintiff.
 - **Stay Away Provision:** Ordering the defendant to stay at least a certain number of yards or feet away from the plaintiff, her home, and car. The stay-away distance is 100 feet.
@@ -1178,11 +1178,11 @@ __SIGNATURE__
 
 exports[`toDiscord on every form > civil-restraining-order > empty, plain-line tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
-**CASE NUMBER:** __YYGJCC#####__
+**CASE NUMBER:** __YYSCCC#####__
 ────────────────────
 **PLAINTIFF/PETITIONER:** __FIRSTNAME LASTNAME__
 **DEFENDANT/RESPONDENT:** __FIRSTNAME LASTNAME__
@@ -1193,7 +1193,7 @@ COURTHOUSE NAME: __GREG E JOPLIN__
 
 **THE PEOPLE OF THE STATE OF SAN ANDREAS, TO WHOEVER IT MAY CONCERN:**
 
-The Superior Court of the State of San Andreas has issued an order restraining the aforementioned defendant from conducting the following:
+The SAN ANDREAS COURT has issued an order restraining the aforementioned defendant from conducting the following:
 
 - **No Contact Provision:** Prohibiting the defendant from calling, texting, emailing, stalking, attacking, hitting, or disturbing the plaintiff.
 - **Stay Away Provision:** Ordering the defendant to stay at least a certain number of yards or feet away from the plaintiff, her home, and car. The stay-away distance is 100 feet.
@@ -1211,9 +1211,9 @@ __SIGNATURE__
 
 exports[`toDiscord on every form > civil-restraining-order > filled, code tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
 **CASE NUMBER:** __X\\<&>"1 X2__
 ────────────────────
@@ -1226,7 +1226,7 @@ COURTHOUSE NAME: __GREG E JOPLIN__
 
 **THE PEOPLE OF THE STATE OF SAN ANDREAS, TO WHOEVER IT MAY CONCERN:**
 
-The Superior Court of the State of San Andreas has issued an order restraining the aforementioned defendant from conducting the following:
+The SAN ANDREAS COURT has issued an order restraining the aforementioned defendant from conducting the following:
 
 - **No Contact Provision:** Prohibiting the defendant from calling, texting, emailing, stalking, attacking, hitting, or disturbing the plaintiff.
 - **Stay Away Provision:** Ordering the defendant to stay at least a certain number of yards or feet away from the plaintiff, her home, and car. The stay-away distance is X\\<&>"1 X2 feet.
@@ -1244,11 +1244,11 @@ https://example.com/a.png
 
 exports[`toDiscord on every form > civil-witness-appearance-subpoena > empty, code tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
-**CASE NUMBER:** __YYGJCC#####__
+**CASE NUMBER:** __YYSCCC#####__
 ────────────────────
 **PLAINTIFF/PETITIONER:** __FIRSTNAME LASTNAME__
 **DEFENDANT/RESPONDENT:** __FIRSTNAME LASTNAME__
@@ -1273,11 +1273,11 @@ __SIGNATURE__
 
 exports[`toDiscord on every form > civil-witness-appearance-subpoena > empty, plain-line tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
-**CASE NUMBER:** __YYGJCC#####__
+**CASE NUMBER:** __YYSCCC#####__
 ────────────────────
 **PLAINTIFF/PETITIONER:** __FIRSTNAME LASTNAME__
 **DEFENDANT/RESPONDENT:** __FIRSTNAME LASTNAME__
@@ -1302,9 +1302,9 @@ __SIGNATURE__
 
 exports[`toDiscord on every form > civil-witness-appearance-subpoena > filled, code tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
 **CASE NUMBER:** __X\\<&>"1 X2__
 ────────────────────
@@ -1330,7 +1330,7 @@ https://example.com/a.png
 `;
 
 exports[`toDiscord on every form > criminal-arraignment > empty, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
@@ -1404,7 +1404,7 @@ I, the undersigned, hereby declare under penalty of perjury under the laws of th
 `;
 
 exports[`toDiscord on every form > criminal-arraignment > empty, plain-line tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
@@ -1478,7 +1478,7 @@ I, the undersigned, hereby declare under penalty of perjury under the laws of th
 `;
 
 exports[`toDiscord on every form > criminal-arraignment > filled, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
@@ -1557,11 +1557,11 @@ I, the undersigned, hereby declare under penalty of perjury under the laws of th
 
 exports[`toDiscord on every form > criminal-case-schedule > empty, code tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
-**CASE NUMBER:** __YYGJCC#####__
+**CASE NUMBER:** __YYSCCC#####__
 ────────────────────
 **PLAINTIFF/PETITIONER:** __THE PEOPLE OF THE STATE OF SAN ANDREAS__
 **DEFENDANT/RESPONDENT:** __FIRSTNAME LASTNAME__
@@ -1581,11 +1581,11 @@ These dates represent the maximum allowable timeframe for each stage of the proc
 
 exports[`toDiscord on every form > criminal-case-schedule > empty, plain-line tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
-**CASE NUMBER:** __YYGJCC#####__
+**CASE NUMBER:** __YYSCCC#####__
 ────────────────────
 **PLAINTIFF/PETITIONER:** __THE PEOPLE OF THE STATE OF SAN ANDREAS__
 **DEFENDANT/RESPONDENT:** __FIRSTNAME LASTNAME__
@@ -1605,9 +1605,9 @@ These dates represent the maximum allowable timeframe for each stage of the proc
 
 exports[`toDiscord on every form > criminal-case-schedule > filled, code tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
 **CASE NUMBER:** __X\\<&>"1 X2__
 ────────────────────
@@ -1629,11 +1629,11 @@ These dates represent the maximum allowable timeframe for each stage of the proc
 
 exports[`toDiscord on every form > criminal-document-retrieval-subpoena > empty, code tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
-**CASE NUMBER:** __YYGJCR#####__
+**CASE NUMBER:** __YYSCCR#####__
 ────────────────────
 **PLAINTIFF/PETITIONER:** __THE PEOPLE OF THE STATE OF SAN ANDREAS__
 **DEFENDANT/RESPONDENT:** __FIRSTNAME LASTNAME__
@@ -1668,11 +1668,11 @@ __SIGNATURE__
 
 exports[`toDiscord on every form > criminal-document-retrieval-subpoena > empty, plain-line tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
-**CASE NUMBER:** __YYGJCR#####__
+**CASE NUMBER:** __YYSCCR#####__
 ────────────────────
 **PLAINTIFF/PETITIONER:** __THE PEOPLE OF THE STATE OF SAN ANDREAS__
 **DEFENDANT/RESPONDENT:** __FIRSTNAME LASTNAME__
@@ -1707,9 +1707,9 @@ __SIGNATURE__
 
 exports[`toDiscord on every form > criminal-document-retrieval-subpoena > filled, code tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
 **CASE NUMBER:** __X\\<&>"1 X2__
 ────────────────────
@@ -1745,14 +1745,14 @@ https://example.com/a.png
 `;
 
 exports[`toDiscord on every form > criminal-expungement > empty, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
 https://i.ibb.co/zQMVtSr/150x150court.png
 ────────────────────
 \`\`\`
-┌──────────────────────────┐  )  Court File: YYGJCR#####
+┌──────────────────────────┐  )  Court File: YYSCCR#####
 │ THE PEOPLE OF            │  )
 │ THE STATE OF SAN ANDREAS │  )  ┌─────────────┐
 │ (Plaintiff)              │  )  │ EXPUNGEMENT │
@@ -1788,7 +1788,7 @@ on **MONTH DD, YYYY**"
 `;
 
 exports[`toDiscord on every form > criminal-expungement > empty, plain-line tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
@@ -1803,7 +1803,7 @@ THE STATE OF SAN ANDREAS
 Firstname Lastname
 **(Defendant)**
 ────────────────────
-Court File: YYGJCR#####
+Court File: YYSCCR#####
 
 ────────────────────
 **EXPUNGEMENT**
@@ -1841,7 +1841,7 @@ on **MONTH DD, YYYY**"
 `;
 
 exports[`toDiscord on every form > criminal-expungement > filled, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
@@ -1888,14 +1888,14 @@ on **January 2, 2026**"
 `;
 
 exports[`toDiscord on every form > criminal-habeas-corpus-petition > empty, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
 https://i.ibb.co/zQMVtSr/150x150court.png
 ────────────────────
 \`\`\`
-┌──────────────────────────┐  )  Court File: YYGJCR#####
+┌──────────────────────────┐  )  Court File: YYSCCR#####
 │ Firstname Lastname       │  )
 │ (Petitioner)             │  )  ┌───────────────┐
 │                          │  )  │ PETITION FOR  │
@@ -1918,7 +1918,7 @@ on **MONTH DD, YYYY**"
 `;
 
 exports[`toDiscord on every form > criminal-habeas-corpus-petition > empty, plain-line tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
@@ -1933,7 +1933,7 @@ THE PEOPLE OF
 THE STATE OF SAN ANDREAS
 **(Respondent)**
 ────────────────────
-Court File: YYGJCR#####
+Court File: YYSCCR#####
 
 ────────────────────
 **PETITION FOR**
@@ -1954,7 +1954,7 @@ on **MONTH DD, YYYY**"
 `;
 
 exports[`toDiscord on every form > criminal-habeas-corpus-petition > filled, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
@@ -1987,7 +1987,7 @@ on **January 2, 2026**"
 `;
 
 exports[`toDiscord on every form > criminal-judgement > empty, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
@@ -2031,7 +2031,7 @@ It is henceforth ordered by Judge **Insert Name**, and shall be carried out with
 `;
 
 exports[`toDiscord on every form > criminal-judgement > empty, plain-line tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
@@ -2080,7 +2080,7 @@ It is henceforth ordered by Judge **Insert Name**, and shall be carried out with
 `;
 
 exports[`toDiscord on every form > criminal-judgement > filled, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
@@ -2126,14 +2126,14 @@ It is henceforth ordered by Judge **X\\<&>"1 X2**, and shall be carried out with
 `;
 
 exports[`toDiscord on every form > criminal-motion-to-dismiss > empty, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
 https://i.ibb.co/zQMVtSr/150x150court.png
 ────────────────────
 \`\`\`
-┌──────────────────────────┐  )  Court File: YYGJCR#####
+┌──────────────────────────┐  )  Court File: YYSCCR#####
 │ THE PEOPLE OF            │  )
 │ THE STATE OF SAN ANDREAS │  )  ┌───────────────────┐
 │ (Plaintiff)              │  )  │ MOTION TO DISMISS │
@@ -2167,7 +2167,7 @@ on **MONTH DD, YYYY**"
 `;
 
 exports[`toDiscord on every form > criminal-motion-to-dismiss > empty, plain-line tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
@@ -2182,7 +2182,7 @@ THE STATE OF SAN ANDREAS
 Firstname Lastname
 **(Defendant)**
 ────────────────────
-Court File: YYGJCR#####
+Court File: YYSCCR#####
 
 ────────────────────
 **MOTION TO DISMISS**
@@ -2217,7 +2217,7 @@ on **MONTH DD, YYYY**"
 `;
 
 exports[`toDiscord on every form > criminal-motion-to-dismiss > filled, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
@@ -2263,14 +2263,14 @@ on **January 2, 2026**"
 `;
 
 exports[`toDiscord on every form > criminal-motion-to-dismiss-for-a-speedy-trial-violation > empty, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
 https://i.ibb.co/zQMVtSr/150x150court.png
 ────────────────────
 \`\`\`
-┌──────────────────────────┐  )  Court File: YYGJCR#####
+┌──────────────────────────┐  )  Court File: YYSCCR#####
 │ THE PEOPLE OF            │  )
 │ THE STATE OF SAN ANDREAS │  )  ┌───────────────────┐
 │ (Plaintiff)              │  )  │ MOTION TO DISMISS │
@@ -2304,7 +2304,7 @@ on **MONTH DD, YYYY**"
 `;
 
 exports[`toDiscord on every form > criminal-motion-to-dismiss-for-a-speedy-trial-violation > empty, plain-line tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
@@ -2319,7 +2319,7 @@ THE STATE OF SAN ANDREAS
 Firstname Lastname
 **(Defendant)**
 ────────────────────
-Court File: YYGJCR#####
+Court File: YYSCCR#####
 
 ────────────────────
 **MOTION TO DISMISS**
@@ -2356,7 +2356,7 @@ on **MONTH DD, YYYY**"
 `;
 
 exports[`toDiscord on every form > criminal-motion-to-dismiss-for-a-speedy-trial-violation > filled, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
@@ -2402,14 +2402,14 @@ on **January 2, 2026**"
 `;
 
 exports[`toDiscord on every form > criminal-nolle-prosequi > empty, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
 https://i.ibb.co/zQMVtSr/150x150court.png
 ────────────────────
 \`\`\`
-┌──────────────────────────┐  )  Court File: ##GJCR#####
+┌──────────────────────────┐  )  Court File: ##SCCR#####
 │ THE PEOPLE OF            │  )
 │ THE STATE OF SAN ANDREAS │  )  ┌───────────────────┐
 │ (Plaintiff)              │  )  │ MOTION TO DISMISS │
@@ -2454,7 +2454,7 @@ on **MONTH DD, YYYY**"
 `;
 
 exports[`toDiscord on every form > criminal-nolle-prosequi > empty, plain-line tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
@@ -2469,7 +2469,7 @@ THE STATE OF SAN ANDREAS
 Defendant Name
 **(Defendant)**
 ────────────────────
-Court File: ##GJCR#####
+Court File: ##SCCR#####
 
 ────────────────────
 **MOTION TO DISMISS**
@@ -2516,7 +2516,7 @@ on **MONTH DD, YYYY**"
 `;
 
 exports[`toDiscord on every form > criminal-nolle-prosequi > filled, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
@@ -2694,11 +2694,11 @@ https://example.com/a.png"
 
 exports[`toDiscord on every form > criminal-witness-appearance-subpoena > empty, code tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
-**CASE NUMBER:** __YYGJCC#####__
+**CASE NUMBER:** __YYSCCC#####__
 ────────────────────
 **PLAINTIFF/PETITIONER:** __THE PEOPLE OF THE STATE OF SAN ANDREAS__
 **DEFENDANT/RESPONDENT:** __FIRSTNAME LASTNAME__
@@ -2725,11 +2725,11 @@ __SIGNATURE__
 
 exports[`toDiscord on every form > criminal-witness-appearance-subpoena > empty, plain-line tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
-**CASE NUMBER:** __YYGJCC#####__
+**CASE NUMBER:** __YYSCCC#####__
 ────────────────────
 **PLAINTIFF/PETITIONER:** __THE PEOPLE OF THE STATE OF SAN ANDREAS__
 **DEFENDANT/RESPONDENT:** __FIRSTNAME LASTNAME__
@@ -2756,9 +2756,9 @@ __SIGNATURE__
 
 exports[`toDiscord on every form > criminal-witness-appearance-subpoena > filled, code tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
 **CASE NUMBER:** __X\\<&>"1 X2__
 ────────────────────
@@ -2786,7 +2786,7 @@ https://example.com/a.png
 `;
 
 exports[`toDiscord on every form > extra-general-motion > empty, code tables 1`] = `
-"**SUPERIOR COURT OF THE STATE OF SAN ANDREAS, COUNTY OF LOS SANTOS**
+"**SAN ANDREAS COURT, COUNTY OF LOS SANTOS**
 \`\`\`
 PLAINTIFF NAME,  )
 Plaintiff,
@@ -2814,7 +2814,7 @@ Attorney for the Defendant
 `;
 
 exports[`toDiscord on every form > extra-general-motion > empty, plain-line tables 1`] = `
-"**SUPERIOR COURT OF THE STATE OF SAN ANDREAS, COUNTY OF LOS SANTOS**
+"**SAN ANDREAS COURT, COUNTY OF LOS SANTOS**
 PLAINTIFF NAME,
 Plaintiff,
 v.
@@ -2871,7 +2871,7 @@ X\\<&>"1 X2
 `;
 
 exports[`toDiscord on every form > extra-general-petition > empty, code tables 1`] = `
-"**SUPERIOR COURT OF THE STATE OF SAN ANDREAS, COUNTY OF LOS SANTOS**
+"**SAN ANDREAS COURT, COUNTY OF LOS SANTOS**
 \`\`\`
 PETITIONER NAME,  )  Case No. __________
 Petitioner,
@@ -2893,7 +2893,7 @@ Petitioner"
 `;
 
 exports[`toDiscord on every form > extra-general-petition > empty, plain-line tables 1`] = `
-"**SUPERIOR COURT OF THE STATE OF SAN ANDREAS, COUNTY OF LOS SANTOS**
+"**SAN ANDREAS COURT, COUNTY OF LOS SANTOS**
 PETITIONER NAME,
 Petitioner,
 Case No. \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
@@ -2949,7 +2949,7 @@ X\\<&>"1 X2"
 `;
 
 exports[`toDiscord on every form > extra-interrogatories > empty, code tables 1`] = `
-"**SUPERIOR COURT OF THE STATE OF SAN ANDREAS, COUNTY OF LOS SANTOS**
+"**SAN ANDREAS COURT, COUNTY OF LOS SANTOS**
 \`\`\`
 PLAINTIFF NAME,  )
 Plaintiff,
@@ -2984,7 +2984,7 @@ Attorney for Plaintiff"
 `;
 
 exports[`toDiscord on every form > extra-interrogatories > empty, plain-line tables 1`] = `
-"**SUPERIOR COURT OF THE STATE OF SAN ANDREAS, COUNTY OF LOS SANTOS**
+"**SAN ANDREAS COURT, COUNTY OF LOS SANTOS**
 PLAINTIFF NAME,
 Plaintiff,
 v.
@@ -3057,7 +3057,7 @@ X\\<&>"1 X2"
 `;
 
 exports[`toDiscord on every form > extra-name-change > empty, code tables 1`] = `
-"**SUPERIOR COURT OF THE STATE OF SAN ANDREAS, COUNTY OF LOS SANTOS**
+"**SAN ANDREAS COURT, COUNTY OF LOS SANTOS**
 \`\`\`
 In re the Name of  )  Case No. __________
 PETITIONER NAME,
@@ -3084,7 +3084,7 @@ Petitioner"
 `;
 
 exports[`toDiscord on every form > extra-name-change > empty, plain-line tables 1`] = `
-"**SUPERIOR COURT OF THE STATE OF SAN ANDREAS, COUNTY OF LOS SANTOS**
+"**SAN ANDREAS COURT, COUNTY OF LOS SANTOS**
 In re the Name of
 PETITIONER NAME,
 Petitioner.
@@ -3235,7 +3235,7 @@ X<&>"1 X2  X<&>"1 X2
 `;
 
 exports[`toDiscord on every form > extra-subpoena > empty, code tables 1`] = `
-"**SUPERIOR COURT OF THE STATE OF SAN ANDREAS, COUNTY OF LOS SANTOS**
+"**SAN ANDREAS COURT, COUNTY OF LOS SANTOS**
 \`\`\`
 PLAINTIFF NAME,  )
 Plaintiff,
@@ -3268,7 +3268,7 @@ Attorney for the Plaintiff"
 `;
 
 exports[`toDiscord on every form > extra-subpoena > empty, plain-line tables 1`] = `
-"**SUPERIOR COURT OF THE STATE OF SAN ANDREAS, COUNTY OF LOS SANTOS**
+"**SAN ANDREAS COURT, COUNTY OF LOS SANTOS**
 PLAINTIFF NAME,
 Plaintiff,
 v.
@@ -3336,14 +3336,14 @@ X\\<&>"1 X2"
 `;
 
 exports[`toDiscord on every form > misc-bail-application > empty, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
 https://i.ibb.co/zQMVtSr/150x150court.png
 ────────────────────
 \`\`\`
-┌──────────────────────────┐  )  Court File: YYGJCR#####
+┌──────────────────────────┐  )  Court File: YYSCCR#####
 │ THE PEOPLE OF            │  )
 │ THE STATE OF SAN ANDREAS │  )  ┌───────────────┐
 │ (Plaintiff)              │  )  │ BAIL PETITION │
@@ -3399,7 +3399,7 @@ on **MONTH DD, YYYY**"
 `;
 
 exports[`toDiscord on every form > misc-bail-application > empty, plain-line tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
@@ -3414,7 +3414,7 @@ THE STATE OF SAN ANDREAS
 Firstname Lastname
 **(Defendant)**
 ────────────────────
-Court File: YYGJCR#####
+Court File: YYSCCR#####
 
 ────────────────────
 **BAIL PETITION**
@@ -3467,7 +3467,7 @@ on **MONTH DD, YYYY**"
 `;
 
 exports[`toDiscord on every form > misc-bail-application > filled, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 
@@ -3527,7 +3527,7 @@ on **January 2, 2026**"
 `;
 
 exports[`toDiscord on every form > misc-certificate-of-criminal-record > empty, code tables 1`] = `
-"## **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"## **SAN ANDREAS COURT**
 ## **FOR THE COUNTY OF LOS SANTOS**
 
 \`\`\`
@@ -3537,7 +3537,7 @@ born on xxx              OF CRIMINAL RECORD
                          Issued on: MONTH DD, YYYY
 \`\`\`
 
-**THIS IS TO CERTIFY** that a search of the official records of the Superior Court of the State of San Andreas, Criminal Division, has been conducted for the above-named individual. The results are set forth below:
+**THIS IS TO CERTIFY** that a search of the official records of the SAN ANDREAS COURT, Criminal Division, has been conducted for the above-named individual. The results are set forth below:
 
 ## **__I. PERSONAL INFORMATION ON FILE__**
 
@@ -3562,16 +3562,16 @@ born on xxx              OF CRIMINAL RECORD
 
 This certificate is issued upon the request of the individual named above and reflects information contained in the official records of this Court as of the date indicated. This document does not reflect arrests or prosecutions that did not result in court proceedings or are sealed under law.
 
-### **ISSUED BY THE SUPERIOR COURT OF SAN ANDREAS**
+### **ISSUED BY THE SAN ANDREAS COURT**
 ### **DATE:** MONTH DD, YYYY
 
 ### *COURT ADMINISTRATOR EMMA MYERS*
 ### *CLERK OF THE SUPERIOR COURT*
-### *GREG E. JOPLIN COURTHOUSE*"
+### *SUPERIOR COURT*"
 `;
 
 exports[`toDiscord on every form > misc-certificate-of-criminal-record > empty, plain-line tables 1`] = `
-"## **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"## **SAN ANDREAS COURT**
 ## **FOR THE COUNTY OF LOS SANTOS**
 
 ## Issued to NAME SURNAME,
@@ -3582,7 +3582,7 @@ exports[`toDiscord on every form > misc-certificate-of-criminal-record > empty, 
 
 ## *Issued on: MONTH DD, YYYY*
 
-**THIS IS TO CERTIFY** that a search of the official records of the Superior Court of the State of San Andreas, Criminal Division, has been conducted for the above-named individual. The results are set forth below:
+**THIS IS TO CERTIFY** that a search of the official records of the SAN ANDREAS COURT, Criminal Division, has been conducted for the above-named individual. The results are set forth below:
 
 ## **__I. PERSONAL INFORMATION ON FILE__**
 
@@ -3607,16 +3607,16 @@ exports[`toDiscord on every form > misc-certificate-of-criminal-record > empty, 
 
 This certificate is issued upon the request of the individual named above and reflects information contained in the official records of this Court as of the date indicated. This document does not reflect arrests or prosecutions that did not result in court proceedings or are sealed under law.
 
-### **ISSUED BY THE SUPERIOR COURT OF SAN ANDREAS**
+### **ISSUED BY THE SAN ANDREAS COURT**
 ### **DATE:** MONTH DD, YYYY
 
 ### *COURT ADMINISTRATOR EMMA MYERS*
 ### *CLERK OF THE SUPERIOR COURT*
-### *GREG E. JOPLIN COURTHOUSE*"
+### *SUPERIOR COURT*"
 `;
 
 exports[`toDiscord on every form > misc-certificate-of-criminal-record > filled, code tables 1`] = `
-"## **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"## **SAN ANDREAS COURT**
 ## **FOR THE COUNTY OF LOS SANTOS**
 
 \`\`\`
@@ -3626,7 +3626,7 @@ born on X<&>"1 X2     OF CRIMINAL RECORD
                       Issued on: January 2, 2026
 \`\`\`
 
-**THIS IS TO CERTIFY** that a search of the official records of the Superior Court of the State of San Andreas, Criminal Division, has been conducted for the above-named individual. The results are set forth below:
+**THIS IS TO CERTIFY** that a search of the official records of the SAN ANDREAS COURT, Criminal Division, has been conducted for the above-named individual. The results are set forth below:
 
 ## **__I. PERSONAL INFORMATION ON FILE__**
 
@@ -3647,22 +3647,22 @@ born on X<&>"1 X2     OF CRIMINAL RECORD
 
 This certificate is issued upon the request of the individual named above and reflects information contained in the official records of this Court as of the date indicated. This document does not reflect arrests or prosecutions that did not result in court proceedings or are sealed under law.
 
-### **ISSUED BY THE SUPERIOR COURT OF SAN ANDREAS**
+### **ISSUED BY THE SAN ANDREAS COURT**
 ### **DATE:** January 2, 2026
 
 ### *X\\<&>"1 X2 X\\<&>"1 X2*
 ### *CLERK OF THE SUPERIOR COURT*
-### *GREG E. JOPLIN COURTHOUSE*"
+### *SUPERIOR COURT*"
 `;
 
 exports[`toDiscord on every form > misc-decree-of-adoption > empty, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # __COUNTY OF LOS SANTOS__
 # CIVIL DIVISION
 
 ────────────────────
 \`\`\`
-┌───────────────┐  )  Court File: YYGJCCNNNN
+┌───────────────┐  )  Court File: YYSCCCNNNN
 │ NAME SURNAME  │  )
 │ (Petitioners) │  )  ┌────────────────────┐
 │               │  )  │ DECREE OF ADOPTION │
@@ -3695,7 +3695,7 @@ It is henceforth ordered by judge NAME SURNAME, and shall be carried out without
 
 **REGISTRY**
 
-This document is accepted for registration on MONTH DAY, YEAR, offered a copy to the parties and the original stored in the Greg E. Joplin Courthouse archive, by the local registrar, authorized by the Court Administrator.
+This document is accepted for registration on MONTH DAY, YEAR, offered a copy to the parties and the original stored in the Superior Court archive, by the local registrar, authorized by the Court Administrator.
 
 ────────────────────
 
@@ -3709,7 +3709,7 @@ This is **NOT MANDATORY** as it requires to have an available namechange, which 
 `;
 
 exports[`toDiscord on every form > misc-decree-of-adoption > empty, plain-line tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # __COUNTY OF LOS SANTOS__
 # CIVIL DIVISION
 
@@ -3722,7 +3722,7 @@ NAME SURNAME
 NAME SURNAME
 **(Minor)**
 ────────────────────
-Court File: YYGJCCNNNN
+Court File: YYSCCCNNNN
 
 ────────────────────
 **DECREE OF ADOPTION**
@@ -3753,7 +3753,7 @@ It is henceforth ordered by judge NAME SURNAME, and shall be carried out without
 
 **REGISTRY**
 
-This document is accepted for registration on MONTH DAY, YEAR, offered a copy to the parties and the original stored in the Greg E. Joplin Courthouse archive, by the local registrar, authorized by the Court Administrator.
+This document is accepted for registration on MONTH DAY, YEAR, offered a copy to the parties and the original stored in the Superior Court archive, by the local registrar, authorized by the Court Administrator.
 
 ────────────────────
 
@@ -3767,7 +3767,7 @@ This is **NOT MANDATORY** as it requires to have an available namechange, which 
 `;
 
 exports[`toDiscord on every form > misc-decree-of-adoption > filled, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # __COUNTY OF LOS SANTOS__
 # CIVIL DIVISION
 
@@ -3806,7 +3806,7 @@ It is henceforth ordered by judge X\\<&>"1 X2, and shall be carried out without 
 
 **REGISTRY**
 
-This document is accepted for registration on January 2, 2026, offered a copy to the parties and the original stored in the Greg E. Joplin Courthouse archive, by the local registrar, authorized by the Court Administrator.
+This document is accepted for registration on January 2, 2026, offered a copy to the parties and the original stored in the Superior Court archive, by the local registrar, authorized by the Court Administrator.
 
 ────────────────────
 
@@ -3821,11 +3821,11 @@ This is **NOT MANDATORY** as it requires to have an available namechange, which 
 
 exports[`toDiscord on every form > misc-faretta-waiver > empty, code tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
-**CASE NUMBER:** __##GJCR#####__
+**CASE NUMBER:** __##SCCR#####__
 ────────────────────
 **PLAINTIFF:** __THE PEOPLE OF THE STATE OF SAN ANDREAS__
 **DEFENDANT:** __FIRSTNAME LASTNAME__
@@ -3926,11 +3926,11 @@ __DATE__
 
 exports[`toDiscord on every form > misc-faretta-waiver > empty, plain-line tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
-**CASE NUMBER:** __##GJCR#####__
+**CASE NUMBER:** __##SCCR#####__
 ────────────────────
 **PLAINTIFF:** __THE PEOPLE OF THE STATE OF SAN ANDREAS__
 **DEFENDANT:** __FIRSTNAME LASTNAME__
@@ -4031,9 +4031,9 @@ __DATE__
 
 exports[`toDiscord on every form > misc-faretta-waiver > filled, code tables 1`] = `
 "────────────────────
-**SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:**
+**SAN ANDREAS COURT, COUNTY OF:**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 ────────────────────
 **CASE NUMBER:** __X\\<&>"1 X2__
 ────────────────────
@@ -4135,13 +4135,13 @@ __January 2, 2026__
 `;
 
 exports[`toDiscord on every form > misc-marriage-license-certificate > empty, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # __COUNTY OF LOS SANTOS__
 # CIVIL DIVISION
 
 ────────────────────
 \`\`\`
-┌──────────┐  )  Court File: --GJCC-----
+┌──────────┐  )  Court File: --SCCC-----
 │ John Doe │  )
 │ (Spouse) │  )  ┌─────────────────────┐
 │          │  )  │ LICENSE OF MARRIAGE │
@@ -4198,7 +4198,7 @@ I, THE UNDERSIGNED, DECLARE UNDER PENALTY OF PERJURY UNDER THE LAWS OF THE STATE
 
 **[15]** The marriage has taken place on DAY, MONTH, YEAR, in the city and county of Los Santos.
 
-**[16]** The full name of the person solemnizing marriage is NAME SURNAME (JUDGE), under the official title of Judge of the Superior Court of San Andreas.
+**[16]** The full name of the person solemnizing marriage is NAME SURNAME (JUDGE), under the official title of Judge of the SAN ANDREAS COURT.
 
 ────────────────────
 **VI. NEW NAMES**
@@ -4210,11 +4210,11 @@ I, THE UNDERSIGNED, DECLARE UNDER PENALTY OF PERJURY UNDER THE LAWS OF THE STATE
 ────────────────────
 **VII. REGISTRY**
 
-**[19]** This document is accepted for registration on DAY MONTH YEAR, offered a copy to the parties and the original stored in the Greg E. Joplin Courthouse archive, by the local registrar, authorized by the Court Clerk, Mary Anne Hopkins."
+**[19]** This document is accepted for registration on DAY MONTH YEAR, offered a copy to the parties and the original stored in the Superior Court archive, by the local registrar, authorized by the Court Clerk, Mary Anne Hopkins."
 `;
 
 exports[`toDiscord on every form > misc-marriage-license-certificate > empty, plain-line tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # __COUNTY OF LOS SANTOS__
 # CIVIL DIVISION
 
@@ -4227,7 +4227,7 @@ John Doe
 Jane Doe
 **(Spouse)**
 ────────────────────
-Court File: --GJCC-----
+Court File: --SCCC-----
 
 ────────────────────
 **LICENSE OF MARRIAGE**
@@ -4282,7 +4282,7 @@ I, THE UNDERSIGNED, DECLARE UNDER PENALTY OF PERJURY UNDER THE LAWS OF THE STATE
 
 **[15]** The marriage has taken place on DAY, MONTH, YEAR, in the city and county of Los Santos.
 
-**[16]** The full name of the person solemnizing marriage is NAME SURNAME (JUDGE), under the official title of Judge of the Superior Court of San Andreas.
+**[16]** The full name of the person solemnizing marriage is NAME SURNAME (JUDGE), under the official title of Judge of the SAN ANDREAS COURT.
 
 ────────────────────
 **VI. NEW NAMES**
@@ -4294,11 +4294,11 @@ I, THE UNDERSIGNED, DECLARE UNDER PENALTY OF PERJURY UNDER THE LAWS OF THE STATE
 ────────────────────
 **VII. REGISTRY**
 
-**[19]** This document is accepted for registration on DAY MONTH YEAR, offered a copy to the parties and the original stored in the Greg E. Joplin Courthouse archive, by the local registrar, authorized by the Court Clerk, Mary Anne Hopkins."
+**[19]** This document is accepted for registration on DAY MONTH YEAR, offered a copy to the parties and the original stored in the Superior Court archive, by the local registrar, authorized by the Court Clerk, Mary Anne Hopkins."
 `;
 
 exports[`toDiscord on every form > misc-marriage-license-certificate > filled, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # __COUNTY OF LOS SANTOS__
 # CIVIL DIVISION
 
@@ -4361,7 +4361,7 @@ I, THE UNDERSIGNED, DECLARE UNDER PENALTY OF PERJURY UNDER THE LAWS OF THE STATE
 
 **[15]** The marriage has taken place on 2, January, 2026, in the city and county of Los Santos.
 
-**[16]** The full name of the person solemnizing marriage is X\\<&>"1 X2 (JUDGE), under the official title of Judge of the Superior Court of San Andreas.
+**[16]** The full name of the person solemnizing marriage is X\\<&>"1 X2 (JUDGE), under the official title of Judge of the SAN ANDREAS COURT.
 
 ────────────────────
 **VI. NEW NAMES**
@@ -4373,17 +4373,17 @@ I, THE UNDERSIGNED, DECLARE UNDER PENALTY OF PERJURY UNDER THE LAWS OF THE STATE
 ────────────────────
 **VII. REGISTRY**
 
-**[19]** This document is accepted for registration on 2 January 2026, offered a copy to the parties and the original stored in the Greg E. Joplin Courthouse archive, by the local registrar, authorized by the Court Clerk, Mary Anne Hopkins."
+**[19]** This document is accepted for registration on 2 January 2026, offered a copy to the parties and the original stored in the Superior Court archive, by the local registrar, authorized by the Court Clerk, Mary Anne Hopkins."
 `;
 
 exports[`toDiscord on every form > misc-order-decree > empty, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # DIVISION
 https://i.ibb.co/zQMVtSr/150x150court.png
 ────────────────────
 \`\`\`
-┌────────────────────┐  )  Court File: YYGJXX#####
+┌────────────────────┐  )  Court File: YYSCXX#####
 │ PLAINTIFF NAME(S), │  )
 │ Plaintiff(s),      │  )  ┌─────────────┐
 │                    │  )  │ ORDER TITLE │
@@ -4404,12 +4404,12 @@ It is hereby **ORDERED**:
 
 **SO ORDERED.**
 */s/ JUDGE NAME*
-Superior Court of the State of San Andreas
+SAN ANDREAS COURT
 County of Los Santos"
 `;
 
 exports[`toDiscord on every form > misc-order-decree > empty, plain-line tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # DIVISION
 https://i.ibb.co/zQMVtSr/150x150court.png
@@ -4421,7 +4421,7 @@ PLAINTIFF NAME(S),
 DEFENDANT NAME(S),
 **Defendant(s)**.
 ────────────────────
-Court File: YYGJXX#####
+Court File: YYSCXX#####
 
 ────────────────────
 **ORDER TITLE**
@@ -4437,12 +4437,12 @@ It is hereby **ORDERED**:
 
 **SO ORDERED.**
 */s/ JUDGE NAME*
-Superior Court of the State of San Andreas
+SAN ANDREAS COURT
 County of Los Santos"
 `;
 
 exports[`toDiscord on every form > misc-order-decree > filled, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # **COUNTY OF LOS SANTOS**
 # CRIMINAL DIVISION
 https://i.ibb.co/zQMVtSr/150x150court.png
@@ -4505,7 +4505,7 @@ It is hereby **ORDERED**:
 
 **SO ORDERED.**
 */s/ X\\<&>"1 X2 X\\<&>"1 X2*
-Superior Court of the State of San Andreas
+SAN ANDREAS COURT
 County of Los Santos"
 `;
 
@@ -4549,8 +4549,8 @@ exports[`toDiscord on every form > small-claims-defendants-response > empty, cod
 "────────────────────
 ### **Defendant's Response**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
-CASE NUMBER: __YYGJSM#####__
+COURTHOUSE NAME: __SUPERIOR COURT__
+CASE NUMBER: __YYSCSM#####__
 FILING DATE: __DD/MMM/YYYY__
 PLAINTIFF: __INSERT NAME__
 DEFENDANT: __INSERT NAME__
@@ -4582,8 +4582,8 @@ exports[`toDiscord on every form > small-claims-defendants-response > empty, pla
 "────────────────────
 ### **Defendant's Response**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
-CASE NUMBER: __YYGJSM#####__
+COURTHOUSE NAME: __SUPERIOR COURT__
+CASE NUMBER: __YYSCSM#####__
 FILING DATE: __DD/MMM/YYYY__
 PLAINTIFF: __INSERT NAME__
 DEFENDANT: __INSERT NAME__
@@ -4615,7 +4615,7 @@ exports[`toDiscord on every form > small-claims-defendants-response > filled, co
 "────────────────────
 ### **Defendant's Response**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 CASE NUMBER: __X\\<&>"1 X2__
 FILING DATE: __02/JAN/2026__
 PLAINTIFF: __X\\<&>"1 X2__
@@ -4663,8 +4663,8 @@ exports[`toDiscord on every form > small-claims-notice-of-entry-of-judgment > em
 "────────────────────
 ### **Notice of Entry of Judgment**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
-CASE NUMBER: __YYGJSM#####__
+COURTHOUSE NAME: __SUPERIOR COURT__
+CASE NUMBER: __YYSCSM#####__
 FILING DATE: __DD/MMM/YYYY__
 PLAINTIFF: __INSERT NAME__
 DEFENDANT: __INSERT NAME__
@@ -4686,8 +4686,8 @@ exports[`toDiscord on every form > small-claims-notice-of-entry-of-judgment > em
 "────────────────────
 ### **Notice of Entry of Judgment**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
-CASE NUMBER: __YYGJSM#####__
+COURTHOUSE NAME: __SUPERIOR COURT__
+CASE NUMBER: __YYSCSM#####__
 FILING DATE: __DD/MMM/YYYY__
 PLAINTIFF: __INSERT NAME__
 DEFENDANT: __INSERT NAME__
@@ -4709,7 +4709,7 @@ exports[`toDiscord on every form > small-claims-notice-of-entry-of-judgment > fi
 "────────────────────
 ### **Notice of Entry of Judgment**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 CASE NUMBER: __X\\<&>"1 X2__
 FILING DATE: __02/JAN/2026__
 PLAINTIFF: __X\\<&>"1 X2__
@@ -4735,14 +4735,14 @@ exports[`toDiscord on every form > small-claims-notice-of-trial > empty, code ta
 "────────────────────
 ### **Notice of Trial**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
-CASE NUMBER: __YYGJSM#####__
+COURTHOUSE NAME: __SUPERIOR COURT__
+CASE NUMBER: __YYSCSM#####__
 FILING DATE: __DD/MMM/YYYY__
 PLAINTIFF: __INSERT NAME__
 DEFENDANT: __INSERT NAME__
 ────────────────────
 ### **Notice to the plaintiff and defendant:**
-The trial date has been set for DD/MMM/YYY, HH:MM at the Greg E. Joplin Court House. If you are calling a crucial witness, it is your responsibility to notify them. If your witness fails to appear, the court may decide to proceed without them. If you fail to appear, the court may decide to rule in favor of the other party. You must inform the court as soon as possible if you cannot make it to trial.
+The trial date has been set for DD/MMM/YYY, HH:MM at the Superior Court. If you are calling a crucial witness, it is your responsibility to notify them. If your witness fails to appear, the court may decide to proceed without them. If you fail to appear, the court may decide to rule in favor of the other party. You must inform the court as soon as possible if you cannot make it to trial.
 
 Signed by:
 *Judge Insert Name*
@@ -4753,14 +4753,14 @@ exports[`toDiscord on every form > small-claims-notice-of-trial > empty, plain-l
 "────────────────────
 ### **Notice of Trial**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
-CASE NUMBER: __YYGJSM#####__
+COURTHOUSE NAME: __SUPERIOR COURT__
+CASE NUMBER: __YYSCSM#####__
 FILING DATE: __DD/MMM/YYYY__
 PLAINTIFF: __INSERT NAME__
 DEFENDANT: __INSERT NAME__
 ────────────────────
 ### **Notice to the plaintiff and defendant:**
-The trial date has been set for DD/MMM/YYY, HH:MM at the Greg E. Joplin Court House. If you are calling a crucial witness, it is your responsibility to notify them. If your witness fails to appear, the court may decide to proceed without them. If you fail to appear, the court may decide to rule in favor of the other party. You must inform the court as soon as possible if you cannot make it to trial.
+The trial date has been set for DD/MMM/YYY, HH:MM at the Superior Court. If you are calling a crucial witness, it is your responsibility to notify them. If your witness fails to appear, the court may decide to proceed without them. If you fail to appear, the court may decide to rule in favor of the other party. You must inform the court as soon as possible if you cannot make it to trial.
 
 Signed by:
 *Judge Insert Name*
@@ -4771,14 +4771,14 @@ exports[`toDiscord on every form > small-claims-notice-of-trial > filled, code t
 "────────────────────
 ### **Notice of Trial**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 CASE NUMBER: __X\\<&>"1 X2__
 FILING DATE: __02/JAN/2026__
 PLAINTIFF: __X\\<&>"1 X2__
 DEFENDANT: __X\\<&>"1 X2__
 ────────────────────
 ### **Notice to the plaintiff and defendant:**
-The trial date has been set for 02/JAN/2026, X\\<&>"1 X2 at the Greg E. Joplin Court House. If you are calling a crucial witness, it is your responsibility to notify them. If your witness fails to appear, the court may decide to proceed without them. If you fail to appear, the court may decide to rule in favor of the other party. You must inform the court as soon as possible if you cannot make it to trial.
+The trial date has been set for 02/JAN/2026, X\\<&>"1 X2 at the Superior Court. If you are calling a crucial witness, it is your responsibility to notify them. If your witness fails to appear, the court may decide to proceed without them. If you fail to appear, the court may decide to rule in favor of the other party. You must inform the court as soon as possible if you cannot make it to trial.
 
 Signed by:
 *Judge X\\<&>"1 X2*
@@ -4787,10 +4787,10 @@ Signed by:
 
 exports[`toDiscord on every form > small-claims-plaintiffs-claim-and-order-to-go-to-court > empty, code tables 1`] = `
 "────────────────────
-### **Plaintiff's Claim and ORDER to Go to Small Claims Court**
+### **Plaintiff's Claim and ORDER to Go to San Andreas Small Claims Court**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
-CASE NUMBER: __YYGJSM#####__
+COURTHOUSE NAME: __SUPERIOR COURT__
+CASE NUMBER: __YYSCSM#####__
 FILING DATE: __DD/MMM/YYYY__
 PLAINTIFF: __INSERT NAME__
 DEFENDANT: __INSERT NAME__
@@ -4798,7 +4798,7 @@ DEFENDANT: __INSERT NAME__
 ### **Instructions for the person suing:**
 - You are the plaintiff. The person you are suing is the defendant.
 - The monetary restitution requested in step three cannot exceed $75,000.
-- You must pay the filing fee to routing number 0200 0007 2 before you submit this complaint with the court. The title of the transfer must be the case number and "filing fee" - for example "26GJSM00001 filing fee". You need to submit proof of payment in section 4. If no proof of payment is attached, your claim may be dismissed and if you paid the filing fee, it will not be returned to you. The filing fee is 10% of the amount you request in section 3, but it cannot be lower than $3,000. If you mistakenly pay a higher filing fee than required, the difference will not be returned to you.
+- You must pay the filing fee to routing number 0200 0007 2 before you submit this complaint with the court. The title of the transfer must be the case number and "filing fee" - for example "90SCSM00001 filing fee". You need to submit proof of payment in section 4. If no proof of payment is attached, your claim may be dismissed and if you paid the filing fee, it will not be returned to you. The filing fee is 10% of the amount you request in section 3, but it cannot be lower than $3,000. If you mistakenly pay a higher filing fee than required, the difference will not be returned to you.
 - Any relevant evidence you have must be included in section 5 of this complaint.
 - After you submit this complaint, you need to reach out to >Los Santos Sheriff's Department Court Services Bureau\\< and request that they serve the defendant. You need to show the court proof of you reaching out to Court Services by submitting a >proof of service request form\\< (( as a response to this court thread )). If you fail do this within 24 hours, your claim will be dismissed and your filing fee will not be returned to you.
 - You and the defendant must go to court on the trial date once set. If you do not go to court, you may lose the case, and you will not be able to refile your claim.
@@ -4868,10 +4868,10 @@ I, *Insert Name*, affirm that the above-stated facts are true and accurate to th
 
 exports[`toDiscord on every form > small-claims-plaintiffs-claim-and-order-to-go-to-court > empty, plain-line tables 1`] = `
 "────────────────────
-### **Plaintiff's Claim and ORDER to Go to Small Claims Court**
+### **Plaintiff's Claim and ORDER to Go to San Andreas Small Claims Court**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
-CASE NUMBER: __YYGJSM#####__
+COURTHOUSE NAME: __SUPERIOR COURT__
+CASE NUMBER: __YYSCSM#####__
 FILING DATE: __DD/MMM/YYYY__
 PLAINTIFF: __INSERT NAME__
 DEFENDANT: __INSERT NAME__
@@ -4879,7 +4879,7 @@ DEFENDANT: __INSERT NAME__
 ### **Instructions for the person suing:**
 - You are the plaintiff. The person you are suing is the defendant.
 - The monetary restitution requested in step three cannot exceed $75,000.
-- You must pay the filing fee to routing number 0200 0007 2 before you submit this complaint with the court. The title of the transfer must be the case number and "filing fee" - for example "26GJSM00001 filing fee". You need to submit proof of payment in section 4. If no proof of payment is attached, your claim may be dismissed and if you paid the filing fee, it will not be returned to you. The filing fee is 10% of the amount you request in section 3, but it cannot be lower than $3,000. If you mistakenly pay a higher filing fee than required, the difference will not be returned to you.
+- You must pay the filing fee to routing number 0200 0007 2 before you submit this complaint with the court. The title of the transfer must be the case number and "filing fee" - for example "90SCSM00001 filing fee". You need to submit proof of payment in section 4. If no proof of payment is attached, your claim may be dismissed and if you paid the filing fee, it will not be returned to you. The filing fee is 10% of the amount you request in section 3, but it cannot be lower than $3,000. If you mistakenly pay a higher filing fee than required, the difference will not be returned to you.
 - Any relevant evidence you have must be included in section 5 of this complaint.
 - After you submit this complaint, you need to reach out to >Los Santos Sheriff's Department Court Services Bureau\\< and request that they serve the defendant. You need to show the court proof of you reaching out to Court Services by submitting a >proof of service request form\\< (( as a response to this court thread )). If you fail do this within 24 hours, your claim will be dismissed and your filing fee will not be returned to you.
 - You and the defendant must go to court on the trial date once set. If you do not go to court, you may lose the case, and you will not be able to refile your claim.
@@ -4949,9 +4949,9 @@ I, *Insert Name*, affirm that the above-stated facts are true and accurate to th
 
 exports[`toDiscord on every form > small-claims-plaintiffs-claim-and-order-to-go-to-court > filled, code tables 1`] = `
 "────────────────────
-### **Plaintiff's Claim and ORDER to Go to Small Claims Court**
+### **Plaintiff's Claim and ORDER to Go to San Andreas Small Claims Court**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 CASE NUMBER: __X\\<&>"1 X2__
 FILING DATE: __02/JAN/2026__
 PLAINTIFF: __X\\<&>"1 X2__
@@ -4960,7 +4960,7 @@ DEFENDANT: __X\\<&>"1 X2__
 ### **Instructions for the person suing:**
 - You are the plaintiff. The person you are suing is the defendant.
 - The monetary restitution requested in step three cannot exceed $75,000.
-- You must pay the filing fee to routing number 0200 0007 2 before you submit this complaint with the court. The title of the transfer must be the case number and "filing fee" - for example "26GJSM00001 filing fee". You need to submit proof of payment in section 4. If no proof of payment is attached, your claim may be dismissed and if you paid the filing fee, it will not be returned to you. The filing fee is 10% of the amount you request in section 3, but it cannot be lower than $3,000. If you mistakenly pay a higher filing fee than required, the difference will not be returned to you.
+- You must pay the filing fee to routing number 0200 0007 2 before you submit this complaint with the court. The title of the transfer must be the case number and "filing fee" - for example "90SCSM00001 filing fee". You need to submit proof of payment in section 4. If no proof of payment is attached, your claim may be dismissed and if you paid the filing fee, it will not be returned to you. The filing fee is 10% of the amount you request in section 3, but it cannot be lower than $3,000. If you mistakenly pay a higher filing fee than required, the difference will not be returned to you.
 - Any relevant evidence you have must be included in section 5 of this complaint.
 - After you submit this complaint, you need to reach out to >Los Santos Sheriff's Department Court Services Bureau\\< and request that they serve the defendant. You need to show the court proof of you reaching out to Court Services by submitting a >proof of service request form\\< (( as a response to this court thread )). If you fail do this within 24 hours, your claim will be dismissed and your filing fee will not be returned to you.
 - You and the defendant must go to court on the trial date once set. If you do not go to court, you may lose the case, and you will not be able to refile your claim.
@@ -5065,8 +5065,8 @@ exports[`toDiscord on every form > small-claims-proof-of-service-request > empty
 "────────────────────
 ### **Proof of Service Request**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
-CASE NUMBER: __YYGJSM#####__
+COURTHOUSE NAME: __SUPERIOR COURT__
+CASE NUMBER: __YYSCSM#####__
 FILING DATE: __DD/MMM/YYYY__
 PLAINTIFF: __INSERT NAME__
 DEFENDANT: __INSERT NAME__
@@ -5083,8 +5083,8 @@ exports[`toDiscord on every form > small-claims-proof-of-service-request > empty
 "────────────────────
 ### **Proof of Service Request**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
-CASE NUMBER: __YYGJSM#####__
+COURTHOUSE NAME: __SUPERIOR COURT__
+CASE NUMBER: __YYSCSM#####__
 FILING DATE: __DD/MMM/YYYY__
 PLAINTIFF: __INSERT NAME__
 DEFENDANT: __INSERT NAME__
@@ -5101,7 +5101,7 @@ exports[`toDiscord on every form > small-claims-proof-of-service-request > fille
 "────────────────────
 ### **Proof of Service Request**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 CASE NUMBER: __X\\<&>"1 X2__
 FILING DATE: __02/JAN/2026__
 PLAINTIFF: __X\\<&>"1 X2__
@@ -5121,8 +5121,8 @@ exports[`toDiscord on every form > small-claims-request-to-dismiss-case > empty,
 "────────────────────
 ### **Request to Dismiss Small Claims Case**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
-CASE NUMBER: __YYGJSM#####__
+COURTHOUSE NAME: __SUPERIOR COURT__
+CASE NUMBER: __YYSCSM#####__
 FILING DATE: __DD/MMM/YYYY__
 PLAINTIFF: __INSERT NAME__
 DEFENDANT: __INSERT NAME__
@@ -5143,8 +5143,8 @@ exports[`toDiscord on every form > small-claims-request-to-dismiss-case > empty,
 "────────────────────
 ### **Request to Dismiss Small Claims Case**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
-CASE NUMBER: __YYGJSM#####__
+COURTHOUSE NAME: __SUPERIOR COURT__
+CASE NUMBER: __YYSCSM#####__
 FILING DATE: __DD/MMM/YYYY__
 PLAINTIFF: __INSERT NAME__
 DEFENDANT: __INSERT NAME__
@@ -5165,7 +5165,7 @@ exports[`toDiscord on every form > small-claims-request-to-dismiss-case > filled
 "────────────────────
 ### **Request to Dismiss Small Claims Case**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 CASE NUMBER: __X\\<&>"1 X2__
 FILING DATE: __02/JAN/2026__
 PLAINTIFF: __X\\<&>"1 X2__
@@ -5187,9 +5187,9 @@ exports[`toDiscord on every form > small-claims-writ-of-execution > empty, code 
 "────────────────────
 ### **Writ of Execution**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
-CASE NUMBER: __YYGJSM#####__
-ORIGINAL CASE NUMBER: __YYGJSM#####__
+COURTHOUSE NAME: __SUPERIOR COURT__
+CASE NUMBER: __YYSCSM#####__
+ORIGINAL CASE NUMBER: __YYSCSM#####__
 FILING DATE: __DD/MMM/YYYY__
 PLAINTIFF: __INSERT NAME__
 DEFENDANT: __INSERT NAME__
@@ -5221,9 +5221,9 @@ exports[`toDiscord on every form > small-claims-writ-of-execution > empty, plain
 "────────────────────
 ### **Writ of Execution**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
-CASE NUMBER: __YYGJSM#####__
-ORIGINAL CASE NUMBER: __YYGJSM#####__
+COURTHOUSE NAME: __SUPERIOR COURT__
+CASE NUMBER: __YYSCSM#####__
+ORIGINAL CASE NUMBER: __YYSCSM#####__
 FILING DATE: __DD/MMM/YYYY__
 PLAINTIFF: __INSERT NAME__
 DEFENDANT: __INSERT NAME__
@@ -5255,7 +5255,7 @@ exports[`toDiscord on every form > small-claims-writ-of-execution > filled, code
 "────────────────────
 ### **Writ of Execution**
 BRANCH NAME: __LOS SANTOS__
-COURTHOUSE NAME: __GREG E JOPLIN__
+COURTHOUSE NAME: __SUPERIOR COURT__
 CASE NUMBER: __X\\<&>"1 X2__
 ORIGINAL CASE NUMBER: __X\\<&>"1 X2__
 FILING DATE: __02/JAN/2026__
@@ -5289,7 +5289,7 @@ Judge's signature:
 
 exports[`toDiscord on every form > supreme-judgement > empty, code tables 1`] = `
 "────────────────────
-**SUPREME COURT OF SAN ANDREAS**
+**SAN ANDREAS SUPREME COURT**
 ────────────────────
 **CASE NUMBER:** __YYSCWC#####__
 ────────────────────
@@ -5319,7 +5319,7 @@ __SIGNATURE__
 
 exports[`toDiscord on every form > supreme-judgement > empty, plain-line tables 1`] = `
 "────────────────────
-**SUPREME COURT OF SAN ANDREAS**
+**SAN ANDREAS SUPREME COURT**
 ────────────────────
 **CASE NUMBER:** __YYSCWC#####__
 ────────────────────
@@ -5349,7 +5349,7 @@ __SIGNATURE__
 
 exports[`toDiscord on every form > supreme-judgement > filled, code tables 1`] = `
 "────────────────────
-**SUPREME COURT OF SAN ANDREAS**
+**SAN ANDREAS SUPREME COURT**
 ────────────────────
 **CASE NUMBER:** __X\\<&>"1 X2__
 ────────────────────
@@ -5396,7 +5396,7 @@ exports[`toDiscord on every form > supreme-writ-of-certiorari > empty, code tabl
 ────────────────────
 **I. CAUSES OF ACTION**
 
-In this Petition to the Supreme Court, **Appellant** alleges that an error in judgement has been undertaken by a ruling decreed by the Appellate Court of San Andreas on **DAY/MONTH/YEAR** in regards to a **Insert Court Division (IE: Criminal, Civil, Traffic)** violation, that is henceforth requiring immediate judicial relief in regards to the following causes of action:
+In this Petition to the Supreme Court, **Appellant** alleges that an error in judgement has been undertaken by a ruling decreed by the SAN ANDREAS APPELLATE COURT on **DAY/MONTH/YEAR** in regards to a **Insert Court Division (IE: Criminal, Civil, Traffic)** violation, that is henceforth requiring immediate judicial relief in regards to the following causes of action:
 
 - [-] - Misinterpretation of Legal Principle
 - [-] - Contradiction of Legal Principle
@@ -5450,7 +5450,7 @@ Court File: YYSCWC#####
 ────────────────────
 **I. CAUSES OF ACTION**
 
-In this Petition to the Supreme Court, **Appellant** alleges that an error in judgement has been undertaken by a ruling decreed by the Appellate Court of San Andreas on **DAY/MONTH/YEAR** in regards to a **Insert Court Division (IE: Criminal, Civil, Traffic)** violation, that is henceforth requiring immediate judicial relief in regards to the following causes of action:
+In this Petition to the Supreme Court, **Appellant** alleges that an error in judgement has been undertaken by a ruling decreed by the SAN ANDREAS APPELLATE COURT on **DAY/MONTH/YEAR** in regards to a **Insert Court Division (IE: Criminal, Civil, Traffic)** violation, that is henceforth requiring immediate judicial relief in regards to the following causes of action:
 
 - [-] - Misinterpretation of Legal Principle
 - [-] - Contradiction of Legal Principle
@@ -5499,7 +5499,7 @@ exports[`toDiscord on every form > supreme-writ-of-certiorari > filled, code tab
 ────────────────────
 **I. CAUSES OF ACTION**
 
-In this Petition to the Supreme Court, **Appellant** alleges that an error in judgement has been undertaken by a ruling decreed by the Appellate Court of San Andreas on **02/JAN/2026** in regards to a **Criminal** violation, that is henceforth requiring immediate judicial relief in regards to the following causes of action:
+In this Petition to the Supreme Court, **Appellant** alleges that an error in judgement has been undertaken by a ruling decreed by the SAN ANDREAS APPELLATE COURT on **02/JAN/2026** in regards to a **Criminal** violation, that is henceforth requiring immediate judicial relief in regards to the following causes of action:
 
 - [X] - Misinterpretation of Legal Principle
 - [X] - Contradiction of Legal Principle
@@ -5542,7 +5542,7 @@ I, **X\\<&>"1 X2**, affirm that the above-stated facts are true and accurate to 
 `;
 
 exports[`toDiscord on every form > traffic-complaint-petition > empty, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # __COUNTY OF LOS SANTOS__
 # TRAFFIC DIVISION
 
@@ -5585,7 +5585,7 @@ I, **Insert Name**, affirm that the above-stated facts are true and accurate to 
 `;
 
 exports[`toDiscord on every form > traffic-complaint-petition > empty, plain-line tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # __COUNTY OF LOS SANTOS__
 # TRAFFIC DIVISION
 
@@ -5633,7 +5633,7 @@ I, **Insert Name**, affirm that the above-stated facts are true and accurate to 
 `;
 
 exports[`toDiscord on every form > traffic-complaint-petition > filled, code tables 1`] = `
-"# **SUPERIOR COURT OF THE STATE OF SAN ANDREAS**
+"# **SAN ANDREAS COURT**
 # __COUNTY OF LOS SANTOS__
 # TRAFFIC DIVISION
 

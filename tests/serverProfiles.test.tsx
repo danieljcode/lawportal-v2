@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 // UI integration tests for the server-profile feature (FEAT-002): the toolbar
-// server toggle, FormView date offsets and court-name mapping, Sidebar mapped
+// server toggle, FormView date offsets, FreestyleRP court names from the data, Sidebar
 // headings, and the Characters dialog Server select.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
@@ -120,23 +120,11 @@ describe("Toolbar server toggle", () => {
 
 /* ---------- Sidebar court headings ---------- */
 
-describe("Sidebar with server profiles", () => {
-  const sidebarProps = (server: typeof SERVERS.gtaw): SidebarProps => ({
-    forms: ALL_FORMS,
-    current: null,
-    commissioner: false,
-    server,
-  });
+describe("Sidebar court headings", () => {
+  const sidebarProps: SidebarProps = { forms: ALL_FORMS, current: null, commissioner: false };
 
-  it("shows original court headings for gtaw", () => {
-    act(() => root.render(createElement(Sidebar, sidebarProps(SERVERS.gtaw))));
-    const summaries = [...document.querySelectorAll("#form-list summary")].map((s) => s.textContent);
-    expect(summaries).toContain("Superior Court of San Andreas - Criminal Division");
-    expect(summaries).toContain("Miscellaneous");
-  });
-
-  it("shows mapped court headings for freestyle", () => {
-    act(() => root.render(createElement(Sidebar, sidebarProps(SERVERS.freestyle))));
+  it("shows FreestyleRP court headings straight from the form data (LP-69)", () => {
+    act(() => root.render(createElement(Sidebar, sidebarProps)));
     const summaries = [...document.querySelectorAll("#form-list summary")].map((s) => s.textContent);
     expect(summaries).toContain("San Andreas Criminal Court");
     expect(summaries).toContain("San Andreas Civil Court");
@@ -181,13 +169,13 @@ describe("FormView with server profiles", () => {
     expect(must("#form-crumb").textContent).toContain("San Andreas Civil Court");
   });
 
-  it("renders original court phrase for gtaw", () => {
+  it("shows the same FreestyleRP wording on gtaw: there's no translation step left (LP-69)", () => {
     const { getOutput } = mountForm(SERVERS.gtaw, "civil-complaint");
     const o = getOutput();
     expect(o).not.toBeNull();
-    expect(o!.finalHtml).toContain("SUPERIOR COURT OF THE STATE OF SAN ANDREAS");
-    // Breadcrumb shows original court.
-    expect(must("#form-crumb").textContent).toContain("Superior Court of San Andreas - Civil Division");
+    expect(o!.finalHtml).toContain("SAN ANDREAS COURT");
+    expect(o!.finalHtml).not.toContain("SUPERIOR COURT OF THE STATE OF SAN ANDREAS");
+    expect(must("#form-crumb").textContent).toContain("San Andreas Civil Court");
   });
 
   // Case numbers now start EMPTY in the editor; the server-aware pattern is the input

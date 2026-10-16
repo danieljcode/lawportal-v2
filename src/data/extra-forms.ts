@@ -11,7 +11,7 @@ const TABLE_OPEN =
 const TABLE_CLOSE = "</tbody>\n</table>\n";
 
 const COURT_LINE =
-  '<p style="text-align:center"><strong>{{Court|SUPERIOR COURT OF THE STATE OF SAN ANDREAS, COUNTY OF LOS SANTOS}}</strong></p>\n';
+  '<p style="text-align:center"><strong>{{Court|SAN ANDREAS COURT, COUNTY OF LOS SANTOS}}</strong></p>\n';
 
 const CASE_NO = "Case No. {{Case number|__________}}";
 

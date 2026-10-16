@@ -294,7 +294,7 @@ export default function App() {
         )}
         {/* "with-output" adds the third grid column (form preview or J.A.P. output). */}
         <div className={"layout" + (showOutput ? " with-output" : "")}>
-          <Sidebar forms={ALL_FORMS} current={current} commissioner={commissioner} server={server} />
+          <Sidebar forms={ALL_FORMS} current={current} commissioner={commissioner} />
           <main className="editor" id="editor" ref={editorRef}>
             {route.kind === "form" && form ? (
               <FormView

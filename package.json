@@ -10,7 +10,7 @@
     "start": "next start -H 127.0.0.1",
     "start:lan": "node scripts/run-lan.mjs start",
     "test": "vitest run",
-    "port-forms": "node scripts/port-forms.mjs",
+    "port-forms": "node --experimental-strip-types --no-warnings scripts/port-forms.mjs",
     "screenshots": "node scripts/screenshots.mjs",
     "smoke:preview": "node scripts/preview-smoke.mjs",
     "release-notes": "node --experimental-strip-types --no-warnings scripts/release-notes.mjs"

@@ -25,7 +25,6 @@ import type {
   Tree,
   Values,
 } from "./types";
-import { withCourthouse } from "./courts";
 
 export const TYPES: readonly FieldType[] = [
   "text",
@@ -344,8 +343,8 @@ export function prefillValue(f: Field, now?: Date, lookup?: Lookup): string {
 
 /**
  * The display pattern for a case-number field: 2-digit year + courthouse +
- * division + number (src/lib/courts.ts). The form's own courthouse code is
- * replaced with ours, then the `prefill` is expanded the same way
+ * division + number (src/lib/courts.ts; port-forms writes the courthouse into
+ * each form's prefill, e.g. `YYSCCR00XXX`). The `prefill` is expanded the same way
  * `prefillValue` does (`^YY` → 2-digit year of `now`, which callers pass as the
  * server date; `<Label?A=x;B=y>` → the code for another field's current value)
  * but, unlike `prefillValue`, when the `<Division?…>` lookup misses it falls
@@ -356,7 +355,7 @@ export function prefillValue(f: Field, now?: Date, lookup?: Lookup): string {
 export function caseNumberPattern(f: Field, now: Date | undefined, lookup?: Lookup): string {
   if (!f.prefill) return "";
   const when = now || new Date();
-  return withCourthouse(f.prefill)
+  return f.prefill
     .replace(/^YY/, String(when.getUTCFullYear()).slice(-2))
     .replace(/<([^?>]+)\?([^>]*)>/g, (_m, label: string, map: string) => {
       const pairs = map
