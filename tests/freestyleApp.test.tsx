@@ -193,6 +193,36 @@ describe("App without a server choice (LP-70)", () => {
     expect(must("#form-crumb").textContent).toContain("San Andreas Civil Court");
   });
 
+  it("on load, drops the old server field from saved characters and deletes the saved default (LP-71)", () => {
+    localStorage.setItem(
+      "lawapp_chars",
+      JSON.stringify([
+        { id: "oldchar1", name: "Old Gtaw", title: "Judge", server: "gtaw" },
+        { id: "oldchar2", name: "Old Free", server: "freestyle" },
+      ]),
+    );
+    localStorage.setItem("lawapp_server", "gtaw");
+    mountApp();
+    expect(localStorage.getItem("lawapp_server")).toBeNull();
+    const stored = JSON.parse(localStorage.getItem("lawapp_chars")!) as Array<Record<string, unknown>>;
+    expect(stored).toEqual([
+      { id: "oldchar1", name: "Old Gtaw", title: "Judge" },
+      { id: "oldchar2", name: "Old Free" },
+    ]);
+  });
+
+  it("opens a draft saved with GTAW values: the values stay, the form shows the new wording (LP-71)", () => {
+    localStorage.setItem(
+      "lawapp_draft_criminal-case-schedule",
+      JSON.stringify({ values: { Courthouse: "GREG E JOPLIN", "Case number": "26GJCR00147" }, autofilled: {}, derived: {} }),
+    );
+    mountApp();
+    go("#criminal-case-schedule");
+    expect(must<HTMLSelectElement>("#f-courthouse").value).toBe("GREG E JOPLIN");
+    expect(must<HTMLInputElement>("#f-case-number").value).toBe("26GJCR00147");
+    expect(must("#form-crumb").textContent).toContain("San Andreas Criminal Court");
+  });
+
   it("the Characters dialog has no Server field, and a saved character has no server", () => {
     mountApp();
     click("#open-characters");
