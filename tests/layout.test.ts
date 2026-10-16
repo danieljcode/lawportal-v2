@@ -5,7 +5,7 @@ import { layout, segments, type LayoutItem } from "@/lib/formState";
 import { compile, fields } from "@/lib/template";
 import type { Entry } from "@/lib/types";
 import { refRenderSections, type ItemRecord, type SegmentRecord } from "./layoutOracle";
-import { hasOracle, refTemplate } from "./oracle";
+import { hasOracle, paritySuite, refTemplate } from "./oracle";
 
 function records(items: LayoutItem[]): ItemRecord[] {
   return items.map((it): ItemRecord => {
@@ -55,7 +55,7 @@ describe("segments", () => {
   });
 });
 
-describe.skipIf(!hasOracle)("layout parity with the reference loop", () => {
+describe.skipIf(!hasOracle)(paritySuite("layout parity with the reference loop"), () => {
   for (const id of ["criminal-arraignment", "civil-proof-of-service"]) {
     it(`${id} (has checklists)`, () => {
       const html = getForm(id)!.html;
