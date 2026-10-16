@@ -91,6 +91,23 @@ describe("Characters dialog", () => {
     expect($("#char-list")).toBeNull();
   });
 
+  it("offers Restore my version when a sync merge kept this browser's copy aside (LP-64)", () => {
+    act(() => root.unmount());
+    sync.__resetForTests();
+    localStorage.setItem(
+      sync.LOST_KEY,
+      JSON.stringify({ at: "2026-02-01T00:00:00.000Z", characters: [{ id: "char0001", name: "Kept Aside" }] }),
+    );
+    root = createRoot(container);
+    act(() => root.render(createElement(App)));
+    click("#open-characters");
+    expect(must("#sync-lost").textContent).toContain("Your version of 1 character was replaced");
+    click("#sync-restore");
+    expect($("#sync-lost")).toBeNull();
+    expect(characterStore().get("char0001")?.name).toBe("Kept Aside");
+    expect(must("#char-list").textContent).toContain("Kept Aside");
+  });
+
   it("has the 13 fields, needs a name, and the docket box follows the title", () => {
     click("#open-characters");
     click("#new-character");
@@ -221,12 +238,16 @@ describe("What's new", () => {
     expect(must("#changelog-list time").getAttribute("datetime")).toBe(CHANGELOG[0].date);
     expect([...document.querySelectorAll(".log-entry:first-child .log-type")].map((e) => e.textContent)).toEqual([
       "New",
-      "Updated",
+      "Fixed",
     ]);
     expect([...document.querySelectorAll(".log-entry:nth-child(2) .log-type")].map((e) => e.textContent)).toEqual([
       "New",
+      "Updated",
     ]);
     expect([...document.querySelectorAll(".log-entry:nth-child(3) .log-type")].map((e) => e.textContent)).toEqual([
+      "New",
+    ]);
+    expect([...document.querySelectorAll(".log-entry:nth-child(4) .log-type")].map((e) => e.textContent)).toEqual([
       "Updated",
     ]);
   });
