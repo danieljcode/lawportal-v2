@@ -44,7 +44,7 @@ export const FIELDS: readonly DocketField[] = [
   { key: "notes", label: "Notes", multiline: true },
 ];
 
-/** Litigation codes inside a case number (26GJCR00147 → CR). */
+/** Litigation codes inside a case number (90SCCR00147 → CR). */
 export const DIVISION_CODES: Readonly<Record<string, string>> = {
   CR: "CRIMINAL DIVISION",
   CC: "CIVIL DIVISION",

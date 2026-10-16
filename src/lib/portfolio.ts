@@ -7,6 +7,7 @@
 // is stored separately. The task texts, counts, colours and notes are the
 // court's requirements, transcribed from the reference js_portfolio.js.
 
+import { DEFAULT_COURTHOUSE } from "./courts";
 import type { Character, Portfolio, PortfolioEntry, PortfolioLevel } from "./types";
 import {
   createChannel,
@@ -51,12 +52,12 @@ export type TaskKind = "case" | "civil" | "AW" | "SW" | "ESW" | "transcript" | "
 
 export const KINDS: Readonly<Record<BaseKind, readonly KindField[]>> = {
   case: [
-    { key: "num", label: "Case number", ph: "XXGJCR00000" },
+    { key: "num", label: "Case number", ph: "XX" + DEFAULT_COURTHOUSE.code + "CR00000" },
     { key: "caption", label: "Case name", ph: "People of the State of San Andreas v. John Doe" },
     { key: "link", label: "Link", ph: "LINKTOCASE", url: true },
   ],
   civil: [
-    { key: "num", label: "Case number", ph: "XXGJCC00000" },
+    { key: "num", label: "Case number", ph: "XX" + DEFAULT_COURTHOUSE.code + "CC00000" },
     { key: "caption", label: "Case name", ph: "John Doe v. John Doe" },
     { key: "link", label: "Link", ph: "LINKTOCASE", url: true },
   ],
@@ -69,7 +70,7 @@ export const KINDS: Readonly<Record<BaseKind, readonly KindField[]>> = {
     { key: "link", label: "Transcript link", ph: "LINKTOTRANSCRIPTS", url: true },
   ],
   probation: [
-    { key: "num", label: "Case number", ph: "XXGJCR00000" },
+    { key: "num", label: "Case number", ph: "XX" + DEFAULT_COURTHOUSE.code + "CR00000" },
     { key: "caption", label: "Case name", ph: "People of the State of San Andreas v. John Doe" },
     { key: "link", label: "Case link", ph: "LINKTOCASE", url: true },
     { key: "discord", label: "Discord message link", ph: "LINKTODISCORDMESSAGE", url: true },

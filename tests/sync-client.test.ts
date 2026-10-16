@@ -150,7 +150,7 @@ describe("change tracking", () => {
     expect(calls).toHaveLength(1);
 
     const c = characterStore().save({ name: "Jane Doe" });
-    docketStore().save(c.id, { caseNumber: "26GJCR00001" });
+    docketStore().save(c.id, { caseNumber: "90SCCR00001" });
     expect(localStorage.getItem(sync.DIRTY_KEY)).toBe("1");
     expect(sync.getState().status).toBe("pending");
     await vi.advanceTimersByTimeAsync(699);
@@ -162,7 +162,7 @@ describe("change tracking", () => {
     expect(body.rev).toBe(0);
     expect(body.data.characters).toHaveLength(1);
     expect(body.data.characters[0]).toMatchObject({ id: c.id, name: "Jane Doe" });
-    expect((body.data.characters[0].dockets as Array<{ caseNumber: string }>)[0].caseNumber).toBe("26GJCR00001");
+    expect((body.data.characters[0].dockets as Array<{ caseNumber: string }>)[0].caseNumber).toBe("90SCCR00001");
 
     await vi.advanceTimersByTimeAsync(0);
     expect(localStorage.getItem(sync.DIRTY_KEY)).toBeNull();
@@ -200,7 +200,7 @@ describe("change tracking", () => {
           updated: "u5",
           data: {
             characters: [
-              { id: "srv00002", name: "Second", dockets: [{ caseNumber: "26GJCC00002" }] },
+              { id: "srv00002", name: "Second", dockets: [{ caseNumber: "90SCCC00002" }] },
               { id: "srv00001", name: "First", jap: { I: {}, II: {} } },
             ],
           },
@@ -211,7 +211,7 @@ describe("change tracking", () => {
     const before = sync.getState().applied;
     await sync.push();
     expect(names()).toEqual(["Second", "First", "Local Person"]);
-    expect(docketStore().list("srv00002")[0].caseNumber).toBe("26GJCC00002");
+    expect(docketStore().list("srv00002")[0].caseNumber).toBe("90SCCC00002");
     expect(calls).toHaveLength(2);
     expect(calls[1].body).toMatchObject({ rev: 5 });
     expect(pushedNames(calls[1])).toEqual(["Second", "First", "Local Person"]);

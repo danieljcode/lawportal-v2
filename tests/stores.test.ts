@@ -219,7 +219,7 @@ describe("characters", () => {
     chars.move(b.id, 1); // no-op at the bottom
     expect(chars.list().map((c) => c.id)).toEqual([a.id, copy.id, b.id]);
 
-    dockets.save(a.id, { caseNumber: "26GJCR00001" });
+    dockets.save(a.id, { caseNumber: "90SCCR00001" });
     jap.save(a.id, { level: "I" });
     chars.setActive(a.id);
     chars.remove(a.id);
@@ -257,8 +257,8 @@ describe("characters", () => {
     const src = stores();
     const a = src.chars.save({ id: "aaaa1111", name: "A", title: "Judge" });
     const b = src.chars.save({ id: "bbbb2222", name: "B" });
-    src.dockets.save(a.id, { caseNumber: "26GJCR00001" });
-    src.jap.save(b.id, { level: "II", II: { "1.1": [{ num: "26GJCR00002" }] } });
+    src.dockets.save(a.id, { caseNumber: "90SCCR00001" });
+    src.jap.save(b.id, { level: "II", II: { "1.1": [{ num: "90SCCR00002" }] } });
     const doc = src.chars.exportJson();
     expect(doc.app).toBe("jsa-form-generator");
     expect(doc.version).toBe(1);
@@ -276,8 +276,8 @@ describe("characters", () => {
       dst.jap.replace(character.id, source.jap ?? null);
     }
     expect(dst.chars.list().map((c) => c.name)).toEqual(["A", "B"]);
-    expect(dst.dockets.list(a.id).map((d) => d.caseNumber)).toEqual(["26GJCR00001"]);
-    expect(dst.jap.get(b.id)?.II["1.1"]).toEqual([{ num: "26GJCR00002" }]);
+    expect(dst.dockets.list(a.id).map((d) => d.caseNumber)).toEqual(["90SCCR00001"]);
+    expect(dst.jap.get(b.id)?.II["1.1"]).toEqual([{ num: "90SCCR00002" }]);
   });
 
   it("rejects bad import files", () => {
@@ -360,8 +360,8 @@ describe("dockets", () => {
 
   it("rejects duplicate case numbers and missing ones", () => {
     const { dockets } = stores();
-    dockets.save(ID, { caseNumber: "26gjcr00001" });
-    expect(() => dockets.save(ID, { caseNumber: "26GJCR00001" })).toThrow("26GJCR00001 is already on this docket.");
+    dockets.save(ID, { caseNumber: "90sccr00001" });
+    expect(() => dockets.save(ID, { caseNumber: "90SCCR00001" })).toThrow("90SCCR00001 is already on this docket.");
     expect(() => dockets.save(ID, { caseNumber: " " })).toThrow("A docket needs a case number.");
   });
 
@@ -385,11 +385,11 @@ describe("dockets", () => {
 
   it("upserts by case number keeping other fields", () => {
     const { dockets } = stores();
-    dockets.save(ID, { caseNumber: "26GJCC00042", plaintiff: "P", notes: "keep" });
-    const u = dockets.upsert(ID, { caseNumber: "26gjcc00042", defendant: "D" })!;
+    dockets.save(ID, { caseNumber: "90SCCC00042", plaintiff: "P", notes: "keep" });
+    const u = dockets.upsert(ID, { caseNumber: "90sccc00042", defendant: "D" })!;
     expect(u).toMatchObject({ plaintiff: "P", defendant: "D", notes: "keep" });
     expect(dockets.list(ID)).toHaveLength(1);
-    expect(dockets.findByCase(ID, " 26GJCC00042 ")?.id).toBe(u.id);
+    expect(dockets.findByCase(ID, " 90SCCC00042 ")?.id).toBe(u.id);
     dockets.upsert(ID, { caseNumber: "NEW" });
     expect(dockets.list(ID)).toHaveLength(2);
   });
@@ -425,7 +425,7 @@ describe("dockets", () => {
   });
 
   it("finds the division from the case code, else the court", () => {
-    expect(divisionFor({ caseNumber: "26GJCC00147" })).toBe("CIVIL DIVISION");
+    expect(divisionFor({ caseNumber: "90SCCC00147" })).toBe("CIVIL DIVISION");
     expect(divisionFor({ caseNumber: "2026-CV-1", court: "Superior Court of San Andreas - Traffic Division" })).toBe(
       "TRAFFIC DIVISION",
     );
@@ -448,12 +448,12 @@ describe("portfolio", () => {
 
   it("pads required tasks with placeholder lines and fills entries", () => {
     const out = render("I", {
-      "1.1": [{ num: "26GJCR00001", caption: "People v. X", link: "https://f.gta/1" }],
+      "1.1": [{ num: "90SCCR00001", caption: "People v. X", link: "https://f.gta/1" }],
       "2.1": [{ num: "AW-12345" }],
       "3.1": [{ date: "2026-01-02", link: "https://f.gta/t" }],
     });
     expect(out).toContain(
-      "[b]1.1. Preside over two trials resolved through summary judgment.[/b]\n[list]\n[*][url=https://f.gta/1][26GJCR00001] People v. X[/url]\n[*][url=LINKTOCASE][XXGJCR00000] People of the State of San Andreas v. John Doe[/url]\n[/list]",
+      "[b]1.1. Preside over two trials resolved through summary judgment.[/b]\n[list]\n[*][url=https://f.gta/1][90SCCR00001] People v. X[/url]\n[*][url=LINKTOCASE][XXSCCR00000] People of the State of San Andreas v. John Doe[/url]\n[/list]",
     );
     expect(out).toContain("[*][url=LINKTOWARRANT]AW-12345[/url]");
     expect(out).toContain("[*][url=LINKTOWARRANT]SW-00000[/url]");

@@ -229,19 +229,19 @@ describe("Dockets dialog", () => {
     expect(must("#docket-list").textContent).toContain("No cases yet.");
 
     click("#new-docket");
-    type("#docket-caseNumber", "26GJCC00147");
+    type("#docket-caseNumber", "90SCCC00147");
     type("#docket-plaintiff", "Ann Smith");
     submit("#docket-form");
-    expect(docketStore().list(id).map((d) => d.caseNumber)).toEqual(["26GJCC00147"]);
+    expect(docketStore().list(id).map((d) => d.caseNumber)).toEqual(["90SCCC00147"]);
 
     click("#new-docket");
-    type("#docket-caseNumber", "26gjcc00147");
+    type("#docket-caseNumber", "90sccc00147");
     submit("#docket-form");
-    expect(must("#docket-error").textContent).toBe("26gjcc00147 is already on this docket.");
+    expect(must("#docket-error").textContent).toBe("90sccc00147 is already on this docket.");
     click("#cancel-docket");
 
     type("#docket-search", "ann smith");
-    expect(must("#docket-list").textContent).toContain("26GJCC00147");
+    expect(must("#docket-list").textContent).toContain("90SCCC00147");
     const buttons = () => [...document.querySelectorAll<HTMLButtonElement>("#docket-list button")];
     expect(buttons().map((b) => b.textContent)).toEqual(["Use in form", "Edit", "Close case", "Delete"]);
 
@@ -252,8 +252,8 @@ describe("Dockets dialog", () => {
 
     act(() => buttons().find((b) => b.textContent === "Use in form")!.click());
     expect(must<HTMLDialogElement>("#dockets-dialog").hasAttribute("open")).toBe(false);
-    expect(must<HTMLInputElement>("#f-case-number").value).toBe("26GJCC00147");
-    expect(must("#docket-status").textContent).toMatch(/^Loaded 26GJCC00147/);
+    expect(must<HTMLInputElement>("#f-case-number").value).toBe("90SCCC00147");
+    expect(must("#docket-status").textContent).toMatch(/^Loaded 90SCCC00147/);
   });
 });
 
