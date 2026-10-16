@@ -8,6 +8,7 @@
 
 import type { BlockEntry, Character, CondEntry, Docket, Entry, Field, FormDef, Scalar, Values } from "./types";
 import { defaultItems, prefillDeps, prefillValue, todayUTC } from "./template";
+import { courthouseFor } from "./courts";
 import { DIVISION_CODES, divisionFor } from "./dockets";
 import { readJson, writeJson, type KV } from "./storage";
 
@@ -31,7 +32,6 @@ export const EMPTY_STATE: FormState = Object.freeze({
 export const PLAINTIFF_LABELS = ["Plaintiff name", "Plaintiff name(s)", "Petitioner name", "Appellant name", "Petitioners (names)"];
 export const DEFENDANT_LABELS = ["Defendant name", "Defendant name(s)"];
 export const FILED_LABELS = ["Action filed", "Filing date"];
-export const COURTHOUSES: Readonly<Record<string, string>> = { GJ: "GREG E JOPLIN", VD: "VINCENT SHROEDER DAVIS" };
 
 /* ------------------------------------------------------------ scope paths */
 
@@ -279,7 +279,7 @@ export function fillFromCharacter(entries: Entry[], s: FormState, char: Characte
 
 /**
  * A hand-typed case number keeps its digits when the division changes; only the
- * code is swapped (26GJCR00147 → 26GJCC00147). A number that is still the derived value is left for applyPrefills.
+ * code is swapped (90SCCR00147 → 90SCCC00147). A number that is still the derived value is left for applyPrefills.
  */
 export function swapCaseCode(scope: Values, division: string, derivedCaseNumber: string | undefined): Values {
   const code = Object.keys(DIVISION_CODES).find((k) => DIVISION_CODES[k] === division);
@@ -354,8 +354,8 @@ export function docketToForm(entries: Entry[], s: FormState, d: Docket): { state
   for (const l of PLAINTIFF_LABELS) put(l, d.plaintiff);
   for (const l of DEFENDANT_LABELS) put(l, d.defendant);
 
-  const place = /^\d{2}(GJ|VD)/i.exec(d.caseNumber || "");
-  put("Courthouse", place ? COURTHOUSES[place[1].toUpperCase()] : undefined);
+  // Only our courthouses; an old GTAW number (26GJ…) leaves the field alone.
+  put("Courthouse", courthouseFor(d.caseNumber)?.name);
   const div = divisionFor(d);
   put("Division", div);
   put("Court division", div ? titleWords(div.replace(/ DIVISION$/, "")) : undefined);

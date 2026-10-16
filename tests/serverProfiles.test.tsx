@@ -195,37 +195,49 @@ describe("FormView with server profiles", () => {
   const realYY = String(new Date().getUTCFullYear()).slice(-2);
   const offsetYY = String(new Date().getUTCFullYear() - 36).slice(-2);
 
-  it("starts the Case number input empty with the server pattern as placeholder, and the pattern as blank-field output (freestyle strips GJ)", () => {
+  it("starts the Case number input empty with the 90SCCR00XXX-style pattern as placeholder and blank-field output (LP-68)", () => {
     const { getOutput } = mountForm(SERVERS.freestyle, "criminal-case-schedule");
     const o = getOutput();
     expect(o).not.toBeNull();
     const input = must<HTMLInputElement>("#f-case-number");
     expect(input.value).toBe(""); // box starts empty
-    expect(input.placeholder).toBe(offsetYY + "CR00XXX"); // GJ stripped, offset year
-    // Blank-field output still carries the server-correct pattern (no GJ).
-    expect(o!.finalHtml).toContain(offsetYY + "CR");
-    expect(o!.finalHtml).not.toContain(offsetYY + "GJCR");
-    if (realYY !== offsetYY) expect(o!.finalHtml).not.toContain(realYY + "GJCR");
+    expect(input.placeholder).toBe(offsetYY + "SCCR00XXX"); // in-game year, Superior Court, criminal
+    // Blank-field output still carries the pattern, and nothing GJ.
+    expect(o!.finalHtml).toContain(offsetYY + "SCCR");
+    expect(o!.finalHtml).not.toMatch(/\d\dGJ(CR|CC|TC|SM)/);
   });
 
-  it("keeps GJ and the real year for gtaw, input empty with the pattern as placeholder", () => {
+  it("uses the same courthouse on gtaw, with the real year, until LP-70 removes it", () => {
     const { getOutput } = mountForm(SERVERS.gtaw, "criminal-case-schedule");
     const o = getOutput();
     expect(o).not.toBeNull();
     const input = must<HTMLInputElement>("#f-case-number");
     expect(input.value).toBe("");
-    expect(input.placeholder).toBe(realYY + "GJCR00XXX");
-    expect(o!.finalHtml).toContain(realYY + "GJCR");
+    expect(input.placeholder).toBe(realYY + "SCCR00XXX");
+    expect(o!.finalHtml).toContain(realYY + "SCCR");
   });
 
-  it("drops GJ for freestyle on a traffic (TC) form too", () => {
+  it("shows a Courthouse value that isn't one of the dropdown's options, rather than blanking it", () => {
+    // A docket for 90SC… fills SUPERIOR COURT; until LP-69 the form's own options are the GTAW ones.
+    localStorage.setItem(
+      "lawapp_draft_criminal-case-schedule",
+      JSON.stringify({ values: { Courthouse: "SUPERIOR COURT" }, autofilled: {}, derived: {} }),
+    );
+    const { getOutput } = mountForm(SERVERS.freestyle, "criminal-case-schedule");
+    const select = must<HTMLSelectElement>("#f-courthouse");
+    expect(select.value).toBe("SUPERIOR COURT");
+    expect(select.selectedOptions[0].textContent).toBe("SUPERIOR COURT");
+    expect(getOutput()!.finalHtml).toContain("SUPERIOR COURT");
+  });
+
+  it("builds a traffic (TC) case number the same way", () => {
     const { getOutput } = mountForm(SERVERS.freestyle, "traffic-complaint-petition");
     const o = getOutput();
     expect(o).not.toBeNull();
     const input = must<HTMLInputElement>("#f-case-number");
     expect(input.value).toBe("");
-    expect(input.placeholder).toBe(offsetYY + "TC00XXX");
-    expect(o!.finalHtml).toContain(offsetYY + "TC");
+    expect(input.placeholder).toBe(offsetYY + "SCTC00XXX");
+    expect(o!.finalHtml).toContain(offsetYY + "SCTC");
     expect(o!.finalHtml).not.toContain("GJTC");
   });
 
@@ -247,7 +259,7 @@ describe("Case number placeholder tracks the server toggle", () => {
     act(() => root.render(createElement(App)));
   }
 
-  it("flips GJ on/off and updates the year when the toolbar server changes", () => {
+  it("updates the year when the toolbar server changes; the courthouse stays SC", () => {
     const realYY = String(new Date().getUTCFullYear()).slice(-2);
     const offsetYY = String(new Date().getUTCFullYear() - 36).slice(-2);
     mountApp();
@@ -255,15 +267,15 @@ describe("Case number placeholder tracks the server toggle", () => {
 
     const gtawInput = must<HTMLInputElement>("#f-case-number");
     expect(gtawInput.value).toBe("");
-    expect(gtawInput.placeholder).toBe(realYY + "GJCR00XXX");
+    expect(gtawInput.placeholder).toBe(realYY + "SCCR00XXX");
 
     choose("#active-server", "freestyle");
     const fsInput = must<HTMLInputElement>("#f-case-number");
     expect(fsInput.value).toBe("");
-    expect(fsInput.placeholder).toBe(offsetYY + "CR00XXX"); // GJ gone, year shifted
+    expect(fsInput.placeholder).toBe(offsetYY + "SCCR00XXX"); // year shifted
 
     choose("#active-server", "gtaw");
-    expect(must<HTMLInputElement>("#f-case-number").placeholder).toBe(realYY + "GJCR00XXX");
+    expect(must<HTMLInputElement>("#f-case-number").placeholder).toBe(realYY + "SCCR00XXX");
   });
 });
 

@@ -22,25 +22,9 @@ export interface ServerProfile {
   yearOffset: number;
   /** Sidebar `court` value → replacement name (empty for gtaw = identity). */
   courtNames: Record<string, string>;
-  /**
-   * Adapt a case-number pattern (already year-expanded, e.g. `26GJCR00XXX`) for
-   * this server. gtaw is the identity; freestyle strips the `GJ` prefix.
-   */
-  caseNumberTransform(pattern: string): string;
 }
 
-/**
- * Remove the literal `GJ` that immediately follows the leading 2-digit year of a
- * case-number pattern (e.g. `26GJCR00XXX` → `26CR00XXX`). The strip runs once at
- * the start and leaves the form's own division letters (CR/CC/TC/SM/…) and any
- * pattern without a `GJ` after the year (e.g. `26SCWC00XXX`) untouched.
- *
- * `GJ` = "Greg E Joplin", a GTAW-only courthouse code; FreestyleRP has no such
- * prefix, so it never appears in a FreestyleRP case number.
- */
-export function stripGJ(pattern: string): string {
-  return pattern.replace(/^(\d{2})GJ/i, "$1");
-}
+// Case numbers and courthouses are the same on both servers: see courts.ts (LP-68).
 
 /** Sidebar/breadcrumb court values (from forms.json + extra-forms.ts) → FreestyleRP names. */
 const FREESTYLE_COURT_NAMES: Record<string, string> = {
@@ -55,15 +39,12 @@ const FREESTYLE_COURT_NAMES: Record<string, string> = {
 };
 
 export const SERVERS: Record<ServerId, ServerProfile> = {
-  // GTAW keeps the GJ (Greg Joplin) courthouse code → identity transform.
-  gtaw: { id: "gtaw", name: "GTAW", yearOffset: 0, courtNames: {}, caseNumberTransform: (p) => p },
-  // FreestyleRP has no GJ courthouse code → strip it from case numbers.
+  gtaw: { id: "gtaw", name: "GTAW", yearOffset: 0, courtNames: {} },
   freestyle: {
     id: "freestyle",
     name: "FreestyleRP",
     yearOffset: -36,
     courtNames: FREESTYLE_COURT_NAMES,
-    caseNumberTransform: stripGJ,
   },
 };
 
