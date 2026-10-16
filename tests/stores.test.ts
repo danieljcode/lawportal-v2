@@ -6,6 +6,7 @@ import {
   FIELDS,
   hasDocket,
   LEGACY_KEY,
+  LEGACY_SERVER_KEY,
   CHARS_KEY,
 } from "@/lib/characters";
 import { createDocketStore, divisionFor, STATUSES } from "@/lib/dockets";
@@ -117,6 +118,42 @@ describe("storage helpers", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     expect(() => writeJson(kv, "k", 1)).toThrow(SAVE_FAILED);
     warn.mockRestore();
+  });
+});
+
+describe("dropping the pre-LP-70 server field (LP-71)", () => {
+  const OLD = [
+    { id: "gtawchar1", name: "Gee Taw", title: "Attorney at Law", bar: "B-12", server: "gtaw", updatedAt: "2026-01-01T00:00:00.000Z" },
+    { id: "fschar001", name: "Sam Style", server: "freestyle", docket: true },
+    { id: "newchar01", name: "Already Clean" },
+  ];
+
+  it("removes server from every saved character, keeps everything else exactly, and deletes the saved default", () => {
+    const { kv, chars, dockets } = stores();
+    kv.set(CHARS_KEY, JSON.stringify(OLD));
+    kv.set(LEGACY_SERVER_KEY, "gtaw");
+    dockets.save("gtawchar1", { caseNumber: "26GJCC00147", plaintiff: "Ann" });
+
+    expect(chars.migrateServerField()).toBe(2);
+    const stored = JSON.parse(kv.get(CHARS_KEY)!) as Array<Record<string, unknown>>;
+    expect(stored).toEqual([
+      { id: "gtawchar1", name: "Gee Taw", title: "Attorney at Law", bar: "B-12", updatedAt: "2026-01-01T00:00:00.000Z" },
+      { id: "fschar001", name: "Sam Style", docket: true },
+      { id: "newchar01", name: "Already Clean" },
+    ]);
+    expect(kv.get(LEGACY_SERVER_KEY)).toBeNull();
+    // Dockets keep their case numbers as filed, GJ and all.
+    expect(dockets.list("gtawchar1").map((d) => d.caseNumber)).toEqual(["26GJCC00147"]);
+  });
+
+  it("is a no-op the second time and on clean data", () => {
+    const { kv, chars } = stores();
+    kv.set(CHARS_KEY, JSON.stringify(OLD));
+    chars.migrateServerField();
+    const after = kv.get(CHARS_KEY);
+    expect(chars.migrateServerField()).toBe(0);
+    expect(kv.get(CHARS_KEY)).toBe(after);
+    expect(stores().chars.migrateServerField()).toBe(0); // nothing saved at all
   });
 });
 

@@ -267,6 +267,43 @@ describe("change tracking", () => {
   });
 });
 
+describe("synced data from before LP-70 (LP-71)", () => {
+  it("stores a pulled copy without the old server field, and sends it back clean for the other devices", async () => {
+    seed([], {}, 1);
+    const calls = stubFetch(
+      {
+        status: 200,
+        body: {
+          rev: 2,
+          updated: "u2",
+          data: { characters: [{ id: "gtawchar1", name: "Gee Taw", title: "Attorney at Law", server: "gtaw", updatedAt: T0 }] },
+        },
+      },
+      { status: 200, body: { rev: 3, updated: "u3" } },
+    );
+    await sync.pull(true);
+    const [c] = characterStore().list();
+    expect(c).toMatchObject({ name: "Gee Taw", title: "Attorney at Law", updatedAt: T0 });
+    expect(c).not.toHaveProperty("server");
+    expect(calls.map((x) => x.method)).toEqual(["GET", "PUT"]);
+    const sent = (calls[1].body as { rev: number; data: sync.SyncDoc }).data.characters;
+    expect(sent).toHaveLength(1);
+    expect(sent[0]).toMatchObject({ name: "Gee Taw", updatedAt: T0 });
+    expect(sent[0]).not.toHaveProperty("server");
+    expect(localStorage.getItem(sync.DIRTY_KEY)).toBeNull();
+  });
+
+  it("doesn't push when the server copy is already clean", async () => {
+    seed([{ id: "char0001", name: "Clean", updatedAt: T0 }], { char0001: T0 }, 2);
+    const calls = stubFetch({
+      status: 200,
+      body: { rev: 2, updated: "u2", data: { characters: [{ id: "char0001", name: "Clean", updatedAt: T0 }] } },
+    });
+    await sync.pull(true);
+    expect(calls.map((x) => x.method)).toEqual(["GET"]);
+  });
+});
+
 describe("conflicts keep unsent edits (LP-64)", () => {
   it("a docket or J.A.P. change stamps its character", () => {
     characterStore().save({ id: "char0001", name: "Jane Doe", updatedAt: T0 }, { keepStamp: true });
