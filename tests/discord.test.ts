@@ -22,7 +22,7 @@ const CAPTION =
   '<td><div style="border:1px solid #000000;padding:15px"><p>Ann Smith</p><p><strong>(Plaintiff)</strong></p>' +
   "<p>- against -</p><p>Bob Jones</p><p><strong>(Defendant)</strong></p></div></td>" +
   "<td><span>)<br />)<br />)<br />)<br />)</span></td>" +
-  '<td><p style="text-align:center">Court File: 26GJCC00001</p><p>&nbsp;</p>' +
+  '<td><p style="text-align:center">Court File: 90SCCC00001</p><p>&nbsp;</p>' +
   '<div style="border:1px solid #000000;padding:15px"><p style="text-align:center"><strong>CIVIL COMPLAINT</strong></p></div>' +
   "<p><em>Action Filed: January 2, 2026</em></p></td>" +
   "</tr></tbody></table>";
@@ -242,7 +242,7 @@ describe("toDiscord: tables", () => {
     for (let k = 0; k < 5; k++) expect(lines[k][at], lines[k]).toBe(")");
     for (const ch of ["┌", "┐", "└", "┘", "│", "─"]) expect(out).toContain(ch);
     expect(out).toContain("CIVIL COMPLAINT");
-    expect(out).toContain("Court File: 26GJCC00001");
+    expect(out).toContain("Court File: 90SCCC00001");
     for (const l of lines) {
       expect(l).toBe(l.trimEnd());
       expect(l.length).toBeLessThanOrEqual(40 * 3 + 4);
