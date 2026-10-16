@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { characterStore } from "@/lib/characters";
 import { docketStore } from "@/lib/dockets";
 import { portfolioStore } from "@/lib/portfolio";
-import { S_SYNC_APPLY_FAIL } from "@/lib/strings";
+import { S_SYNC_APPLY_FAIL, S_SYNC_LOST } from "@/lib/strings";
 import * as sync from "@/lib/sync";
 
 const CODE = "JSA-ABCD-EFGH-JKLM-NPQR-STUV";
@@ -43,6 +43,22 @@ function names(): string[] {
   return characterStore()
     .list()
     .map((c) => c.name);
+}
+
+function pushedNames(call: Call): string[] {
+  return (call.body as { data: sync.SyncDoc }).data.characters.map((c) => String(c.name));
+}
+
+// Stamps older than anything saved during a test run.
+const T0 = "2026-01-01T00:00:00.000Z";
+const T1 = "2026-02-01T00:00:00.000Z";
+
+/** Sync on at `rev`, these characters stored with their own stamps, and `base` as the last server copy seen. */
+function seed(chars: Array<{ id: string; name: string; updatedAt: string }>, base: Record<string, string>, rev = 1): void {
+  localStorage.setItem(sync.CODE_KEY, CODE);
+  localStorage.setItem(sync.REV_KEY, String(rev));
+  localStorage.setItem(sync.BASE_KEY, JSON.stringify(base));
+  for (const c of chars) characterStore().save(c, { keepStamp: true });
 }
 
 beforeEach(() => {
@@ -174,30 +190,34 @@ describe("change tracking", () => {
     expect(calls).toEqual(["PUT", "PUT"]);
   });
 
-  it("a 409 applies the server copy and reports a conflict", async () => {
+  it("a 409 merges the server copy, keeps a character added here, and sends the merge", async () => {
     characterStore().save({ id: "local001", name: "Local Person" });
-    stubFetch({
-      status: 409,
-      body: {
-        rev: 5,
-        updated: "u5",
-        data: {
-          characters: [
-            { id: "srv00002", name: "Second", dockets: [{ caseNumber: "26GJCC00002" }] },
-            { id: "srv00001", name: "First", jap: { I: {}, II: {} } },
-          ],
+    const calls = stubFetch(
+      {
+        status: 409,
+        body: {
+          rev: 5,
+          updated: "u5",
+          data: {
+            characters: [
+              { id: "srv00002", name: "Second", dockets: [{ caseNumber: "26GJCC00002" }] },
+              { id: "srv00001", name: "First", jap: { I: {}, II: {} } },
+            ],
+          },
         },
       },
-    });
+      { status: 200, body: { rev: 6, updated: "u6" } },
+    );
     const before = sync.getState().applied;
     await sync.push();
-    expect(names()).toEqual(["Second", "First"]);
+    expect(names()).toEqual(["Second", "First", "Local Person"]);
     expect(docketStore().list("srv00002")[0].caseNumber).toBe("26GJCC00002");
-    expect(characterStore().get("local001")).toBeNull();
-    expect(localStorage.getItem(sync.REV_KEY)).toBe("5");
+    expect(calls).toHaveLength(2);
+    expect(calls[1].body).toMatchObject({ rev: 5 });
+    expect(pushedNames(calls[1])).toEqual(["Second", "First", "Local Person"]);
+    expect(localStorage.getItem(sync.REV_KEY)).toBe("6");
     expect(localStorage.getItem(sync.DIRTY_KEY)).toBeNull();
-    expect(sync.getState()).toMatchObject({ status: "conflict", updated: "u5", applied: before + 1 });
-    expect(sync.getState().message).toMatch(/Another device saved changes first/);
+    expect(sync.getState()).toMatchObject({ status: "synced", updated: "u6", applied: before + 1, lost: 0 });
   });
 
   it("applying a server copy does not mark the data dirty", async () => {
@@ -244,6 +264,177 @@ describe("change tracking", () => {
     await sync.push();
     expect(sync.getState()).toMatchObject({ status: "error" });
     expect(sync.getState().message).toMatch(/doesn't recognise this sync code/);
+  });
+});
+
+describe("conflicts keep unsent edits (LP-64)", () => {
+  it("a docket or J.A.P. change stamps its character", () => {
+    characterStore().save({ id: "char0001", name: "Jane Doe", updatedAt: T0 }, { keepStamp: true });
+    docketStore().save("char0001", { caseNumber: "26CC00001" });
+    const afterDocket = characterStore().get("char0001")?.updatedAt;
+    expect(afterDocket! > T0).toBe(true);
+    characterStore().save({ id: "char0001", name: "Jane Doe", updatedAt: T0 }, { keepStamp: true });
+    portfolioStore().save("char0001", { level: "I" });
+    expect(characterStore().get("char0001")?.updatedAt! > T0).toBe(true);
+  });
+
+  it("pull with unsent edits: a docket edit here survives another device's change to a different character", async () => {
+    // The steps in LP-64: B edits a docket offline, A edits a character and syncs, B comes back.
+    seed(
+      [
+        { id: "char0001", name: "Alice", updatedAt: T0 },
+        { id: "char0002", name: "Bob", updatedAt: T0 },
+      ],
+      { char0001: T0, char0002: T0 },
+    );
+    docketStore().save("char0002", { caseNumber: "26CC00002", title: "Edited offline" });
+    localStorage.setItem(sync.DIRTY_KEY, "1");
+    const calls = stubFetch(
+      {
+        status: 200,
+        body: {
+          rev: 2,
+          updated: "u2",
+          data: {
+            characters: [
+              { id: "char0001", name: "Alice Renamed", updatedAt: T1 },
+              { id: "char0002", name: "Bob", updatedAt: T0 },
+            ],
+          },
+        },
+      },
+      { status: 200, body: { rev: 3, updated: "u3" } },
+    );
+    await sync.pull(true);
+    expect(names()).toEqual(["Alice Renamed", "Bob"]);
+    expect(docketStore().list("char0002").map((d) => d.caseNumber)).toEqual(["26CC00002"]);
+    expect(calls.map((c) => c.method)).toEqual(["GET", "PUT"]);
+    expect(calls[1].body).toMatchObject({ rev: 2 });
+    const sent = (calls[1].body as { data: sync.SyncDoc }).data.characters;
+    expect(sent.find((c) => c.id === "char0002")?.dockets).toMatchObject([{ caseNumber: "26CC00002" }]);
+    expect(localStorage.getItem(sync.DIRTY_KEY)).toBeNull();
+    expect(sync.getState()).toMatchObject({ status: "synced", lost: 0 });
+    expect(localStorage.getItem(sync.LOST_KEY)).toBeNull();
+  });
+
+  it("push 409: the newer copy of each character wins and a losing local edit is kept aside", async () => {
+    seed(
+      [
+        { id: "char0001", name: "Mine Newer", updatedAt: T1 },
+        { id: "char0002", name: "Mine Older", updatedAt: T0 },
+      ],
+      { char0001: "2025-12-01T00:00:00.000Z", char0002: "2025-12-01T00:00:00.000Z" },
+    );
+    const calls = stubFetch(
+      {
+        status: 409,
+        body: {
+          rev: 4,
+          updated: "u4",
+          data: {
+            characters: [
+              { id: "char0001", name: "Theirs Older", updatedAt: T0 },
+              { id: "char0002", name: "Theirs Newer", updatedAt: T1 },
+            ],
+          },
+        },
+      },
+      { status: 200, body: { rev: 5, updated: "u5" } },
+    );
+    await sync.push();
+    expect(names()).toEqual(["Mine Newer", "Theirs Newer"]);
+    expect(pushedNames(calls[1])).toEqual(["Mine Newer", "Theirs Newer"]);
+    const kept = JSON.parse(localStorage.getItem(sync.LOST_KEY) || "{}") as sync.SyncDoc;
+    expect(kept.characters.map((c) => c.name)).toEqual(["Mine Older"]);
+    expect(sync.getState().lost).toBe(1);
+  });
+
+  it("the message says when another device's version replaced an edit here", async () => {
+    seed([{ id: "char0001", name: "Mine", updatedAt: T0 }], { char0001: "2025-12-01T00:00:00.000Z" });
+    localStorage.setItem(sync.DIRTY_KEY, "1");
+    stubFetch({
+      status: 200,
+      body: { rev: 2, updated: "u2", data: { characters: [{ id: "char0001", name: "Theirs", updatedAt: T1 }] } },
+    });
+    await sync.pull(true);
+    expect(names()).toEqual(["Theirs"]);
+    expect(sync.getState()).toMatchObject({ status: "conflict", message: S_SYNC_LOST(1), lost: 1 });
+    expect(localStorage.getItem(sync.DIRTY_KEY)).toBeNull();
+  });
+
+  it("deletions on either side stand, unless the deleted character was edited since", async () => {
+    seed(
+      [
+        { id: "char0001", name: "Both have it", updatedAt: T0 },
+        { id: "char0003", name: "Deleted there", updatedAt: T0 },
+        { id: "char0004", name: "Deleted there, edited here", updatedAt: T1 },
+      ],
+      { char0001: T0, char0002: T0, char0003: T0, char0004: T0, char0005: T0 },
+    );
+    localStorage.setItem(sync.DIRTY_KEY, "1");
+    const calls = stubFetch(
+      {
+        status: 200,
+        body: {
+          rev: 2,
+          updated: "u2",
+          data: {
+            characters: [
+              { id: "char0001", name: "Both have it", updatedAt: T0 },
+              { id: "char0002", name: "Deleted here", updatedAt: T0 },
+              { id: "char0005", name: "Deleted here, edited there", updatedAt: T1 },
+            ],
+          },
+        },
+      },
+      { status: 200, body: { rev: 3, updated: "u3" } },
+    );
+    await sync.pull(true);
+    expect(names()).toEqual(["Both have it", "Deleted here, edited there"]);
+    expect(pushedNames(calls[1])).toEqual(["Both have it", "Deleted here, edited there"]);
+    const kept = JSON.parse(localStorage.getItem(sync.LOST_KEY) || "{}") as sync.SyncDoc;
+    expect(kept.characters.map((c) => c.name)).toEqual(["Deleted there, edited here"]);
+  });
+
+  it("without a remembered server copy nothing is treated as deleted", () => {
+    characterStore().save({ id: "char0001", name: "Only here" });
+    const { doc, lost } = sync.resolve({ characters: [{ id: "char0002", name: "Only there" }] }, null);
+    expect(doc.characters.map((c) => c.name)).toEqual(["Only there", "Only here"]);
+    expect(lost).toEqual([]);
+  });
+
+  it("Restore my version puts the kept copy back with a fresh stamp and sends it", async () => {
+    vi.useFakeTimers();
+    seed([{ id: "char0001", name: "Theirs", updatedAt: T1 }], { char0001: T1 });
+    localStorage.setItem(
+      sync.LOST_KEY,
+      JSON.stringify({
+        at: T1,
+        characters: [{ id: "char0001", name: "Mine", updatedAt: T0, dockets: [{ caseNumber: "26CC00009" }] }],
+      }),
+    );
+    const calls = stubFetch(
+      { status: 200, body: { rev: 1, updated: "u1", data: { characters: [{ id: "char0001", name: "Theirs", updatedAt: T1 }] } } },
+      { status: 200, body: { rev: 2, updated: "u2" } },
+    );
+    await sync.init();
+    expect(sync.getState().lost).toBe(1);
+    expect(sync.restoreLost()).toBe(1);
+    expect(names()).toEqual(["Mine"]);
+    expect(characterStore().get("char0001")?.updatedAt! > T1).toBe(true);
+    expect(docketStore().list("char0001").map((d) => d.caseNumber)).toEqual(["26CC00009"]);
+    expect(sync.getState().lost).toBe(0);
+    expect(localStorage.getItem(sync.LOST_KEY)).toBeNull();
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(calls.map((c) => c.method)).toEqual(["GET", "PUT"]);
+    expect(pushedNames(calls[1])).toEqual(["Mine"]);
+  });
+
+  it("discardLost forgets the kept copy", () => {
+    localStorage.setItem(sync.LOST_KEY, JSON.stringify({ at: T1, characters: [{ id: "char0001", name: "Mine" }] }));
+    sync.discardLost();
+    expect(localStorage.getItem(sync.LOST_KEY)).toBeNull();
+    expect(sync.getState().lost).toBe(0);
   });
 });
 

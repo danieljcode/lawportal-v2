@@ -5,7 +5,11 @@
 // this browser's storage is a cache of it. Every data change is pushed 700 ms
 // after it happens; the latest copy is pulled on init and when the tab comes
 // back into view (at most every 20 s unless forced). If another device saved
-// in between, the server answers 409 and this browser takes that copy.
+// in between (a 409 on push, or a newer rev on pull while this browser has
+// unsent edits), the two copies are merged one character at a time: the newer
+// updatedAt wins, and dockets and J.A.P. go with their character. This
+// browser's versions that lose are kept under lawapp_sync_lost so the user can
+// restore them.
 //
 // The code lives in local storage under lawapp_sync_code and is only ever sent
 // to /api/ in the Authorization header. Client only: nothing runs at import.
@@ -13,12 +17,16 @@ import { characterStore } from "./characters";
 import { docketStore } from "./dockets";
 import { portfolioStore } from "./portfolio";
 import { defaultKV } from "./storage";
-import { S_SYNC_APPLY_FAIL } from "./strings";
+import { S_SYNC_APPLY_FAIL, S_SYNC_LOST, S_SYNC_MERGED } from "./strings";
 
 export const CODE_KEY = "lawapp_sync_code";
 export const REV_KEY = "lawapp_sync_rev";
 /** "1" while a local change hasn't been accepted by the server. */
 export const DIRTY_KEY = "lawapp_sync_dirty";
+/** {id: updatedAt} of the last server copy seen here: tells a character added here from one deleted elsewhere. */
+export const BASE_KEY = "lawapp_sync_base";
+/** This browser's versions of characters that lost the last merge ({at, characters}), for "Restore my version". */
+export const LOST_KEY = "lawapp_sync_lost";
 
 /** Same accept rule as the server (src/lib/server/code.ts). */
 export const CODE_RE = /^JSA(-[A-Z0-9]{4}){5}$/;
@@ -46,6 +54,8 @@ export interface SyncState {
   updated: string | null;
   /** How many times a server copy replaced this browser's data (the UI redraws on change). */
   applied: number;
+  /** How many of this browser's characters are kept aside after losing a merge (0: nothing to restore). */
+  lost: number;
 }
 
 /** The sync document: the export shape, with dockets and J.A.P. inside each character. */
@@ -64,7 +74,7 @@ interface ApiBody {
 const PUSH_DELAY = 700;
 const PULL_THROTTLE = 20_000;
 
-const INITIAL: SyncState = Object.freeze({ status: "off", message: "", updated: null, applied: 0 });
+const INITIAL: SyncState = Object.freeze({ status: "off", message: "", updated: null, applied: 0, lost: 0 });
 
 let state: SyncState = INITIAL;
 const listeners = new Set<(s: SyncState) => void>();
@@ -120,6 +130,15 @@ export function onChange(fn: (s: SyncState) => void): () => void {
 
 function set(status: SyncStatus, message = "", updated?: string): void {
   state = Object.freeze({ ...state, status, message, updated: updated || state.updated });
+  notify();
+}
+
+function setLost(lost: number): void {
+  state = Object.freeze({ ...state, lost });
+  notify();
+}
+
+function notify(): void {
   for (const fn of [...listeners]) {
     try {
       fn(state);
@@ -201,7 +220,7 @@ function apply(doc: unknown): number {
     for (const item of incoming) {
       try {
         const c = (item && typeof item === "object" ? item : {}) as Record<string, unknown>;
-        const saved = chars.save(c);
+        const saved = chars.save(c, { keepStamp: true });
         keep.add(saved.id);
         order.push(saved.id);
         dockets.replace(saved.id, Array.isArray(c.dockets) ? c.dockets : []);
@@ -241,6 +260,127 @@ export function merge(serverDoc: unknown): SyncDoc {
   return out;
 }
 
+type Doc = Record<string, unknown>;
+
+function charactersOf(doc: unknown): Doc[] {
+  const raw = doc && typeof doc === "object" ? (doc as { characters?: unknown }).characters : undefined;
+  return Array.isArray(raw) ? raw.filter((c): c is Doc => !!c && typeof c === "object") : [];
+}
+
+/** A character's updatedAt; "" (older than any stamp) for data saved before stamps existed. */
+function stampOf(c: Doc): string {
+  return typeof c.updatedAt === "string" ? c.updatedAt : "";
+}
+
+function readBase(): Map<string, string> | null {
+  try {
+    const o: unknown = JSON.parse(lsGet(BASE_KEY) || "null");
+    if (!o || typeof o !== "object" || Array.isArray(o)) return null;
+    return new Map(Object.entries(o).filter((e): e is [string, string] => typeof e[1] === "string"));
+  } catch {
+    return null;
+  }
+}
+
+function saveBase(chars: Doc[]): void {
+  const o: Record<string, string> = {};
+  for (const c of chars) if (typeof c.id === "string") o[c.id] = stampOf(c);
+  lsSet(BASE_KEY, JSON.stringify(o));
+}
+
+export interface Resolved {
+  doc: SyncDoc;
+  /** This browser's versions that lost and had changed here since the last server copy. */
+  lost: Doc[];
+  /** True when the result holds anything of this browser's, so it must be pushed. */
+  keptLocal: boolean;
+}
+
+/**
+ * Merge this browser's characters into a newer server copy, one character at a
+ * time (dockets and J.A.P. go with their character). The newer updatedAt wins
+ * and the server wins a tie. `base`, the last server copy seen here, tells a
+ * character added on one side from one deleted on the other; without it (sync
+ * set up before this existed) nothing is treated as deleted.
+ */
+export function resolve(serverDoc: unknown, base: Map<string, string> | null = readBase()): Resolved {
+  const local = new Map<string, Doc>();
+  for (const c of snapshot().characters) local.set(c.id as string, c);
+  const changedHere = (c: Doc) => !base || base.get(c.id as string) !== stampOf(c);
+  const out: Doc[] = [];
+  const lost: Doc[] = [];
+  let keptLocal = false;
+  const seen = new Set<string>();
+  for (const s of charactersOf(serverDoc)) {
+    const id = String(s.id);
+    seen.add(id);
+    const l = local.get(id);
+    if (!l) {
+      // Deleted here: that stands unless the other device has changed it since.
+      if (base?.get(id) === stampOf(s)) keptLocal = true;
+      else out.push(s);
+      continue;
+    }
+    if (stampOf(l) > stampOf(s)) {
+      out.push(l);
+      keptLocal = true;
+    } else {
+      out.push(s);
+      if (stampOf(l) !== stampOf(s) && changedHere(l)) lost.push(l);
+    }
+  }
+  for (const [id, l] of local) {
+    if (seen.has(id)) continue;
+    if (base?.has(id)) {
+      // Deleted on the other device; keep this browser's edits to it aside.
+      if (changedHere(l)) lost.push(l);
+      continue;
+    }
+    out.push(l);
+    keptLocal = true;
+  }
+  return { doc: { characters: out }, lost, keptLocal };
+}
+
+function readLost(): Doc[] {
+  try {
+    const o: unknown = JSON.parse(lsGet(LOST_KEY) || "null");
+    return o && typeof o === "object" ? charactersOf(o) : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Put this browser's versions back after a merge chose another device's: each
+ * is saved with a fresh updatedAt (so it wins the next merge) and pushed.
+ * Returns how many were restored.
+ */
+export function restoreLost(): number {
+  const chars = characterStore();
+  const dockets = docketStore();
+  const portfolio = portfolioStore();
+  let restored = 0;
+  for (const c of readLost()) {
+    try {
+      const saved = chars.save(c);
+      dockets.replace(saved.id, Array.isArray(c.dockets) ? c.dockets : []);
+      portfolio.replace(saved.id, c.jap || null);
+      restored++;
+    } catch (err) {
+      console.warn("[sync] couldn't restore a character", err);
+    }
+  }
+  discardLost();
+  return restored;
+}
+
+/** Forget the kept-aside versions. */
+export function discardLost(): void {
+  lsSet(LOST_KEY, null);
+  setLost(0);
+}
+
 /** Set `status` after applying a server copy, unless some characters failed to store. */
 function setAfterApply(failed: number, status: SyncStatus, message: string, updated?: string): void {
   if (failed) set("error", S_SYNC_APPLY_FAIL(failed), updated);
@@ -249,31 +389,67 @@ function setAfterApply(failed: number, status: SyncStatus, message: string, upda
 
 /* ---------- push / pull ---------- */
 
+/**
+ * Take a server copy newer than this browser's. With unsent edits the two are
+ * merged (see resolve) instead of the server copy replacing them. Returns true
+ * when the result kept something of this browser's, so it needs pushing.
+ */
+function takeServer(b: ApiBody, dirty: boolean): boolean {
+  lsSet(REV_KEY, String(b.rev));
+  const server = charactersOf(b.data);
+  if (!dirty) {
+    const failed = apply(b.data);
+    saveBase(server);
+    lsSet(DIRTY_KEY, null);
+    setAfterApply(failed, "synced", "Updated from the server.", b.updated);
+    return false;
+  }
+  const { doc, lost, keptLocal } = resolve(b.data);
+  saveBase(server);
+  if (lost.length) {
+    // Add to anything not yet restored; a newer copy of the same character replaces the older one.
+    const ids = new Set(lost.map((c) => c.id));
+    const all = [...readLost().filter((c) => !ids.has(c.id)), ...lost];
+    lsSet(LOST_KEY, JSON.stringify({ at: new Date().toISOString(), characters: all }));
+    setLost(all.length);
+  }
+  const failed = apply(doc);
+  lsSet(DIRTY_KEY, keptLocal ? "1" : null);
+  setAfterApply(
+    failed,
+    lost.length ? "conflict" : "synced",
+    lost.length ? S_SYNC_LOST(lost.length) : keptLocal ? S_SYNC_MERGED : "Updated from the server.",
+    b.updated,
+  );
+  return keptLocal;
+}
+
 /** Send this browser's data. Pushes are serialised: a push during another waits for it. */
 export function push(): Promise<void> {
+  return send(true);
+}
+
+/** One PUT; after a 409 the merged copy is sent once more (`retry`). */
+function send(retry: boolean): Promise<void> {
   if (!code()) return Promise.resolve();
-  if (inflight) return inflight.then(push);
+  if (inflight) return inflight.then(() => send(retry));
   set("saving", "Saving…");
-  inflight = request("PUT", "data", { rev: rev(), data: snapshot() })
+  const sent = snapshot();
+  let again = false;
+  inflight = request("PUT", "data", { rev: rev(), data: sent })
     .then(
       (r) => {
         const b = r.body || {};
         if (r.status === 200) {
           lsSet(REV_KEY, String(b.rev));
           lsSet(DIRTY_KEY, null);
+          saveBase(sent.characters);
           set("synced", "", b.updated);
           return;
         }
         if (r.status === 409) {
-          lsSet(REV_KEY, String(b.rev));
-          lsSet(DIRTY_KEY, null);
-          const failed = apply(b.data);
-          setAfterApply(
-            failed,
-            "conflict",
-            "Another device saved changes first, so this browser now shows that version. Redo your last change if it's missing.",
-            b.updated,
-          );
+          // This browser was sending its own data, so treat it as unsent edits.
+          again = takeServer(b, true) && retry;
           return;
         }
         if (r.status === 404 || r.status === 401) {
@@ -292,6 +468,7 @@ export function push(): Promise<void> {
     )
     .then(() => {
       inflight = null;
+      if (again) return send(false);
     });
   return inflight;
 }
@@ -311,22 +488,11 @@ export async function pull(force = false): Promise<boolean> {
   const b = r.body || {};
   if (r.status === 200) {
     if (b.rev !== rev()) {
-      const lost = !!lsGet(DIRTY_KEY);
-      const failed = apply(b.data);
-      lsSet(REV_KEY, String(b.rev));
-      lsSet(DIRTY_KEY, null);
-      setAfterApply(
-        failed,
-        lost ? "conflict" : "synced",
-        lost
-          ? "Another device saved changes while this one had unsent edits, so this browser now shows the other device's version."
-          : "Updated from the server.",
-        b.updated,
-      );
-    } else if (lsGet(DIRTY_KEY)) {
-      await push(); // send edits made while offline
-    } else if (state.status !== "synced") {
-      set("synced", "", b.updated);
+      if (takeServer(b, !!lsGet(DIRTY_KEY))) await push();
+    } else {
+      saveBase(charactersOf(b.data)); // the copy this browser last synced with
+      if (lsGet(DIRTY_KEY)) await push(); // send edits made while offline
+      else if (state.status !== "synced") set("synced", "", b.updated);
     }
     return true;
   }
@@ -382,6 +548,7 @@ export function disable(): void {
   lsSet(CODE_KEY, null);
   lsSet(REV_KEY, null);
   lsSet(DIRTY_KEY, null);
+  lsSet(BASE_KEY, null);
   set("off");
 }
 
@@ -419,6 +586,8 @@ export function init(): Promise<void> {
     () => document.removeEventListener("visibilitychange", onVisible),
     () => window.removeEventListener("online", onOnline),
   ];
+  const lost = readLost().length;
+  if (lost) setLost(lost);
   initPromise = (async () => {
     if (code()) {
       set("loading", "Loading from the server…");
