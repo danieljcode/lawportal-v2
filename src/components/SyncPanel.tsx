@@ -181,6 +181,24 @@ export default function SyncPanel({ autoEnable = false, onAutoEnableDone }: Sync
       <p className={"small sync-message" + (warn ? " warn" : "")} id="sync-message" role="status" aria-live="polite">
         {message}
       </p>
+      {st.lost > 0 && (
+        <div className="row sync-lost" id="sync-lost">
+          <span className="small warn">
+            {st.lost === 1
+              ? "Your version of 1 character was replaced by another device's."
+              : `Your versions of ${st.lost} characters were replaced by another device's.`}
+          </span>
+          <button className="mini" id="sync-restore" type="button" onClick={() => sync.restoreLost()}>
+            Restore my version
+          </button>
+          <button className="mini" id="sync-discard" type="button" onClick={() => {
+              if (confirm("Throw away your kept version? The other device's version stays. This cannot be undone.")) sync.discardLost();
+            }}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
     </section>
   );
 }

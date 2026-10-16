@@ -109,6 +109,11 @@ Sync is optional and runs entirely on the computer that runs the app:
   there is no rate limiting. Only use `:lan` on a network you trust.
 - "Stop syncing on this device" keeps the local copy. "Delete server copy" removes the file from
   `data/sync/`; every device using that code stops syncing.
+- If two devices change data before syncing, they are merged one character at a time: the most
+  recently changed copy of each character wins, with its dockets and J.A.P. Characters added or
+  deleted on either side stay added or deleted. When another device's copy replaces an edit made
+  here, your version is kept in this browser (`lawapp_sync_lost`) and the sync panel offers
+  "Restore my version". "Newer" goes by each device's clock.
 
 ## .docx export
 

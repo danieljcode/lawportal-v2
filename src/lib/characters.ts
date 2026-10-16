@@ -7,7 +7,18 @@
 import type { Character } from "./types";
 import { DOCKETS_PREFIX } from "./dockets";
 import { JAP_PREFIX } from "./portfolio";
-import { createChannel, defaultKV, isId, newId, readJson, writeJson, writeString, type KV } from "./storage";
+import {
+  createChannel,
+  defaultKV,
+  isId,
+  ISO_TIME_RE,
+  newId,
+  onCharacterTouched,
+  readJson,
+  writeJson,
+  writeString,
+  type KV,
+} from "./storage";
 
 export const CHARS_KEY = "lawapp_chars";
 export const ACTIVE_KEY = "lawapp_active_char";
@@ -99,6 +110,7 @@ export function clean(input: unknown): Character {
   }
   // Carry over the old judge-only box.
   if (out.docket === undefined && c.judge === true) out.docket = true;
+  if (typeof c.updatedAt === "string" && ISO_TIME_RE.test(c.updatedAt)) out.updatedAt = c.updatedAt;
   return out as unknown as Character;
 }
 
@@ -117,8 +129,13 @@ export interface ImportResult {
 export interface CharacterStore {
   list(): Character[];
   get(id: string): Character | null;
-  /** Throws "A character needs a name.", "You can keep up to 200 characters." or the storage error. */
-  save(c: Partial<Character> | Record<string, unknown>): Character;
+  /**
+   * Stamps updatedAt with now unless `keepStamp` (sync storing another device's copy).
+   * Throws "A character needs a name.", "You can keep up to 200 characters." or the storage error.
+   */
+  save(c: Partial<Character> | Record<string, unknown>, opts?: { keepStamp?: boolean }): Character;
+  /** Stamp updatedAt with now (a docket or J.A.P. change); nothing for an unknown id. */
+  touch(id: string): void;
   /** Also removes the character's dockets and J.A.P., and clears the active id if it was active. */
   remove(id: string): void;
   duplicate(id: string): Character | null;
@@ -166,9 +183,10 @@ export function createCharacterStore(kv: KV): CharacterStore {
   }
 
   /** Insert or replace by id inside `list` (no write). */
-  function put(list: Character[], input: unknown): Character {
+  function put(list: Character[], input: unknown, stamp = true): Character {
     const data = clean(input);
     if (!data.name) throw new Error(NEEDS_NAME);
+    if (stamp) data.updatedAt = new Date().toISOString();
     const i = list.findIndex((x) => x.id === data.id);
     if (i >= 0) list[i] = data;
     else {
@@ -202,12 +220,20 @@ export function createCharacterStore(kv: KV): CharacterStore {
   return {
     list: read,
     get,
-    save(c) {
+    save(c, opts) {
       const list = read();
-      const saved = put(list, c);
+      const saved = put(list, c, !opts?.keepStamp);
       write(list);
       changes.emit();
       return saved;
+    },
+    touch(id) {
+      const list = read();
+      const c = list.find((x) => x.id === id);
+      if (!c) return;
+      c.updatedAt = new Date().toISOString();
+      write(list);
+      changes.emit();
     },
     remove(id) {
       const list = read();
@@ -344,6 +370,10 @@ let instance: CharacterStore | null = null;
 
 /** The app's character store (created on first use; client only). */
 export function characterStore(): CharacterStore {
-  if (!instance) instance = createCharacterStore(defaultKV());
+  if (!instance) {
+    const store = createCharacterStore(defaultKV());
+    onCharacterTouched((id) => store.touch(id));
+    instance = store;
+  }
   return instance;
 }
