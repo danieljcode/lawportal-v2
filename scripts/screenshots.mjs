@@ -33,6 +33,8 @@ try {
       try {
         localStorage.setItem("lawapp_theme", t);
         localStorage.removeItem("lawapp_last_form");
+        // FreestyleRP only (epic LP-67); the app's own default stays until LP-70.
+        localStorage.setItem("lawapp_server", "freestyle");
       } catch {
         // storage blocked: the shot falls back to the system theme
       }

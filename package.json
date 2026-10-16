@@ -2,6 +2,7 @@
   "name": "lawapp",
   "version": "0.1.0",
   "private": true,
+  "license": "UNLICENSED",
   "scripts": {
     "dev": "next dev -H 127.0.0.1",
     "dev:lan": "node scripts/run-lan.mjs dev",
