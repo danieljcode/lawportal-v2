@@ -12,6 +12,10 @@ contract), and it looks like a 1990s Windows desktop.
 > Personal tool. These are roleplay court forms, not legal documents. Always check a filing before
 > posting.
 
+![A civil complaint being filled in, with the live forum preview beside it](docs/screenshots/form-light.png)
+
+![The same complaint as Discord messages, in the dark theme](docs/screenshots/discord-dark.png)
+
 ## Running it
 
 ```bash
@@ -214,6 +218,13 @@ push and pull request. When the repo secret `REFERENCE_TOKEN` is set (a read-onl
 and runs the parity tests too, with `LAWAPP_REQUIRE_REFERENCE=1` so a missing file fails the run
 instead of skipping. Pull requests from forks don't get the secret, so they skip the parity tests.
 
+## Working on it
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how issues, branches, commits and pull requests are run,
+and the Definition of Done. The screenshots above come from `npm run screenshots` (copied from
+`.agents/screenshots/` into `docs/screenshots/`).
+
 ## Credits
 
-Made by Dan.
+Made by Dan. All rights reserved: see [LICENSE](LICENSE), which also notes the third-party court
+forms.
