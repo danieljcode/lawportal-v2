@@ -115,7 +115,6 @@ export interface Character {
   signature?: string;
   notes?: string;
   docket?: boolean;
-  server?: "gtaw" | "freestyle";
   /** ISO time of the last change on any device, including its dockets and J.A.P. (sync merges by it). */
   updatedAt?: string;
 }

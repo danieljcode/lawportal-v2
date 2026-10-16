@@ -2,7 +2,6 @@
 
 import { useState, type MouseEvent } from "react";
 import type { Character } from "@/lib/types";
-import { SERVER_ORDER, SERVERS, type ServerId } from "@/lib/servers";
 import { BADGES, type SyncStatus } from "@/lib/sync";
 import { cycle, getTheme, ICONS, themeLabel, type ThemeMode } from "@/lib/theme";
 
@@ -16,9 +15,6 @@ export interface ToolbarProps {
   showJap: boolean;
   /** Sync status for the dot; null while sync is off on this device. */
   syncStatus: SyncStatus | null;
-  /** The active server id (reflects the active character, or the persisted default). */
-  serverId: ServerId;
-  onServer(id: ServerId): void;
   changelogUnread: boolean;
   navOpen: boolean;
   onHome(e: MouseEvent): void;
@@ -71,22 +67,6 @@ export default function Toolbar(p: ToolbarProps) {
               </option>
             ))}
           </select>
-        </label>
-        <label className="server-picker">
-          <span className="muted">Server</span>
-          <select
-            id="active-server"
-            aria-label="Active server"
-            value={p.serverId}
-            onChange={(e) => p.onServer(e.target.value as ServerId)}
-          >
-            {SERVER_ORDER.map((sid) => (
-              <option key={sid} value={sid}>
-                {SERVERS[sid].name}
-              </option>
-            ))}
-          </select>
-          <span className="tag" id="server-badge">{SERVERS[p.serverId].name}</span>
         </label>
         {p.showDockets && (
           <button type="button" className="btn" id="open-dockets" onClick={p.onDockets}>

@@ -16,7 +16,7 @@ import {
   render,
   todayUTC,
 } from "@/lib/template";
-import { getServerDate, SERVERS } from "@/lib/servers";
+import { gameDate } from "@/lib/freestyle";
 import type { BlockEntry, CondEntry, Entry, Field } from "@/lib/types";
 
 /** The first field token of a one-token template. */
@@ -110,10 +110,9 @@ describe("prefill", () => {
 });
 
 describe("caseNumberPattern", () => {
-  const freestyle = SERVERS.freestyle;
-  // Callers (FormView) pass an already server-offset `now` (getServerDate), so the
+  // Callers (FormView) pass the in-game `now` (gameDate), so the
   // 2-digit year comes from that date.
-  const fsNow = (d: Date) => getServerDate(d, freestyle);
+  const fsNow = (d: Date) => gameDate(d);
 
   it("builds year + courthouse + division + number from the prefill (LP-68, LP-69)", () => {
     const f = field("{{Case number=YYSCCR00XXX}}");
