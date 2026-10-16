@@ -25,7 +25,7 @@ describe("character file", () => {
     const a = stores();
     const judge = a.characters.save({ name: "Jane Roe", title: "Court Commissioner II" });
     const lawyer = a.characters.save({ name: "John Doe", title: "Attorney at Law" });
-    a.dockets.save(lawyer.id, { caseNumber: "26GJCC00147", plaintiff: "Ann", defendant: "Bob" });
+    a.dockets.save(lawyer.id, { caseNumber: "90SCCC00147", plaintiff: "Ann", defendant: "Bob" });
     a.portfolio.save(judge.id, { level: "II", II: { "2.1": [{ num: "AW-00001", link: "https://example.com/w" }] } });
 
     const text = exportText(a);
@@ -33,7 +33,7 @@ describe("character file", () => {
     expect(doc.app).toBe("jsa-form-generator");
     expect(doc.version).toBe(1);
     expect(doc.characters).toHaveLength(2);
-    expect(doc.characters[1].dockets[0].caseNumber).toBe("26GJCC00147");
+    expect(doc.characters[1].dockets[0].caseNumber).toBe("90SCCC00147");
     expect(doc.characters[0].jap.II["2.1"][0].num).toBe("AW-00001");
 
     const b = stores();
@@ -41,7 +41,7 @@ describe("character file", () => {
     expect(n).toBe(2);
     expect(importedMessage(n)).toBe("Imported 2 characters.");
     expect(b.characters.list().map((c) => c.name)).toEqual(["Jane Roe", "John Doe"]);
-    expect(b.dockets.list(lawyer.id).map((d) => d.caseNumber)).toEqual(["26GJCC00147"]);
+    expect(b.dockets.list(lawyer.id).map((d) => d.caseNumber)).toEqual(["90SCCC00147"]);
     expect(b.portfolio.get(judge.id)?.level).toBe("II");
     expect(b.portfolio.get(judge.id)?.II["2.1"]).toEqual([{ num: "AW-00001", link: "https://example.com/w" }]);
   });

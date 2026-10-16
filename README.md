@@ -2,12 +2,13 @@
 
 [![CI](https://github.com/danieljcode/lawportal-v2/actions/workflows/ci.yml/badge.svg)](https://github.com/danieljcode/lawportal-v2/actions/workflows/ci.yml)
 
-A personal, local web app for writing San Andreas court filings. Pick a form, fill in the fields, and
-copy the finished filing straight into a forum editor (as formatted HTML or as BBCode), or download it
-as a Word `.docx`.
+A personal, local web app for writing San Andreas court filings on the **FreestyleRP** roleplay
+server. Pick a form, fill in the fields, and copy the finished filing straight into a forum editor (as
+formatted HTML or as BBCode), into Discord, or download it as a Word `.docx`.
 
 It carries 39 court forms plus six of our own templates (petitions, a motion, discovery and a
-contract), and it looks like a 1990s Windows desktop.
+contract), all in FreestyleRP's court names, and it looks like a 1990s Windows desktop. FreestyleRP
+is set in 1990, so every date the app fills in is 36 years back from today's real date.
 
 > Personal tool. These are roleplay court forms, not legal documents. Always check a filing before
 > posting.
@@ -177,10 +178,10 @@ npm run port-forms
 ```
 
 This reads `.agents/reference/jsa/js_forms.data.js` and writes `src/data/forms.json`. Links to the
-old forum hosts are unwrapped (the link text stays; see `scripts/scrub-links.mjs`), then the GTAW
-wording is replaced with FreestyleRP's (`scripts/freestyle-wording.mjs`): court names and phrases
-such as "Superior Court of the State of San Andreas" → "San Andreas Court", and the GTAW courthouses
-and `GJ` case-number code → the courthouses in `src/lib/courts.ts`. So `forms.json` holds exactly
+old forum hosts are unwrapped (the link text stays; see `scripts/scrub-links.mjs`), then the
+reference forms' court wording is replaced with FreestyleRP's (`scripts/freestyle-wording.mjs`):
+court names and phrases such as "Superior Court of the State of San Andreas" → "San Andreas Court",
+and their courthouses and case-number code → the courthouses in `src/lib/courts.ts`. So `forms.json` holds exactly
 what gets posted, with no translation in the app. It refuses to write if any template contains
 scripts, event handlers, non-http(s) links or other unsafe markup, and lists the offending form ids.
 Run `npm test` afterwards: a test fails if `forms.json` isn't what port-forms would write now, for

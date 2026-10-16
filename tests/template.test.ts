@@ -74,12 +74,12 @@ describe("formatDate", () => {
 
 describe("prefill", () => {
   it("YY becomes the two-digit UTC year", () => {
-    expect(prefillValue(field("{{Case number=YYGJCR00XXX}}"), NOW)).toBe("26GJCR00XXX");
+    expect(prefillValue(field("{{Case number=YYSCCR00XXX}}"), NOW)).toBe("26SCCR00XXX");
   });
 
   it("<Label?A=x> takes the code for another field's value", () => {
-    const f = field("{{Case number=YYGJ<Division?CRIMINAL DIVISION=CR;CIVIL DIVISION=CC>00XXX}}");
-    expect(prefillValue(f, NOW, (l) => (l === "Division" ? "CIVIL DIVISION" : undefined))).toBe("26GJCC00XXX");
+    const f = field("{{Case number=YYSC<Division?CRIMINAL DIVISION=CR;CIVIL DIVISION=CC>00XXX}}");
+    expect(prefillValue(f, NOW, (l) => (l === "Division" ? "CIVIL DIVISION" : undefined))).toBe("26SCCC00XXX");
     expect(prefillValue(f, NOW, () => "TRAFFIC DIVISION")).toBe("");
     expect(prefillValue(f, NOW)).toBe("");
     expect(prefillDeps(f)).toEqual(["Division"]);

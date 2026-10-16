@@ -115,10 +115,10 @@ describe("update API (AC 29)", () => {
   });
 
   it("setValue(Division) swaps the case code in the addressed scope only", () => {
-    const s = deepFreeze(state({ "Case number": "26GJCR00999", "#Cases": [{ "Case number": "26GJCR00147" }] }));
+    const s = deepFreeze(state({ "Case number": "90SCCR00999", "#Cases": [{ "Case number": "90SCCR00147" }] }));
     const next = setValue(s, [{ block: "Cases", index: 0 }], "Division", "CIVIL DIVISION");
-    expect(items(next.values, "Cases")[0]).toEqual({ "Case number": "26GJCC00147", Division: "CIVIL DIVISION" });
-    expect(next.values["Case number"]).toBe("26GJCR00999");
+    expect(items(next.values, "Cases")[0]).toEqual({ "Case number": "90SCCC00147", Division: "CIVIL DIVISION" });
+    expect(next.values["Case number"]).toBe("90SCCR00999");
   });
 
   it('setCond(false) stores "?Name": false', () => {
@@ -145,18 +145,18 @@ describe("Division and the case code (R2)", () => {
   });
 
   it("swaps a hand-typed number", () => {
-    const s = deepFreeze(state({ Division: "CRIMINAL DIVISION", "Case number": "26GJCR00147" }));
+    const s = deepFreeze(state({ Division: "CRIMINAL DIVISION", "Case number": "90SCCR00147" }));
     const next = setValue(s, [], "Division", "CIVIL DIVISION");
-    expect(next.values["Case number"]).toBe("26GJCC00147");
-    expect(applyPrefills(entries, next, NOW).values["Case number"]).toBe("26GJCC00147");
+    expect(next.values["Case number"]).toBe("90SCCC00147");
+    expect(applyPrefills(entries, next, NOW).values["Case number"]).toBe("90SCCC00147");
   });
 
   it("swapCaseCode needs a known division and a matching number", () => {
-    const scope = { "Case number": "26GJCR00147" };
+    const scope = { "Case number": "90SCCR00147" };
     expect(swapCaseCode(scope, "NOWHERE", undefined)).toBe(scope);
     expect(swapCaseCode({ "Case number": "2026-CV-1" }, "CIVIL DIVISION", undefined)).toEqual({ "Case number": "2026-CV-1" });
-    expect(swapCaseCode(scope, "TRAFFIC DIVISION", undefined)).toEqual({ "Case number": "26GJTC00147" });
-    expect(swapCaseCode(scope, "TRAFFIC DIVISION", "26GJCR00147")).toBe(scope);
+    expect(swapCaseCode(scope, "TRAFFIC DIVISION", undefined)).toEqual({ "Case number": "90SCTC00147" });
+    expect(swapCaseCode(scope, "TRAFFIC DIVISION", "90SCCR00147")).toBe(scope);
   });
 });
 
@@ -249,8 +249,8 @@ describe("opening and adding (R1, R6)", () => {
     expect(s.values["Plaintiff name"]).toBe("Ann Lee");
     expect(s.autofilled["Plaintiff name"]).toBe("Ann Lee");
     // A stored hand-typed number is kept.
-    const typed = openState(entries, state({ "Case number": "26GJCC00147" }), null, NOW);
-    expect(typed.values["Case number"]).toBe("26GJCC00147");
+    const typed = openState(entries, state({ "Case number": "90SCCC00147" }), null, NOW);
+    expect(typed.values["Case number"]).toBe("90SCCC00147");
   });
 
   it("readDraft discards an invalid draft", () => {
@@ -278,7 +278,7 @@ describe("opening and adding (R1, R6)", () => {
 describe("dockets ↔ form", () => {
   const docket = (over: Partial<Docket>): Docket => ({
     id: "d1",
-    caseNumber: "26GJCC00147",
+    caseNumber: "90SCCC00147",
     status: "Open",
     updated: "2026-01-01T00:00:00.000Z",
     ...over,
@@ -296,7 +296,7 @@ describe("dockets ↔ form", () => {
     );
     expect(filled).toBe(4);
     expect(next.values).toMatchObject({
-      "Case number": "26GJCC00147",
+      "Case number": "90SCCC00147",
       "Plaintiff name": "Ann and Bo",
       "Defendant name": "Cy",
       "Action filed": "2026-01-05",
@@ -335,7 +335,7 @@ describe("dockets ↔ form", () => {
     });
     const sched = getForm("criminal-case-schedule")!;
     const se = fields(compile(sched.html));
-    const s = applyPrefills(se, state({ "Case number": "26GJCR00147", "Plaintiff name": "People" }), NOW);
+    const s = applyPrefills(se, state({ "Case number": "90SCCR00147", "Plaintiff name": "People" }), NOW);
     const p = formToDocketPatch(sched, se, s.values);
     expect(p).toMatchObject({ patch: { plaintiff: "People", nextEvent: "Judgement", nextDate: "2026-03-31", filed: "2026-03-10" } });
     expect("patch" in p && p.patch.status).toBeFalsy();
@@ -344,7 +344,7 @@ describe("dockets ↔ form", () => {
   it("formToDocketPatch needs a real case number", () => {
     const f = getForm("civil-complaint")!;
     const e = fields(compile(f.html));
-    expect(formToDocketPatch(f, e, { "Case number": "26GJCC00XXX" })).toEqual({ error: "Enter the case number first." });
+    expect(formToDocketPatch(f, e, { "Case number": "90SCCC00XXX" })).toEqual({ error: "Enter the case number first." });
     expect(formToDocketPatch(f, e, {})).toEqual({ error: "Enter the case number first." });
   });
 
