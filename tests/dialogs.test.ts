@@ -2,15 +2,16 @@
 // The FEAT-005 UI through the whole App: the Characters dialog (12 fields, the
 // name error, the docket box following the title, storage note), J.A.P. gating
 // and output, the Dockets dialog, and What's new clearing the unread dot.
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import App from "@/components/App";
 import { CHANGELOG } from "@/data/changelog";
-import { characterStore } from "@/lib/characters";
+import { LOG_TYPES } from "@/lib/changelog";
+import { characterStore, CHARS_KEY } from "@/lib/characters";
 import { docketStore } from "@/lib/dockets";
 import { portfolioStore } from "@/lib/portfolio";
-import { S_JAP_OFF, S_STORAGE_LOCAL } from "@/lib/strings";
+import { S_JAP_OFF, S_SET_ASIDE, S_STORAGE_LOCAL } from "@/lib/strings";
 import * as sync from "@/lib/sync";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -106,6 +107,33 @@ describe("Characters dialog", () => {
     expect($("#sync-lost")).toBeNull();
     expect(characterStore().get("char0001")?.name).toBe("Kept Aside");
     expect(must("#char-list").textContent).toContain("Kept Aside");
+  });
+
+  it("sets damaged characters aside with a notice and offers Download damaged data (LP-65)", async () => {
+    act(() => root.unmount());
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    localStorage.setItem(CHARS_KEY, "[{\"id\":\"abcd1234\",\"name\":\"Half writ");
+    root = createRoot(container);
+    act(() => root.render(createElement(App)));
+    expect(must("#set-aside-notice").textContent).toContain(S_SET_ASIDE);
+    expect(localStorage.getItem(CHARS_KEY)).toBeNull();
+
+    let blob: Blob | null = null;
+    const createUrl = vi.fn((b: Blob) => {
+      blob = b;
+      return "blob:damaged";
+    });
+    Object.assign(URL, { createObjectURL: createUrl, revokeObjectURL: () => {} });
+    const anchorClick = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+    click("#open-characters");
+    click("#download-damaged");
+    expect(anchorClick).toHaveBeenCalled();
+    const file = JSON.parse(await blob!.text()) as { setAside: Array<{ key: string; raw: string }> };
+    expect(file.setAside).toMatchObject([{ key: CHARS_KEY, raw: "[{\"id\":\"abcd1234\",\"name\":\"Half writ" }]);
+
+    click("#set-aside-dismiss");
+    expect($("#set-aside-notice")).toBeNull();
+    warn.mockRestore();
   });
 
   it("has the 13 fields, needs a name, and the docket box follows the title", () => {
@@ -236,19 +264,11 @@ describe("What's new", () => {
     expect($("#changelog-dot")).toBeNull();
     expect(document.querySelectorAll("#changelog-list article.log-entry")).toHaveLength(CHANGELOG.length);
     expect(must("#changelog-list time").getAttribute("datetime")).toBe(CHANGELOG[0].date);
-    expect([...document.querySelectorAll(".log-entry:first-child .log-type")].map((e) => e.textContent)).toEqual([
-      "New",
-      "Fixed",
-    ]);
-    expect([...document.querySelectorAll(".log-entry:nth-child(2) .log-type")].map((e) => e.textContent)).toEqual([
-      "New",
-      "Updated",
-    ]);
-    expect([...document.querySelectorAll(".log-entry:nth-child(3) .log-type")].map((e) => e.textContent)).toEqual([
-      "New",
-    ]);
-    expect([...document.querySelectorAll(".log-entry:nth-child(4) .log-type")].map((e) => e.textContent)).toEqual([
-      "Updated",
-    ]);
+    // Each entry shows one heading per item type it has, in LOG_TYPES order.
+    const entries = [...document.querySelectorAll("#changelog-list article.log-entry")];
+    CHANGELOG.forEach((entry, i) => {
+      const expected = LOG_TYPES.filter(([t]) => entry.items.some((item) => item.type === t)).map(([, label]) => label);
+      expect([...entries[i].querySelectorAll(".log-type")].map((e) => e.textContent)).toEqual(expected);
+    });
   });
 });

@@ -845,6 +845,9 @@ dialog::backdrop { background: rgba(0, 0, 0, .4); }
 }
 .sync-message { min-height: 1em; margin: 6px 0 0; color: var(--muted); }
 .sync-message.warn { color: var(--bad); font-weight: 700; }
+.set-aside-notice { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin: 4px 6px; padding: 6px 8px; border: 2px solid var(--bad); }
+.set-aside-notice strong { color: var(--bad); }
+.set-aside-notice .mini { margin-left: auto; }
 .char-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; margin-top: 8px; align-items: start; }
 :where(dialog) .char-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
 .char-list li { padding: 6px 8px; border-left: 3px solid var(--shadow); }

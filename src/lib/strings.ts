@@ -41,6 +41,9 @@ export function S_SYNC_LOST(n: number): string {
     : `Another device changed ${n} of the same characters more recently, so its versions are shown. Yours are kept: use Restore my version to bring them back.`;
 }
 
+export const S_SET_ASIDE = "Some saved data couldn't be read and was set aside.";
+export const S_SET_ASIDE_HINT = "Use Download damaged data in the Characters dialog to keep a copy you can fix by hand.";
+
 export const S_JAP_OFF = "Portfolios are saved in this browser. Turn on sync to keep them on this app's server too.";
 
 export const S_JAP_ON = "Saved in this browser and on this app's server.";
