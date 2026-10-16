@@ -4,6 +4,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { ALL_FORMS } from "@/data";
 import { hasRefForms, paritySuite, REF_FORMS } from "./oracle";
+import { toFreestyle } from "../scripts/freestyle-wording.mjs";
 import { unwrapBlockedLinks } from "../scripts/scrub-links.mjs";
 import { checkTemplateHtml } from "../scripts/template-safety.mjs";
 
@@ -51,12 +52,16 @@ describe("unwrapBlockedLinks", () => {
     expect(unwrapBlockedLinks(html)).toBe(html);
   });
 
-  // forms.json must be exactly the scrubbed reference forms (what `npm run port-forms` writes).
-  it.skipIf(!hasRefForms)(paritySuite("matches the scrubbed reference forms", hasRefForms), () => {
+  // forms.json must be exactly what port-forms writes: scrubbed links, then FreestyleRP wording
+  // (so it fails if courts.ts or the wording changed without re-running port-forms).
+  it.skipIf(!hasRefForms)(paritySuite("matches the reference forms as port-forms writes them", hasRefForms), () => {
     const text = readFileSync(REF_FORMS, "utf8");
     const ref = JSON.parse(text.slice(text.indexOf("["), text.lastIndexOf("]") + 1)) as Array<Record<string, string>>;
-    expect(ALL_FORMS.filter((f) => ref.some((r) => r.id === f.id)).map((f) => [f.id, f.html])).toEqual(
-      ref.map((r) => [r.id, unwrapBlockedLinks(r.html)]),
+    expect(ALL_FORMS.filter((f) => ref.some((r) => r.id === f.id)).map((f) => [f.id, f.court, f.html])).toEqual(
+      ref.map((r) => {
+        const out = toFreestyle({ ...r, html: unwrapBlockedLinks(r.html) });
+        return [r.id, out.court, out.html];
+      }),
     );
   });
 });

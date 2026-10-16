@@ -17,6 +17,10 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  { date: "2026-10-16", title: "FreestyleRP forms", items: [
+    { type: "update", text: "Every court form is now written in FreestyleRP's court names, so what you see in the editor is exactly what gets posted." },
+    { type: "update", text: "The Courthouse box offers Superior Court, and the Greg E. Joplin courthouse is gone from every form." },
+  ]},
   { date: "2026-10-16", title: "FreestyleRP case numbers", items: [
     { type: "update", text: "Case numbers now name the Superior Court, for example 90SCCR00XXX, instead of the old GTAW courthouses. Case numbers already on your dockets stay as they were filed." },
     { type: "update", text: "Loading a case from a docket fills in Superior Court as the courthouse." },
