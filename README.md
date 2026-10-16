@@ -58,9 +58,11 @@ Open `http://<this computer's LAN IP>:3000` on the other device. Notes:
 - **Start page** with the three steps (add your character, fill in the form, copy for forum).
 - **Form editor.** Inputs generated from the template: collapsible sections with "x of y filled"
   counts, checkbox lists with inline details, repeatable items (add, remove, reorder), optional
-  sections, dates with Today/Auto. Case number boxes start empty and show the server-aware pattern as
-  a placeholder (GTAW keeps the GJ code, FreestyleRP drops it); leaving one blank still prints the
-  pattern in the output. Collapse all, Fill from character and Clear form. Drafts save automatically
+  sections, dates with Today/Auto. Case number boxes start empty and show the pattern as a
+  placeholder: in-game year, courthouse, division and number, e.g. `90SCCR00XXX` (Superior Court,
+  criminal); leaving one blank still prints the pattern in the output. The courthouse and the
+  case-number shape are set in `src/lib/courts.ts`; FreestyleRP has no official court details yet,
+  so swap real ones in there. Collapse all, Fill from character and Clear form. Drafts save automatically
   per form and the last form reopens on load.
 - **Toolbar.** "Filing as" (the active character), the server toggle, Dockets, J.A.P., Characters with
   a sync status dot, What's new with an unread dot, the theme button, and a ☰ form list on narrow
