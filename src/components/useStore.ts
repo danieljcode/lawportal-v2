@@ -8,6 +8,7 @@ import { useSyncExternalStore } from "react";
 import { characterStore } from "@/lib/characters";
 import { docketStore } from "@/lib/dockets";
 import { portfolioStore } from "@/lib/portfolio";
+import { setAsideVersion, subscribeSetAside } from "@/lib/storage";
 import * as sync from "@/lib/sync";
 
 function subscribeCharacters(fn: () => void): () => void {
@@ -41,6 +42,11 @@ const portfolioSnapshot = () => portfolioStore().version();
 
 export function usePortfolioVersion(): number {
   return useSyncExternalStore(subscribePortfolio, portfolioSnapshot, portfolioSnapshot);
+}
+
+/** Counts values set aside as unreadable since the page loaded (0: none). */
+export function useSetAsideVersion(): number {
+  return useSyncExternalStore(subscribeSetAside, setAsideVersion, setAsideVersion);
 }
 
 const subscribeSync = (fn: () => void) => sync.onChange(() => fn());

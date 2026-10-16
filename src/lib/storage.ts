@@ -81,17 +81,103 @@ export function backend(): Backend {
   return defaultBackend;
 }
 
-/** Parse a JSON value; a corrupt value is removed (with a warning) and read as null. */
+/**
+ * Parse a JSON value. A corrupt value reads as null and is set aside (see
+ * setAside) before it is removed, so one bad write can't wipe saved work.
+ */
 export function readJson<T = unknown>(kv: KV, key: string): T | null {
   const raw = kv.get(key);
   if (raw === null || raw === "") return null;
   try {
     return JSON.parse(raw) as T;
   } catch {
-    console.warn(`[storage] removing corrupt value for ${key}`);
-    kv.remove(key);
+    console.warn(`[storage] setting aside unreadable value for ${key}`);
+    if (setAside(kv, key, raw)) kv.remove(key);
     return null;
   }
+}
+
+/* ---------- damaged values ---------- */
+
+/** Backups are `lawapp_corrupt_<key>_<ms>`; the last 3 per key are kept. */
+export const CORRUPT_PREFIX = "lawapp_corrupt_";
+/** JSON list of the backup keys (KV can't list keys). */
+export const CORRUPT_INDEX_KEY = "lawapp_corrupt_index";
+export const KEEP_CORRUPT = 3;
+
+export interface SetAsideValue {
+  /** The key the value was read from. */
+  key: string;
+  /** ISO time it was set aside. */
+  at: string;
+  /** The value exactly as stored. */
+  raw: string;
+}
+
+const setAsideChanges = createChannel();
+/** Values that couldn't be backed up in storage (full or blocked): kept for this page only. */
+let unsaved: SetAsideValue[] = [];
+
+function corruptIndex(kv: KV): string[] {
+  try {
+    const list: unknown = JSON.parse(kv.get(CORRUPT_INDEX_KEY) || "[]");
+    return Array.isArray(list) ? list.filter((k): k is string => typeof k === "string" && k.startsWith(CORRUPT_PREFIX)) : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Copy an unreadable value to a backup key before it's dropped, keeping the
+ * last 3 per key, and raise the "set aside" notice. Returns false when the
+ * backup couldn't be written: the caller should then leave the value alone.
+ */
+export function setAside(kv: KV, key: string, raw: string): boolean {
+  const now = Date.now();
+  let saved = false;
+  try {
+    const backup = CORRUPT_PREFIX + key + "_" + now;
+    kv.set(backup, raw);
+    const index = [...corruptIndex(kv).filter((k) => k !== backup), backup];
+    const mine = index.filter((k) => k.startsWith(CORRUPT_PREFIX + key + "_"));
+    const drop = new Set(mine.slice(0, -KEEP_CORRUPT));
+    for (const k of drop) kv.remove(k);
+    kv.set(CORRUPT_INDEX_KEY, JSON.stringify(index.filter((k) => !drop.has(k))));
+    saved = true;
+  } catch (err) {
+    console.warn(`[storage] couldn't back up ${key}; leaving it in place`, err);
+    if (!unsaved.some((v) => v.key === key && v.raw === raw)) {
+      unsaved.push({ key, at: new Date(now).toISOString(), raw });
+    }
+  }
+  setAsideChanges.emit();
+  return saved;
+}
+
+/** Every value set aside: the stored backups (oldest first), then any this page couldn't store. */
+export function listSetAside(kv: KV): SetAsideValue[] {
+  const out: SetAsideValue[] = [];
+  for (const k of corruptIndex(kv)) {
+    const raw = kv.get(k);
+    if (raw === null) continue;
+    const cut = k.lastIndexOf("_");
+    const ms = Number(k.slice(cut + 1));
+    out.push({
+      key: k.slice(CORRUPT_PREFIX.length, cut),
+      at: Number.isFinite(ms) ? new Date(ms).toISOString() : "",
+      raw,
+    });
+  }
+  return [...out, ...unsaved];
+}
+
+/** Fires when a value is set aside; the version counts them since the page loaded. */
+export const subscribeSetAside = setAsideChanges.subscribe;
+export const setAsideVersion = setAsideChanges.version;
+
+/** Test-only: forget values held in memory. */
+export function __resetSetAsideForTests(): void {
+  unsaved = [];
 }
 
 /** Store a JSON value. Throws Error(SAVE_FAILED) when the browser refuses the write. */

@@ -24,7 +24,8 @@ import OutputPane from "./OutputPane";
 import Sidebar from "./Sidebar";
 import Taskbar from "./Taskbar";
 import Toolbar from "./Toolbar";
-import { useCharacterVersion, useSyncState } from "./useStore";
+import { S_SET_ASIDE, S_SET_ASIDE_HINT } from "@/lib/strings";
+import { useCharacterVersion, useSetAsideVersion, useSyncState } from "./useStore";
 
 export type Route = { kind: "home" } | { kind: "form"; id: string } | { kind: "jap" };
 
@@ -77,6 +78,9 @@ export default function App() {
     return initialRoute();
   });
   const [navOpen, setNavOpen] = useState(false);
+  const setAsideCount = useSetAsideVersion();
+  /** The set-aside count when the notice was last dismissed; a new one shows it again. */
+  const [setAsideSeen, setSetAsideSeen] = useState(0);
   const [highlight, setHighlight] = useState(true);
   /** The last output FormView reported, with the form it belongs to (out is null when that template failed to compile). */
   const [output, setOutput] = useState<{ formId: string; out: FormOutput | null } | null>(null);
@@ -280,6 +284,14 @@ export default function App() {
           onCharacters={() => openCharacters()}
           onChangelog={openChangelog}
         />
+        {setAsideCount > setAsideSeen && (
+          <div className="set-aside-notice" id="set-aside-notice" role="alert">
+            <strong>{S_SET_ASIDE}</strong> {S_SET_ASIDE_HINT}
+            <button type="button" className="mini" id="set-aside-dismiss" onClick={() => setSetAsideSeen(setAsideCount)}>
+              Dismiss
+            </button>
+          </div>
+        )}
         {/* "with-output" adds the third grid column (form preview or J.A.P. output). */}
         <div className={"layout" + (showOutput ? " with-output" : "")}>
           <Sidebar forms={ALL_FORMS} current={current} commissioner={commissioner} server={server} />

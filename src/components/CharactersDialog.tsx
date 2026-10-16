@@ -7,13 +7,27 @@ import { checkFileSize, EXPORT_FILENAME, exportText, importedMessage, importText
 import { characterStore, FIELDS, hasDocket, titleKeepsDocket } from "@/lib/characters";
 import { docketStore } from "@/lib/dockets";
 import { portfolioStore } from "@/lib/portfolio";
-import { backend } from "@/lib/storage";
+import { backend, defaultKV, listSetAside } from "@/lib/storage";
 import { S_STORAGE_LOCAL, S_STORAGE_MEMORY, S_STORAGE_SYNC } from "@/lib/strings";
 import * as sync from "@/lib/sync";
 import type { Character } from "@/lib/types";
 import Dialog from "./Dialog";
 import SyncPanel from "./SyncPanel";
-import { useDocketVersion, useSyncState } from "./useStore";
+import { useDocketVersion, useSetAsideVersion, useSyncState } from "./useStore";
+
+export const DAMAGED_FILENAME = "court-filing-damaged-data.json";
+
+function download(text: string, filename: string): void {
+  const blob = new Blob([text], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
 
 export interface CharactersDialogProps {
   open: boolean;
@@ -66,6 +80,8 @@ function CharactersBody({ characters, activeId, onDockets, autoSync, onAutoSyncD
   const fileRef = useRef<HTMLInputElement>(null);
   useDocketVersion(); // the "Dockets (n)" counts follow docket changes
   useSyncState(); // the storage note follows sync on/off
+  useSetAsideVersion(); // the download button appears once something is set aside
+  const hasDamaged = listSetAside(defaultKV()).length > 0;
 
   const store = characterStore();
   const syncOn = !!sync.code();
@@ -111,17 +127,11 @@ function CharactersBody({ characters, activeId, onDockets, autoSync, onAutoSyncD
     if (editing && editing.id === c.id) setEditing(null);
   };
 
-  const exportFile = () => {
-    const blob = new Blob([exportText()], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = EXPORT_FILENAME;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 0);
-  };
+  const exportFile = () => download(exportText(), EXPORT_FILENAME);
+
+  // Each value exactly as it was stored, with where and when it was set aside.
+  const downloadDamaged = () =>
+    download(JSON.stringify({ app: "jsa-form-generator", setAside: listSetAside(defaultKV()) }, null, 2), DAMAGED_FILENAME);
 
   const importFile = async (e: ChangeEvent<HTMLInputElement>) => {
     const input = e.target;
@@ -223,6 +233,11 @@ function CharactersBody({ characters, activeId, onDockets, autoSync, onAutoSyncD
               hidden
               onChange={importFile}
             />
+            {hasDamaged && (
+              <button type="button" className="btn" id="download-damaged" onClick={downloadDamaged}>
+                Download damaged data
+              </button>
+            )}
           </div>
         </div>
         {editing && (

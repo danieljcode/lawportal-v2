@@ -21,7 +21,17 @@ import {
   render,
   topicTitle,
 } from "@/lib/portfolio";
-import { memoryKV, readJson, writeJson, SAVE_FAILED, type KV } from "@/lib/storage";
+import {
+  __resetSetAsideForTests,
+  CORRUPT_PREFIX,
+  listSetAside,
+  memoryKV,
+  readJson,
+  setAsideVersion,
+  writeJson,
+  SAVE_FAILED,
+  type KV,
+} from "@/lib/storage";
 
 /** A memory KV whose keys can be inspected. */
 function spyKV(): KV & { keys(): string[] } {
@@ -43,12 +53,62 @@ function stores(kv: KV = spyKV()) {
 }
 
 describe("storage helpers", () => {
-  it("removes corrupt JSON and warns", () => {
-    const kv = memoryKV({ k: "{nope" });
+  it("sets corrupt JSON aside before removing it, and raises the notice (LP-65)", () => {
+    const kv = memoryKV({ lawapp_chars: "[{\"id\":\"abcd1234\",\"name\":\"Ha" });
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    expect(readJson(kv, "k")).toBeNull();
-    expect(kv.get("k")).toBeNull();
+    const now = vi.spyOn(Date, "now").mockReturnValue(Date.UTC(2026, 9, 16, 12));
+    const notices = setAsideVersion();
+    expect(readJson(kv, "lawapp_chars")).toBeNull();
+    expect(kv.get("lawapp_chars")).toBeNull();
+    const backup = CORRUPT_PREFIX + "lawapp_chars_" + Date.UTC(2026, 9, 16, 12);
+    expect(kv.get(backup)).toBe("[{\"id\":\"abcd1234\",\"name\":\"Ha");
+    expect(listSetAside(kv)).toEqual([
+      { key: "lawapp_chars", at: "2026-10-16T12:00:00.000Z", raw: "[{\"id\":\"abcd1234\",\"name\":\"Ha" },
+    ]);
+    expect(setAsideVersion()).toBe(notices + 1);
     expect(warn).toHaveBeenCalled();
+    now.mockRestore();
+    warn.mockRestore();
+  });
+
+  it("keeps the last 3 set-aside copies per key", () => {
+    const kv = memoryKV();
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    let t = 1_000;
+    const now = vi.spyOn(Date, "now").mockImplementation(() => ++t);
+    for (const raw of ["{a", "{b", "{c", "{d"]) {
+      kv.set("lawapp_dockets_abcd1234", raw);
+      readJson(kv, "lawapp_dockets_abcd1234");
+    }
+    kv.set("lawapp_jap_abcd1234", "{other");
+    readJson(kv, "lawapp_jap_abcd1234");
+    expect(listSetAside(kv).map((v) => v.key + ":" + v.raw)).toEqual([
+      "lawapp_dockets_abcd1234:{b",
+      "lawapp_dockets_abcd1234:{c",
+      "lawapp_dockets_abcd1234:{d",
+      "lawapp_jap_abcd1234:{other",
+    ]);
+    expect(kv.get(CORRUPT_PREFIX + "lawapp_dockets_abcd1234_1001")).toBeNull();
+    now.mockRestore();
+    warn.mockRestore();
+  });
+
+  it("leaves a corrupt value in place when its backup can't be written, but keeps a copy for download", () => {
+    const base = memoryKV({ lawapp_chars: "{full" });
+    const kv: KV = {
+      ...base,
+      set: (k, v) => {
+        if (k.startsWith(CORRUPT_PREFIX)) throw new Error("QuotaExceeded");
+        base.set(k, v);
+      },
+    };
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    expect(readJson(kv, "lawapp_chars")).toBeNull();
+    expect(kv.get("lawapp_chars")).toBe("{full");
+    expect(listSetAside(kv)).toMatchObject([{ key: "lawapp_chars", raw: "{full" }]);
+    readJson(kv, "lawapp_chars");
+    expect(listSetAside(kv)).toHaveLength(1);
+    __resetSetAsideForTests();
     warn.mockRestore();
   });
 
@@ -237,13 +297,14 @@ describe("characters", () => {
     expect(chars.migrateLegacy()).toBe(0);
   });
 
-  it("drops an unreadable legacy list", () => {
+  it("sets aside an unreadable legacy list", () => {
     const kv = spyKV();
     kv.set(LEGACY_KEY, "{broken");
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     expect(createCharacterStore(kv).migrateLegacy()).toBe(0);
     expect(kv.get(LEGACY_KEY)).toBeNull();
     expect(kv.get(CHARS_KEY)).toBeNull();
+    expect(listSetAside(kv)).toMatchObject([{ key: LEGACY_KEY, raw: "{broken" }]);
     warn.mockRestore();
   });
 });
