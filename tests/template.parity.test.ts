@@ -4,7 +4,7 @@ import { ALL_FORMS, getForm } from "@/data";
 import { compile, fields, render } from "@/lib/template";
 import type { Entry } from "@/lib/types";
 import { fixture } from "./fixtures";
-import { hasOracle, refTemplate, type RefEntry } from "./oracle";
+import { hasOracle, paritySuite, refTemplate, type RefEntry } from "./oracle";
 
 /** Comparable form of a fields() list from either engine. */
 function normalize(entries: readonly (Entry | RefEntry)[]): unknown[] {
@@ -32,7 +32,7 @@ function normalize(entries: readonly (Entry | RefEntry)[]): unknown[] {
   });
 }
 
-describe.skipIf(!hasOracle)("template engine parity with the reference", () => {
+describe.skipIf(!hasOracle)(paritySuite("template engine parity with the reference"), () => {
   // Compiled lazily inside each test, so collection never touches a missing oracle.
   function both(html: string) {
     const ref = refTemplate!;

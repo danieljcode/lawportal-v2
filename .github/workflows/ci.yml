@@ -7,8 +7,20 @@ on:
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
+    env:
+      # Read-only token for the private reference repo (README, Reference data).
+      REFERENCE_TOKEN: ${{ secrets.REFERENCE_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+
+      # The parity tests need it; without the secret (forks) they skip with a note.
+      - name: Check out reference data
+        if: env.REFERENCE_TOKEN != ''
+        uses: actions/checkout@v4
+        with:
+          repository: danieljcode/lawportal-reference
+          token: ${{ secrets.REFERENCE_TOKEN }}
+          path: .agents/reference/jsa
 
       - uses: actions/setup-node@v4
         with:
@@ -17,4 +29,7 @@ jobs:
 
       - run: npm ci
       - run: npm test
+        env:
+          # With the data checked out, a missing file fails the run instead of skipping.
+          LAWAPP_REQUIRE_REFERENCE: ${{ env.REFERENCE_TOKEN != '' && '1' || '' }}
       - run: npm run build

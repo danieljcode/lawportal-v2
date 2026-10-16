@@ -1,8 +1,9 @@
 // AC 27 (template safety), the old-forum link scrub, and R4 (no latin-1 double-encoded text under src/).
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { ALL_FORMS } from "@/data";
+import { hasRefForms, paritySuite, REF_FORMS } from "./oracle";
 import { unwrapBlockedLinks } from "../scripts/scrub-links.mjs";
 import { checkTemplateHtml } from "../scripts/template-safety.mjs";
 
@@ -51,9 +52,8 @@ describe("unwrapBlockedLinks", () => {
   });
 
   // forms.json must be exactly the scrubbed reference forms (what `npm run port-forms` writes).
-  const refForms = path.resolve(process.cwd(), ".agents/reference/jsa/js_forms.data.js");
-  it.skipIf(!existsSync(refForms))("matches the scrubbed reference forms", () => {
-    const text = readFileSync(refForms, "utf8");
+  it.skipIf(!hasRefForms)(paritySuite("matches the scrubbed reference forms", hasRefForms), () => {
+    const text = readFileSync(REF_FORMS, "utf8");
     const ref = JSON.parse(text.slice(text.indexOf("["), text.lastIndexOf("]") + 1)) as Array<Record<string, string>>;
     expect(ALL_FORMS.filter((f) => ref.some((r) => r.id === f.id)).map((f) => [f.id, f.html])).toEqual(
       ref.map((r) => [r.id, unwrapBlockedLinks(r.html)]),
