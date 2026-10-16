@@ -3,16 +3,21 @@
 
 import { CHANGELOG } from "@/data/changelog";
 import { friendlyDate, LOG_TYPES } from "@/lib/changelog";
+import { APP_VERSION } from "@/lib/version";
 import Dialog from "./Dialog";
 
 export default function ChangelogDialog({ open, onClose }: { open: boolean; onClose(): void }) {
   return (
     <Dialog open={open} onClose={onClose} id="changelog-dialog" className="changelog" titleId="changelog-title" title="What's new">
+      <p className="muted small" id="app-version">
+        Version {APP_VERSION}
+      </p>
       <div id="changelog-list">
         {CHANGELOG.map((entry) => (
           <article className="log-entry" key={entry.date + "|" + (entry.title || "")}>
             <header>
               <time dateTime={entry.date}>{friendlyDate(entry.date)}</time>
+              {entry.version && <span className="log-version">v{entry.version}</span>}
               {entry.title && <span className="log-title">{entry.title}</span>}
             </header>
             {LOG_TYPES.map(([type, label]) => {
