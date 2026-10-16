@@ -1,5 +1,7 @@
 # Court Filing Generator
 
+[![CI](https://github.com/danieljcode/lawportal-v2/actions/workflows/ci.yml/badge.svg)](https://github.com/danieljcode/lawportal-v2/actions/workflows/ci.yml)
+
 A personal, local web app for writing San Andreas court filings. Pick a form, fill in the fields, and
 copy the finished filing straight into a forum editor (as formatted HTML or as BBCode), or download it
 as a Word `.docx`.
@@ -179,6 +181,10 @@ and preview (`src/lib/discord.ts`, `src/lib/discordSplit.ts`, `src/lib/discordPr
 and message limits on every form), the form state and layout, the
 stores, the sync API and client, the `.docx` converter, XSS escaping, template safety, and the UI
 (form view, preview, dialogs, Discord tab, J.A.P.).
+
+CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm test` and `npm run build` on Node 22 for every
+push and pull request. CI has no `.agents/` folder, so the reference-engine differential tests are
+skipped there and only run locally.
 
 ## Credits
 
