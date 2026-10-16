@@ -184,8 +184,8 @@ lists the offending form ids. Run `npm test` afterwards.
 
 `npm run port-forms` and the parity tests use files from the
 [JSA Form Generator](https://forum.gta.world/en/topic/93922-court-petitions-directory/) by Awucard:
-`js_template.js`, `js_bbcode.js` and `js_forms.data.js`. They have no licence, so they aren't in this
-public repo. They're kept in the private repo `danieljcode/lawportal-reference` (files at its root).
+`js_template.js`, `js_bbcode.js` and `js_forms.data.js`. They have no licence, so they're kept apart
+from this code, in the private repo `danieljcode/lawportal-reference` (files at its root).
 With access, put them where the scripts and tests look:
 
 ```bash
