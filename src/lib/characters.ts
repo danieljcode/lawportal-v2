@@ -15,6 +15,7 @@ import {
   newId,
   onCharacterTouched,
   readJson,
+  setAside,
   writeJson,
   writeString,
   type KV,
@@ -327,8 +328,8 @@ export function createCharacterStore(kv: KV): CharacterStore {
       try {
         old = JSON.parse(raw);
       } catch {
-        console.warn("[characters] dropping unreadable " + LEGACY_KEY);
-        kv.remove(LEGACY_KEY);
+        console.warn("[characters] setting aside unreadable " + LEGACY_KEY);
+        if (setAside(kv, LEGACY_KEY, raw)) kv.remove(LEGACY_KEY);
         return 0;
       }
       const arr = Array.isArray(old) ? old : old && typeof old === "object" ? (old as { characters?: unknown }).characters : [];

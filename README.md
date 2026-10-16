@@ -96,6 +96,11 @@ Open `http://<this computer's LAN IP>:3000` on the other device. Notes:
 Data lives in this browser's local storage (keys prefixed `lawapp_`). The "Today" date buttons and
 date prefills use UTC, like the forum's courts.
 
+If a saved value can't be read (a half-finished write, a crashed tab), it isn't deleted: it's copied
+to `lawapp_corrupt_<key>_<time>` first (the last 3 per key are kept), the app shows a notice, and
+"Download damaged data" in the Characters dialog saves every set-aside value to a JSON file so it can
+be fixed by hand. If even the copy can't be written, the value is left where it is.
+
 ## Sync and security
 
 Sync is optional and runs entirely on the computer that runs the app:
