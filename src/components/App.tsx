@@ -66,14 +66,20 @@ function initialRoute(): Route {
   return parseRoute();
 }
 
-let migrated = false;
+/** One-time data migrations. Each is a no-op once done, so running on every mount is safe. */
+function migrate(): void {
+  characterStore().migrateLegacy();
+  try {
+    characterStore().migrateServerField();
+  } catch (err) {
+    // storage refused the write: the field is ignored anyway, so try again next load
+    console.warn("[characters] couldn't drop the old server field", err);
+  }
+}
 
 export default function App() {
   const [route, setRoute] = useState<Route>(() => {
-    if (!migrated) {
-      migrated = true;
-      characterStore().migrateLegacy();
-    }
+    migrate();
     return initialRoute();
   });
   const [navOpen, setNavOpen] = useState(false);
