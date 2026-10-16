@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import type { FormDef } from "@/lib/types";
-import { mapCourt, type ServerProfile } from "@/lib/servers";
 import { S_CREDIT, S_DISCLAIMER } from "@/lib/strings";
 
 const JAP_NAME = "Judicial Advancement Portfolio";
@@ -33,11 +32,9 @@ export interface SidebarProps {
   current: string | null;
   /** Show the Court Commissioners group. */
   commissioner: boolean;
-  /** The active server profile (for court-name mapping). */
-  server: ServerProfile;
 }
 
-export default function Sidebar({ forms, current, commissioner, server }: SidebarProps) {
+export default function Sidebar({ forms, current, commissioner }: SidebarProps) {
   const [query, setQuery] = useState("");
   const q = query.trim().toLowerCase();
   const groups = useMemo(() => group(forms, q), [forms, q]);
@@ -72,7 +69,7 @@ export default function Sidebar({ forms, current, commissioner, server }: Sideba
         )}
         {groups.map((g) => (
           <details open key={g.court}>
-            <summary>{mapCourt(server, g.court)}</summary>
+            <summary>{g.court}</summary>
             {g.runs.map((run, i) => (
               <div key={i} className="tree-run">
                 {run.section && <p className="section-label">{run.section}</p>}

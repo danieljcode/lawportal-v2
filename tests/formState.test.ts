@@ -25,6 +25,7 @@ import {
   writeDraft,
   type FormState,
 } from "@/lib/formState";
+import { divisionFor } from "@/lib/dockets";
 import { memoryKV } from "@/lib/storage";
 import { compile, fields, todayUTC } from "@/lib/template";
 import type { Character, Docket, Entry, Values } from "@/lib/types";
@@ -133,14 +134,14 @@ describe("Division and the case code (R2)", () => {
 
   it("leaves a derived number for applyPrefills", () => {
     const s = deepFreeze(
-      state({ Division: "CRIMINAL DIVISION", "Case number": "26GJCR00XXX" }, {}, { "Case number": "26GJCR00XXX" }),
+      state({ Division: "CRIMINAL DIVISION", "Case number": "26SCCR00XXX" }, {}, { "Case number": "26SCCR00XXX" }),
     );
     const next = setValue(s, [], "Division", "CIVIL DIVISION");
-    expect(next.values["Case number"]).toBe("26GJCR00XXX");
+    expect(next.values["Case number"]).toBe("26SCCR00XXX");
     expect(hasDependents(entries, next.values, "Division")).toBe(true);
     const after = applyPrefills(entries, next, NOW);
-    expect(after.values["Case number"]).toBe("26GJCC00XXX");
-    expect(after.derived["Case number"]).toBe("26GJCC00XXX");
+    expect(after.values["Case number"]).toBe("26SCCC00XXX");
+    expect(after.derived["Case number"]).toBe("26SCCC00XXX");
   });
 
   it("swaps a hand-typed number", () => {
@@ -168,7 +169,7 @@ describe("prefills", () => {
     expect(s.values.Judgement).toBe("2026-03-31");
     expect(s.values["Pre-trial motions start"]).toBe("2026-03-10");
     expect(s.values["Closing arguments end"]).toBe("2026-03-29");
-    expect(s.values["Case number"]).toBe("26GJCR00XXX");
+    expect(s.values["Case number"]).toBe("26SCCR00XXX");
 
     // Moving the judgement reflows its dependents but not a hand-typed one.
     let next = setValue(s, [], "Witness examinations end", "2026-01-01");
@@ -243,8 +244,8 @@ describe("opening and adding (R1, R6)", () => {
     expect(s.values["Defendant name"]).toBe("Cy");
     expect(items(s.values, "Exhibits")).toHaveLength(1); // the draft's array is kept
     expect(items(s.values, "Defendants")).toHaveLength(2);
-    expect(s.values["Case number"]).toBe("26GJCC00XXX");
-    expect(s.derived["Case number"]).toBe("26GJCC00XXX");
+    expect(s.values["Case number"]).toBe("26SCCC00XXX");
+    expect(s.derived["Case number"]).toBe("26SCCC00XXX");
     expect(s.values["Plaintiff name"]).toBe("Ann Lee");
     expect(s.autofilled["Plaintiff name"]).toBe("Ann Lee");
     // A stored hand-typed number is kept.
@@ -328,9 +329,9 @@ describe("dockets ↔ form", () => {
 
   it("formToDocketPatch builds the patch and closes judgement forms", () => {
     const j = getForm("criminal-judgement")!;
-    const res = formToDocketPatch(j, fields(compile(j.html)), { "Case number": "26GJCR00147" });
+    const res = formToDocketPatch(j, fields(compile(j.html)), { "Case number": "90SCCR00147" });
     expect(res).toEqual({
-      patch: { caseNumber: "26GJCR00147", court: "Superior Court of San Andreas - Criminal Division", status: "Closed" },
+      patch: { caseNumber: "90SCCR00147", court: "San Andreas Criminal Court", status: "Closed" },
     });
     const sched = getForm("criminal-case-schedule")!;
     const se = fields(compile(sched.html));
@@ -347,14 +348,23 @@ describe("dockets ↔ form", () => {
     expect(formToDocketPatch(f, e, {})).toEqual({ error: "Enter the case number first." });
   });
 
-  it("never writes Miscellaneous or Additional Templates as the court", () => {
+  it("never writes the general San Andreas Court or Additional Templates as the court", () => {
     const e = entriesOf("misc-order-decree");
-    for (const court of ["Miscellaneous", "Additional Templates"]) {
+    for (const court of ["San Andreas Court", "Additional Templates"]) {
       const p = formToDocketPatch({ id: "x", court }, e, { "Case number": "2026-CV-0042" });
       expect(p).toEqual({ patch: { caseNumber: "2026-CV-0042" } });
     }
-    const p = formToDocketPatch({ id: "x", court: "Appellate Court of San Andreas" }, e, { "Case number": "2026-CV-0042" });
-    expect("patch" in p && p.patch.court).toBe("Appellate Court of San Andreas");
+    const p = formToDocketPatch({ id: "x", court: "San Andreas Appellate Court" }, e, { "Case number": "2026-CV-0042" });
+    expect("patch" in p && p.patch.court).toBe("San Andreas Appellate Court");
+  });
+
+  it("reads a docket's division from a FreestyleRP court name or one saved before LP-69", () => {
+    expect(divisionFor({ court: "San Andreas Civil Court" })).toBe("CIVIL DIVISION");
+    expect(divisionFor({ court: "San Andreas Small Claims Court" })).toBe("SMALL CLAIMS DIVISION");
+    expect(divisionFor({ court: "Superior Court of San Andreas - Traffic Division" })).toBe("TRAFFIC DIVISION");
+    expect(divisionFor({ court: "San Andreas Appellate Court" })).toBeUndefined();
+    // The case number's own code wins.
+    expect(divisionFor({ caseNumber: "90SCCR00001", court: "San Andreas Civil Court" })).toBe("CRIMINAL DIVISION");
   });
 });
 

@@ -115,8 +115,8 @@ describe("caseNumberPattern", () => {
   // 2-digit year comes from that date.
   const fsNow = (d: Date) => getServerDate(d, freestyle);
 
-  it("builds year + our courthouse + division + number, with no GJ (LP-68)", () => {
-    const f = field("{{Case number=YYGJCR00XXX}}");
+  it("builds year + courthouse + division + number from the prefill (LP-68, LP-69)", () => {
+    const f = field("{{Case number=YYSCCR00XXX}}");
     expect(caseNumberPattern(f, fsNow(NOW))).toBe("90SCCR00XXX");
     expect(caseNumberPattern(f, NOW)).toBe("26SCCR00XXX");
   });
@@ -127,7 +127,7 @@ describe("caseNumberPattern", () => {
   });
 
   it("uses the first <Division?…> code when no Division is chosen", () => {
-    const f = field("{{Case number=YYGJ<Division?CRIMINAL DIVISION=CR;CIVIL DIVISION=CC;TRAFFIC DIVISION=TC;SMALL CLAIMS DIVISION=SM>00XXX}}");
+    const f = field("{{Case number=YYSC<Division?CRIMINAL DIVISION=CR;CIVIL DIVISION=CC;TRAFFIC DIVISION=TC;SMALL CLAIMS DIVISION=SM>00XXX}}");
     // No lookup → first code (CR), so the placeholder is never empty.
     expect(caseNumberPattern(f, fsNow(NOW))).toBe("90SCCR00XXX");
     // A chosen Division wins over the first code.
@@ -139,12 +139,12 @@ describe("caseNumberPattern", () => {
 
   it("sources the pattern from the prefill, not the (noisy) fallback", () => {
     // Fallback letters/placeholders differ from the prefill; the pattern follows the prefill.
-    const f = field("{{Case number=YYGJCR00XXX|##GJCR#####}}");
+    const f = field("{{Case number=YYSCCR00XXX|##SCCR#####}}");
     expect(caseNumberPattern(f, fsNow(NOW))).toBe("90SCCR00XXX");
   });
 
   it("tracks the year across the New-Year rollover (freestyle = year − 36)", () => {
-    const f = field("{{Case number=YYGJCR00XXX}}");
+    const f = field("{{Case number=YYSCCR00XXX}}");
     expect(caseNumberPattern(f, fsNow(new Date("2026-12-31T23:00:00Z")))).toBe("90SCCR00XXX");
     expect(caseNumberPattern(f, fsNow(new Date("2027-01-01T01:00:00Z")))).toBe("91SCCR00XXX");
   });

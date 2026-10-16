@@ -1,10 +1,11 @@
-// One-off: port the directory forms from the reference client into src/data/forms.json.
+// Port the directory forms from the reference client into src/data/forms.json, with FreestyleRP wording (scripts/freestyle-wording.mjs).
 // DES §Data steps 1–4. The source is JSON after `window.FORMS =`, so it is parsed, never evaluated.
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { checkTemplateHtml } from "./template-safety.mjs";
 import { unwrapBlockedLinks } from "./scrub-links.mjs";
+import { toFreestyle } from "./freestyle-wording.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const source = path.join(root, ".agents", "reference", "jsa", "js_forms.data.js");
@@ -55,8 +56,9 @@ forms.forEach((form, i) => {
   }
   if (ids.has(form.id)) fail(`duplicate form id "${form.id}"`);
   ids.add(form.id);
-  // Drop links to the old forum hosts; the link text stays.
+  // Drop links to the old forum hosts (the link text stays), then FreestyleRP wording (LP-69).
   form.html = unwrapBlockedLinks(form.html);
+  Object.assign(form, toFreestyle(form));
 });
 
 const problems = [];

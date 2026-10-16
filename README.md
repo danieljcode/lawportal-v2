@@ -68,9 +68,9 @@ Open `http://<this computer's LAN IP>:3000` on the other device. Notes:
   a sync status dot, What's new with an unread dot, the theme button, and a ☰ form list on narrow
   screens.
 - **Server toggle.** Switch between GTAW and FreestyleRP. FreestyleRP shifts dates back 36 years (so a
-  real 2026 reads as 1990, 2027 as 1991) and renames the courts to generic "San Andreas" ones in the
-  sidebar, breadcrumb and every filing. Each character remembers its server; with no character active
-  the choice is saved as the default.
+  real 2026 reads as 1990, 2027 as 1991). Each character remembers its server; with no character
+  active the choice is saved as the default. The forms themselves use FreestyleRP's generic
+  "San Andreas" court names on both (see Updating the directory forms); the toggle goes in LP-70.
 - **Forum preview.** A live, always-light preview with Highlight unfilled; Preview, BBCode and
   Discord tabs; **Copy for forum** (HTML that keeps tables, with BBCode as plain text), **Copy
   BBCode**, and **Download .docx**.
@@ -178,9 +178,14 @@ npm run port-forms
 ```
 
 This reads `.agents/reference/jsa/js_forms.data.js` and writes `src/data/forms.json`. Links to the
-old forum hosts are unwrapped (the link text stays; see `scripts/scrub-links.mjs`). It refuses to
-write if any template contains scripts, event handlers, non-http(s) links or other unsafe markup, and
-lists the offending form ids. Run `npm test` afterwards.
+old forum hosts are unwrapped (the link text stays; see `scripts/scrub-links.mjs`), then the GTAW
+wording is replaced with FreestyleRP's (`scripts/freestyle-wording.mjs`): court names and phrases
+such as "Superior Court of the State of San Andreas" → "San Andreas Court", and the GTAW courthouses
+and `GJ` case-number code → the courthouses in `src/lib/courts.ts`. So `forms.json` holds exactly
+what gets posted, with no translation in the app. It refuses to write if any template contains
+scripts, event handlers, non-http(s) links or other unsafe markup, and lists the offending form ids.
+Run `npm test` afterwards: a test fails if `forms.json` isn't what port-forms would write now, for
+example after changing `courts.ts` without re-running it.
 
 ## Reference data
 
