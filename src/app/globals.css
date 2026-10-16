@@ -871,6 +871,7 @@ dialog.changelog { width: min(640px, calc(100vw - 24px)); }
 .log-entry header { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
 .log-entry time { font-weight: 700; font-size: 14px; }
 .log-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--muted); }
+.log-version { font-size: 12px; font-weight: 700; padding: 0 4px; border: 1px solid var(--muted); }
 .log-group { margin: 6px 0 0; }
 .log-type { display: inline-block; margin: 0 0 2px; padding: 0 6px; font-size: 12px; font-weight: 700; border: 1px solid var(--shadow); background: var(--field); }
 .log-type.new { color: var(--good); }

@@ -11,10 +11,15 @@ export interface ChangelogEntry {
   /** `YYYY-MM-DD`. */
   date: string;
   title?: string;
+  /** Set on a release's entry (`0.2.0`); its items are that release's GitHub Release notes. */
+  version?: string;
   items: ChangelogItem[];
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  { date: "2026-10-16", title: "Version number", items: [
+    { type: "new", text: "What's new now shows which version of the app you're using, and each release's entry is marked with its version." },
+  ]},
   { date: "2026-10-16", title: "Damaged data kept", items: [
     { type: "fix", text: "Saved data that can't be read is no longer deleted. It's set aside, a notice tells you, and Download damaged data in the Characters dialog gives you a copy to fix by hand." },
   ]},

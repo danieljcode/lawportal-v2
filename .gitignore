@@ -10,3 +10,6 @@
 next-env.d.ts
 /data/
 /.agents/
+
+# npm run release-notes output
+release-notes.md

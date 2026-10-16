@@ -8,6 +8,7 @@ import { createRoot, type Root } from "react-dom/client";
 import App from "@/components/App";
 import { CHANGELOG } from "@/data/changelog";
 import { LOG_TYPES } from "@/lib/changelog";
+import { APP_VERSION } from "@/lib/version";
 import { characterStore, CHARS_KEY } from "@/lib/characters";
 import { docketStore } from "@/lib/dockets";
 import { portfolioStore } from "@/lib/portfolio";
@@ -262,6 +263,7 @@ describe("What's new", () => {
     expect($("#changelog-dot")).not.toBeNull();
     click("#open-changelog");
     expect($("#changelog-dot")).toBeNull();
+    expect(must("#app-version").textContent).toBe("Version " + APP_VERSION);
     expect(document.querySelectorAll("#changelog-list article.log-entry")).toHaveLength(CHANGELOG.length);
     expect(must("#changelog-list time").getAttribute("datetime")).toBe(CHANGELOG[0].date);
     // Each entry shows one heading per item type it has, in LOG_TYPES order.
