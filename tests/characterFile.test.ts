@@ -63,34 +63,19 @@ describe("character file", () => {
     expect(() => importText("{}", stores())).toThrow("No characters found in that file.");
   });
 
-  it("round-trips a character with server:'freestyle' through export/import", () => {
-    const a = stores();
-    a.characters.save({ name: "Sam Style", server: "freestyle" });
-    const text = exportText(a);
-    const doc = JSON.parse(text);
-    expect(doc.characters[0].server).toBe("freestyle");
-
-    const b = stores();
-    importText(text, b);
-    const [c] = b.characters.list();
-    expect(c.name).toBe("Sam Style");
-    expect(c.server).toBe("freestyle");
-  });
-
-  it("imports a character without a server field as undefined (→ gtaw at read time)", () => {
+  it("imports an export from before LP-70: the old server field is dropped, the rest is kept", () => {
     const s = stores();
-    const text = JSON.stringify({ characters: [{ id: "abc123", name: "Old Timer" }] });
+    const text = JSON.stringify({
+      characters: [
+        { id: "abc123", name: "Gee Taw", title: "Attorney at Law", server: "gtaw" },
+        { id: "def456", name: "Sam Style", server: "freestyle" },
+      ],
+    });
     importText(text, s);
-    const [c] = s.characters.list();
-    expect(c.name).toBe("Old Timer");
-    expect(c.server).toBeUndefined();
-  });
-
-  it("drops an invalid server value during clean()", () => {
-    const s = stores();
-    s.characters.save({ name: "Hacker", server: "invalid" as any });
-    const [c] = s.characters.list();
-    expect(c.name).toBe("Hacker");
-    expect(c.server).toBeUndefined();
+    const [a, b] = s.characters.list();
+    expect(a).toMatchObject({ name: "Gee Taw", title: "Attorney at Law" });
+    expect(b.name).toBe("Sam Style");
+    for (const c of [a, b]) expect(c).not.toHaveProperty("server");
+    expect(JSON.parse(exportText(s)).characters[0]).not.toHaveProperty("server");
   });
 });

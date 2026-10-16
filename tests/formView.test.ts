@@ -11,7 +11,6 @@ import { createRoot, type Root } from "react-dom/client";
 import FormView, { type FormViewProps } from "@/components/FormView";
 import { getForm } from "@/data";
 import { draftKey } from "@/lib/formState";
-import { SERVERS } from "@/lib/servers";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -25,7 +24,7 @@ let root: Root;
 function props(id: string): FormViewProps & { key: string } {
   const form = getForm(id);
   if (!form) throw new Error("missing form " + id);
-  return { key: id, form, activeCharacter: null, highlight: true, server: SERVERS.gtaw, onOutput: () => {} };
+  return { key: id, form, activeCharacter: null, highlight: true, onOutput: () => {} };
 }
 
 function mount(id: string): void {

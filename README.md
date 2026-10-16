@@ -64,13 +64,12 @@ Open `http://<this computer's LAN IP>:3000` on the other device. Notes:
   case-number shape are set in `src/lib/courts.ts`; FreestyleRP has no official court details yet,
   so swap real ones in there. Collapse all, Fill from character and Clear form. Drafts save automatically
   per form and the last form reopens on load.
-- **Toolbar.** "Filing as" (the active character), the server toggle, Dockets, J.A.P., Characters with
-  a sync status dot, What's new with an unread dot, the theme button, and a ☰ form list on narrow
-  screens.
-- **Server toggle.** Switch between GTAW and FreestyleRP. FreestyleRP shifts dates back 36 years (so a
-  real 2026 reads as 1990, 2027 as 1991). Each character remembers its server; with no character
-  active the choice is saved as the default. The forms themselves use FreestyleRP's generic
-  "San Andreas" court names on both (see Updating the directory forms); the toggle goes in LP-70.
+- **Toolbar.** "Filing as" (the active character), Dockets, J.A.P., Characters with a sync status
+  dot, What's new with an unread dot, the theme button, and a ☰ form list on narrow screens.
+- **FreestyleRP only.** There's no server choice. Every date a form produces (Today, Auto,
+  prefills, the case-number year) is in-game: 36 years back, so a real 2026 reads as 1990 and 2027
+  as 1991 (`src/lib/freestyle.ts`). The forms use FreestyleRP's generic "San Andreas" court names
+  (see Updating the directory forms).
 - **Forum preview.** A live, always-light preview with Highlight unfilled; Preview, BBCode and
   Discord tabs; **Copy for forum** (HTML that keeps tables, with BBCode as plain text), **Copy
   BBCode**, and **Download .docx**.

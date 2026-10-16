@@ -57,11 +57,6 @@ export const FIELDS: readonly CharacterField[] = [
   { key: "signature", label: "Signature", hint: "Text, or a link to a signature image" },
   { key: "notes", label: "Notes", multiline: true },
   {
-    key: "server",
-    label: "Server",
-    selectOptions: ["gtaw:GTAW", "freestyle:FreestyleRP"],
-  },
-  {
     key: "docket",
     label: "Keeps a docket (judge or lawyer)",
     checkbox: true,

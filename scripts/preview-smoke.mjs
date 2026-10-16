@@ -53,12 +53,10 @@ const LOAD_IDS = ["civil-complaint", "criminal-arraignment", "small-claims-writ-
 
 const CHAR_A = { id: "smokechara1", name: "Dan Tester", title: "Attorney at Law" };
 const CHAR_B = { id: "smokecharb1", name: "Other Person", title: "Attorney at Law" };
-const CHAR_C = { id: "smokecharc1", name: "Freestyle Filer", title: "Attorney at Law", server: "freestyle" };
-const CASE = "26GJCC00147";
+const CASE = "90SCCC00147";
 
-/** The 2-digit year each server prefixes a case number with (freestyle is 36 years back). */
-const GTAW_YY = String(new Date().getUTCFullYear()).slice(-2);
-const FREESTYLE_YY = String(new Date().getUTCFullYear() - 36).slice(-2);
+/** The 2-digit in-game year a case number starts with (FreestyleRP is 36 years back). */
+const GAME_YY = String(new Date().getUTCFullYear() - 36).slice(-2);
 
 /* ---------- init scripts (run in the page before any app script) ---------- */
 
@@ -386,47 +384,25 @@ async function phaseSidebar(browser, theme, mode, ctx) {
   await context.close();
 }
 
-/* ---------- server profiles ---------- */
+/* ---------- FreestyleRP only (LP-68, LP-69, LP-70) ---------- */
 
-async function phaseServer(browser, theme, mode, ctx) {
-  // Seed characters: CHAR_A (gtaw) and CHAR_C (freestyle).
-  const seed = {
-    chars: [CHAR_A, CHAR_C],
-    dockets: [],
-    draft: null,
-  };
+async function phaseFreestyle(browser, theme, mode, ctx) {
   const errors = [];
-  const context = await newContext(browser, theme, mode, seed);
+  const context = await newContext(browser, theme, mode, { chars: [CHAR_A], dockets: [], draft: null });
   const page = await newPage(context, errors);
 
-  // Form 1: civil-complaint — check court mapping and case number prefix.
+  // civil-complaint: FreestyleRP court wording and an in-game SC case number, no GTAW.
   await page.goto(base + "/#civil-complaint");
-  await firstDisplay(page, ctx, "server gtaw civil-complaint (A)", ["CIVIL DIVISION"]);
-  // gtaw case-number prefix shows the real 2-digit year.
-  await updated(page, ctx, "server gtaw case prefix", [GTAW_YY + "GJCC"]);
-  // gtaw court phrase in preview.
+  await firstDisplay(page, ctx, "freestyle civil-complaint", ["SAN ANDREAS COURT", GAME_YY + "SCCC"], ["SUPERIOR COURT OF THE STATE", "GJCC"]);
   checks++;
-  const gtawPreview = await page.evaluate(previewText);
-  if (!gtawPreview.includes("SUPERIOR COURT")) failures.push(`${ctx} server gtaw civil-complaint: missing SUPERIOR COURT`);
+  if (await page.$("#active-server")) failures.push(`${ctx} freestyle: the server toggle is still in the toolbar`);
 
-  // Switch to freestyle character.
-  await page.selectOption("#active-character", CHAR_C.id);
-  // Wait for the freestyle court phrase.
-  await updated(page, ctx, "server freestyle civil-complaint court", ["SAN ANDREAS COURT"], ["SUPERIOR COURT OF THE STATE"]);
-  // Verify offset year prefix, with the GJ dropped on freestyle (no "GJ" after the year).
-  await updated(page, ctx, "server freestyle civil-complaint case prefix", [FREESTYLE_YY + "CC"], [FREESTYLE_YY + "GJCC"]);
-
-  // Form 2: criminal-case-schedule — has =today date and a case-number pattern.
+  // criminal-case-schedule: a today prefill and an SC criminal case number.
   await resetProbe(page);
   await page.click(`#sidebar a[href="#criminal-case-schedule"]`);
-  // Should already be in freestyle mode (CHAR_C is still active): offset year, no GJ.
-  await firstDisplay(page, ctx, "server freestyle criminal-case-schedule", [FREESTYLE_YY + "CR"], [FREESTYLE_YY + "GJCR"]);
+  await firstDisplay(page, ctx, "freestyle criminal-case-schedule", [GAME_YY + "SCCR"], ["GJCR"]);
 
-  // Switch back to gtaw character.
-  await page.selectOption("#active-character", CHAR_A.id);
-  await updated(page, ctx, "server gtaw criminal-case-schedule", [GTAW_YY + "GJCR"]);
-
-  flushErrors(ctx, "server", errors);
+  flushErrors(ctx, "freestyle", errors);
   await context.close();
 }
 
@@ -443,7 +419,7 @@ try {
       await phaseNav(browser, theme, mode, ctx);
       await phaseSeeded(browser, theme, mode, ctx);
       await phaseSidebar(browser, theme, mode, ctx);
-      await phaseServer(browser, theme, mode, ctx);
+      await phaseFreestyle(browser, theme, mode, ctx);
       console.log(`${ctx}: ${failures.length - before} failure(s)`);
     }
   }

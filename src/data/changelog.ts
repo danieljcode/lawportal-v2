@@ -17,6 +17,9 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  { date: "2026-10-16", title: "FreestyleRP only", items: [
+    { type: "update", text: "The app is now just for FreestyleRP: the Server switch is gone from the toolbar and from characters, and every form uses the in-game year (1990)." },
+  ]},
   { date: "2026-10-16", title: "FreestyleRP forms", items: [
     { type: "update", text: "Every court form is now written in FreestyleRP's court names, so what you see in the editor is exactly what gets posted." },
     { type: "update", text: "The Courthouse box offers Superior Court, and the Greg E. Joplin courthouse is gone from every form." },

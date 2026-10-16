@@ -121,9 +121,9 @@ describe("storage helpers", () => {
 });
 
 describe("characters", () => {
-  it("has the 13 fields in order", () => {
+  it("has the 12 fields in order (no Server since LP-70)", () => {
     expect(FIELDS.map((f) => f.key)).toEqual([
-      "name", "title", "dob", "gender", "phone", "address", "occupation", "bar", "email", "signature", "notes", "server", "docket",
+      "name", "title", "dob", "gender", "phone", "address", "occupation", "bar", "email", "signature", "notes", "docket",
     ]);
   });
 
