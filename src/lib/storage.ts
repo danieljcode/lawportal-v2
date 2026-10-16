@@ -129,6 +129,24 @@ export function createChannel(): Channel {
   };
 }
 
+/*
+ * Docket and J.A.P. edits call touchCharacter so their character's updatedAt
+ * moves too: sync merges one character at a time, with its dockets and J.A.P.
+ * (the app's character store listens; the stores don't import each other).
+ */
+const touchListeners = new Set<(charId: string) => void>();
+
+export function onCharacterTouched(fn: (charId: string) => void): () => void {
+  touchListeners.add(fn);
+  return () => {
+    touchListeners.delete(fn);
+  };
+}
+
+export function touchCharacter(charId: string): void {
+  for (const fn of [...touchListeners]) fn(charId);
+}
+
 /** Ids of characters (and the keys derived from them) are always this shape. */
 export const ID_RE = /^[a-z0-9]{4,32}$/;
 

@@ -32,6 +32,15 @@ export function S_SYNC_APPLY_FAIL(n: number): string {
   return `Couldn't store ${n} synced character(s) in this browser.`;
 }
 
+export const S_SYNC_MERGED = "Merged your changes with another device's.";
+
+/** After a merge where another device's newer copy replaced this browser's edits. */
+export function S_SYNC_LOST(n: number): string {
+  return n === 1
+    ? "Another device changed the same character more recently, so its version is shown. Your version is kept: use Restore my version to bring it back."
+    : `Another device changed ${n} of the same characters more recently, so its versions are shown. Yours are kept: use Restore my version to bring them back.`;
+}
+
 export const S_JAP_OFF = "Portfolios are saved in this browser. Turn on sync to keep them on this app's server too.";
 
 export const S_JAP_ON = "Saved in this browser and on this app's server.";

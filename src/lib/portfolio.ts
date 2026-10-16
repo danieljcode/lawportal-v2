@@ -8,7 +8,17 @@
 // court's requirements, transcribed from the reference js_portfolio.js.
 
 import type { Character, Portfolio, PortfolioEntry, PortfolioLevel } from "./types";
-import { createChannel, defaultKV, isId, ISO_DATE_RE, ISO_TIME_RE, readJson, writeJson, type KV } from "./storage";
+import {
+  createChannel,
+  defaultKV,
+  isId,
+  ISO_DATE_RE,
+  ISO_TIME_RE,
+  readJson,
+  touchCharacter,
+  writeJson,
+  type KV,
+} from "./storage";
 
 export const JAP_PREFIX = "lawapp_jap_";
 export const MAX_ENTRIES = 60;
@@ -351,12 +361,14 @@ export function createPortfolioStore(kv: KV): PortfolioStore {
       data.updated = new Date().toISOString();
       writeJson(kv, key(charId), data);
       changes.emit();
+      touchCharacter(charId);
       return data;
     },
     remove(charId) {
       if (!isId(charId)) return;
       kv.remove(key(charId));
       changes.emit();
+      touchCharacter(charId);
     },
     replace(charId, p) {
       if (!isId(charId)) return;

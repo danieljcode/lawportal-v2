@@ -11,6 +11,7 @@ import {
   ISO_TIME_RE,
   newId,
   readJson,
+  touchCharacter,
   writeJson,
   type KV,
 } from "./storage";
@@ -159,6 +160,7 @@ export function createDocketStore(kv: KV): DocketStore {
       if (!isId(charId)) return null;
       const saved = saveQuiet(charId, d);
       changes.emit();
+      touchCharacter(charId);
       return saved;
     },
     upsert(charId, patch) {
@@ -171,12 +173,14 @@ export function createDocketStore(kv: KV): DocketStore {
       if (!existing) delete merged.id;
       const saved = saveQuiet(charId, merged);
       changes.emit();
+      touchCharacter(charId);
       return saved;
     },
     remove(charId, id) {
       if (!isId(charId)) return;
       write(charId, read(charId).filter((d) => d.id !== id));
       changes.emit();
+      touchCharacter(charId);
     },
     removeAll(charId) {
       if (!isId(charId)) return;
