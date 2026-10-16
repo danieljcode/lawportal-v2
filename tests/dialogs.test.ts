@@ -137,7 +137,7 @@ describe("Characters dialog", () => {
     warn.mockRestore();
   });
 
-  it("has the 13 fields, needs a name, and the docket box follows the title", () => {
+  it("has the 12 fields, needs a name, and the docket box follows the title", () => {
     click("#open-characters");
     click("#new-character");
     const ids = [...document.querySelectorAll("#char-fields :is(input, textarea, select)")].map((e) => e.id);
@@ -153,7 +153,6 @@ describe("Characters dialog", () => {
       "char-email",
       "char-signature",
       "char-notes",
-      "char-server",
       "char-docket",
     ]);
     submit("#char-form");

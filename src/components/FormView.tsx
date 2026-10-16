@@ -26,7 +26,7 @@ import {
   writeDraft,
   type FormState,
 } from "@/lib/formState";
-import { getServerDate, type ServerProfile } from "@/lib/servers";
+import { gameDate } from "@/lib/freestyle";
 import { defaultKV, readJson, writeJson } from "@/lib/storage";
 import { S_DISCLAIMER } from "@/lib/strings";
 import { caseNumberPattern, compile, fields, render } from "@/lib/template";
@@ -46,8 +46,6 @@ export interface FormViewProps {
   form: FormDef;
   activeCharacter: Character | null;
   highlight: boolean;
-  /** The active server profile (dates and court names depend on it). */
-  server: ServerProfile;
   /**
    * The rendered output, or null when the template couldn't be compiled (the output pane hides),
    * tagged with the form it belongs to so App never shows another form's output.
@@ -70,7 +68,7 @@ type Compiled = { tree: Tree; entries: Entry[]; error: null } | { tree: null; en
 
 /**
  * Rewrite every "Case number" field that carries a prefill so the editor box
- * starts EMPTY while the server-aware pattern becomes the field's fallback. The
+ * starts EMPTY while the in-game pattern becomes the field's fallback. The
  * fallback is what `render` emits for a blank field (so the pattern still appears
  * in every output) and what `FieldInput` shows as the input placeholder. Dropping
  * the prefill stops `applyPrefills` from pre-filling the value, so the box is
@@ -131,19 +129,17 @@ export default function FormView({
   form,
   activeCharacter,
   highlight,
-  server,
   onOutput,
   onOutputGone,
   docketRequest,
   onDocketBar,
 }: FormViewProps) {
-  // The server-offset "now" fed to every date producer. Stable per render (new Date()
-  // would thrash the ctx memo), recomputed only when the server changes — so it still
-  // rolls over with the real calendar because the component re-renders over time.
-  const now = useMemo(() => getServerDate(new Date(), server), [server.id]);
+  // The in-game "now" (FreestyleRP, 36 years back) fed to every date producer: Today, Auto,
+  // prefills and the case-number year. Fixed while the form is open (new Date() on every
+  // render would thrash the ctx memo); opening a form takes the current date again.
+  const now = useMemo(() => gameDate(new Date()), [form.id]);
 
-  // `now` feeds the case-number placeholder/fallback pattern, so a server switch (and the
-  // natural New-Year re-render) recomputes it, so the year updates.
+  // `now` also feeds the case-number placeholder/fallback pattern.
   const compiled = useMemo(() => compileForm(form, now), [form, now]);
   const { tree, entries } = compiled;
 
@@ -195,16 +191,6 @@ export default function FormView({
     charRef.current = activeCharacter;
     setState((s) => fillFromCharacter(entries, s, activeCharacter, false));
   }, [activeCharacter, entries]);
-
-  // When the server changes (via character switch or toolbar toggle) the offset `now` changes.
-  // Re-apply prefills so derived case-number prefixes (YY…) and date values track the new year.
-  // Skipped on mount (openState already applied prefills with the correct `now`).
-  const nowRef = useRef(now);
-  useEffect(() => {
-    if (nowRef.current === now) return;
-    nowRef.current = now;
-    setState((s) => applyPrefills(entries, s, now));
-  }, [now, entries]);
 
   // Output, derived during render: on mount the deferred values equal the opening state, so the
   // first output is ready in the first commit (no frame needed). Later edits re-render the

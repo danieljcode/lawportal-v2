@@ -10,7 +10,6 @@ import { isUnread, markSeen } from "@/lib/changelog";
 import { characterStore, hasDocket } from "@/lib/characters";
 import { LAST_FORM_KEY } from "@/lib/formState";
 import { isCommissioner } from "@/lib/portfolio";
-import { DEFAULT_SERVER, getServer, SERVER_KEY, type ServerId } from "@/lib/servers";
 import { defaultKV } from "@/lib/storage";
 import * as sync from "@/lib/sync";
 import ChangelogDialog from "./ChangelogDialog";
@@ -94,8 +93,6 @@ export default function App() {
   const [docketRequest, setDocketRequest] = useState<DocketRequest | null>(null);
   /** The open form shows its docket bar (it has a Case number and the active character keeps a docket). */
   const [docketBar, setDocketBar] = useState(false);
-  /** Bumped when the persisted default server changes (no character active), to re-read it. */
-  const [serverBump, setServerBump] = useState(0);
   const editorRef = useRef<HTMLElement>(null);
 
   /* ---------- stores ---------- */
@@ -109,31 +106,6 @@ export default function App() {
     // The versions are the change signals; the store is read fresh when either moves.
   }, [charVersion, syncState.applied]);
   const active = useMemo(() => (activeId ? characters.find((c) => c.id === activeId) || null : null), [characters, activeId]);
-
-  // Derive the active server: character's server field when selected, otherwise a persisted default.
-  const activeServerId: ServerId = useMemo(() => {
-    if (active && active.server) return active.server;
-    const stored = defaultKV().get(SERVER_KEY);
-    return stored === "freestyle" ? "freestyle" : DEFAULT_SERVER;
-    // serverBump triggers re-read when the persisted default is toggled (no character active).
-  }, [active, serverBump]);
-  const server = useMemo(() => getServer(activeServerId), [activeServerId]);
-
-  const onServer = useCallback(
-    (id: ServerId) => {
-      if (active) {
-        characterStore().save({ ...active, server: id });
-      } else {
-        try {
-          defaultKV().set(SERVER_KEY, id);
-        } catch {
-          // private mode
-        }
-        setServerBump((n) => n + 1);
-      }
-    },
-    [active],
-  );
 
   // A stale active id (deleted character) reads as none and is cleared.
   useEffect(() => {
@@ -274,8 +246,6 @@ export default function App() {
           showDockets={hasDocket(active)}
           showJap={commissioner}
           syncStatus={syncOn ? syncState.status : null}
-          serverId={server.id}
-          onServer={onServer}
           changelogUnread={changelogUnread}
           navOpen={navOpen}
           onHome={goHome}
@@ -302,7 +272,6 @@ export default function App() {
                 form={form}
                 activeCharacter={active}
                 highlight={highlight}
-                server={server}
                 onOutput={onOutput}
                 onOutputGone={onOutputGone}
                 docketRequest={docketRequest}
