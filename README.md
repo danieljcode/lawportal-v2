@@ -1,6 +1,6 @@
 # Court Filing Generator
 
-[![CI](https://github.com/danieljcode/lawgenerator/actions/workflows/ci.yml/badge.svg)](https://github.com/danieljcode/lawgenerator/actions/workflows/ci.yml)
+[![CI](https://github.com/danieljcode/lawportal-v2/actions/workflows/ci.yml/badge.svg)](https://github.com/danieljcode/lawportal-v2/actions/workflows/ci.yml)
 
 A personal, local web app for writing San Andreas court filings. Pick a form, fill in the fields, and
 copy the finished filing straight into a forum editor (as formatted HTML or as BBCode), or download it
