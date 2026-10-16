@@ -487,12 +487,25 @@ export async function pull(force = false): Promise<boolean> {
   }
   const b = r.body || {};
   if (r.status === 200) {
+    // LP-71: a server copy still carrying the pre-LP-70 `server` field is sent back clean
+    // (this browser's copy never has it), so every other device gets it clean too.
+    const stale = charactersOf(b.data).some((c) => "server" in c);
+    let pushed = false;
     if (b.rev !== rev()) {
-      if (takeServer(b, !!lsGet(DIRTY_KEY))) await push();
+      if (takeServer(b, !!lsGet(DIRTY_KEY))) {
+        await push();
+        pushed = true;
+      }
     } else {
       saveBase(charactersOf(b.data)); // the copy this browser last synced with
-      if (lsGet(DIRTY_KEY)) await push(); // send edits made while offline
-      else if (state.status !== "synced") set("synced", "", b.updated);
+      if (lsGet(DIRTY_KEY)) {
+        await push(); // send edits made while offline
+        pushed = true;
+      } else if (state.status !== "synced") set("synced", "", b.updated);
+    }
+    if (stale && !pushed) {
+      lsSet(DIRTY_KEY, "1");
+      await push();
     }
     return true;
   }

@@ -24,6 +24,8 @@ import {
 export const CHARS_KEY = "lawapp_chars";
 export const ACTIVE_KEY = "lawapp_active_char";
 export const LEGACY_KEY = "lawapp.characters.v1";
+/** The default server saved before LP-70 (GTAW / FreestyleRP); deleted by migrateServerField. */
+export const LEGACY_SERVER_KEY = "lawapp_server";
 export const MAX_CHARACTERS = 200;
 const MAX_TEXT = 4000;
 
@@ -144,6 +146,12 @@ export interface CharacterStore {
   importJson(text: string): ImportResult;
   /** Move characters from the old `lawapp.characters.v1` list; returns the number migrated. */
   migrateLegacy(): number;
+  /**
+   * LP-71: drop the `server` field saved on characters before LP-70 and the saved
+   * default server. Nothing else is touched (not even updatedAt, so sync doesn't
+   * see an edit). Returns how many characters had the field.
+   */
+  migrateServerField(): number;
   /** Fires after data mutations (save, remove, duplicate, move, importJson, migrateLegacy). */
   subscribe(fn: () => void): () => void;
   /** Fires when the active character changes (UI only; not synced). */
@@ -354,6 +362,20 @@ export function createCharacterStore(kv: KV): CharacterStore {
       kv.remove(LEGACY_KEY);
       if (list.length) changes.emit();
       return list.length;
+    },
+    migrateServerField() {
+      kv.remove(LEGACY_SERVER_KEY);
+      const raw = readJson<unknown>(kv, CHARS_KEY);
+      if (!Array.isArray(raw)) return 0;
+      let count = 0;
+      const next = raw.map((item) => {
+        if (!item || typeof item !== "object" || !("server" in item)) return item;
+        count++;
+        const { server: _dropped, ...rest } = item as Record<string, unknown>;
+        return rest;
+      });
+      if (count) writeJson(kv, CHARS_KEY, next);
+      return count;
     },
     subscribe: changes.subscribe,
     subscribeActive: activeChanges.subscribe,
