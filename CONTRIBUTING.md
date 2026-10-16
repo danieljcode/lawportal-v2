@@ -50,8 +50,8 @@ reviews and merges.
 - v1.0 Hosted firm
 - No Fix version: unscheduled ideas
 
-A version ships when all its issues are Done. Then it's tagged in Git and the Jira version is marked
-Released.
+A version ships when all its issues are Done. Then it's tagged in Git, gets a GitHub Release, and the
+Jira version is marked Released: see [README, How to release](README.md#how-to-release).
 
 ## Board columns
 
