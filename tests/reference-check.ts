@@ -1,5 +1,5 @@
 // Vitest global setup: says once, in the run's own output, whether the parity
-// suites have their reference data (README, Reference data). CI sets
+// suites have their reference data (docs/templates-and-forms.md, Reference data). CI sets
 // LAWAPP_REQUIRE_REFERENCE after checking the data out, so a gap fails the run.
 import { existsSync } from "node:fs";
 import path from "node:path";
@@ -13,5 +13,5 @@ export default function setup(): void {
   if (process.env.LAWAPP_REQUIRE_REFERENCE) {
     throw new Error("LAWAPP_REQUIRE_REFERENCE is set but .agents/reference/jsa/ is missing " + missing.join(", "));
   }
-  console.warn("\n[parity] skipped: reference data not found (missing " + missing.join(", ") + "; see README, Reference data)\n");
+  console.warn("\n[parity] skipped: reference data not found (missing " + missing.join(", ") + "; see docs/templates-and-forms.md, Reference data)\n");
 }

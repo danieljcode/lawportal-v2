@@ -1,4 +1,4 @@
-// GitHub Release notes for the version in package.json (README, How to release).
+// GitHub Release notes for the version in package.json (docs/releasing.md).
 //
 // The notes are that version's What's new entry (src/data/changelog.ts, the
 // entry whose `version` matches), so the app and the release always say the

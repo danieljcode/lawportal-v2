@@ -1,6 +1,6 @@
 # How we work
 
-This is a personal project, and the code is not open for reuse (see [LICENSE](LICENSE)). These are
+This is a personal project, and the code is not open for reuse (see [LICENSE](../LICENSE)). These are
 the conventions for anyone working on it with Daniel. Planning lives in the Jira project **LP**
 ("Law portal") at https://freestylelawportal.atlassian.net.
 
@@ -25,6 +25,23 @@ it so each change can be traced back to its issue.
 
 Nothing is pushed or merged to `main` directly: every change goes through a pull request, and Daniel
 reviews and merges.
+
+## Working on an issue
+
+1. **Pick one issue at a time** from the top of the board: To Do, then Backlog, in rank order.
+   Skip anything flagged or labelled `blocked`. Before starting a `size-l` issue, split it into
+   smaller issues in Jira first.
+2. **Move it to In Progress** and make its branch from an up-to-date `main`.
+3. **Make the change** with its tests, and run `npm test` and `npm run build`.
+4. **Open a pull request** (title and description as above). CI must be green.
+5. **After Daniel merges**, update local `main` before anything else:
+   ```bash
+   git checkout main
+   git fetch origin
+   git merge --ff-only origin/main
+   git status -sb    # must not say "behind"
+   ```
+6. **Move the issue to Done** with a short comment on what changed and how it was tested.
 
 ## Issue types
 
@@ -51,7 +68,7 @@ reviews and merges.
 - No Fix version: unscheduled ideas
 
 A version ships when all its issues are Done. Then it's tagged in Git, gets a GitHub Release, and the
-Jira version is marked Released: see [README, How to release](README.md#how-to-release).
+Jira version is marked Released: see [Releasing](releasing.md).
 
 ## Board columns
 
@@ -70,7 +87,7 @@ Jira version is marked Released: see [README, How to release](README.md#how-to-r
       links the Jira issue
 
 Before calling a change done, run `npm test` and `npm run build`. The parity tests also need the
-reference data (see [README, Reference data](README.md#reference-data)).
+reference data (see [Templates and forms](templates-and-forms.md#reference-data)).
 
 ## Weekly grooming (10 minutes)
 
