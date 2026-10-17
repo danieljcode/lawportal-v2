@@ -8,7 +8,7 @@ jobs:
   test-and-build:
     runs-on: ubuntu-latest
     env:
-      # Read-only token for the private reference repo (README, Reference data).
+      # Read-only token for the private reference repo (docs/templates-and-forms.md, Reference data).
       REFERENCE_TOKEN: ${{ secrets.REFERENCE_TOKEN }}
     steps:
       - uses: actions/checkout@v4
