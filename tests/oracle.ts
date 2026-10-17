@@ -49,7 +49,7 @@ export const REF_FORMS = path.join(dir, "js_forms.data.js");
 export const hasRefForms = existsSync(REF_FORMS);
 
 // tests/reference-check.ts prints this once per run, and fails it under LAWAPP_REQUIRE_REFERENCE.
-export const SKIP_NOTE = "skipped: reference data not found (see README, Reference data)";
+export const SKIP_NOTE = "skipped: reference data not found (see docs/templates-and-forms.md, Reference data)";
 
 /** A parity suite's name, with the skip note added when the reference data is missing. */
 export function paritySuite(name: string, available = hasOracle): string {
