@@ -23,7 +23,7 @@ if (!existsSync(source)) {
     `the reference forms aren't here: ${path.relative(root, source)}\n` +
       "  They're kept in the private repo danieljcode/lawportal-reference. With access, run:\n" +
       "    git clone https://github.com/danieljcode/lawportal-reference.git .agents/reference/jsa\n" +
-      "  See README, Reference data.",
+      "  See docs/templates-and-forms.md, Reference data.",
   );
 }
 
