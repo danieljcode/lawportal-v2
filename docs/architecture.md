@@ -119,6 +119,8 @@ The only server code is three route handlers and `src/lib/server/`:
   `127.0.0.1`. That also stops DNS-rebinding pages reaching the local API.
 - **Capped bodies** (`body.ts`). Route handlers have no built-in body limit, so they read through
   `readCapped`: 1 MB for sync data, 2 MB for `.docx`.
+- **Rate limits** (`rateLimit.ts`). The sync routes answer `429` when an IP (or the server overall)
+  makes too many codes, or an IP sends too many bad codes: see [Sync](sync.md#server-storage).
 - **Sync storage** is one JSON file per sync code: see [Sync, storage and recovery](sync.md).
 
 ## Related

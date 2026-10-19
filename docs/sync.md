@@ -31,6 +31,18 @@ lost. Sync is optional and runs entirely on the computer that runs the app.
   while Windows (antivirus, indexing) holds the target.
 - **Limits.** At most 1,000 sync files (`POST` answers `503` after that), a 1 MB body and 200
   characters per `PUT`.
+- **Rate limits** (LP-8, `src/lib/server/rateLimit.ts`), answered with `429` and a `Retry-After`:
+  - new codes: 5 an hour per IP, and 5 an hour across the whole server;
+  - requests with a malformed or unknown code: 30 a minute per IP. Once over, that IP's sync
+    requests are all refused until the minute is up, good code or not.
+
+  The counts are kept in memory, so restarting the app clears them. The IP comes from
+  `X-Forwarded-For`, which a client can fake, so the per-IP limits only stop casual abuse; the
+  overall cap is what stops anyone filling the 1,000 files.
+
+- **Unused codes expire.** A code that was made but never written to (still `rev` 0) is deleted
+  after 7 days, checked each time a new code is made. Turning sync on uploads straight away, so in
+  practice this only removes codes nobody used.
 - **Optimistic writes.** `PUT /api/data` sends the `rev` it last saw. If the stored `rev` is
   different, another device saved first: the server answers `409` with its copy instead of writing.
 
@@ -106,5 +118,6 @@ write, a crashed tab) (LP-65):
 ## Security notes
 
 - By default the server only answers on `localhost` (see [Architecture](architecture.md#server)).
-- With the `:lan` scripts it's open to your network, traffic is plain http (no TLS), and there's no
-  rate limiting. Only use `:lan` on a network you trust.
+- With the `:lan` scripts it's open to your network and traffic is plain http (no TLS). The rate
+  limits above stop someone on the network filling sync storage or guessing codes freely, but
+  anyone there can still see a code as it's sent. Only use `:lan` on a network you trust.

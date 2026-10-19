@@ -76,7 +76,8 @@ npm run build && npm run start:lan
   requests from other devices.
 - Over plain http on the LAN the browser's clipboard API isn't available (it isn't a secure
   context), so the app copies through a text selection instead.
-- Traffic is unencrypted and there's no rate limiting: only use LAN mode on a network you trust.
+- Traffic is unencrypted: only use LAN mode on a network you trust. The sync API is rate limited
+  (see [Sync](sync.md#server-storage)).
 
 ## Scripts
 
