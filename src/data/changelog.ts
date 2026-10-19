@@ -19,6 +19,20 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-19",
+    title: "Undo and draft history",
+    items: [
+      {
+        type: "new",
+        text: "Undo and Redo buttons (or Ctrl+Z and Ctrl+Y) in every form. Typing a word or a line counts as one step, and Clear form can be undone too.",
+      },
+      {
+        type: "new",
+        text: "Draft history keeps earlier versions of each form's draft: one every few minutes while you edit, and one before Clear form. Pick a version to preview it, then restore it if you need it. The last 20 per form are kept, and they're in your full backup.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-19",
     title: "Crash screen",
     items: [
       {

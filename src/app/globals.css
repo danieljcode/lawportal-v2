@@ -2030,3 +2030,53 @@ dialog.changelog {
   margin: 8px 0 0;
   min-height: 1em;
 }
+
+/* ---------- draft history (LP-89) ---------- */
+.history-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+  gap: 12px;
+  margin-top: 8px;
+  align-items: start;
+}
+:where(dialog) .history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 60vh;
+  overflow: auto;
+}
+.history-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid var(--shadow);
+  border-left: 3px solid var(--shadow);
+  background: var(--face);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.history-item.current {
+  border-left: 5px solid var(--select-bg);
+  font-weight: 700;
+}
+.history-preview .post-frame {
+  max-height: 55vh;
+  overflow: auto;
+}
+@media (max-width: 700px) {
+  .history-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  :where(dialog) .history-list {
+    max-height: 30vh;
+  }
+}

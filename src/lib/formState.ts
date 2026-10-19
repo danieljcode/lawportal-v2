@@ -28,4 +28,6 @@ export { layout, sectionMeta, segments, singular } from "./formState/layout";
 export { missingRequired } from "./formState/required";
 export type { MissingField } from "./formState/required";
 export type { ChecklistRow, LayoutItem, Segment } from "./formState/layout";
-export { COLLAPSED_KEY, LAST_FORM_KEY, draftKey, readDraft, writeDraft } from "./formState/drafts";
+export { COLLAPSED_KEY, LAST_FORM_KEY, draftKey, readDraft, toFormState, writeDraft } from "./formState/drafts";
+export { GROUP_MS, UNDO_LIMIT, change, redo, startUndo, undo } from "./formState/undo";
+export type { Undoable } from "./formState/undo";

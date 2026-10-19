@@ -64,6 +64,9 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
   private. If two devices change the same character, the newer change wins and the other is kept so
   you can restore it. The sync server limits how many codes can be made (5 an hour) and how many
   wrong codes one device can try, so others on your network can't fill it up.
+- **Undo and Redo** (or Ctrl+Z and Ctrl+Y) step back through your edits in a form, and **Draft
+  history** keeps earlier versions of each form's draft (every few minutes, and before Clear form)
+  that you can preview and restore.
 - If saved data is ever damaged, it's **set aside rather than deleted**, and the Characters dialog
   offers **Download damaged data**.
 
