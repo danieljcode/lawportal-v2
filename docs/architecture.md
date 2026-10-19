@@ -4,7 +4,8 @@ The big picture: what runs where, where data lives, and how a filing gets from a
 
 ## Shape of the app
 
-It's a Next.js 15 app (React 19, TypeScript) that runs almost entirely in the browser.
+It's a Next.js 16 app (React 19, TypeScript, built with Turbopack) that runs almost entirely in the
+browser.
 
 - **One page, client only.** `src/app/page.tsx` renders `AppLoader`, which loads `App` with
   `ssr: false`. The app reads local storage on its first render, so it never renders on the server

@@ -55,7 +55,9 @@ Formatting is Prettier's job and ESLint checks for mistakes (LP-86); CI runs bot
 - **Prettier** (`.prettierrc.json`): its defaults, with lines up to 120 characters. Generated files
   are left alone (`.prettierignore`: `forms.json`, snapshots, the lockfile).
 - **ESLint** (`eslint.config.mjs`): Next.js's `core-web-vitals` and TypeScript rules, with style
-  rules turned off in favour of Prettier. A rule is only switched off on a line with a reason:
+  rules turned off in favour of Prettier. Since Next.js 16 (LP-97) these include React's newer hooks
+  rules: for example, don't call `setState` straight inside an effect to reset state when a value
+  changes; adjust it while rendering instead (see `DiscordPanel` or `SyncPanel`). A rule is only switched off on a line with a reason:
   `// eslint-disable-next-line <rule> -- <why>`.
 - **Kiro or VS Code:** `.vscode/settings.json` makes Prettier the formatter and formats on save,
   using the project's config. Install the two recommended extensions when prompted (Prettier,
