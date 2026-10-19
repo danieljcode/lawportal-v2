@@ -102,8 +102,13 @@ export default function App() {
   /* ---------- page changes ---------- */
 
   // A new page closes the drawer and starts at the top (routing and the title: useRoute).
-  useEffect(() => {
+  // The drawer closes while rendering (not in an effect); the scroll is DOM work, so it stays in one.
+  const [navRoute, setNavRoute] = useState(route);
+  if (navRoute !== route) {
+    setNavRoute(route);
     setNavOpen(false);
+  }
+  useEffect(() => {
     if (editorRef.current) editorRef.current.scrollTop = 0;
   }, [route, form]);
 

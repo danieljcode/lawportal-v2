@@ -154,22 +154,20 @@ export default function FormView({
   const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // The writer captures this form's id, so a flush after unmount lands on the right key.
-  const writerRef = useRef<DraftWriter | null>(null);
-  if (!writerRef.current) writerRef.current = createDraftWriter((s) => writeDraft(defaultKV(), form.id, s));
+  const [writer] = useState<DraftWriter>(() => createDraftWriter((s) => writeDraft(defaultKV(), form.id, s)));
 
   useEffect(() => {
-    writerRef.current!.schedule(state);
-  }, [state]);
+    writer.schedule(state);
+  }, [writer, state]);
 
   useEffect(() => {
-    const writer = writerRef.current!;
     const onHide = () => writer.flush();
     window.addEventListener("pagehide", onHide);
     return () => {
       window.removeEventListener("pagehide", onHide);
       writer.flush();
     };
-  }, []);
+  }, [writer]);
 
   useEffect(() => {
     try {
