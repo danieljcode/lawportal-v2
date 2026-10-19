@@ -19,6 +19,16 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-19",
+    title: "Crash screen",
+    items: [
+      {
+        type: "new",
+        text: "If part of the app ever breaks, you get an Application Error box in its place instead of a blank page, and the rest keeps working. It can reload, download a backup of your data, or copy error details to send us (without your sync code or anything you've typed).",
+      },
+    ],
+  },
+  {
+    date: "2026-10-19",
     title: "Required fields",
     items: [
       {
