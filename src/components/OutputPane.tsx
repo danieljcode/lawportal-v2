@@ -134,7 +134,13 @@ export default function OutputPane({ form, finalHtml, previewHtml, highlight, on
             {tabButton("discord", "Discord")}
           </div>
           <label className="toggle">
-            <input type="checkbox" className="win-check" id="highlight" checked={highlight} onChange={(e) => onHighlight(e.target.checked)} />{" "}
+            <input
+              type="checkbox"
+              className="win-check"
+              id="highlight"
+              checked={highlight}
+              onChange={(e) => onHighlight(e.target.checked)}
+            />{" "}
             Highlight unfilled
           </label>
         </div>
@@ -166,16 +172,28 @@ export default function OutputPane({ form, finalHtml, previewHtml, highlight, on
           ) : (
             <div id="bbcode-pane" role="tabpanel" aria-labelledby="tab-bbcode">
               <p className="note">
-                Invision has no table BBCode, so table layouts are flattened here. Use <strong>Copy for forum</strong> to
-                keep them.
+                Invision has no table BBCode, so table layouts are flattened here. Use <strong>Copy for forum</strong>{" "}
+                to keep them.
               </p>
-              <textarea id="bbcode" className="code-area" readOnly spellCheck={false} value={bbcode} aria-label="BBCode" />
+              <textarea
+                id="bbcode"
+                className="code-area"
+                readOnly
+                spellCheck={false}
+                value={bbcode}
+                aria-label="BBCode"
+              />
             </div>
           )}
         </div>
       </div>
       <div className="status-bar">
-        <span className={"status" + (status ? (status.bad ? " bad" : " good") : "")} id="copy-status" role="status" aria-live="polite">
+        <span
+          className={"status" + (status ? (status.bad ? " bad" : " good") : "")}
+          id="copy-status"
+          role="status"
+          aria-live="polite"
+        >
           {status ? status.text : ""}
         </span>
       </div>

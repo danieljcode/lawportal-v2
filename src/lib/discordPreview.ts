@@ -151,7 +151,9 @@ function renderLine(l: string): string {
   const li = /^((?: {2})*)(- |(\d+)\. )(.*)$/.exec(l);
   if (li) {
     const depth = Math.min(li[1].length / 2, 4);
-    const bullet = li[3] ? `<span class="dc-bullet">${escapeHtml(li[3])}.</span>` : '<span class="dc-bullet" aria-hidden="true">•</span>';
+    const bullet = li[3]
+      ? `<span class="dc-bullet">${escapeHtml(li[3])}.</span>`
+      : '<span class="dc-bullet" aria-hidden="true">•</span>';
     return `<div class="dc-li dc-depth-${depth}">${bullet} ${inline(li[4])}</div>`;
   }
   return `<div class="dc-line">${inline(l)}</div>`;

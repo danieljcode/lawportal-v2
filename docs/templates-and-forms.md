@@ -13,20 +13,20 @@ There are two kinds of form:
 
 A template is the forum post's own HTML with `{{tokens}}` (engine: `src/lib/template.ts`):
 
-| Token | Meaning |
-|---|---|
-| `{{Label}}` | A text field. Fields with the same label share one value. |
-| `{{Label\|fallback}}` | Fallback HTML shown while the field is empty. |
-| `{{Label:type}}` | Type: `text`, `textarea`, `date`, `number`, `select`, `check`, `spoiler`, `image`, `url`, `list`, `paras`. |
-| `{{Label:select:A;B;C}}` | Options (select), the on/off text (check), a date format (`long`, `short`, `us`, `dmy`…), a list wrap tag or a paragraph style. |
-| `{{Label=prefill}}` | A prefill: `today`, `today+21`, `<Other label>-2` for dates; `YY` and `<Division?CRIMINAL DIVISION=CR;…>` for text. |
-| `{{@name}}` / `{{Label@title}}` | Filled from the active character (`name`, `title`, `dob`, `gender`, `phone`, `address`, `occupation`, `bar`, `email`, `signature`). |
-| `{{Label>strong}}` | Wraps a filled value in a tag. |
-| `{{#Items\|3}} … {{/Items}}` | A repeatable block (default 1 item). |
-| `{{?Optional\|off}} … {{/Optional}}` | An optional section (on unless `\|off`). |
-| `{{$index}}` `{{$word}}` `{{$WORD}}` `{{$letter}}` `{{$roman}}` | The item's position inside a block. |
-| `{{$roman after Items}}` | The numeral after a block's last item. |
-| `{{-- Section name}}` | Starts a collapsible section in the editor. Renders nothing. |
+| Token                                                           | Meaning                                                                                                                             |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `{{Label}}`                                                     | A text field. Fields with the same label share one value.                                                                           |
+| `{{Label\|fallback}}`                                           | Fallback HTML shown while the field is empty.                                                                                       |
+| `{{Label:type}}`                                                | Type: `text`, `textarea`, `date`, `number`, `select`, `check`, `spoiler`, `image`, `url`, `list`, `paras`.                          |
+| `{{Label:select:A;B;C}}`                                        | Options (select), the on/off text (check), a date format (`long`, `short`, `us`, `dmy`…), a list wrap tag or a paragraph style.     |
+| `{{Label=prefill}}`                                             | A prefill: `today`, `today+21`, `<Other label>-2` for dates; `YY` and `<Division?CRIMINAL DIVISION=CR;…>` for text.                 |
+| `{{@name}}` / `{{Label@title}}`                                 | Filled from the active character (`name`, `title`, `dob`, `gender`, `phone`, `address`, `occupation`, `bar`, `email`, `signature`). |
+| `{{Label>strong}}`                                              | Wraps a filled value in a tag.                                                                                                      |
+| `{{#Items\|3}} … {{/Items}}`                                    | A repeatable block (default 1 item).                                                                                                |
+| `{{?Optional\|off}} … {{/Optional}}`                            | An optional section (on unless `\|off`).                                                                                            |
+| `{{$index}}` `{{$word}}` `{{$WORD}}` `{{$letter}}` `{{$roman}}` | The item's position inside a block.                                                                                                 |
+| `{{$roman after Items}}`                                        | The numeral after a block's last item.                                                                                              |
+| `{{-- Section name}}`                                           | Starts a collapsible section in the editor. Renders nothing.                                                                        |
 
 Special labels:
 

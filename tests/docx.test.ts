@@ -238,7 +238,11 @@ describe("POST /api/docx", () => {
     const prev = process.env.LAWAPP_ALLOW_LAN;
     delete process.env.LAWAPP_ALLOW_LAN;
     try {
-      const res = await post({ html: "<p>x</p>" }, { "Content-Type": "application/json" }, "http://evil.example:3000/api/docx");
+      const res = await post(
+        { html: "<p>x</p>" },
+        { "Content-Type": "application/json" },
+        "http://evil.example:3000/api/docx",
+      );
       expect(res.status).toBe(421);
     } finally {
       if (prev !== undefined) process.env.LAWAPP_ALLOW_LAN = prev;

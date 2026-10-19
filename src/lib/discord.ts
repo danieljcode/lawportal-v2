@@ -168,7 +168,10 @@ function classOf(el: Element): string {
 }
 
 function plainText(el: Node): string {
-  return (el.textContent || "").replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
+  return (el.textContent || "")
+    .replace(/\u00a0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 /** Heading prefix for an effective font size. */
@@ -411,7 +414,10 @@ class Converter {
         return;
       }
       case "pre": {
-        const lines = (el.textContent || "").replace(/\n$/, "").split("\n").map((l) => l.split(FENCE).join(SAFE_FENCE));
+        const lines = (el.textContent || "")
+          .replace(/\n$/, "")
+          .split("\n")
+          .map((l) => l.split(FENCE).join(SAFE_FENCE));
         this.b.code("", lines);
         return;
       }

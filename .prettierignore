@@ -1,0 +1,9 @@
+# Generated files: formatted by their own tools, so Prettier leaves them alone (LP-86).
+src/data/forms.json
+tests/__snapshots__/
+package-lock.json
+.next/
+data/
+.agents/
+next-env.d.ts
+CLAUDE.md

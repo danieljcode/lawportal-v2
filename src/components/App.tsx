@@ -110,8 +110,12 @@ export default function App() {
     const store = characterStore();
     return { characters: store.list(), activeId: store.activeId() };
     // The versions are the change signals; the store is read fresh when either moves.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- the versions are the signals, not values used inside
   }, [charVersion, syncState.applied]);
-  const active = useMemo(() => (activeId ? characters.find((c) => c.id === activeId) || null : null), [characters, activeId]);
+  const active = useMemo(
+    () => (activeId ? characters.find((c) => c.id === activeId) || null : null),
+    [characters, activeId],
+  );
 
   // A stale active id (deleted character) reads as none and is cleared.
   useEffect(() => {
@@ -214,10 +218,7 @@ export default function App() {
 
   const onOutput = useCallback((o: FormOutput | null, formId: string) => setOutput({ formId, out: o }), []);
   // Only the leaving form's own output is dropped, so this can't race a newer form's publish.
-  const onOutputGone = useCallback(
-    (formId: string) => setOutput((p) => (p && p.formId === formId ? null : p)),
-    [],
-  );
+  const onOutputGone = useCallback((formId: string) => setOutput((p) => (p && p.formId === formId ? null : p)), []);
   // Another form's output (only within the render before FormView's layout effect publishes) shows as empty;
   // null only when this form's template failed to compile (the pane hides).
   const formOutput = form && output && output.formId === form.id ? output.out : EMPTY_OUTPUT;
@@ -263,7 +264,12 @@ export default function App() {
         {setAsideCount > setAsideSeen && (
           <div className="set-aside-notice" id="set-aside-notice" role="alert">
             <strong>{S_SET_ASIDE}</strong> {S_SET_ASIDE_HINT}
-            <button type="button" className="mini" id="set-aside-dismiss" onClick={() => setSetAsideSeen(setAsideCount)}>
+            <button
+              type="button"
+              className="mini"
+              id="set-aside-dismiss"
+              onClick={() => setSetAsideSeen(setAsideCount)}
+            >
               Dismiss
             </button>
           </div>

@@ -55,16 +55,16 @@ function stores(kv: KV = spyKV()) {
 
 describe("storage helpers", () => {
   it("sets corrupt JSON aside before removing it, and raises the notice (LP-65)", () => {
-    const kv = memoryKV({ lawapp_chars: "[{\"id\":\"abcd1234\",\"name\":\"Ha" });
+    const kv = memoryKV({ lawapp_chars: '[{"id":"abcd1234","name":"Ha' });
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const now = vi.spyOn(Date, "now").mockReturnValue(Date.UTC(2026, 9, 16, 12));
     const notices = setAsideVersion();
     expect(readJson(kv, "lawapp_chars")).toBeNull();
     expect(kv.get("lawapp_chars")).toBeNull();
     const backup = CORRUPT_PREFIX + "lawapp_chars_" + Date.UTC(2026, 9, 16, 12);
-    expect(kv.get(backup)).toBe("[{\"id\":\"abcd1234\",\"name\":\"Ha");
+    expect(kv.get(backup)).toBe('[{"id":"abcd1234","name":"Ha');
     expect(listSetAside(kv)).toEqual([
-      { key: "lawapp_chars", at: "2026-10-16T12:00:00.000Z", raw: "[{\"id\":\"abcd1234\",\"name\":\"Ha" },
+      { key: "lawapp_chars", at: "2026-10-16T12:00:00.000Z", raw: '[{"id":"abcd1234","name":"Ha' },
     ]);
     expect(setAsideVersion()).toBe(notices + 1);
     expect(warn).toHaveBeenCalled();
@@ -114,7 +114,13 @@ describe("storage helpers", () => {
   });
 
   it("turns a refused write into the friendly error", () => {
-    const kv: KV = { get: () => null, set: () => { throw new Error("QuotaExceeded"); }, remove: () => {} };
+    const kv: KV = {
+      get: () => null,
+      set: () => {
+        throw new Error("QuotaExceeded");
+      },
+      remove: () => {},
+    };
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     expect(() => writeJson(kv, "k", 1)).toThrow(SAVE_FAILED);
     warn.mockRestore();
@@ -123,7 +129,14 @@ describe("storage helpers", () => {
 
 describe("dropping the pre-LP-70 server field (LP-71)", () => {
   const OLD = [
-    { id: "gtawchar1", name: "Gee Taw", title: "Attorney at Law", bar: "B-12", server: "gtaw", updatedAt: "2026-01-01T00:00:00.000Z" },
+    {
+      id: "gtawchar1",
+      name: "Gee Taw",
+      title: "Attorney at Law",
+      bar: "B-12",
+      server: "gtaw",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    },
     { id: "fschar001", name: "Sam Style", server: "freestyle", docket: true },
     { id: "newchar01", name: "Already Clean" },
   ];
@@ -137,7 +150,13 @@ describe("dropping the pre-LP-70 server field (LP-71)", () => {
     expect(chars.migrateServerField()).toBe(2);
     const stored = JSON.parse(kv.get(CHARS_KEY)!) as Array<Record<string, unknown>>;
     expect(stored).toEqual([
-      { id: "gtawchar1", name: "Gee Taw", title: "Attorney at Law", bar: "B-12", updatedAt: "2026-01-01T00:00:00.000Z" },
+      {
+        id: "gtawchar1",
+        name: "Gee Taw",
+        title: "Attorney at Law",
+        bar: "B-12",
+        updatedAt: "2026-01-01T00:00:00.000Z",
+      },
       { id: "fschar001", name: "Sam Style", docket: true },
       { id: "newchar01", name: "Already Clean" },
     ]);
@@ -160,12 +179,30 @@ describe("dropping the pre-LP-70 server field (LP-71)", () => {
 describe("characters", () => {
   it("has the 12 fields in order (no Server since LP-70)", () => {
     expect(FIELDS.map((f) => f.key)).toEqual([
-      "name", "title", "dob", "gender", "phone", "address", "occupation", "bar", "email", "signature", "notes", "docket",
+      "name",
+      "title",
+      "dob",
+      "gender",
+      "phone",
+      "address",
+      "occupation",
+      "bar",
+      "email",
+      "signature",
+      "notes",
+      "docket",
     ]);
   });
 
   it("cleans: trims, drops empties, caps at 4000, keeps docket boolean, migrates judge", () => {
-    const c = cleanCharacter({ id: "abcd1234", name: "  Ann  ", title: "", notes: "x".repeat(5000), docket: 1, extra: "no" });
+    const c = cleanCharacter({
+      id: "abcd1234",
+      name: "  Ann  ",
+      title: "",
+      notes: "x".repeat(5000),
+      docket: 1,
+      extra: "no",
+    });
     expect(c).toEqual({ id: "abcd1234", name: "Ann", notes: "x".repeat(4000), docket: true });
     expect(cleanCharacter({ id: "bad id!", name: "B", judge: true })).toMatchObject({ name: "B", docket: true });
     expect(cleanCharacter({ id: "bad id!", name: "B" }).id).toMatch(/^[a-z0-9]{4,32}$/);
@@ -300,7 +337,9 @@ describe("characters", () => {
 
   it('stores dockets of an imported "../x" id under its new id (AC 12)', () => {
     const { kv, chars, dockets } = stores();
-    const res = chars.importJson(JSON.stringify({ characters: [{ id: "../x", name: "X", dockets: [{ caseNumber: "C1" }] }] }));
+    const res = chars.importJson(
+      JSON.stringify({ characters: [{ id: "../x", name: "X", dockets: [{ caseNumber: "C1" }] }] }),
+    );
     const { source, character } = res.saved[0];
     expect(character.id).not.toBe("../x");
     expect(character.id).toMatch(/^[a-z0-9]{4,32}$/);
@@ -438,7 +477,9 @@ describe("portfolio", () => {
 
   it("renders the reference header and topic title (AC 17)", () => {
     const out = render("I", {}, "Jane Roe");
-    expect(out.startsWith("[divbox=transparent][br][/br][size=165][b][center]JUDICIAL ADVANCEMENT PORTFOLIO")).toBe(true);
+    expect(out.startsWith("[divbox=transparent][br][/br][size=165][b][center]JUDICIAL ADVANCEMENT PORTFOLIO")).toBe(
+      true,
+    );
     expect(out).toContain("[center]Jane Roe - Court Commissioner I[/center][hr]\n");
     expect(out.endsWith("[/divbox]")).toBe(true);
     expect(render("II", null)).toContain("[center]Firstname Lastname - Court Commissioner II[/center]");
@@ -464,7 +505,9 @@ describe("portfolio", () => {
   it("CC II texts differ from CC I", () => {
     expect(LEVELS.II.sections[1].tasks[0].text).toBe("Review five arrest warrants (include at least one denial).");
     expect(LEVELS.I.sections[1].tasks[0].text).toBe("Review five arrest warrants.");
-    expect(render("II", {})).toContain("[b]3.3. Draft an appellate opinion.[/b]\n[color=#444444]Reach out to your supervisor");
+    expect(render("II", {})).toContain(
+      "[b]3.3. Draft an appellate opinion.[/b]\n[color=#444444]Reach out to your supervisor",
+    );
   });
 
   it("cleans text and urls", () => {
@@ -478,7 +521,13 @@ describe("portfolio", () => {
   it("counts progress and completeness", () => {
     expect(complete("case", { num: "1", link: "https://x" })).toBe(true);
     expect(complete("case", { num: "1" })).toBe(false);
-    const p = progress("I", { "1.1": [{ num: "1", link: "https://x" }, { num: "2", link: "https://y" }, { num: "3", link: "https://z" }] });
+    const p = progress("I", {
+      "1.1": [
+        { num: "1", link: "https://x" },
+        { num: "2", link: "https://y" },
+        { num: "3", link: "https://z" },
+      ],
+    });
     expect(p).toEqual({ done: 2, need: 24 });
   });
 

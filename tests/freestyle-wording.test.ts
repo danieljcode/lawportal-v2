@@ -29,7 +29,13 @@ describe("court names", () => {
   });
 
   it("the forms' courts are all FreestyleRP names", () => {
-    const allowed = new Set([...Object.values(DIVISION_COURTS), APPELLATE_COURT, SUPREME_COURT, GENERAL_COURT, "Additional Templates"]);
+    const allowed = new Set([
+      ...Object.values(DIVISION_COURTS),
+      APPELLATE_COURT,
+      SUPREME_COURT,
+      GENERAL_COURT,
+      "Additional Templates",
+    ]);
     for (const f of ALL_FORMS) expect(allowed, f.id).toContain(f.court);
     expect(COURTS).not.toContain("Miscellaneous");
   });
@@ -39,18 +45,22 @@ describe("court phrases in the template HTML", () => {
   it("replaces the all-caps Superior Court header (and the &nbsp; variant)", () => {
     expect(html("<p>SUPERIOR COURT OF THE STATE OF SAN ANDREAS</p>")).toBe("<p>SAN ANDREAS COURT</p>");
     expect(html("<p>SUPERIOR&nbsp;COURT OF THE STATE OF SAN ANDREAS</p>")).toBe("<p>SAN ANDREAS COURT</p>");
-    expect(html("<strong>SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:</strong>")).toBe("<strong>SAN ANDREAS COURT, COUNTY OF:</strong>");
+    expect(html("<strong>SUPERIOR COURT OF SAN ANDREAS, COUNTY OF:</strong>")).toBe(
+      "<strong>SAN ANDREAS COURT, COUNTY OF:</strong>",
+    );
   });
 
   it("replaces mixed-case Superior Court phrases", () => {
     expect(html("Superior Court of San Andreas, County of Los Santos")).toBe("SAN ANDREAS COURT, County of Los Santos");
-    expect(html("Superior Court of the State of San Andreas has issued an order")).toBe("SAN ANDREAS COURT has issued an order");
+    expect(html("Superior Court of the State of San Andreas has issued an order")).toBe(
+      "SAN ANDREAS COURT has issued an order",
+    );
   });
 
   it("replaces Appellate and Supreme phrases before the general Superior one can swallow them", () => {
-    expect(html("APPELLATE COURT OF SAN ANDREAS and SUPREME COURT OF SAN ANDREAS and SUPERIOR COURT OF SAN ANDREAS")).toBe(
-      "SAN ANDREAS APPELLATE COURT and SAN ANDREAS SUPREME COURT and SAN ANDREAS COURT",
-    );
+    expect(
+      html("APPELLATE COURT OF SAN ANDREAS and SUPREME COURT OF SAN ANDREAS and SUPERIOR COURT OF SAN ANDREAS"),
+    ).toBe("SAN ANDREAS APPELLATE COURT and SAN ANDREAS SUPREME COURT and SAN ANDREAS COURT");
   });
 
   it("prefixes 'Small Claims Court' with the state", () => {
@@ -61,9 +71,13 @@ describe("court phrases in the template HTML", () => {
 describe("courthouses (from courts.ts)", () => {
   it("puts our courthouse in case-number prefills and fallbacks, for every division", () => {
     for (const div of ["CR", "CC", "TC", "SM", "XX"]) {
-      expect(html(`{{Case number=YYGJ${div}00XXX|YYGJ${div}#####}}`)).toBe(`{{Case number=YYSC${div}00XXX|YYSC${div}#####}}`);
+      expect(html(`{{Case number=YYGJ${div}00XXX|YYGJ${div}#####}}`)).toBe(
+        `{{Case number=YYSC${div}00XXX|YYSC${div}#####}}`,
+      );
     }
-    expect(html("{{Case number=YYGJ<Division?A=CR>00XXX|##GJCR#####}}")).toBe("{{Case number=YYSC<Division?A=CR>00XXX|##SCCR#####}}");
+    expect(html("{{Case number=YYGJ<Division?A=CR>00XXX|##GJCR#####}}")).toBe(
+      "{{Case number=YYSC<Division?A=CR>00XXX|##SCCR#####}}",
+    );
     expect(html("{{Case number=YYGJCC00XXX|--GJCC-----}}")).toBe("{{Case number=YYSCCC00XXX|--SCCC-----}}");
   });
 

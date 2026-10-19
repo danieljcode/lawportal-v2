@@ -22,15 +22,18 @@ export default function JapOutput({ character }: { character: Character }) {
 
   const bbcode = useMemo(() => {
     // version is the change signal; the store is read fresh when it moves.
-    const p =
-      (version >= 0 && portfolioStore().get(character.id)) || clean({ level: levelFromTitle(character.title) });
+    const p = (version >= 0 && portfolioStore().get(character.id)) || clean({ level: levelFromTitle(character.title) });
     return render(p.level, p[p.level], character.name);
   }, [character.id, character.name, character.title, version]);
   const topic = topicTitle(character.name);
 
   const copy = async (text: string, what: string) => {
     const ok = await copyText(text);
-    setStatus(ok ? { text: what + " copied.", bad: false } : { text: "Copy failed: select the text and press Ctrl+C.", bad: true });
+    setStatus(
+      ok
+        ? { text: what + " copied.", bad: false }
+        : { text: "Copy failed: select the text and press Ctrl+C.", bad: true },
+    );
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => setStatus(null), 4000);
   };
@@ -56,7 +59,8 @@ export default function JapOutput({ character }: { character: Character }) {
           </button>
         </div>
         <p className="note">
-          Paste it into the post box as it is. Anything you haven&apos;t filled in yet keeps the template&apos;s placeholder.
+          Paste it into the post box as it is. Anything you haven&apos;t filled in yet keeps the template&apos;s
+          placeholder.
         </p>
         <textarea
           id="jap-bbcode"
@@ -68,7 +72,12 @@ export default function JapOutput({ character }: { character: Character }) {
         />
       </div>
       <div className="status-bar">
-        <span className={"status" + (status ? (status.bad ? " bad" : " good") : "")} id="jap-status" role="status" aria-live="polite">
+        <span
+          className={"status" + (status ? (status.bad ? " bad" : " good") : "")}
+          id="jap-status"
+          role="status"
+          aria-live="polite"
+        >
           {status ? status.text : ""}
         </span>
       </div>

@@ -214,7 +214,11 @@ describe("App without a server choice (LP-70)", () => {
   it("opens a draft saved with GTAW values: the values stay, the form shows the new wording (LP-71)", () => {
     localStorage.setItem(
       "lawapp_draft_criminal-case-schedule",
-      JSON.stringify({ values: { Courthouse: "GREG E JOPLIN", "Case number": "26GJCR00147" }, autofilled: {}, derived: {} }),
+      JSON.stringify({
+        values: { Courthouse: "GREG E JOPLIN", "Case number": "26GJCR00147" },
+        autofilled: {},
+        derived: {},
+      }),
     );
     mountApp();
     go("#criminal-case-schedule");

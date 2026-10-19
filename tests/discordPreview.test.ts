@@ -110,7 +110,7 @@ describe("renderDiscordHtml: XSS", () => {
       '"><script>alert(1)</script>',
       "[<img src=x onerror=alert(1)>](https://e.com)",
       '[x](https://e.com/"onmouseover="alert(1))',
-      "https://e.com/\"><script>alert(1)</script>",
+      'https://e.com/"><script>alert(1)</script>',
       "```\n</code></pre><script>alert(1)</script>\n```",
       "**<script>** ||<iframe>||",
     ]) {
@@ -159,7 +159,13 @@ describe("Discord settings", () => {
   });
 
   it("reports a refused write", () => {
-    const kv: KV = { get: () => null, set: () => { throw new Error("quota"); }, remove: () => {} };
+    const kv: KV = {
+      get: () => null,
+      set: () => {
+        throw new Error("quota");
+      },
+      remove: () => {},
+    };
     expect(writeDiscordSettings(DEFAULT_DISCORD, kv)).toBe(false);
   });
 });

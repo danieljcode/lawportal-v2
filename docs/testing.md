@@ -15,19 +15,19 @@ All suites are in `tests/` and use [Vitest](https://vitest.dev). Most run in Nod
 DOM start with `// @vitest-environment jsdom`. UI tests render the real `App` (or one component)
 with React and drive it through the DOM.
 
-| Area | Suites |
-|---|---|
-| Template engine | `template.test.ts`, `template.parity.test.ts`, `layout.test.ts` |
-| Safety | `xss.test.ts`, `template-safety.test.ts` |
-| Wording | `strings.test.ts` (no outside branding or links in the app's own text) |
-| Outputs | `bbcode.test.ts`, `discord*.test.ts`, `docx.test.ts`, `preview.test.ts` |
-| Forms and state | `formState.test.ts`, `formView.test.ts`, `extra-forms.test.ts`, `draftWriter.test.ts` |
-| FreestyleRP | `freestyle.test.ts`, `freestyle-wording.test.ts`, `freestyleApp.test.tsx` |
-| Stores and files | `stores.test.ts`, `characterFile.test.ts` |
-| Sync | `sync-api.test.ts` (the routes, against a temp directory), `sync-client.test.ts` (stubbed `fetch`), `body.test.ts` |
-| UI | `dialogs.test.ts`, `discordPanel.test.ts` |
-| Releases | `release.test.ts`, `theme-changelog.test.ts` |
-| Conventions | `commit-format.test.ts` (the commit and PR title check) |
+| Area             | Suites                                                                                                             |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Template engine  | `template.test.ts`, `template.parity.test.ts`, `layout.test.ts`                                                    |
+| Safety           | `xss.test.ts`, `template-safety.test.ts`                                                                           |
+| Wording          | `strings.test.ts` (no outside branding or links in the app's own text)                                             |
+| Outputs          | `bbcode.test.ts`, `discord*.test.ts`, `docx.test.ts`, `preview.test.ts`                                            |
+| Forms and state  | `formState.test.ts`, `formView.test.ts`, `extra-forms.test.ts`, `draftWriter.test.ts`                              |
+| FreestyleRP      | `freestyle.test.ts`, `freestyle-wording.test.ts`, `freestyleApp.test.tsx`                                          |
+| Stores and files | `stores.test.ts`, `characterFile.test.ts`                                                                          |
+| Sync             | `sync-api.test.ts` (the routes, against a temp directory), `sync-client.test.ts` (stubbed `fetch`), `body.test.ts` |
+| UI               | `dialogs.test.ts`, `discordPanel.test.ts`                                                                          |
+| Releases         | `release.test.ts`, `theme-changelog.test.ts`                                                                       |
+| Conventions      | `commit-format.test.ts` (the commit and PR title check)                                                            |
 
 ## What `tests/xss.test.ts` protects
 
@@ -65,6 +65,7 @@ using the [reference data](templates-and-forms.md#reference-data) in `.agents/re
    read-only token for `danieljcode/lawportal-reference`). Pull requests from forks don't get the
    secret, so they skip the parity tests.
 2. `npm ci`, then `npm audit --omit=dev --audit-level=high` (see [Dependencies](dependencies.md)),
+   `npm run lint` and `npm run format:check` (see [Development](development.md#code-style-and-editor-set-up)),
    `npm test` (with `LAWAPP_REQUIRE_REFERENCE=1` when the data was checked out) and `npm run build`.
 
 A second workflow, **Conventions** (`.github/workflows/conventions.yml`), runs on pull requests and
