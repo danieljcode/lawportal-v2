@@ -1,23 +1,20 @@
 // Dockets: the cases a judge or lawyer character is handling (INV §e.2).
-// One JSON list per character under lawapp_dockets_<charId>; the key is
-// removed when the list is empty. Behaviour follows the reference js_dockets.js.
+// One list per character under lawapp_dockets_<charId>; the key is removed
+// when the list is empty. Behaviour follows the reference js_dockets.js.
+// Saved through the keyed store base (store.ts, LP-99) as schema version 2:
+// {"v": 2, "data": [...]}. Version 1 is the bare list saved before LP-99.
 
 import { DIVISION_COURTS } from "./courts";
 import type { Docket, DocketStatus } from "./types";
-import {
-  createChannel,
-  defaultKV,
-  isId,
-  ISO_DATE_RE,
-  ISO_TIME_RE,
-  newId,
-  readJson,
-  touchCharacter,
-  writeJson,
-  type KV,
-} from "./storage";
+import { defaultKV, isId, ISO_DATE_RE, ISO_TIME_RE, newId, touchCharacter, type KV } from "./storage";
+import { createKeyedStore, type Migration } from "./store";
 
 export const DOCKETS_PREFIX = "lawapp_dockets_";
+/** The saved lists' schema version (LP-99). */
+export const DOCKETS_VERSION = 2;
+
+/** Version 1 was the bare list; version 2 is the same list in the store envelope. */
+export const DOCKET_MIGRATIONS: readonly Migration[] = [{ to: 2, up: (data) => data }];
 
 export const STATUSES: readonly DocketStatus[] = ["Open", "Awaiting arguments", "Awaiting judgement", "Closed"];
 
@@ -110,25 +107,31 @@ export interface DocketStore {
   removeAll(charId: string): void;
   /** Replace a character's whole docket (import and sync). */
   replace(charId: string, items: unknown): void;
+  /** Upgrade every saved docket to the current schema version (LP-99); runs once at start-up. */
+  migrate(): boolean;
   /** Fires after data mutations. */
   subscribe(fn: () => void): () => void;
   version(): number;
 }
 
+/** A saved list: entries without a case number are dropped. */
+function validList(raw: unknown): Docket[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((d): d is Docket => !!d && typeof d === "object" && typeof (d as Docket).caseNumber === "string");
+}
+
 export function createDocketStore(kv: KV): DocketStore {
-  const changes = createChannel();
-  const key = (charId: string) => DOCKETS_PREFIX + charId;
-
-  function read(charId: string): Docket[] {
-    const raw = readJson<unknown>(kv, key(charId));
-    if (!Array.isArray(raw)) return [];
-    return raw.filter((d): d is Docket => !!d && typeof d === "object" && typeof (d as Docket).caseNumber === "string");
-  }
-
-  function write(charId: string, list: Docket[]): void {
-    if (list.length) writeJson(kv, key(charId), list);
-    else kv.remove(key(charId));
-  }
+  const store = createKeyedStore<Docket[]>(kv, {
+    prefix: DOCKETS_PREFIX,
+    isId,
+    version: DOCKETS_VERSION,
+    validate: validList,
+    migrations: DOCKET_MIGRATIONS,
+    isEmpty: (list) => list.length === 0,
+  });
+  const read = store.get;
+  /** Save (or remove, when empty) and tell subscribers. */
+  const write = store.set;
 
   function findByCase(charId: string, caseNumber: string): Docket | null {
     if (!isId(charId)) return null;
@@ -166,7 +169,6 @@ export function createDocketStore(kv: KV): DocketStore {
     save(charId, d) {
       if (!isId(charId)) return null;
       const saved = saveQuiet(charId, d);
-      changes.emit();
       touchCharacter(charId);
       return saved;
     },
@@ -179,7 +181,6 @@ export function createDocketStore(kv: KV): DocketStore {
       }
       if (!existing) delete merged.id;
       const saved = saveQuiet(charId, merged);
-      changes.emit();
       touchCharacter(charId);
       return saved;
     },
@@ -189,13 +190,11 @@ export function createDocketStore(kv: KV): DocketStore {
         charId,
         read(charId).filter((d) => d.id !== id),
       );
-      changes.emit();
       touchCharacter(charId);
     },
     removeAll(charId) {
       if (!isId(charId)) return;
-      kv.remove(key(charId));
-      changes.emit();
+      write(charId, []);
     },
     replace(charId, items) {
       if (!isId(charId)) return;
@@ -204,10 +203,10 @@ export function createDocketStore(kv: KV): DocketStore {
         .map(clean)
         .filter((d) => d.caseNumber);
       write(charId, list);
-      changes.emit();
     },
-    subscribe: changes.subscribe,
-    version: changes.version,
+    migrate: store.migrate,
+    subscribe: store.subscribe,
+    version: store.version,
   };
 }
 
