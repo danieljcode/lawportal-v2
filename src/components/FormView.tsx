@@ -33,13 +33,14 @@ import { caseNumberPattern, compile, fields, render } from "@/lib/template";
 import type { Character, Docket, Entry, FormDef, Node, Tree } from "@/lib/types";
 import { FormContext, type FormCtx } from "./fields/FormContext";
 import Sections from "./fields/Sections";
+import type { SafeHtml } from "@/lib/safeHtml";
 import { useDocketVersion } from "./useStore";
 
 export interface FormOutput {
-  /** Final HTML (no highlight): Copy for forum, BBCode, .docx. */
-  finalHtml: string;
+  /** Final HTML (no highlight): Copy for forum, BBCode, .docx. Rendered, so SafeHtml (LP-5). */
+  finalHtml: SafeHtml;
   /** What the preview shows (highlight per the checkbox). */
-  previewHtml: string;
+  previewHtml: SafeHtml;
 }
 
 export interface FormViewProps {

@@ -13,6 +13,7 @@
 // untouched form reproduces the directory template exactly. Behaviour follows
 // the reference engine; see .agents/tasks/jsa-investigation.md §b.
 
+import { trustAsSafeHtml, type SafeHtml } from "./safeHtml";
 import type { BlockEntry, BlockNode, CondEntry, CondNode, Entry, Field, FieldType, Node, Tree, Values } from "./types";
 
 export const TYPES: readonly FieldType[] = [
@@ -101,8 +102,11 @@ const LINE_BREAK_SRC = "<(?:br|p|li|tr|td|div|hr)\\b";
 const IMAGE_URL = /^https?:\/\/\S+\.(png|jpe?g|gif|webp)(\?\S*)?$/i;
 const ANY_URL = /^https?:\/\/\S+$/i;
 
-export function escapeHtml(s: unknown): string {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+/** Text as HTML: `&`, `<`, `>` and `"` become entities, so it can never become markup (LP-5: SafeHtml). */
+export function escapeHtml(s: unknown): SafeHtml {
+  return trustAsSafeHtml(
+    String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"),
+  );
 }
 
 export function characterLabel(key: string): string {
@@ -626,8 +630,12 @@ function renderNodes(nodes: Node[], values: Values, opts: RenderOptions, index: 
 }
 
 /** Render a compiled tree with the given values. */
-export function render(tree: Tree, values?: Values, opts?: RenderOptions): string {
-  return renderNodes(tree.children, values || {}, opts || {}, 0);
+/**
+ * The filing's HTML: the template's own markup with every user value escaped
+ * (escapeHtml), so it's SafeHtml (LP-5).
+ */
+export function render(tree: Tree, values?: Values, opts?: RenderOptions): SafeHtml {
+  return trustAsSafeHtml(renderNodes(tree.children, values || {}, opts || {}, 0));
 }
 
 /* ------------------------------------------------------------------ plain */
