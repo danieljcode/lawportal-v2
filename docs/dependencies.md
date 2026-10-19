@@ -50,6 +50,6 @@ When the audit fails:
 
 ### Current override
 
-| Override | Why |
-|---|---|
+| Override                    | Why                                                                                                                                                                                                                                                                       |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `next` → `postcss` `8.5.31` | Next 15 pins PostCSS 8.4.31, which has high-severity advisories (GHSA-qx2v-qp2m-jg93 and related). npm's only fix was Next 16. PostCSS 8.5.31 is a minor update within PostCSS 8: the build's CSS is byte-identical. Remove the override once Next ships a fixed PostCSS. |

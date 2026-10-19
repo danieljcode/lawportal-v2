@@ -8,8 +8,27 @@ export const TEXT_VALUE = 'X<&>"1\n\nX2';
 export const MD_TEXT = "a*b_c~d|e`f\\g # > [x](https://e.com) @here <@1>";
 
 const WORDS = [
-  "the", "court", "finds", "that", "plaintiff", "filed", "a", "timely", "motion", "and", "defendant",
-  "did", "not", "respond", "within", "fourteen", "days", "of", "service", "under", "rule",
+  "the",
+  "court",
+  "finds",
+  "that",
+  "plaintiff",
+  "filed",
+  "a",
+  "timely",
+  "motion",
+  "and",
+  "defendant",
+  "did",
+  "not",
+  "respond",
+  "within",
+  "fourteen",
+  "days",
+  "of",
+  "service",
+  "under",
+  "rule",
 ];
 
 /** ≈ 2,600 chars of sentence-structured text with markdown-looking pieces mixed in. */

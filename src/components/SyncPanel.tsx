@@ -158,7 +158,13 @@ export default function SyncPanel({ autoEnable = false, onAutoEnableDone }: Sync
             <code className="sync-code" id="sync-code">
               {shown ? code : masked(code)}
             </code>
-            <button className="mini" id="sync-reveal" type="button" aria-pressed={shown} onClick={() => setShown((s) => !s)}>
+            <button
+              className="mini"
+              id="sync-reveal"
+              type="button"
+              aria-pressed={shown}
+              onClick={() => setShown((s) => !s)}
+            >
               {shown ? "Hide" : "Show"}
             </button>
             <button className="mini" id="sync-copy" type="button" onClick={copyCode}>
@@ -191,8 +197,13 @@ export default function SyncPanel({ autoEnable = false, onAutoEnableDone }: Sync
           <button className="mini" id="sync-restore" type="button" onClick={() => sync.restoreLost()}>
             Restore my version
           </button>
-          <button className="mini" id="sync-discard" type="button" onClick={() => {
-              if (confirm("Throw away your kept version? The other device's version stays. This cannot be undone.")) sync.discardLost();
+          <button
+            className="mini"
+            id="sync-discard"
+            type="button"
+            onClick={() => {
+              if (confirm("Throw away your kept version? The other device's version stays. This cannot be undone."))
+                sync.discardLost();
             }}
           >
             Dismiss

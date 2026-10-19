@@ -131,7 +131,10 @@ function CharactersBody({ characters, activeId, onDockets, autoSync, onAutoSyncD
 
   // Each value exactly as it was stored, with where and when it was set aside.
   const downloadDamaged = () =>
-    download(JSON.stringify({ app: "jsa-form-generator", setAside: listSetAside(defaultKV()) }, null, 2), DAMAGED_FILENAME);
+    download(
+      JSON.stringify({ app: "jsa-form-generator", setAside: listSetAside(defaultKV()) }, null, 2),
+      DAMAGED_FILENAME,
+    );
 
   const importFile = async (e: ChangeEvent<HTMLInputElement>) => {
     const input = e.target;
@@ -242,11 +245,17 @@ function CharactersBody({ characters, activeId, onDockets, autoSync, onAutoSyncD
         </div>
         {editing && (
           <form id="char-form" className="char-form" noValidate onSubmit={save} aria-labelledby="char-form-title">
-            <h3 id="char-form-title">{editing.id ? "Edit " + (store.get(editing.id)?.name || "character") : "New character"}</h3>
+            <h3 id="char-form-title">
+              {editing.id ? "Edit " + (store.get(editing.id)?.name || "character") : "New character"}
+            </h3>
             <div id="char-fields">
               {FIELDS.map((f) => {
                 const fid = "char-" + f.key;
-                const help = f.hint ? <p className="help" id={fid + "-help"}>{f.hint}</p> : null;
+                const help = f.hint ? (
+                  <p className="help" id={fid + "-help"}>
+                    {f.hint}
+                  </p>
+                ) : null;
                 if (f.checkbox) {
                   return (
                     <div className="field" key={f.key}>
@@ -275,10 +284,7 @@ function CharactersBody({ characters, activeId, onDockets, autoSync, onAutoSyncD
                   return (
                     <div className="field" key={f.key}>
                       <label htmlFor={fid}>{f.label}</label>
-                      <select
-                        {...common}
-                        onChange={(e) => setField(f.key, e.target.value)}
-                      >
+                      <select {...common} onChange={(e) => setField(f.key, e.target.value)}>
                         {f.selectOptions.map((o) => {
                           const [val, label] = o.split(":");
                           return (

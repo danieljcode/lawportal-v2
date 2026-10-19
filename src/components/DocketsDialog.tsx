@@ -125,7 +125,12 @@ function DocketsBody({ charId, canUse, onUse, onClose }: DocketsDialogProps & { 
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
-        <select id="docket-filter" aria-label="Filter by status" value={status} onChange={(e) => setStatus(e.target.value)}>
+        <select
+          id="docket-filter"
+          aria-label="Filter by status"
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+        >
           {FILTERS.map(([value, label]) => (
             <option key={value || "all"} value={value}>
               {label}
@@ -205,7 +210,9 @@ function DocketsBody({ charId, canUse, onUse, onClose }: DocketsDialogProps & { 
                     </select>
                   );
                 } else if (f.multiline) {
-                  input = <textarea id={fid} rows={3} value={value} onChange={(e) => setField(f.key, e.target.value)} />;
+                  input = (
+                    <textarea id={fid} rows={3} value={value} onChange={(e) => setField(f.key, e.target.value)} />
+                  );
                 } else {
                   input = (
                     <input

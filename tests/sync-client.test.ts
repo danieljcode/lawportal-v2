@@ -54,7 +54,11 @@ const T0 = "2026-01-01T00:00:00.000Z";
 const T1 = "2026-02-01T00:00:00.000Z";
 
 /** Sync on at `rev`, these characters stored with their own stamps, and `base` as the last server copy seen. */
-function seed(chars: Array<{ id: string; name: string; updatedAt: string }>, base: Record<string, string>, rev = 1): void {
+function seed(
+  chars: Array<{ id: string; name: string; updatedAt: string }>,
+  base: Record<string, string>,
+  rev = 1,
+): void {
   localStorage.setItem(sync.CODE_KEY, CODE);
   localStorage.setItem(sync.REV_KEY, String(rev));
   localStorage.setItem(sync.BASE_KEY, JSON.stringify(base));
@@ -106,7 +110,10 @@ describe("sync.init (AC 26)", () => {
   it("pulls once on init when a code is set, with the reference fetch options", async () => {
     localStorage.setItem(sync.CODE_KEY, CODE);
     localStorage.setItem(sync.REV_KEY, "3");
-    const calls = stubFetch({ status: 200, body: { rev: 3, data: { characters: [] }, updated: "2026-01-01T00:00:00.000Z" } });
+    const calls = stubFetch({
+      status: 200,
+      body: { rev: 3, data: { characters: [] }, updated: "2026-01-01T00:00:00.000Z" },
+    });
     const fetchMock = vi.mocked(fetch);
     const seen: string[] = [];
     sync.onChange((s) => seen.push(s.status));
@@ -114,7 +121,11 @@ describe("sync.init (AC 26)", () => {
     expect(calls).toHaveLength(1);
     expect(calls[0]).toMatchObject({ url: "/api/data", method: "GET" });
     expect(calls[0].headers.Authorization).toBe("Bearer " + CODE);
-    expect(fetchMock.mock.calls[0][1]).toMatchObject({ credentials: "omit", cache: "no-store", referrerPolicy: "no-referrer" });
+    expect(fetchMock.mock.calls[0][1]).toMatchObject({
+      credentials: "omit",
+      cache: "no-store",
+      referrerPolicy: "no-referrer",
+    });
     expect(seen).toEqual(["loading", "synced"]);
   });
 });
@@ -276,7 +287,9 @@ describe("synced data from before LP-70 (LP-71)", () => {
         body: {
           rev: 2,
           updated: "u2",
-          data: { characters: [{ id: "gtawchar1", name: "Gee Taw", title: "Attorney at Law", server: "gtaw", updatedAt: T0 }] },
+          data: {
+            characters: [{ id: "gtawchar1", name: "Gee Taw", title: "Attorney at Law", server: "gtaw", updatedAt: T0 }],
+          },
         },
       },
       { status: 200, body: { rev: 3, updated: "u3" } },
@@ -344,7 +357,11 @@ describe("conflicts keep unsent edits (LP-64)", () => {
     );
     await sync.pull(true);
     expect(names()).toEqual(["Alice Renamed", "Bob"]);
-    expect(docketStore().list("char0002").map((d) => d.caseNumber)).toEqual(["26CC00002"]);
+    expect(
+      docketStore()
+        .list("char0002")
+        .map((d) => d.caseNumber),
+    ).toEqual(["26CC00002"]);
     expect(calls.map((c) => c.method)).toEqual(["GET", "PUT"]);
     expect(calls[1].body).toMatchObject({ rev: 2 });
     const sent = (calls[1].body as { data: sync.SyncDoc }).data.characters;
@@ -451,7 +468,10 @@ describe("conflicts keep unsent edits (LP-64)", () => {
       }),
     );
     const calls = stubFetch(
-      { status: 200, body: { rev: 1, updated: "u1", data: { characters: [{ id: "char0001", name: "Theirs", updatedAt: T1 }] } } },
+      {
+        status: 200,
+        body: { rev: 1, updated: "u1", data: { characters: [{ id: "char0001", name: "Theirs", updatedAt: T1 }] } },
+      },
       { status: 200, body: { rev: 2, updated: "u2" } },
     );
     await sync.init();
@@ -459,7 +479,11 @@ describe("conflicts keep unsent edits (LP-64)", () => {
     expect(sync.restoreLost()).toBe(1);
     expect(names()).toEqual(["Mine"]);
     expect((characterStore().get("char0001")?.updatedAt ?? "") > T1).toBe(true);
-    expect(docketStore().list("char0001").map((d) => d.caseNumber)).toEqual(["26CC00009"]);
+    expect(
+      docketStore()
+        .list("char0001")
+        .map((d) => d.caseNumber),
+    ).toEqual(["26CC00009"]);
     expect(sync.getState().lost).toBe(0);
     expect(localStorage.getItem(sync.LOST_KEY)).toBeNull();
     await vi.advanceTimersByTimeAsync(1000);
@@ -511,7 +535,10 @@ describe("enable / link / disable / destroy", () => {
     characterStore().save({ id: "shared01", name: "Local Shared" });
     characterStore().save({ id: "local001", name: "Local Only" });
     const calls = stubFetch(
-      { status: 200, body: { rev: 4, updated: "u4", data: { characters: [{ id: "shared01", name: "Server Shared" }] } } },
+      {
+        status: 200,
+        body: { rev: 4, updated: "u4", data: { characters: [{ id: "shared01", name: "Server Shared" }] } },
+      },
       { status: 200, body: { rev: 5, updated: "u5" } },
     );
     await sync.link("  " + CODE.toLowerCase() + " ");

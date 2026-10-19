@@ -252,7 +252,8 @@ function apply(doc: unknown): number {
 
 /** Fold this browser's characters into a server document (the server wins on id clashes). */
 export function merge(serverDoc: unknown): SyncDoc {
-  const raw = serverDoc && typeof serverDoc === "object" ? (serverDoc as { characters?: unknown }).characters : undefined;
+  const raw =
+    serverDoc && typeof serverDoc === "object" ? (serverDoc as { characters?: unknown }).characters : undefined;
   const list = Array.isArray(raw) ? raw.filter((c): c is Record<string, unknown> => !!c && typeof c === "object") : [];
   const out: SyncDoc = { characters: list.slice() };
   const have = new Set(out.characters.map((c) => c.id));
@@ -459,7 +460,9 @@ function send(retry: boolean): Promise<void> {
         set(
           "error",
           b.error ||
-            "Couldn't save to the server (" + r.status + "). Changes are kept in this browser and will be sent next time.",
+            "Couldn't save to the server (" +
+              r.status +
+              "). Changes are kept in this browser and will be sent next time.",
         );
       },
       () => {
@@ -532,7 +535,8 @@ function changed(): void {
 export async function enable(): Promise<string> {
   const r = await request("POST", "account", {}, false);
   const b = r.body || {};
-  if (r.status !== 201 || typeof b.code !== "string") throw new Error(b.error || "The server refused (" + r.status + ").");
+  if (r.status !== 201 || typeof b.code !== "string")
+    throw new Error(b.error || "The server refused (" + r.status + ").");
   lsSet(CODE_KEY, b.code);
   lsSet(REV_KEY, "0");
   await push();
@@ -541,7 +545,9 @@ export async function enable(): Promise<string> {
 
 /** Use an existing code: fetch its data, fold in this browser's characters, apply, and upload the result. */
 export async function link(typed: string): Promise<void> {
-  const c = String(typed || "").trim().toUpperCase();
+  const c = String(typed || "")
+    .trim()
+    .toUpperCase();
   if (!CODE_RE.test(c)) throw new Error(BAD_CODE);
   const r = await request("GET", "data", undefined, c);
   const b = r.body || {};

@@ -121,7 +121,9 @@ let unsaved: SetAsideValue[] = [];
 function corruptIndex(kv: KV): string[] {
   try {
     const list: unknown = JSON.parse(kv.get(CORRUPT_INDEX_KEY) || "[]");
-    return Array.isArray(list) ? list.filter((k): k is string => typeof k === "string" && k.startsWith(CORRUPT_PREFIX)) : [];
+    return Array.isArray(list)
+      ? list.filter((k): k is string => typeof k === "string" && k.startsWith(CORRUPT_PREFIX))
+      : [];
   } catch {
     return [];
   }

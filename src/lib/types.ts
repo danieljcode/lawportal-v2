@@ -10,17 +10,7 @@ export interface FormDef {
 }
 
 export type FieldType =
-  | "text"
-  | "textarea"
-  | "date"
-  | "number"
-  | "select"
-  | "check"
-  | "spoiler"
-  | "image"
-  | "url"
-  | "list"
-  | "paras";
+  "text" | "textarea" | "date" | "number" | "select" | "check" | "spoiler" | "image" | "url" | "list" | "paras";
 
 /** One parsed `{{Label[=prefill][@char][:type[:opts]][>tag][|fallback]}}` token. */
 export interface Field {

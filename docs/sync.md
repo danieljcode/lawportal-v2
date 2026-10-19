@@ -14,7 +14,7 @@ lost. Sync is optional and runs entirely on the computer that runs the app.
 - **Use code** in another browser fetches that code's data and merges this browser's characters
   into it.
 - **Stop syncing on this device** keeps the local copy. **Delete server copy** (`DELETE
-  /api/account`) removes the file; every device using that code stops syncing.
+/api/account`) removes the file; every device using that code stops syncing.
 
 ## Server storage
 

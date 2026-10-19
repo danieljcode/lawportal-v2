@@ -12,9 +12,11 @@ const bb = (html: string) => fromHtml(html, parse);
 
 describe("fromHtml", () => {
   it("flattens table cells to one line each and drops empty cells", () => {
-    expect(bb('<table><tbody><tr><td style="text-align:center"> A </td><td></td><td>B</td></tr><tr><td>C</td></tr></tbody></table>')).toBe(
-      "A\nB\n\nC\n",
-    );
+    expect(
+      bb(
+        '<table><tbody><tr><td style="text-align:center"> A </td><td></td><td>B</td></tr><tr><td>C</td></tr></tbody></table>',
+      ),
+    ).toBe("A\nB\n\nC\n");
   });
 
   it("maps font-size px to [size]", () => {
@@ -30,7 +32,9 @@ describe("fromHtml", () => {
 
   it("aligns paragraphs", () => {
     expect(bb('<p style="text-align:center">Mid</p>')).toBe("[center]Mid[/center]\n");
-    expect(bb('<p style="text-align:right">R</p><p style="text-align:justify">J</p>')).toBe("[right]R[/right]\n\n[justify]J[/justify]\n");
+    expect(bb('<p style="text-align:right">R</p><p style="text-align:justify">J</p>')).toBe(
+      "[right]R[/right]\n\n[justify]J[/justify]\n",
+    );
   });
 
   it("turns the spoiler div into [spoiler] and drops the header", () => {
@@ -45,9 +49,9 @@ describe("fromHtml", () => {
   });
 
   it("converts inline tags, links, images and drops <mark>", () => {
-    expect(bb('<p><b>B</b> <i>I</i> <u>U</u> <s>S</s> <a href="https://e.com">L</a> <img src="https://e.com/a.png"></p>')).toBe(
-      "[b]B[/b] [i]I[/i] [u]U[/u] [s]S[/s] [url=https://e.com]L[/url] [img]https://e.com/a.png[/img]\n",
-    );
+    expect(
+      bb('<p><b>B</b> <i>I</i> <u>U</u> <s>S</s> <a href="https://e.com">L</a> <img src="https://e.com/a.png"></p>'),
+    ).toBe("[b]B[/b] [i]I[/i] [u]U[/u] [s]S[/s] [url=https://e.com]L[/url] [img]https://e.com/a.png[/img]\n");
     expect(bb('<p><mark class="unfilled" title="X">NAME</mark></p>')).toBe("NAME\n");
     expect(bb("<p><strong> </strong>x</p>")).toBe("x\n");
   });

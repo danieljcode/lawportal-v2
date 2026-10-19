@@ -335,7 +335,11 @@ export function createCharacterStore(kv: KV): CharacterStore {
         if (setAside(kv, LEGACY_KEY, raw)) kv.remove(LEGACY_KEY);
         return 0;
       }
-      const arr = Array.isArray(old) ? old : old && typeof old === "object" ? (old as { characters?: unknown }).characters : [];
+      const arr = Array.isArray(old)
+        ? old
+        : old && typeof old === "object"
+          ? (old as { characters?: unknown }).characters
+          : [];
       const list: Character[] = [];
       const ids = new Set<string>();
       for (const item of Array.isArray(arr) ? arr : []) {

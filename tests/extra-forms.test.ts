@@ -37,13 +37,23 @@ const SPEC: Record<string, { title: string; section: string; sections: string[];
     title: "Subpoena",
     section: "Discovery",
     sections: ["Court & Caption", "Subpoena Details", "Items Demanded", "Signature"],
-    headings: ["SUBPOENA", "Failure to obey this subpoena may be punished as contempt of court.", "Respectfully submitted,"],
+    headings: [
+      "SUBPOENA",
+      "Failure to obey this subpoena may be punished as contempt of court.",
+      "Respectfully submitted,",
+    ],
   },
   "extra-service-contract": {
     title: "Service Agreement",
     section: "Contracts",
     sections: ["Parties", "Services & Compensation", "Additional Clauses", "Signatures"],
-    headings: ["SERVICES AGREEMENT", "Independent Contractor", "Governing Law", "Entire Agreement", "IN WITNESS WHEREOF"],
+    headings: [
+      "SERVICES AGREEMENT",
+      "Independent Contractor",
+      "Governing Law",
+      "Entire Agreement",
+      "IN WITNESS WHEREOF",
+    ],
   },
 };
 
@@ -73,7 +83,9 @@ describe("Additional Templates", () => {
       });
 
       it("lists the D2 sections", () => {
-        expect(entries.filter((e): e is { section: string } => "section" in e).map((e) => e.section)).toEqual(spec.sections);
+        expect(entries.filter((e): e is { section: string } => "section" in e).map((e) => e.section)).toEqual(
+          spec.sections,
+        );
       });
 
       it("renders top-level text values and the required headings (HTML and BBCode)", () => {
@@ -92,7 +104,8 @@ describe("Additional Templates", () => {
 
       it("uses the directory spoiler header", () => {
         const doc = parse(render(tree, {}));
-        for (const header of doc.querySelectorAll(".ipsSpoiler_header")) expect(header.innerHTML).toBe("<span>Spoiler</span>");
+        for (const header of doc.querySelectorAll(".ipsSpoiler_header"))
+          expect(header.innerHTML).toBe("<span>Spoiler</span>");
         const raw = form.html.match(/<div class="ipsSpoiler_header">([\s\S]*?)<\/div>/g) || [];
         for (const h of raw) expect(h).toBe('<div class="ipsSpoiler_header"><span>Spoiler</span></div>');
       });
@@ -112,15 +125,27 @@ describe("Additional Templates", () => {
   }
 
   it("the five captioned forms carry the docket labels; the agreement doesn't", () => {
-    for (const id of ["extra-general-petition", "extra-name-change", "extra-general-motion", "extra-interrogatories", "extra-subpoena"]) {
+    for (const id of [
+      "extra-general-petition",
+      "extra-name-change",
+      "extra-general-motion",
+      "extra-interrogatories",
+      "extra-subpoena",
+    ]) {
       const entries = fields(compile(getForm(id)!.html));
       expect(hasField(entries, {}, "Case number"), id).toBe(true);
-      expect(PLAINTIFF_LABELS.some((l) => hasField(entries, {}, l)), id).toBe(true);
+      expect(
+        PLAINTIFF_LABELS.some((l) => hasField(entries, {}, l)),
+        id,
+      ).toBe(true);
       expect(hasField(entries, {}, "Filing date"), id).toBe(true);
     }
     for (const id of ["extra-general-motion", "extra-interrogatories", "extra-subpoena"]) {
       const entries = fields(compile(getForm(id)!.html));
-      expect(DEFENDANT_LABELS.some((l) => hasField(entries, {}, l)), id).toBe(true);
+      expect(
+        DEFENDANT_LABELS.some((l) => hasField(entries, {}, l)),
+        id,
+      ).toBe(true);
     }
     expect(hasField(fields(compile(getForm("extra-service-contract")!.html)), {}, "Case number")).toBe(false);
   });

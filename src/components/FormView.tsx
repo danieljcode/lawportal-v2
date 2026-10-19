@@ -219,7 +219,10 @@ export default function FormView({
   };
 
   const onState = useCallback((fn: (s: FormState) => FormState) => setState(fn), []);
-  const ctx: FormCtx = useMemo(() => ({ entries, character: activeCharacter, onState, now }), [entries, activeCharacter, onState, now]);
+  const ctx: FormCtx = useMemo(
+    () => ({ entries, character: activeCharacter, onState, now }),
+    [entries, activeCharacter, onState, now],
+  );
 
   const segs = useMemo(() => splitSegments(entries), [entries]);
   const anyOpen = segs.some((sg) => !collapsed.has(sg.name));
@@ -230,7 +233,10 @@ export default function FormView({
     if (open) next.delete(name);
     else next.add(name);
     setCollapsed(next);
-    saveCollapsed(form.id, segs.filter((sg) => next.has(sg.name)).map((sg) => sg.name));
+    saveCollapsed(
+      form.id,
+      segs.filter((sg) => next.has(sg.name)).map((sg) => sg.name),
+    );
   };
 
   const toggleAll = () => {

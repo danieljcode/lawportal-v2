@@ -70,13 +70,13 @@ court names and the case-number shape live in `src/lib/courts.ts`.
 
 Everything a user saves lives in the browser's local storage (keys start `lawapp_`):
 
-| Store | File | Keys |
-|---|---|---|
-| Characters | `src/lib/characters.ts` | `lawapp_chars`, `lawapp_active_char` |
-| Dockets (per character) | `src/lib/dockets.ts` | `lawapp_dockets_<character id>` |
-| J.A.P. portfolios (per character) | `src/lib/portfolio.ts` | `lawapp_jap_<character id>` |
-| Form drafts | `src/lib/formState.ts`, `draftWriter.ts` | `lawapp_draft_<form id>` |
-| Sync state | `src/lib/sync.ts` | `lawapp_sync_*` |
+| Store                             | File                                     | Keys                                 |
+| --------------------------------- | ---------------------------------------- | ------------------------------------ |
+| Characters                        | `src/lib/characters.ts`                  | `lawapp_chars`, `lawapp_active_char` |
+| Dockets (per character)           | `src/lib/dockets.ts`                     | `lawapp_dockets_<character id>`      |
+| J.A.P. portfolios (per character) | `src/lib/portfolio.ts`                   | `lawapp_jap_<character id>`          |
+| Form drafts                       | `src/lib/formState.ts`, `draftWriter.ts` | `lawapp_draft_<form id>`             |
+| Sync state                        | `src/lib/sync.ts`                        | `lawapp_sync_*`                      |
 
 - **KV wrapper** (`src/lib/storage.ts`). The stores never touch `localStorage` directly: they go
   through a small `KV` interface, so tests use `memoryKV()` and a browser that blocks storage falls
@@ -95,11 +95,11 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
 
 The only server code is three route handlers and `src/lib/server/`:
 
-| Route | Methods | What it does |
-|---|---|---|
-| `/api/account` | `POST` creates a sync code; `DELETE` deletes its data | Sync accounts |
-| `/api/data` | `GET` the copy; `PUT` replaces it (optimistic, by revision) | Sync data |
-| `/api/docx` | `POST` HTML, returns a `.docx` | Word export |
+| Route          | Methods                                                     | What it does  |
+| -------------- | ----------------------------------------------------------- | ------------- |
+| `/api/account` | `POST` creates a sync code; `DELETE` deletes its data       | Sync accounts |
+| `/api/data`    | `GET` the copy; `PUT` replaces it (optimistic, by revision) | Sync data     |
+| `/api/docx`    | `POST` HTML, returns a `.docx`                              | Word export   |
 
 - **Host check** (`guard.ts`). Unless the app was started with `dev:lan` / `start:lan` (which set
   `LAWAPP_ALLOW_LAN=1`), every API route answers `421` to requests not addressed to `localhost` or

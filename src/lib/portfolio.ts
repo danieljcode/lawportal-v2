@@ -114,15 +114,30 @@ function buildSections(color: string, level: PortfolioLevel): Section[] {
           { id: "1.3", text: "Rule on five motions.", note: NOTE_MOTIONS, kind: "case", count: 5 },
         ]
       : [
-          { id: "1.1", text: "Preside over five criminal trials resolved through summary judgment.", kind: "case", count: 5 },
-          { id: "1.2", text: "Preside over five full criminal trials resolved through final judgment.", kind: "case", count: 5 },
+          {
+            id: "1.1",
+            text: "Preside over five criminal trials resolved through summary judgment.",
+            kind: "case",
+            count: 5,
+          },
+          {
+            id: "1.2",
+            text: "Preside over five full criminal trials resolved through final judgment.",
+            kind: "case",
+            count: 5,
+          },
           {
             id: "1.3",
             text: "Preside over two civil trials resolved through a settlement, summary judgment, or final judgment (does not apply to default judgment).",
             kind: "civil",
             count: 2,
           },
-          { id: "1.4", text: "Rule on two standalone motions to dismiss for a speedy trial violation.", kind: "case", count: 2 },
+          {
+            id: "1.4",
+            text: "Rule on two standalone motions to dismiss for a speedy trial violation.",
+            kind: "case",
+            count: 2,
+          },
           { id: "1.5", text: "Rule on one habeas corpus hearing.", kind: "case", count: 1 },
         ];
   const optional: Task[] =
@@ -130,11 +145,21 @@ function buildSections(color: string, level: PortfolioLevel): Section[] {
       ? [
           { id: "3.1", text: "Preside over a Traffic Court session.", note: NOTE_TRAFFIC, kind: "transcript" },
           { id: "3.2", text: "Preside over a habeas corpus hearing.", kind: "case" },
-          { id: "3.3", text: "Preside over a case resulting in probation or self-surrender.", note: NOTE_PROBATION, kind: "probation" },
+          {
+            id: "3.3",
+            text: "Preside over a case resulting in probation or self-surrender.",
+            note: NOTE_PROBATION,
+            kind: "probation",
+          },
         ]
       : [
           { id: "3.1", text: "Preside over a Traffic Court session.", note: NOTE_TRAFFIC, kind: "transcript" },
-          { id: "3.2", text: "Preside over a case resulting in probation or self-surrender.", note: NOTE_PROBATION, kind: "probation" },
+          {
+            id: "3.2",
+            text: "Preside over a case resulting in probation or self-surrender.",
+            note: NOTE_PROBATION,
+            kind: "probation",
+          },
           { id: "3.3", text: "Draft an appellate opinion.", note: NOTE_APPELLATE, kind: null },
         ];
   return [
@@ -282,7 +307,11 @@ function line(kind: TaskKind, e: PortfolioEntry | undefined): string {
  * The finished forum post. Required tasks always list at least as many lines as
  * they ask for, optional ones at least one; missing lines keep the template's placeholders.
  */
-export function render(level: PortfolioLevel, data: Record<string, PortfolioEntry[]> | null | undefined, name?: string): string {
+export function render(
+  level: PortfolioLevel,
+  data: Record<string, PortfolioEntry[]> | null | undefined,
+  name?: string,
+): string {
   const L = LEVELS[level === "II" ? "II" : "I"];
   const d = data || {};
   const head =
@@ -321,7 +350,10 @@ export function complete(kind: TaskKind | null, e: PortfolioEntry | null | undef
 }
 
 /** Done lines against required lines (each required task counts at most its own count). */
-export function progress(level: PortfolioLevel, data: Record<string, PortfolioEntry[]> | null | undefined): { done: number; need: number } {
+export function progress(
+  level: PortfolioLevel,
+  data: Record<string, PortfolioEntry[]> | null | undefined,
+): { done: number; need: number } {
   let done = 0;
   let need = 0;
   for (const t of tasks(level)) {

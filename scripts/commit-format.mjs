@@ -32,7 +32,8 @@ export function checkHeader(header) {
   const [, type, area, rest] = m;
   const problems = [];
   const known = TYPES.includes(type);
-  if (!known && TYPES.includes(type.toLowerCase())) problems.push(`The type "${type}" should be lowercase: "${type.toLowerCase()}".`);
+  if (!known && TYPES.includes(type.toLowerCase()))
+    problems.push(`The type "${type}" should be lowercase: "${type.toLowerCase()}".`);
   else if (!known) problems.push(`"${type}" isn't one of the types: ${TYPES.join(", ")}.`);
   const shown = known ? type : TYPES.includes(type.toLowerCase()) ? type.toLowerCase() : "fix";
   if (area === undefined) problems.push(`It has no area in brackets after the type, for example "${shown}(sync):".`);
@@ -47,11 +48,14 @@ export function checkHeader(header) {
   else {
     // Acronyms (CI, J.A.P.) may lead; ordinary words start lowercase.
     if (/^[A-Z]/.test(summary) && !/^[A-Z][A-Z.]/.test(summary)) {
-      problems.push(`The summary starts with a capital letter; use lowercase ("${summary[0].toLowerCase()}${summary.slice(1, 12)}…").`);
+      problems.push(
+        `The summary starts with a capital letter; use lowercase ("${summary[0].toLowerCase()}${summary.slice(1, 12)}…").`,
+      );
     }
     if (/\.$/.test(summary)) problems.push("The summary ends with a full stop; leave it off.");
   }
-  if (h.length > MAX_LENGTH) problems.push(`It's ${h.length} characters; the limit is ${MAX_LENGTH}, including the key.`);
+  if (h.length > MAX_LENGTH)
+    problems.push(`It's ${h.length} characters; the limit is ${MAX_LENGTH}, including the key.`);
   return problems;
 }
 

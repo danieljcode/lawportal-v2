@@ -34,7 +34,13 @@ function blockOf(entries: Entry[], name: string): BlockEntry {
 
 function labels(entries: Entry[]): string[] {
   return entries.map((e) =>
-    "field" in e ? e.field.label : "block" in e ? "#" + e.block.name : "cond" in e ? "?" + e.cond.name : "--" + e.section,
+    "field" in e
+      ? e.field.label
+      : "block" in e
+        ? "#" + e.block.name
+        : "cond" in e
+          ? "?" + e.cond.name
+          : "--" + e.section,
   );
 }
 
@@ -62,9 +68,9 @@ describe("formatDate", () => {
   it("is case-insensitive and handles ordinal suffixes", () => {
     expect(formatDate("2026-12-31", "SHORT")).toBe("31/DEC/2026");
     const ord = (d: string) => formatDate(`2026-01-${d}`, "ordinal");
-    expect([ord("01"), ord("02"), ord("03"), ord("11"), ord("12"), ord("13"), ord("21"), ord("22"), ord("23")]).toEqual([
-      "1st", "2nd", "3rd", "11th", "12th", "13th", "21st", "22nd", "23rd",
-    ]);
+    expect([ord("01"), ord("02"), ord("03"), ord("11"), ord("12"), ord("13"), ord("21"), ord("22"), ord("23")]).toEqual(
+      ["1st", "2nd", "3rd", "11th", "12th", "13th", "21st", "22nd", "23rd"],
+    );
   });
 
   it("returns non-ISO values unchanged", () => {
@@ -126,7 +132,9 @@ describe("caseNumberPattern", () => {
   });
 
   it("uses the first <Division?…> code when no Division is chosen", () => {
-    const f = field("{{Case number=YYSC<Division?CRIMINAL DIVISION=CR;CIVIL DIVISION=CC;TRAFFIC DIVISION=TC;SMALL CLAIMS DIVISION=SM>00XXX}}");
+    const f = field(
+      "{{Case number=YYSC<Division?CRIMINAL DIVISION=CR;CIVIL DIVISION=CC;TRAFFIC DIVISION=TC;SMALL CLAIMS DIVISION=SM>00XXX}}",
+    );
     // No lookup → first code (CR), so the placeholder is never empty.
     expect(caseNumberPattern(f, fsNow(NOW))).toBe("90SCCR00XXX");
     // A chosen Division wins over the first code.
@@ -228,8 +236,10 @@ describe("render()", () => {
   it("renders fallbacks, highlights and escapes", () => {
     const tree = compile("<p>{{Name|<b>NAME</b>}} {{Note}}</p>");
     expect(render(tree, {})).toBe("<p><b>NAME</b> </p>");
-    expect(render(tree, {}, { highlight: true })).toBe('<p><mark class="unfilled" title="Name"><b>NAME</b></mark> </p>');
-    expect(render(tree, { Name: "<x>&\"" })).toBe("<p>&lt;x&gt;&amp;&quot; </p>");
+    expect(render(tree, {}, { highlight: true })).toBe(
+      '<p><mark class="unfilled" title="Name"><b>NAME</b></mark> </p>',
+    );
+    expect(render(tree, { Name: '<x>&"' })).toBe("<p>&lt;x&gt;&amp;&quot; </p>");
     expect(escapeHtml("a'b")).toBe("a'b");
   });
 
@@ -269,7 +279,9 @@ describe("render()", () => {
       '<p style="text-align:justify">one</p>\n<p style="text-align:justify">two</p>',
     );
     expect(r("{{X:list:b}}", "a\n\nb")).toBe("<li><b>a</b></li>\n<li><b>b</b></li>");
-    expect(r("{{X:spoiler}}", "a\n\nb")).toContain('<div class="ipsSpoiler_contents"><p>a</p><p>&nbsp;</p><p>b</p></div>');
+    expect(r("{{X:spoiler}}", "a\n\nb")).toContain(
+      '<div class="ipsSpoiler_contents"><p>a</p><p>&nbsp;</p><p>b</p></div>',
+    );
     expect(r("{{X:image}}", "javascript:alert(1)")).toBe("javascript:alert(1)");
     expect(r("{{X:url}}", " https://e.com ")).toBe('<a href="https://e.com">https://e.com</a>');
     expect(r("{{X:text:upper}}", "abc")).toBe("ABC");

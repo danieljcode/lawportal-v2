@@ -44,7 +44,11 @@ export default function BlockEditor({ entry, scope, path, prefix }: ScopeProps &
             >
               ↓
             </button>
-            <button type="button" className="mini danger-quiet" onClick={() => onState((s) => removeItem(s, path, name, i))}>
+            <button
+              type="button"
+              className="mini danger-quiet"
+              onClick={() => onState((s) => removeItem(s, path, name, i))}
+            >
               Remove
             </button>
           </div>
