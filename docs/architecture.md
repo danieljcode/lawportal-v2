@@ -91,7 +91,7 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
 | Store                             | File                                     | Keys                                 |
 | --------------------------------- | ---------------------------------------- | ------------------------------------ |
 | Characters                        | `src/lib/characters.ts`                  | `lawapp_chars`, `lawapp_active_char` |
-| Dockets (per character)           | `src/lib/dockets.ts`                     | `lawapp_dockets_<character id>`      |
+| Cases (the firm's, LP-4)          | `src/lib/cases.ts`; `dockets.ts` (view)  | `lawapp_cases`                       |
 | J.A.P. portfolios (per character) | `src/lib/portfolio.ts`                   | `lawapp_jap_<character id>`          |
 | Form drafts                       | `src/lib/formState.ts`, `draftWriter.ts` | `lawapp_draft_<form id>`             |
 | Draft history (LP-89)             | `src/lib/draftHistory.ts`                | `lawapp_history_<form id>`           |
@@ -108,17 +108,18 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
   known fields only, valid ids), so imports, synced copies and old data can't put odd shapes into
   storage.
 - **Stores don't import each other** (LP-3). Work that spans them goes through
-  `src/lib/services/characters.ts`: `deleteCharacter` (the character, its docket and its J.A.P.),
+  `src/lib/services/characters.ts`: `deleteCharacter` (the character and its J.A.P., and takes it
+  off its cases),
   `duplicateCharacter`, and the characters export and import. The one link the other way is
-  `touchCharacter` in `storage.ts`: a docket or J.A.P. change bumps its character's `updatedAt` for
+  `touchCharacter` in `storage.ts`: a J.A.P. change bumps its character's `updatedAt` for
   the sync merge, without the stores importing each other.
 - **The shared store base** (`src/lib/store.ts`, LP-2 and LP-99). `createStore<T>(kv, options)`
   handles one saved value: load, validate, save, the change channel and its version counter. The
   options are `key`, `version`, `validate`, `migrations` and `isEmpty` (a value saved as nothing).
   `createKeyedStore<T>` is the same for one value per id under a key prefix (with `prefix` and
   `isId` instead of `key`): each id is read, saved and upgraded on its own, with one change channel
-  for the lot. All three data stores are built on them: characters on `createStore`, dockets
-  (`lawapp_dockets_<id>`) and the J.A.P. (`lawapp_jap_<id>`) on `createKeyedStore`, so none of
+  for the lot. All the data stores are built on them: characters and cases on `createStore`, the
+  J.A.P. (`lawapp_jap_<id>`) and draft history on `createKeyedStore`, so none of
   them has its own load, save or change-channel code. (Characters keep a second channel for the
   active character, which isn't saved data.)
   - **Every value carries its schema version**, saved as `{"v": 2, "data": …}`. A bare value (saved
@@ -131,10 +132,26 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
     rewritten.
   - **Characters** are at version 2: step 1 brings in the old `lawapp.characters.v1` list when
     nothing's saved (this was `migrateLegacy`), and step 2 wraps the bare array.
-  - **Dockets and the J.A.P.** are at version 2 (LP-99): their only step wraps the bare list or
-    portfolio. Dockets saved before LP-69 keep their GTAW court names and GJ case numbers as filed.
+  - **The J.A.P.** is at version 2 (LP-99): its only step wraps the bare portfolio.
+  - **Cases** are at version 1 (LP-4): with nothing saved, the step turns the old per-character
+    dockets (`lawapp_dockets_<id>`, bare or in the LP-99 envelope) into cases and removes those
+    keys. Dockets saved before LP-69 keep their GTAW court names and GJ case numbers as filed.
   - **To change a store's shape**, bump its `version` and add a step whose `up` turns the old shape
     into the new one, with a test from the old version.
+- **Cases belong to the firm** (`src/lib/cases.ts`, LP-4). A `Case` is the docket fields plus a
+  `lead` character, other `assigned` characters, and `created`/`updated` times.
+  - **The migration** makes one case per case number (any capitals): the character whose entry was
+    updated most recently leads and the others are assigned. Fields come from that newest entry,
+    with gaps filled from the others and differing notes kept together. Cases made this way get an
+    id from their number (`c90sccr00147`), the same on every device.
+  - **A deleted character** is taken off its cases, which stay; a case it led is left with
+    `lead: null` (`needsLead`) for someone to take on.
+  - **Dockets are a view** (`dockets.ts`): a character's docket is the cases they lead or are
+    assigned to, with the same `DocketStore` API the Dockets dialog, docket bar and J.A.P. use until
+    the Case File program (LP-101, LP-100). Saving a number the firm already has puts the character
+    on that case; removing one takes them off it, deleting it when nobody is left. The pure docket
+    fields (`FIELDS`, `clean`, `divisionFor`…) live in `docketFields.ts`, so the two don't import
+    each other.
 - **Undo and draft history** (LP-89). FormView keeps its state in an `Undoable`
   (`src/lib/formState/undo.ts`): every change is an undo step, except that typing in one field
   with pauses under a second joins the last step. Ctrl+Z, Ctrl+Y and Ctrl+Shift+Z work while the

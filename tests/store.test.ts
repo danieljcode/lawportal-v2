@@ -5,7 +5,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { countsOf } from "@/lib/backup";
 import { CHARACTER_MIGRATIONS, CHARS_KEY, CHARS_VERSION, createCharacterStore, LEGACY_KEY } from "@/lib/characters";
-import { createDocketStore, DOCKETS_PREFIX, DOCKETS_VERSION, docketStore } from "@/lib/dockets";
 import { runMigrations } from "@/lib/migrations";
 import { createPortfolioStore, JAP_PREFIX, JAP_VERSION } from "@/lib/portfolio";
 import { isId, listSetAside, memoryKV, type KV } from "@/lib/storage";
@@ -277,43 +276,9 @@ describe("createKeyedStore (LP-99)", () => {
   });
 });
 
-describe("dockets and the J.A.P. on the store (LP-99)", () => {
-  const OLD_DOCKET = [
-    {
-      id: "dock0001",
-      caseNumber: "26GJCC00147",
-      plaintiff: "Ann",
-      court: "Superior Court of San Andreas - Civil Division",
-      status: "Open",
-      updated: "2026-01-01T00:00:00.000Z",
-    },
-  ];
-
-  it("are at version 2", () => {
-    expect(DOCKETS_VERSION).toBe(2);
+describe("the J.A.P. on the store (LP-99)", () => {
+  it("is at version 2", () => {
     expect(JAP_VERSION).toBe(2);
-  });
-
-  it("an old-format docket reads the same before migrating, then is saved as v2 with nothing else changed", () => {
-    const kv = spyKV({ [DOCKETS_PREFIX + "char0001"]: JSON.stringify(OLD_DOCKET) });
-    const dockets = createDocketStore(kv);
-    const before = dockets.list("char0001");
-    expect(before).toEqual(OLD_DOCKET); // GJ numbers and old court names stay as filed
-    expect(dockets.findByCase("char0001", "26gjcc00147")?.id).toBe("dock0001");
-    expect(kv.writes).toEqual([]);
-    expect(dockets.migrate()).toBe(true);
-    expect(JSON.parse(kv.get(DOCKETS_PREFIX + "char0001")!)).toEqual({ v: 2, data: OLD_DOCKET });
-    expect(dockets.list("char0001")).toEqual(before);
-  });
-
-  it("a docket saved after the upgrade keeps the envelope, and removing the last case removes the key", () => {
-    const kv = memoryKV({ [DOCKETS_PREFIX + "char0001"]: JSON.stringify(OLD_DOCKET) });
-    const dockets = createDocketStore(kv);
-    const saved = dockets.save("char0001", { caseNumber: "90SCCR00001" })!;
-    expect(JSON.parse(kv.get(DOCKETS_PREFIX + "char0001")!).data).toHaveLength(2);
-    dockets.remove("char0001", saved.id);
-    dockets.remove("char0001", "dock0001");
-    expect(kv.get(DOCKETS_PREFIX + "char0001")).toBeNull();
   });
 
   it("an old-format J.A.P. reads the same before migrating, then is saved as v2", () => {
@@ -336,14 +301,5 @@ describe("dockets and the J.A.P. on the store (LP-99)", () => {
     jap.remove("char0001");
     expect(kv.get(JAP_PREFIX + "char0001")).toBeNull();
     expect(jap.get("char0001")).toBeNull();
-  });
-
-  it("runMigrations upgrades dockets too", () => {
-    localStorage.clear();
-    localStorage.setItem(DOCKETS_PREFIX + "char0001", JSON.stringify(OLD_DOCKET));
-    runMigrations();
-    expect(JSON.parse(localStorage.getItem(DOCKETS_PREFIX + "char0001")!)).toEqual({ v: 2, data: OLD_DOCKET });
-    expect(docketStore().list("char0001")).toEqual(OLD_DOCKET);
-    localStorage.clear();
   });
 });
