@@ -8,7 +8,8 @@ import { createRoot, type Root } from "react-dom/client";
 import App from "@/components/App";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { EMPTY_STATE, writeDraft } from "@/lib/formState";
-import * as freestyle from "@/lib/freestyle";
+// The form crashes by making something only FormView uses while rendering throw: its draft writer.
+import * as draftWriter from "@/lib/draftWriter";
 import { defaultKV } from "@/lib/storage";
 import * as sync from "@/lib/sync";
 
@@ -66,7 +67,7 @@ afterEach(() => {
 
 describe("a crash in one panel (LP-88)", () => {
   it("shows the crash box in the form's place; the sidebar and toolbar keep working, and the preview hides", () => {
-    vi.spyOn(freestyle, "gameDate").mockImplementation(() => {
+    vi.spyOn(draftWriter, "createDraftWriter").mockImplementation(() => {
       throw new Error("form broke");
     });
     history.replaceState(null, "", "#civil-complaint");
@@ -82,7 +83,7 @@ describe("a crash in one panel (LP-88)", () => {
   });
 
   it("Try again brings the form back once the fault has gone", () => {
-    const spy = vi.spyOn(freestyle, "gameDate").mockImplementation(() => {
+    const spy = vi.spyOn(draftWriter, "createDraftWriter").mockImplementation(() => {
       throw new Error("form broke");
     });
     history.replaceState(null, "", "#civil-complaint");
@@ -97,7 +98,7 @@ describe("a crash in one panel (LP-88)", () => {
   it("Copy error details leaves out the sync code and anything typed into a form", async () => {
     localStorage.setItem("lawapp_sync_code", CODE);
     writeDraft(defaultKV(), "civil-complaint", { ...EMPTY_STATE, values: { "Plaintiff name": SECRET } });
-    vi.spyOn(freestyle, "gameDate").mockImplementation(() => {
+    vi.spyOn(draftWriter, "createDraftWriter").mockImplementation(() => {
       throw new Error(`Bad value "${SECRET}" for ${CODE}`);
     });
     history.replaceState(null, "", "#civil-complaint");

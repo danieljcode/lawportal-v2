@@ -2284,3 +2284,98 @@ dialog.changelog {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ---------- deadlines (LP-18) ---------- */
+.case-links #case-deadlines {
+  grid-column: 1 / -1;
+}
+#open-cases {
+  position: relative;
+}
+.deadline-list,
+.upcoming-list,
+.dates-panel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.deadline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 6px;
+  border: 1px solid var(--shadow);
+  border-left: 3px solid var(--shadow);
+  background: var(--field);
+}
+.deadline > label > span,
+.upcoming-what {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.deadline.done strong {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+.deadline.overdue,
+.upcoming-item.overdue {
+  border-left: 5px solid var(--bad);
+}
+.upcoming-item.soon {
+  border-left: 5px solid var(--missing);
+}
+.deadline-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.deadline-add input[type="text"] {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+.upcoming-item {
+  display: grid;
+  grid-template-columns: minmax(130px, auto) minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  align-items: start;
+  padding: 6px 8px;
+  border: 1px solid var(--shadow);
+  border-left: 3px solid var(--shadow);
+  background: var(--field);
+  color: var(--text);
+}
+.upcoming-when {
+  display: flex;
+  flex-direction: column;
+}
+.upcoming-item.overdue .upcoming-when .small {
+  color: var(--bad);
+  font-weight: 700;
+}
+.dates-panel {
+  margin: 0 0 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--shadow);
+  background: var(--field);
+  color: var(--text);
+}
+.dates-panel p {
+  margin: 0 0 4px;
+}
+@media (max-width: 700px) {
+  .upcoming-item {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .upcoming-what {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}

@@ -8,6 +8,7 @@
 // and the docket bar read and write cases through dockets.ts until the Case
 // File program takes over (LP-101, LP-100).
 
+import { cleanDeadlines, unionDeadlines } from "./deadlines";
 import { clean as cleanDocket, DOCKETS_PREFIX } from "./docketFields";
 import { defaultKV, isId, ISO_TIME_RE, newId, setAside, type KV } from "./storage";
 import { createStore, unwrap, type Migration } from "./store";
@@ -54,7 +55,7 @@ export function cleanCase(input: unknown): Case {
     ? [...new Set(o.assigned.filter((x): x is string => isId(x) && x !== lead))]
     : [];
   const created = typeof o.created === "string" && ISO_TIME_RE.test(o.created) ? o.created : d.updated;
-  return { ...d, lead, assigned, created };
+  return { ...d, lead, assigned, created, deadlines: cleanDeadlines(o.deadlines) };
 }
 
 function validList(raw: unknown): Case[] {
@@ -86,6 +87,7 @@ function combine(newer: Case, older: Case): Case {
   out.lead = newer.lead ?? older.lead ?? null;
   out.assigned = [...new Set(all.filter((id) => id !== out.lead))];
   out.created = newer.created < older.created ? newer.created : older.created;
+  out.deadlines = unionDeadlines(newer.deadlines, older.deadlines);
   return out;
 }
 
@@ -128,7 +130,14 @@ export function casesFromDockets(byCharacter: Iterable<[string, unknown]>): Case
       if (!item || typeof item !== "object" || !(item as Docket).caseNumber) continue;
       const d = cleanDocket(item);
       if (!d.caseNumber) continue;
-      entries.push({ ...d, id: caseIdFor(d.caseNumber), lead: charId, assigned: [], created: d.updated });
+      entries.push({
+        ...d,
+        id: caseIdFor(d.caseNumber),
+        lead: charId,
+        assigned: [],
+        created: d.updated,
+        deadlines: [],
+      });
     }
   }
   // Newest first, so the newest entry's character leads and its fields win.

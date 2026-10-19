@@ -19,6 +19,24 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-19",
+    title: "Deadlines and hearings",
+    items: [
+      {
+        type: "new",
+        text: "Cases in the Case File now hold deadlines and hearing dates with a note. Tick them off when they're done.",
+      },
+      {
+        type: "new",
+        text: "Add dates to case, in the case bar of a form, puts the form's dates on its case: a case schedule adds the whole timetable at once.",
+      },
+      {
+        type: "new",
+        text: "Upcoming lists the next 14 days on your character's cases, overdue first, and the Case File button shows a dot when something is due within 48 hours. Dates are in-game.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-19",
     title: "Filing history",
     items: [
       {

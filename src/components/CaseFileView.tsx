@@ -8,6 +8,7 @@ import { caseProblem, caseStore, filterCases, members, needsLead, NEEDS_LEAD } f
 import { FIELDS, STATUSES } from "@/lib/docketFields";
 import { filingsForCase, filingStore, type Filing } from "@/lib/filings";
 import type { Case, Character } from "@/lib/types";
+import CaseDeadlines from "./CaseDeadlines";
 import { FilingList } from "./FilingsDialog";
 import { useCaseVersion, useFilingVersion } from "./useStore";
 
@@ -66,18 +67,20 @@ export default function CaseFileView({ caseId, characters, onUseFiling = () => {
       />
     );
   } else if (selected) {
-    // Re-keyed on every save (here, or synced in), so the form shows what's stored.
+    // Re-keyed when the case's details change (saved here, or synced in), so the form shows
+    // what's stored. Not on a deadline change: that would throw away unsaved edits above.
     detail = (
-      <CaseEditor
-        key={selected.id + ":" + selected.updated}
-        initial={selected}
-        characters={characters}
-        saved={savedId === selected.id}
-        filings={caseFilings}
-        onUseFiling={onUseFiling}
-        onSaved={onSaved}
-        onCancel={() => {}}
-      />
+      <>
+        <CaseEditor
+          key={selected.id + ":" + detailsStamp(selected)}
+          initial={selected}
+          characters={characters}
+          saved={savedId === selected.id}
+          onSaved={onSaved}
+          onCancel={() => {}}
+        />
+        <CaseLinks c={selected} filings={caseFilings} onUseFiling={onUseFiling} />
+      </>
     );
   } else if (caseId) {
     detail = (
@@ -201,6 +204,49 @@ export default function CaseFileView({ caseId, characters, onUseFiling = () => {
   );
 }
 
+/** The case's details and who's on it, but not its deadlines or when it was saved. */
+function detailsStamp(c: Case): string {
+  const { deadlines: _deadlines, updated: _updated, ...details } = c;
+  return JSON.stringify(details);
+}
+
+/** A case's linked areas: its filings (LP-15), evidence (LP-12, to come) and deadlines (LP-18). */
+function CaseLinks({ c, filings, onUseFiling }: { c: Case; filings: Filing[]; onUseFiling(f: Filing): void }) {
+  const [filingStatus, setFilingStatus] = useState<{ text: string; bad: boolean } | null>(null);
+  return (
+    <div className="case-links">
+      <section className="case-empty" id="case-deadlines" aria-labelledby="case-deadlines-title">
+        <h4 id="case-deadlines-title">Deadlines and hearings</h4>
+        <CaseDeadlines c={c} />
+      </section>
+      <section className="case-empty" id="case-filings" aria-labelledby="case-filings-title">
+        <h4 id="case-filings-title">Filings</h4>
+        {filings.length ? (
+          <>
+            <FilingList
+              filings={filings}
+              hideCase
+              onUse={onUseFiling}
+              onStatus={(text, bad) => setFilingStatus({ text, bad })}
+            />
+            <p className={"small" + (filingStatus?.bad ? " bad" : " good")} role="status">
+              {filingStatus?.text || ""}
+            </p>
+          </>
+        ) : (
+          <p className="small muted">
+            No filings yet. Filings copied or downloaded with this case number will be listed here.
+          </p>
+        )}
+      </section>
+      <section className="case-empty" id="case-evidence" aria-labelledby="case-evidence-title">
+        <h4 id="case-evidence-title">Evidence</h4>
+        <p className="small muted">No evidence yet. Exhibits for this case will be kept here.</p>
+      </section>
+    </div>
+  );
+}
+
 type Values = Partial<Record<(typeof FIELDS)[number]["key"], string>>;
 
 interface CaseEditorProps {
@@ -209,24 +255,12 @@ interface CaseEditorProps {
   characters: Character[];
   /** Show "Saved." (this case was just saved). */
   saved?: boolean;
-  /** The case's filings (LP-15), newest first. */
-  filings?: Filing[];
-  onUseFiling?(f: Filing): void;
   onSaved(saved: Case, isNew: boolean): void;
   /** Cancel a new case. */
   onCancel(): void;
 }
 
-function CaseEditor({
-  initial,
-  characters,
-  saved,
-  filings = [],
-  onUseFiling = () => {},
-  onSaved,
-  onCancel,
-}: CaseEditorProps) {
-  const [filingStatus, setFilingStatus] = useState<{ text: string; bad: boolean } | null>(null);
+function CaseEditor({ initial, characters, saved, onSaved, onCancel }: CaseEditorProps) {
   const [values, setValues] = useState<Values>(() => {
     const v: Values = {};
     for (const f of FIELDS) v[f.key] = initial ? (initial[f.key] as string | undefined) || "" : "";
@@ -395,39 +429,6 @@ function CaseEditor({
           {saved && !edited ? "Saved." : ""}
         </span>
       </div>
-
-      {initial && (
-        <div className="case-links">
-          <section className="case-empty" id="case-filings" aria-labelledby="case-filings-title">
-            <h4 id="case-filings-title">Filings</h4>
-            {filings.length ? (
-              <>
-                <FilingList
-                  filings={filings}
-                  hideCase
-                  onUse={onUseFiling}
-                  onStatus={(text, bad) => setFilingStatus({ text, bad })}
-                />
-                <p className={"small" + (filingStatus?.bad ? " bad" : " good")} role="status">
-                  {filingStatus?.text || ""}
-                </p>
-              </>
-            ) : (
-              <p className="small muted">
-                No filings yet. Filings copied or downloaded with this case number will be listed here.
-              </p>
-            )}
-          </section>
-          <section className="case-empty" id="case-evidence" aria-labelledby="case-evidence-title">
-            <h4 id="case-evidence-title">Evidence</h4>
-            <p className="small muted">No evidence yet. Exhibits for this case will be kept here.</p>
-          </section>
-          <section className="case-empty" id="case-deadlines" aria-labelledby="case-deadlines-title">
-            <h4 id="case-deadlines-title">Deadlines</h4>
-            <p className="small muted">No deadlines yet. Hearing dates and deadlines for this case will show here.</p>
-          </section>
-        </div>
-      )}
     </form>
   );
 }

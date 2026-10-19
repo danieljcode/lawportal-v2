@@ -7,6 +7,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ALL_FORMS } from "@/data";
 import { characterStore, hasDocket } from "@/lib/characters";
+import { caseStore } from "@/lib/cases";
+import { dueSoonCount, gameToday } from "@/lib/deadlines";
 import { draftHistory, hasContent } from "@/lib/draftHistory";
 import type { Filing } from "@/lib/filings";
 import { readDraft, writeDraft } from "@/lib/formState";
@@ -23,6 +25,7 @@ import FormView, { type DraftRequest, type FormOutput } from "./FormView";
 import JapOutput from "./JapOutput";
 import JapView from "./JapView";
 import CaseFileView from "./CaseFileView";
+import UpcomingView from "./UpcomingView";
 import ErrorBoundary from "./ErrorBoundary";
 import OutputPane from "./OutputPane";
 import Sidebar from "./Sidebar";
@@ -30,8 +33,8 @@ import Taskbar from "./Taskbar";
 import Toolbar from "./Toolbar";
 import { S_SET_ASIDE, S_SET_ASIDE_HINT } from "@/lib/strings";
 import { useDialogs } from "./useDialogs";
-import { APP_TITLE, CASES_TITLE, JAP_TITLE, useRoute } from "./useRoute";
-import { useCharacterVersion, useSetAsideVersion, useSyncState } from "./useStore";
+import { APP_TITLE, CASES_TITLE, JAP_TITLE, UPCOMING_TITLE, useRoute } from "./useRoute";
+import { useCaseVersion, useCharacterVersion, useSetAsideVersion, useSyncState } from "./useStore";
 
 export type { DialogName } from "./useDialogs";
 export type { Route } from "./useRoute";
@@ -167,8 +170,17 @@ export default function App() {
         ? JAP_TITLE
         : route.kind === "cases"
           ? CASES_TITLE
-          : APP_TITLE;
-  const current = route.kind === "form" ? route.id : route.kind === "jap" || route.kind === "cases" ? route.kind : null;
+          : route.kind === "upcoming"
+            ? UPCOMING_TITLE
+            : APP_TITLE;
+  const current = route.kind === "form" ? route.id : route.kind === "home" ? null : route.kind;
+  // Deadlines (LP-18): the toolbar dot when the active character has something due within 48 hours.
+  const caseVersion = useCaseVersion();
+  const today = gameToday();
+  const casesDue = useMemo(
+    () => (caseVersion >= 0 ? dueSoonCount(caseStore().list(), active ? active.id : null, today) : 0),
+    [caseVersion, active, today],
+  );
   const showJapOutput = route.kind === "jap" && commissioner && !!active;
   const showOutput = (route.kind === "form" && !!form && formOutput !== null && !formCrashed) || showJapOutput;
   // "Use in form" only for the active character's own docket, into a form that shows the docket bar.
@@ -202,6 +214,7 @@ export default function App() {
           onDockets={() => openDockets(activeId)}
           onCharacters={() => openCharacters()}
           onChangelog={openChangelog}
+          casesDue={casesDue}
         />
         {setAsideCount > setAsideSeen && (
           <div className="set-aside-notice" id="set-aside-notice" role="alert">
@@ -247,6 +260,10 @@ export default function App() {
                   syncState={syncState}
                   onTurnOnSync={() => openCharacters(true)}
                 />
+              </ErrorBoundary>
+            ) : route.kind === "upcoming" ? (
+              <ErrorBoundary where="Upcoming" resetKey={route.kind}>
+                <UpcomingView character={active} />
               </ErrorBoundary>
             ) : route.kind === "cases" ? (
               <ErrorBoundary where="the Case File" resetKey={route.caseId}>
