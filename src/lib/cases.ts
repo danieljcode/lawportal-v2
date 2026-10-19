@@ -263,3 +263,45 @@ export function caseStore(): CaseStore {
   if (!instance) instance = createCaseStore(defaultKV());
   return instance;
 }
+
+/* ---------- the Case File program (LP-101) ---------- */
+
+export interface CaseFilter {
+  /** Matches the case number or either party, ignoring case. */
+  q?: string;
+  /** A status, "needs-lead" for cases without a lead, or "" for all. */
+  status?: string;
+  /** A character id: their cases only. */
+  charId?: string;
+}
+
+export const NEEDS_LEAD = "needs-lead";
+
+/** The cases matching a search and filters, open ones first, then by case number. */
+export function filterCases(list: readonly Case[], f: CaseFilter): Case[] {
+  const q = (f.q || "").trim().toLowerCase();
+  return list
+    .filter((c) => {
+      if (q && ![c.caseNumber, c.plaintiff, c.defendant].some((s) => (s || "").toLowerCase().includes(q))) {
+        return false;
+      }
+      if (f.status === NEEDS_LEAD) {
+        if (!needsLead(c)) return false;
+      } else if (f.status && c.status !== f.status) return false;
+      return !f.charId || isMember(c, f.charId);
+    })
+    .sort((a, b) => {
+      const ca = a.status === "Closed";
+      const cb = b.status === "Closed";
+      if (ca !== cb) return ca ? 1 : -1;
+      return a.caseNumber.localeCompare(b.caseNumber);
+    });
+}
+
+/** Why a case can't be saved as it is, or null: it needs a number no other firm case has. */
+export function caseProblem(c: Pick<Case, "id" | "caseNumber">, list: readonly Case[]): string | null {
+  const n = upper(c.caseNumber || "");
+  if (!n) return "A case needs a case number.";
+  const other = list.find((x) => x.id !== c.id && upper(x.caseNumber) === n);
+  return other ? other.caseNumber + " is already a firm case." : null;
+}

@@ -90,3 +90,27 @@ test("add a case to a judge's docket", async ({ page }) => {
   await page.locator("#docket-form button[type=submit]").click();
   await expect(page.locator("#docket-list")).toContainText("90SCCR00147");
 });
+
+test("Case File: add a case, find it, and open it", async ({ page }, testInfo) => {
+  await seedJudge(page);
+  await page.goto("/#cases");
+  await expect(page.locator("#case-file-title")).toHaveText("Case File");
+  await page.locator("#case-new").click();
+  await page.locator("#case-caseNumber").fill("90SCCR00321");
+  await page.locator("#case-plaintiff").fill("Ann Lee");
+  await page.locator("#case-lead").selectOption("e2ejudge1");
+  await page.locator("#case-save").click();
+  await expect(page).toHaveURL(/#cases\/[a-z0-9]+$/);
+  await expect(page.locator("#case-form-title")).toHaveText("90SCCR00321");
+
+  // Back to the list (on a phone the case replaces it), then search for it.
+  if (testInfo.project.name === "phone") {
+    await expect(page.locator("#case-list")).toBeHidden();
+    await page.locator(".case-back").click();
+  } else {
+    await page.goto("/#cases");
+  }
+  await page.locator("#case-search").fill("ann");
+  await expect(page.locator(".case-row")).toHaveCount(1);
+  await expect(page.locator(".case-row")).toContainText("Lead: Judy Bench");
+});

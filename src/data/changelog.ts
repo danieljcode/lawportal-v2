@@ -19,6 +19,20 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-19",
+    title: "Case File",
+    items: [
+      {
+        type: "new",
+        text: "The Case File (in the toolbar and the sidebar) lists every firm case with its lead and the other characters on it. Search by case number or party, and filter by status, by cases that need a lead, or by character.",
+      },
+      {
+        type: "new",
+        text: "Open a case to edit its parties, court, status, dates and notes, choose its lead and who else is working it, or add a new case. Space is ready for the case's filings, evidence and deadlines.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-19",
     title: "Cases belong to the firm",
     items: [
       {
