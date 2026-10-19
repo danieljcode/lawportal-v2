@@ -4,13 +4,24 @@
 // reads upgrade in memory without writing.
 
 import { characterStore } from "./characters";
+import { docketStore } from "./dockets";
+import { portfolioStore } from "./portfolio";
+
+/** Each store's migrate(), in turn (LP-2, LP-99). */
+const STORES: Array<[string, () => { migrate(): boolean }]> = [
+  ["characters", characterStore],
+  ["dockets", docketStore],
+  ["J.A.P. portfolios", portfolioStore],
+];
 
 export function runMigrations(): void {
-  try {
-    characterStore().migrate();
-  } catch (err) {
-    // Storage refused the write: reads still upgrade in memory, so try again next load.
-    console.warn("[migrations] couldn't save the upgraded characters", err);
+  for (const [name, store] of STORES) {
+    try {
+      store().migrate();
+    } catch (err) {
+      // Storage refused the write: reads still upgrade in memory, so try again next load.
+      console.warn("[migrations] couldn't save the upgraded " + name, err);
+    }
   }
   try {
     characterStore().migrateServerField();
