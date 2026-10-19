@@ -17,3 +17,6 @@ release-notes.md
 # Playwright end-to-end output (LP-6)
 /test-results/
 /playwright-report/
+
+# Written by next dev for coding agents (Next.js 16, LP-97); re-created on every run
+/AGENTS.md

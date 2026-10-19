@@ -51,8 +51,9 @@ When the audit fails:
    dependency instead. Check the build output stays the same.
 4. Don't lower the audit level to get CI green.
 
-### Current override
+### Overrides
 
-| Override                    | Why                                                                                                                                                                                                                                                                       |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `next` → `postcss` `8.5.31` | Next 15 pins PostCSS 8.4.31, which has high-severity advisories (GHSA-qx2v-qp2m-jg93 and related). npm's only fix was Next 16. PostCSS 8.5.31 is a minor update within PostCSS 8: the build's CSS is byte-identical. Remove the override once Next ships a fixed PostCSS. |
+There are none at the moment. Next 15 needed one (LP-85): it pinned PostCSS 8.4.31, which has
+high-severity advisories (GHSA-qx2v-qp2m-jg93 and related), so `package.json` gave it PostCSS 8.5.31.
+Next 16 ships a fixed PostCSS, so the override went with the upgrade (LP-97). If you add one, list it
+here with the reason and when it can go.
