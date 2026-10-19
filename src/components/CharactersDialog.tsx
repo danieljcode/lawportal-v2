@@ -18,6 +18,7 @@ import { checkFileSize, EXPORT_FILENAME, exportText, importedMessage, importText
 import { deleteCharacter, duplicateCharacter } from "@/lib/services/characters";
 import { characterStore, FIELDS, hasDocket, titleKeepsDocket } from "@/lib/characters";
 import { docketStore } from "@/lib/dockets";
+import { download } from "@/lib/download";
 import { backend, defaultKV, listSetAside } from "@/lib/storage";
 import { S_STORAGE_LOCAL, S_STORAGE_MEMORY, S_STORAGE_SYNC } from "@/lib/strings";
 import * as sync from "@/lib/sync";
@@ -31,18 +32,6 @@ export const DAMAGED_FILENAME = "court-filing-damaged-data.json";
 /** "today", "yesterday" or "<n> days ago". */
 function daysAgo(days: number): string {
   return days <= 0 ? "today" : days === 1 ? "yesterday" : days + " days ago";
-}
-
-function download(text: string, filename: string): void {
-  const blob = new Blob([text], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
 export interface CharactersDialogProps {

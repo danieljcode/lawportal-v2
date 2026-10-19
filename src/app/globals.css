@@ -1971,3 +1971,62 @@ dialog.changelog {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ---------- crash screen (LP-88): a Windows 3.0 style "Application Error" box ---------- */
+.crash-wrap {
+  display: grid;
+  place-items: center;
+}
+.crash-app {
+  position: fixed;
+  inset: 0;
+  padding: 16px;
+  background: var(--desktop);
+  overflow: auto;
+}
+.crash-panel {
+  padding: 16px 8px;
+}
+.crash-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.4);
+  overflow: auto;
+}
+.crash {
+  width: min(520px, 100%);
+  padding: 3px;
+}
+.crash-body {
+  padding: 12px;
+}
+.crash-message {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.crash-message p {
+  margin: 0 0 8px;
+}
+.crash-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--text);
+  background: var(--bad);
+  color: var(--face);
+  font-weight: 700;
+  font-size: 18px;
+}
+.crash-actions {
+  justify-content: flex-end;
+}
+.crash-status {
+  margin: 8px 0 0;
+  min-height: 1em;
+}
