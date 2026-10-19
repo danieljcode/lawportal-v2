@@ -110,6 +110,76 @@ describe("Characters dialog", () => {
     expect(must("#char-list").textContent).toContain("Kept Aside");
   });
 
+  it("backs up everything, then restores it after asking with a preview (LP-1)", async () => {
+    characterStore().save({ id: "char0001", name: "Ann Lee" });
+    docketStore().save("char0001", { caseNumber: "90SCCR00001" });
+    localStorage.setItem("lawapp_theme", "dark");
+    let blob: Blob | null = null;
+    let filename = "";
+    Object.assign(URL, {
+      createObjectURL: (b: Blob) => ((blob = b), "blob:backup"),
+      revokeObjectURL: () => {},
+    });
+    const anchorClick = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (
+      this: HTMLAnchorElement,
+    ) {
+      filename = this.download;
+    });
+    click("#open-characters");
+    expect(must("#backup-note").textContent).toContain("No full backup made in this browser yet.");
+    expect(must("#backup-note").className).toContain("warn"); // sync is off and there's a character
+    click("#backup-all");
+    expect(filename).toMatch(/^lawapp-backup-\d{4}-\d{2}-\d{2}\.json$/);
+    const backup = await blob!.text();
+    expect(JSON.parse(backup).data).toMatchObject({ lawapp_theme: "dark" });
+    expect(must("#backup-note").textContent).toContain("Last full backup: today.");
+    expect(must("#backup-note").className).not.toContain("warn");
+
+    // Change things, then restore: confirm shows the preview, and the page reloads.
+    characterStore().save({ id: "char0002", name: "Bo Day" });
+    localStorage.setItem("lawapp_theme", "light");
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+    const reload = vi.fn();
+    const realLocation = window.location;
+    Object.defineProperty(window, "location", { configurable: true, value: { ...realLocation, reload } });
+    try {
+      const input = must<HTMLInputElement>("#restore-file");
+      Object.defineProperty(input, "files", { configurable: true, value: [new File([backup], "lawapp-backup.json")] });
+      await act(async () => {
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+      await act(async () => {});
+      expect(confirmSpy.mock.calls[0][0]).toContain("• Characters: 2 now → 1 in the backup");
+      expect(reload).toHaveBeenCalled();
+      expect(
+        characterStore()
+          .list()
+          .map((c) => c.name),
+      ).toEqual(["Ann Lee"]);
+      expect(localStorage.getItem("lawapp_theme")).toBe("dark");
+    } finally {
+      Object.defineProperty(window, "location", { configurable: true, value: realLocation });
+      confirmSpy.mockRestore();
+      anchorClick.mockRestore();
+    }
+  });
+
+  it("restoring an older characters-only file imports its characters instead (LP-1)", async () => {
+    const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
+    click("#open-characters");
+    const input = must<HTMLInputElement>("#restore-file");
+    const old = JSON.stringify({ characters: [{ id: "oldone01", name: "Old Export", server: "gtaw" }] });
+    Object.defineProperty(input, "files", { configurable: true, value: [new File([old], "lawapp-characters.json")] });
+    await act(async () => {
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    await act(async () => {});
+    expect(alertSpy.mock.calls[0][0]).toBe("That's a characters file, not a full backup. Imported 1 character.");
+    expect(characterStore().get("oldone01")).toMatchObject({ name: "Old Export" });
+    expect(characterStore().get("oldone01")).not.toHaveProperty("server");
+    alertSpy.mockRestore();
+  });
+
   it("sets damaged characters aside with a notice and offers Download damaged data (LP-65)", async () => {
     act(() => root.unmount());
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});

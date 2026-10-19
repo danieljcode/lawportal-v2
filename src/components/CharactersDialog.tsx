@@ -1,8 +1,19 @@
 // The Characters dialog (FR9, INV §a #characters-dialog): the sync panel, the
 // storage note, the character list with its row actions, the New/Edit form,
-// and Export / Import.
+// Export / Import, and the full backup and restore (LP-1).
 
 import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  backupFilename,
+  backupText,
+  countsOf,
+  currentData,
+  daysSinceBackup,
+  needsBackupReminder,
+  parseFile,
+  restoreBackup,
+  restorePreview,
+} from "@/lib/backup";
 import { checkFileSize, EXPORT_FILENAME, exportText, importedMessage, importText } from "@/lib/characterFile";
 import { characterStore, FIELDS, hasDocket, titleKeepsDocket } from "@/lib/characters";
 import { docketStore } from "@/lib/dockets";
@@ -16,6 +27,11 @@ import SyncPanel from "./SyncPanel";
 import { useDocketVersion, useSetAsideVersion, useSyncState } from "./useStore";
 
 export const DAMAGED_FILENAME = "court-filing-damaged-data.json";
+
+/** "today", "yesterday" or "<n> days ago". */
+function daysAgo(days: number): string {
+  return days <= 0 ? "today" : days === 1 ? "yesterday" : days + " days ago";
+}
 
 function download(text: string, filename: string): void {
   const blob = new Blob([text], { type: "application/json" });
@@ -83,6 +99,17 @@ function CharactersBody({ characters, activeId, onDockets, autoSync, onAutoSyncD
   useSetAsideVersion(); // the download button appears once something is set aside
   const hasDamaged = listSetAside(defaultKV()).length > 0;
 
+  const restoreRef = useRef<HTMLInputElement>(null);
+  /** Bumped after a backup, so the note re-reads the backup date. */
+  const [backupBump, setBackupBump] = useState(0);
+  const days = backupBump >= 0 ? daysSinceBackup(defaultKV()) : null;
+  const remind = needsBackupReminder(defaultKV());
+  const backupNote =
+    (days === null ? "No full backup made in this browser yet." : "Last full backup: " + daysAgo(days) + ".") +
+    (remind
+      ? " Sync is off, so a backup is the only copy of your work outside this browser: back up now and keep the file safe."
+      : " A full backup holds characters, dockets, J.A.P., form drafts and settings.");
+
   const store = characterStore();
   const syncOn = !!sync.code();
   const storageNote = backend() === "memory" ? S_STORAGE_MEMORY : syncOn ? S_STORAGE_SYNC : S_STORAGE_LOCAL;
@@ -135,6 +162,44 @@ function CharactersBody({ characters, activeId, onDockets, autoSync, onAutoSyncD
       JSON.stringify({ app: "jsa-form-generator", setAside: listSetAside(defaultKV()) }, null, 2),
       DAMAGED_FILENAME,
     );
+
+  // Full backup (LP-1): everything this browser has saved, in one file.
+  const backUp = () => {
+    const now = new Date();
+    download(backupText(defaultKV(), now), backupFilename(now));
+    setBackupBump((n) => n + 1);
+  };
+
+  const restoreFile = async (e: ChangeEvent<HTMLInputElement>) => {
+    const input = e.target;
+    const file = input.files && input.files[0];
+    if (!file) return;
+    try {
+      checkFileSize(file.size);
+      const text = await file.text();
+      const parsed = parseFile(text);
+      if (parsed.kind === "characters") {
+        // An older characters-only export: imported the usual way, merged by id.
+        alert("That's a characters file, not a full backup. " + importedMessage(importText(text)));
+        return;
+      }
+      const kv = defaultKV();
+      const question = restorePreview(
+        countsOf(currentData(kv)),
+        countsOf(parsed.doc.data),
+        parsed.doc.created,
+        !!sync.code(),
+      );
+      if (!confirm(question)) return;
+      restoreBackup(kv, parsed.doc);
+      // Every store, the theme and the open form re-read what was restored.
+      window.location.reload();
+    } catch (err) {
+      alert("Could not restore: " + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      input.value = "";
+    }
+  };
 
   const importFile = async (e: ChangeEvent<HTMLInputElement>) => {
     const input = e.target;
@@ -241,6 +306,28 @@ function CharactersBody({ characters, activeId, onDockets, autoSync, onAutoSyncD
                 Download damaged data
               </button>
             )}
+          </div>
+          <div className="backup-box" id="backup-box">
+            <p className={"small" + (remind ? " warn" : "")} id="backup-note">
+              {backupNote}
+            </p>
+            <div className="row">
+              <button type="button" className="btn" id="backup-all" onClick={backUp}>
+                Back up everything
+              </button>
+              <button type="button" className="btn" id="restore-button" onClick={() => restoreRef.current?.click()}>
+                Restore backup
+              </button>
+              <input
+                ref={restoreRef}
+                type="file"
+                id="restore-file"
+                accept="application/json,.json"
+                aria-label="Restore backup"
+                hidden
+                onChange={restoreFile}
+              />
+            </div>
           </div>
         </div>
         {editing && (

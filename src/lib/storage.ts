@@ -9,6 +9,8 @@ export interface KV {
   /** Throws when the browser refuses the write (quota, blocked). */
   set(key: string, value: string): void;
   remove(key: string): void;
+  /** Every key stored (the full backup, LP-1). Optional: the stores never need it. */
+  keys?(): string[];
 }
 
 export type Backend = "local" | "memory";
@@ -41,6 +43,14 @@ export function localKV(): KV {
         // ignore: nothing to remove
       }
     },
+    keys() {
+      const out: string[] = [];
+      for (let i = 0; i < ls.length; i++) {
+        const k = ls.key(i);
+        if (k !== null) out.push(k);
+      }
+      return out;
+    },
   };
 }
 
@@ -55,6 +65,7 @@ export function memoryKV(initial?: Record<string, string>): KV {
     remove: (key) => {
       map.delete(key);
     },
+    keys: () => [...map.keys()],
   };
 }
 
