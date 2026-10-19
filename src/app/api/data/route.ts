@@ -3,6 +3,7 @@
 import { checkHost } from "@/lib/server/guard";
 import { parseBearer } from "@/lib/server/code";
 import { readCapped } from "@/lib/server/body";
+import { limitLookup, lookupFailed } from "@/lib/server/rateLimit";
 import { codeHash, read, write, type SyncRecord } from "@/lib/server/syncStore";
 
 export const runtime = "nodejs";
@@ -35,11 +36,19 @@ function parseDoc(body: unknown): { rev: number; data: SyncRecord["data"] } | nu
 export async function GET(req: Request): Promise<Response> {
   const refused = checkHost(req);
   if (refused) return refused;
+  const limited = limitLookup(req);
+  if (limited) return limited;
   const code = parseBearer(req);
-  if (!code) return json({ error: "Missing or invalid sync code." }, 401);
+  if (!code) {
+    lookupFailed(req);
+    return json({ error: "Missing or invalid sync code." }, 401);
+  }
   try {
     const record = await read(code);
-    if (!record) return json({ error: "Unknown sync code." }, 404);
+    if (!record) {
+      lookupFailed(req);
+      return json({ error: "Unknown sync code." }, 404);
+    }
     return json({ rev: record.rev, data: record.data, updated: record.updated }, 200);
   } catch (err) {
     console.error("[sync] read failed for", codeHash(code).slice(0, 8), errCode(err));
@@ -50,8 +59,13 @@ export async function GET(req: Request): Promise<Response> {
 export async function PUT(req: Request): Promise<Response> {
   const refused = checkHost(req);
   if (refused) return refused;
+  const limited = limitLookup(req);
+  if (limited) return limited;
   const code = parseBearer(req);
-  if (!code) return json({ error: "Missing or invalid sync code." }, 401);
+  if (!code) {
+    lookupFailed(req);
+    return json({ error: "Missing or invalid sync code." }, 401);
+  }
   if (!(req.headers.get("content-type") ?? "").toLowerCase().startsWith("application/json")) {
     return json({ error: "Expected application/json." }, 415);
   }
@@ -67,7 +81,10 @@ export async function PUT(req: Request): Promise<Response> {
   if (!doc) return json({ error: "Invalid sync document." }, 400);
   try {
     const result = await write(code, doc.rev, doc.data);
-    if (result === "missing") return json({ error: "Unknown sync code." }, 404);
+    if (result === "missing") {
+      lookupFailed(req);
+      return json({ error: "Unknown sync code." }, 404);
+    }
     if ("conflict" in result) {
       const c = result.conflict;
       return json({ rev: c.rev, data: c.data, updated: c.updated }, 409);

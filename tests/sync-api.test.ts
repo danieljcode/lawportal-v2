@@ -1,12 +1,13 @@
 // Sync API route handlers, called directly with Request objects (AC 15).
-import { existsSync, mkdtempSync, readdirSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, rmSync, utimesSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { DELETE, POST } from "@/app/api/account/route";
 import { GET, PUT } from "@/app/api/data/route";
 import { CODE_RE, generateCode, parseBearer } from "@/lib/server/code";
-import { codeHash, fileFor, write } from "@/lib/server/syncStore";
+import { createOverall, resetLimits } from "@/lib/server/rateLimit";
+import { codeHash, fileFor, sweepUnused, UNUSED_TTL_MS, write } from "@/lib/server/syncStore";
 
 const BASE = "http://localhost:3000/api";
 const realDir = path.join(process.cwd(), "data", "sync");
@@ -22,7 +23,10 @@ beforeAll(() => {
   delete process.env.LAWAPP_ALLOW_LAN;
 });
 
+beforeEach(() => resetLimits());
+
 afterEach(() => {
+  vi.useRealTimers();
   if (savedLan === undefined) delete process.env.LAWAPP_ALLOW_LAN;
   else process.env.LAWAPP_ALLOW_LAN = savedLan;
 });
@@ -37,10 +41,14 @@ function auth(code: string): Record<string, string> {
   return { Authorization: "Bearer " + code };
 }
 
-async function newCode(): Promise<string> {
-  const res = await POST(
-    new Request(BASE + "/account", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" }),
-  );
+function createReq(ip?: string): Request {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (ip) headers["X-Forwarded-For"] = ip;
+  return new Request(BASE + "/account", { method: "POST", headers, body: "{}" });
+}
+
+async function newCode(ip?: string): Promise<string> {
+  const res = await POST(createReq(ip));
   expect(res.status).toBe(201);
   const body = (await res.json()) as { code: string };
   return body.code;
@@ -245,5 +253,94 @@ describe("sync API (AC 15)", () => {
   it("did not create or change the real data/sync directory", () => {
     expect(existsSync(realDir)).toBe(realDirExisted);
     if (realDirExisted) expect(readdirSync(realDir).sort()).toEqual(realDirBefore);
+  });
+});
+
+describe("rate limits (LP-8)", () => {
+  const getAs = (ip: string, code: string) =>
+    GET(new Request(BASE + "/data", { headers: { ...auth(code), "X-Forwarded-For": ip } }));
+
+  it("a 6th new code from one IP in an hour → 429 with Retry-After; other IPs still can", async () => {
+    for (let i = 0; i < 5; i++) await newCode("10.0.0.1");
+    const res = await POST(createReq("10.0.0.1"));
+    expect(res.status).toBe(429);
+    expect(Number(res.headers.get("Retry-After"))).toBeGreaterThan(3000);
+    expect(((await res.json()) as { error: string }).error).toMatch(/Too many new sync codes/);
+
+    createOverall.clear();
+    expect((await POST(createReq("10.0.0.1"))).status).toBe(429);
+    expect((await POST(createReq("10.0.0.2"))).status).toBe(201);
+  });
+
+  it("caps new codes across the server at 5 an hour, whatever IP they claim", async () => {
+    for (let i = 0; i < 5; i++) await newCode("10.1.0." + i);
+    expect((await POST(createReq("10.1.0.99"))).status).toBe(429);
+  });
+
+  it("allows new codes again an hour later", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-19T12:00:00Z"));
+    for (let i = 0; i < 5; i++) await newCode("10.2.0.1");
+    expect((await POST(createReq("10.2.0.1"))).status).toBe(429);
+    vi.setSystemTime(new Date("2026-10-19T13:00:01Z"));
+    expect((await POST(createReq("10.2.0.1"))).status).toBe(201);
+  });
+
+  it("30 bad codes from one IP in a minute → 429, even for a good code; other IPs unaffected", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-19T12:00:00Z"));
+    const code = await newCode();
+    for (let i = 0; i < 15; i++) {
+      expect((await getAs("10.3.0.1", "not-a-code")).status).toBe(401);
+      expect((await getAs("10.3.0.1", generateCode())).status).toBe(404);
+    }
+    const res = await getAs("10.3.0.1", code);
+    expect(res.status).toBe(429);
+    expect(res.headers.get("Retry-After")).toBeTruthy();
+    const del = new Request(BASE + "/account", {
+      method: "DELETE",
+      headers: { ...auth(code), "X-Forwarded-For": "10.3.0.1" },
+    });
+    expect((await DELETE(del)).status).toBe(429);
+    expect((await PUT(put(code, { rev: 0, data: doc() }, { "X-Forwarded-For": "10.3.0.1" }))).status).toBe(429);
+    expect((await getAs("10.3.0.2", code)).status).toBe(200);
+
+    vi.setSystemTime(new Date("2026-10-19T12:01:01Z"));
+    expect((await getAs("10.3.0.1", code)).status).toBe(200);
+  });
+
+  it("good codes don't count towards the lookup limit", async () => {
+    const code = await newCode();
+    for (let i = 0; i < 40; i++) expect((await getAs("10.4.0.1", code)).status).toBe(200);
+  });
+});
+
+describe("unused code cleanup (LP-8)", () => {
+  const age = (code: string, ms: number) => {
+    const then = new Date(Date.now() - ms);
+    utimesSync(fileFor(code), then, then);
+  };
+
+  it("deletes never-written files older than 7 days, keeps the rest", async () => {
+    const stale = await newCode();
+    const written = await newCode();
+    const fresh = await newCode();
+    expect((await PUT(put(written, { rev: 0, data: doc() }))).status).toBe(200);
+    age(stale, UNUSED_TTL_MS + 60_000);
+    age(written, UNUSED_TTL_MS + 60_000);
+    age(fresh, UNUSED_TTL_MS - 60_000);
+
+    const before = readdirSync(dir).length;
+    expect(await sweepUnused()).toBe(before - 1);
+    expect(existsSync(fileFor(stale))).toBe(false);
+    expect(existsSync(fileFor(written))).toBe(true);
+    expect(existsSync(fileFor(fresh))).toBe(true);
+  });
+
+  it("runs when a new code is made", async () => {
+    const stale = await newCode();
+    age(stale, UNUSED_TTL_MS + 60_000);
+    await newCode();
+    expect(existsSync(fileFor(stale))).toBe(false);
   });
 });
