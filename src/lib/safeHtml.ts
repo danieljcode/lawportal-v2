@@ -4,7 +4,7 @@
 // It's an ordinary string with a type-only brand, so it costs nothing at run
 // time, but a plain string can't be passed where SafeHtml is needed: the
 // compiler (and so `npm run build`) refuses it. SafeHtml is produced only by
-// the renderers: escapeHtml and render() in template.ts, and renderDiscordHtml
+// the renderers: escapeHtml and render() (src/lib/template/), and renderDiscordHtml
 // in discordPreview.ts. tests/safeHtml.test.ts fails if any other file calls
 // trustAsSafeHtml.
 
