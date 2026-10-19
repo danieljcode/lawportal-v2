@@ -20,18 +20,20 @@ import {
   hasField,
   LAST_FORM_KEY,
   materializeBlocks,
+  missingRequired,
   openState,
   readDraft,
   segments as splitSegments,
   writeDraft,
   type FormState,
+  type MissingField,
 } from "@/lib/formState";
 import { gameDate } from "@/lib/freestyle";
 import { defaultKV, readJson, writeJson } from "@/lib/storage";
 import { S_DISCLAIMER } from "@/lib/strings";
 import { caseNumberPattern, compile, fields, render } from "@/lib/template";
 import type { Character, Docket, Entry, FormDef, Node, Tree } from "@/lib/types";
-import { FormContext, type FormCtx } from "./fields/FormContext";
+import { FormContext, slugId, type FormCtx } from "./fields/FormContext";
 import Sections from "./fields/Sections";
 import type { SafeHtml } from "@/lib/safeHtml";
 import { useDocketVersion } from "./useStore";
@@ -41,6 +43,10 @@ export interface FormOutput {
   finalHtml: SafeHtml;
   /** What the preview shows (highlight per the checkbox). */
   previewHtml: SafeHtml;
+  /** Required fields still empty (LP-87): the copy buttons warn before copying. */
+  missing: MissingField[];
+  /** Open the field's section and focus it. */
+  jumpTo(m: MissingField): void;
 }
 
 export interface FormViewProps {
@@ -196,11 +202,36 @@ export default function FormView({
   // first output is ready in the first commit (no frame needed). Later edits re-render the
   // preview at transition priority, so typing stays responsive on long templates.
   const deferredValues = useDeferredValue(state.values);
+
+  // A jump from the missing-fields list opens the field's section, then focuses it once rendered.
+  const [focusKey, setFocusKey] = useState<{ key: string; seq: number } | null>(null);
+  const jumpTo = useCallback((m: MissingField) => {
+    setCollapsed((c) => {
+      if (!c.has(m.section)) return c;
+      const next = new Set(c);
+      next.delete(m.section);
+      return next;
+    });
+    setFocusKey((f) => ({ key: m.key, seq: (f ? f.seq : 0) + 1 }));
+  }, []);
+  useEffect(() => {
+    if (!focusKey) return;
+    const el = document.getElementById(slugId(focusKey.key));
+    if (!el) return;
+    el.scrollIntoView?.({ block: "center" });
+    el.focus({ preventScroll: true });
+  }, [focusKey]);
+
   const output = useMemo<FormOutput | null>(() => {
     if (!tree) return null;
     const finalHtml = render(tree, deferredValues, {});
-    return { finalHtml, previewHtml: highlight ? render(tree, deferredValues, { highlight: true }) : finalHtml };
-  }, [tree, deferredValues, highlight]);
+    return {
+      finalHtml,
+      previewHtml: highlight ? render(tree, deferredValues, { highlight: true }) : finalHtml,
+      missing: missingRequired(entries, deferredValues, form.required),
+      jumpTo,
+    };
+  }, [tree, entries, deferredValues, highlight, form.required, jumpTo]);
 
   // Leaving clears this form's output in App, so reopening it never shows the old instance's.
   // Declared before the publish effect: on a StrictMode re-run the setups run in order, publish last.
@@ -218,9 +249,10 @@ export default function FormView({
   };
 
   const onState = useCallback((fn: (s: FormState) => FormState) => setState(fn), []);
+  const required = useMemo(() => new Set(form.required), [form.required]);
   const ctx: FormCtx = useMemo(
-    () => ({ entries, character: activeCharacter, onState, now }),
-    [entries, activeCharacter, onState, now],
+    () => ({ entries, character: activeCharacter, onState, now, required }),
+    [entries, activeCharacter, onState, now, required],
   );
 
   const segs = useMemo(() => splitSegments(entries), [entries]);
