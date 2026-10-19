@@ -7,6 +7,7 @@
 import { useSyncExternalStore } from "react";
 import { caseStore } from "@/lib/cases";
 import { characterStore } from "@/lib/characters";
+import { filingStore } from "@/lib/filings";
 import { docketStore } from "@/lib/dockets";
 import { portfolioStore } from "@/lib/portfolio";
 import { setAsideVersion, subscribeSetAside } from "@/lib/storage";
@@ -44,6 +45,14 @@ const caseSnapshot = () => caseStore().version();
 /** Bumps on every change to the firm's cases (LP-101). */
 export function useCaseVersion(): number {
   return useSyncExternalStore(subscribeCases, caseSnapshot, caseSnapshot);
+}
+
+const subscribeFilings = (fn: () => void) => filingStore().subscribe(fn);
+const filingSnapshot = () => filingStore().version();
+
+/** Bumps on every change to the filing history (LP-15). */
+export function useFilingVersion(): number {
+  return useSyncExternalStore(subscribeFilings, filingSnapshot, filingSnapshot);
 }
 
 const subscribePortfolio = (fn: () => void) => portfolioStore().subscribe(fn);

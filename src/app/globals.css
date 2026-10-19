@@ -2222,3 +2222,65 @@ dialog.changelog {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ---------- filing history (LP-15) ---------- */
+:where(dialog, .case-links) .filing-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 60vh;
+  overflow: auto;
+}
+.filing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 4px 6px;
+  border: 1px solid var(--shadow);
+  border-left: 3px solid var(--shadow);
+  background: var(--field);
+}
+.filing.current {
+  border-left: 5px solid var(--select-bg);
+}
+.filing-main {
+  flex: 1 1 200px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.filing-main:disabled {
+  cursor: default;
+}
+.filing-actions {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.case-links {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.case-links #case-filings {
+  grid-column: 1 / -1;
+}
+.status-bar #open-filings {
+  margin-left: auto;
+}
+@media (max-width: 800px) {
+  .case-links {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
