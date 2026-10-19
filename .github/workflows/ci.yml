@@ -43,3 +43,16 @@ jobs:
           # With the data checked out, a missing file fails the run instead of skipping.
           LAWAPP_REQUIRE_REFERENCE: ${{ env.REFERENCE_TOKEN != '' && '1' || '' }}
       - run: npm run build
+
+      # Real-browser smoke tests of the key journeys, at desktop and phone widths (LP-6).
+      - name: Install Chromium for the end-to-end tests
+        run: npx playwright install --with-deps chromium
+      - name: End-to-end smoke tests
+        run: npm run test:e2e
+      - name: Upload screenshots and traces of failed end-to-end tests
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-failures
+          path: test-results/
+          retention-days: 14
