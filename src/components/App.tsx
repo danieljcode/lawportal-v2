@@ -1,23 +1,20 @@
 "use client";
 
-// The app shell (design §UI components): hash routing, last-form restore,
-// document.title, active character, dialog flags, the narrow-screen drawer and
-// the Win95 window around the three panes.
+// The app shell (design §UI components): the active character, the output of
+// the open form, the narrow-screen drawer and the Win95 window around the three
+// panes. Routing is useRoute.ts and the dialogs useDialogs.ts (LP-7).
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent } from "react";
-import { ALL_FORMS, getForm } from "@/data";
-import { isUnread, markSeen } from "@/lib/changelog";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ALL_FORMS } from "@/data";
 import { characterStore, hasDocket } from "@/lib/characters";
-import { LAST_FORM_KEY } from "@/lib/formState";
 import { isCommissioner } from "@/lib/portfolio";
 import { EMPTY_HTML } from "@/lib/safeHtml";
-import { defaultKV } from "@/lib/storage";
 import * as sync from "@/lib/sync";
 import ChangelogDialog from "./ChangelogDialog";
 import CharactersDialog from "./CharactersDialog";
 import DocketsDialog from "./DocketsDialog";
 import EmptyState from "./EmptyState";
-import FormView, { type DocketRequest, type FormOutput } from "./FormView";
+import FormView, { type FormOutput } from "./FormView";
 import JapOutput from "./JapOutput";
 import JapView from "./JapView";
 import OutputPane from "./OutputPane";
@@ -25,47 +22,14 @@ import Sidebar from "./Sidebar";
 import Taskbar from "./Taskbar";
 import Toolbar from "./Toolbar";
 import { S_SET_ASIDE, S_SET_ASIDE_HINT } from "@/lib/strings";
+import { useDialogs } from "./useDialogs";
+import { APP_TITLE, JAP_TITLE, useRoute } from "./useRoute";
 import { useCharacterVersion, useSetAsideVersion, useSyncState } from "./useStore";
 
-export type Route = { kind: "home" } | { kind: "form"; id: string } | { kind: "jap" };
+export type { DialogName } from "./useDialogs";
+export type { Route } from "./useRoute";
 
-/** Which dialog is open (one at a time). */
-export type DialogName = "characters" | "dockets" | "changelog" | null;
-
-const APP_TITLE = "Court Filing Generator";
-const JAP_TITLE = "Judicial Advancement Portfolio";
 const EMPTY_OUTPUT: FormOutput = { finalHtml: EMPTY_HTML, previewHtml: EMPTY_HTML };
-
-function parseRoute(): Route {
-  let id = "";
-  try {
-    id = decodeURIComponent(location.hash.slice(1));
-  } catch {
-    id = "";
-  }
-  if (id === "jap") return { kind: "jap" };
-  if (id && getForm(id)) return { kind: "form", id };
-  return { kind: "home" };
-}
-
-/** Same place: the browser fires popstate and hashchange for one navigation, and both parse alike. */
-function sameRoute(a: Route, b: Route): boolean {
-  if (a.kind !== b.kind) return false;
-  return a.kind !== "form" || a.id === (b as { id: string }).id;
-}
-
-/**
- * On boot with no hash, reopen the last form (or the J.A.P.), as the reference does. Pure (it runs
- * in render): App writes the restored hash into the URL in a layout effect.
- */
-function initialRoute(): Route {
-  if (!location.hash) {
-    const last = defaultKV().get(LAST_FORM_KEY);
-    if (last === "jap") return { kind: "jap" };
-    if (last && getForm(last)) return { kind: "form", id: last };
-  }
-  return parseRoute();
-}
 
 /** One-time data migrations. Each is a no-op once done, so running on every mount is safe. */
 function migrate(): void {
@@ -79,10 +43,25 @@ function migrate(): void {
 }
 
 export default function App() {
-  const [route, setRoute] = useState<Route>(() => {
+  // Before anything reads the stores, as when it ran in the route's initialiser.
+  useState(() => {
     migrate();
-    return initialRoute();
+    return true;
   });
+  const { route, form, goHome } = useRoute();
+  const {
+    dialog,
+    docketsFor,
+    autoSync,
+    docketRequest,
+    changelogUnread,
+    openDockets,
+    openCharacters,
+    openChangelog,
+    closeDialog,
+    autoSyncDone,
+    loadDocketInForm,
+  } = useDialogs();
   const [navOpen, setNavOpen] = useState(false);
   const setAsideCount = useSetAsideVersion();
   /** The set-aside count when the notice was last dismissed; a new one shows it again. */
@@ -90,14 +69,6 @@ export default function App() {
   const [highlight, setHighlight] = useState(true);
   /** The last output FormView reported, with the form it belongs to (out is null when that template failed to compile). */
   const [output, setOutput] = useState<{ formId: string; out: FormOutput | null } | null>(null);
-  const [dialog, setDialog] = useState<DialogName>(null);
-  /** Character whose docket the Dockets dialog shows. */
-  const [docketsFor, setDocketsFor] = useState<string | null>(null);
-  const [changelogUnread, setChangelogUnread] = useState(() => isUnread());
-  /** J.A.P. "Turn on sync": the Characters dialog starts sync when it opens. */
-  const [autoSync, setAutoSync] = useState(false);
-  /** Dockets "Use in form": a docket for the open FormView to load. */
-  const [docketRequest, setDocketRequest] = useState<DocketRequest | null>(null);
   /** The open form shows its docket bar (it has a Case number and the active character keeps a docket). */
   const [docketBar, setDocketBar] = useState(false);
   const editorRef = useRef<HTMLElement>(null);
@@ -128,46 +99,10 @@ export default function App() {
     void sync.init();
   }, []);
 
-  /* ---------- routing ---------- */
+  /* ---------- page changes ---------- */
 
-  // A restored last form gets its hash before paint. Not during render: Next's router
-  // listens to history updates and would set state while App renders.
-  const bootRoute = useRef(route);
-  useLayoutEffect(() => {
-    const r = bootRoute.current;
-    if (!location.hash && r.kind !== "home") history.replaceState(null, "", "#" + (r.kind === "form" ? r.id : "jap"));
-  }, []);
-
+  // A new page closes the drawer and starts at the top (routing and the title: useRoute).
   useEffect(() => {
-    const onNav = () => {
-      const next = parseRoute();
-      setRoute((prev) => (sameRoute(prev, next) ? prev : next));
-    };
-    window.addEventListener("hashchange", onNav);
-    window.addEventListener("popstate", onNav);
-    return () => {
-      window.removeEventListener("hashchange", onNav);
-      window.removeEventListener("popstate", onNav);
-    };
-  }, []);
-
-  const form = route.kind === "form" ? getForm(route.id) || null : null;
-
-  useEffect(() => {
-    if (route.kind === "home") {
-      // The start page forgets the last form, so a refresh stays here.
-      defaultKV().remove(LAST_FORM_KEY);
-      document.title = APP_TITLE;
-    } else if (route.kind === "jap") {
-      try {
-        defaultKV().set(LAST_FORM_KEY, "jap");
-      } catch {
-        // private mode
-      }
-      document.title = JAP_TITLE + " · " + APP_TITLE;
-    } else if (form) {
-      document.title = form.title + " · " + APP_TITLE;
-    }
     setNavOpen(false);
     if (editorRef.current) editorRef.current.scrollTop = 0;
   }, [route, form]);
@@ -182,40 +117,9 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [navOpen]);
 
-  const goHome = (e: MouseEvent) => {
-    e.preventDefault();
-    if (location.hash) history.pushState(null, "", location.pathname + location.search);
-    setRoute({ kind: "home" });
-  };
-
   /* ---------- toolbar actions ---------- */
 
   const setActive = (id: string | null) => characterStore().setActive(id);
-
-  const openDockets = (charId: string | null = activeId) => {
-    if (!charId) return;
-    setDocketsFor(charId);
-    setDialog("dockets");
-  };
-
-  const openCharacters = (startSync = false) => {
-    setAutoSync(startSync);
-    setDialog("characters");
-  };
-
-  const closeDialog = useCallback(() => setDialog(null), []);
-  const autoSyncDone = useCallback(() => setAutoSync(false), []);
-
-  const loadDocketInForm = (docketId: string) => {
-    setDialog(null);
-    setDocketRequest((r) => ({ docketId, seq: (r ? r.seq : 0) + 1 }));
-  };
-
-  const openChangelog = () => {
-    markSeen();
-    setChangelogUnread(false);
-    setDialog("changelog");
-  };
 
   const onOutput = useCallback((o: FormOutput | null, formId: string) => setOutput({ formId, out: o }), []);
   // Only the leaving form's own output is dropped, so this can't race a newer form's publish.
@@ -258,7 +162,7 @@ export default function App() {
           navOpen={navOpen}
           onHome={goHome}
           onToggleNav={() => setNavOpen((o) => !o)}
-          onDockets={() => openDockets()}
+          onDockets={() => openDockets(activeId)}
           onCharacters={() => openCharacters()}
           onChangelog={openChangelog}
         />
