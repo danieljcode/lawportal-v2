@@ -48,6 +48,8 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
 - **Case File** (toolbar or sidebar): every firm case, with its lead and the other characters on
   it. Search by case number or party, filter by status or character, and open a case to edit its
   details and who's working it.
+- **Conflict check** (sidebar): check a new client's name (and the other side's) against every firm
+  case, with a clear verdict, the matches, and a memo to copy or print. Every check is logged.
 - **New client intake** (sidebar, or the Case File): take a new client's details and the matter in
   one form, then **Open case** creates the case with the intake in its notes. Print it as a one-page
   client sheet.

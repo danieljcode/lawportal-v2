@@ -11,7 +11,7 @@ browser.
   `ssr: false`. The app reads local storage on its first render, so it never renders on the server
   (no hydration mismatches).
 - **Hash routing.** `#civil-complaint` opens a form, `#jap` the J.A.P., `#cases` the Case File and
-  `#cases/<id>` one case in it (LP-101), `#upcoming` what's due (LP-18), `#intake` the new client intake (LP-19), an empty hash the start page. `useRoute` owns the route and remembers the last form under `lawapp_last_form`;
+  `#cases/<id>` one case in it (LP-101), `#upcoming` what's due (LP-18), `#intake` the new client intake (LP-19), `#conflicts` the conflict check (LP-10), an empty hash the start page. `useRoute` owns the route and remembers the last form under `lawapp_last_form`;
   `useDialogs` owns the open dialog; `App.tsx` owns the active character and the layout.
 - **Three small API routes** on the same server, all behind a host check (see [Server](#server)):
   sync (`/api/account`, `/api/data`) and the `.docx` export (`/api/docx`).
@@ -96,6 +96,7 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
 | Form drafts                       | `src/lib/formState.ts`, `draftWriter.ts` | `lawapp_draft_<form id>`             |
 | Draft history (LP-89)             | `src/lib/draftHistory.ts`                | `lawapp_history_<form id>`           |
 | Filing history (LP-15)            | `src/lib/filings.ts`                     | `lawapp_filings`                     |
+| Conflict check log (LP-10)        | `src/lib/conflicts.ts`                   | `lawapp_conflict_log`                |
 | Sync state                        | `src/lib/sync.ts`                        | `lawapp_sync_*`                      |
 
 - **KV wrapper** (`src/lib/storage.ts`). The stores never touch `localStorage` directly: they go
@@ -163,13 +164,21 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
     `lawapp_dockets_<id>` keys. The pure docket
     fields (`FIELDS`, `clean`, `divisionFor`…) live in `docketFields.ts`, so the two don't import
     each other.
+- **Conflict check** (`#conflicts`, `ConflictCheckView.tsx`; `src/lib/conflicts.ts`, LP-10): names (people
+  or businesses) against both parties of every firm case and the case notes. Matching ignores
+  capitals, punctuation and business suffixes (LLC, Inc…); in the parties, part of a name (3+
+  letters) and initials match too, marked partial; in the notes only the whole name. A clear verdict
+  ("No conflicts found" / "Possible conflict: review before accepting"), each match's case, side,
+  status and lead, and a memo to copy or print. Every check is logged (who, when, the names, the
+  result) in `lawapp_conflict_log` (the newest 300), which syncs. `runConflictCheck` in
+  `services/conflicts.ts` searches the cases and logs, since it spans two stores.
 - **New client intake** (`#intake`, `IntakeView.tsx`; `src/lib/intake.ts`, LP-19): the client's details,
   how they found the firm, the matter, the opposing party, a summary and the urgency. **Open case**
   makes the Case File case: the matter type sets the court and which side the client is on
   (criminal and traffic clients are defendants), the chosen character leads, status is Open, and
   the intake goes in the notes. A blank case number becomes `PENDING-<n>` until the court gives one.
   **Print client sheet** prints just the sheet beside the form (a print stylesheet scoped with
-  `:has(#intake-sheet)`). A conflict check (LP-10) will plug in here.
+  `:has(#intake-sheet)`). **Run conflict check** checks the client and the opposing party (LP-10).
 - **Deadlines and hearing dates** (`src/lib/deadlines.ts`, LP-18) live on each case
   (`deadlines`: an in-game date, a label, a note, done), so they sync and back up with it; merging
   two copies of a case keeps both copies' deadlines. Dates are on the 1990 calendar, as forms fill
