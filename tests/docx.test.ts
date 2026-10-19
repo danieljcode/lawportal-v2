@@ -38,7 +38,7 @@ describe("htmlToDocx", () => {
   });
 
   it(`converts all ${ALL_FORMS.length} forms, empty and with fixture A`, { timeout: 120_000 }, async () => {
-    expect(ALL_FORMS).toHaveLength(45);
+    expect(ALL_FORMS).toHaveLength(49);
     for (const form of ALL_FORMS) {
       const tree = compile(form.html);
       for (const values of [{}, fixture(fields(tree), "A")]) {
