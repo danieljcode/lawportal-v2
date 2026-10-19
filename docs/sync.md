@@ -66,6 +66,29 @@ edits. Instead of replacing local data, `resolve()` merges **one character at a 
 Characters saved before the app went FreestyleRP-only carried a `server` field. A pull that finds it
 in the server copy pushes a clean copy back, so every device ends up clean.
 
+## Full backup and restore (LP-1)
+
+`src/lib/backup.ts`, offered in the Characters dialog. Unlike the characters **Export**, which holds
+only characters with their dockets and J.A.P., a backup holds everything this browser has saved.
+
+- **What's in it:** every `lawapp_` key, each value exactly as stored: characters, dockets, J.A.P.,
+  form drafts, settings (theme, Discord, collapsed sections, last form, What's new), set-aside damaged
+  data and kept sync versions (`lawapp_sync_lost`).
+- **What's left out:** the sync code, and this device's own sync bookkeeping (`lawapp_sync_rev`,
+  `_dirty`, `_base`) and backup date (`lawapp_backup_last`), which mean nothing in another browser.
+- **The file:** `lawapp-backup-YYYY-MM-DD.json`, `{ app, kind: "backup", version: 1, created,
+appVersion, data }`. Listing the keys needs the KV wrapper's optional `keys()`.
+- **Restore replaces everything.** After a preview of the counts before and after ("Characters: 3 now
+  → 5 in the backup") and a confirmation, every backed-up key is written and any not in the backup is
+  removed, so the browser ends up exactly as the backup was. It's all or nothing: if storage refuses
+  a write, what was there is put back. The page then reloads so every store re-reads.
+- **With sync on**, the restore marks the data as unsent (`lawapp_sync_dirty`), so it's pushed when
+  the app starts; if another device saved since, the usual [merge](#conflicts-lp-64) applies.
+- **Older characters-only exports** chosen in Restore backup are imported the usual way (merged by
+  id) instead, including old ones with a `server` field.
+- **Reminder:** with sync off and at least one character, the dialog warns when no backup has been
+  made in this browser for 30 days, or ever.
+
 ## Damaged data
 
 `readJson` in `src/lib/storage.ts` handles a saved value that isn't valid JSON (a half-finished

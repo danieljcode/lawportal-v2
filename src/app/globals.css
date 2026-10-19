@@ -1614,6 +1614,18 @@ dialog::backdrop {
   color: var(--bad);
   font-weight: 700;
 }
+.backup-box {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--shadow);
+}
+.backup-box p {
+  margin: 0 0 6px;
+}
+.backup-box .warn {
+  color: var(--bad);
+  font-weight: 700;
+}
 .set-aside-notice {
   display: flex;
   flex-wrap: wrap;
