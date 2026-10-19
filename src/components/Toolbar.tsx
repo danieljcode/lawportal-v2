@@ -73,6 +73,9 @@ export default function Toolbar(p: ToolbarProps) {
             Dockets
           </button>
         )}
+        <a className="btn" id="open-cases" href="#cases" title="The firm's cases">
+          Case File
+        </a>
         {p.showJap && (
           <a className="btn" id="open-jap" href="#jap" title="Judicial Advancement Portfolio">
             J.A.P.

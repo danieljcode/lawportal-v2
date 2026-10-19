@@ -6,6 +6,7 @@ import { S_CREDIT, S_DISCLAIMER } from "@/lib/strings";
 
 const JAP_NAME = "Judicial Advancement Portfolio";
 const JAP_SEARCH = (JAP_NAME + " j.a.p. jap court commissioners").toLowerCase();
+const CASES_SEARCH = "case file cases firm docket";
 
 interface Group {
   court: string;
@@ -39,6 +40,7 @@ export default function Sidebar({ forms, current, commissioner }: SidebarProps) 
   const q = query.trim().toLowerCase();
   const groups = useMemo(() => group(forms, q), [forms, q]);
   const showJap = commissioner && (!q || JAP_SEARCH.indexOf(q) >= 0);
+  const showCases = !q || CASES_SEARCH.indexOf(q) >= 0;
 
   const link = (href: string, text: string, on: boolean) => (
     <a href={href} className={on ? "active" : undefined} aria-current={on ? "page" : undefined}>
@@ -57,6 +59,14 @@ export default function Sidebar({ forms, current, commissioner }: SidebarProps) 
         onChange={(e) => setQuery(e.target.value)}
       />
       <div id="form-list" className="tree">
+        {showCases && (
+          <details open>
+            <summary>The firm</summary>
+            <ul>
+              <li>{link("#cases", "Case File", current === "cases")}</li>
+            </ul>
+          </details>
+        )}
         {showJap ? (
           <details open>
             <summary>Court Commissioners</summary>
@@ -65,7 +75,7 @@ export default function Sidebar({ forms, current, commissioner }: SidebarProps) 
             </ul>
           </details>
         ) : (
-          !groups.length && <p className="muted small">No forms match.</p>
+          !groups.length && !showCases && <p className="muted small">No forms match.</p>
         )}
         {groups.map((g) => (
           <details open key={g.court}>
