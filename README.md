@@ -56,6 +56,9 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
 
 - Everything is saved in **this browser's local storage**. Nothing leaves the computer unless you
   turn on sync.
+- **Back up everything** (Characters dialog) saves one file with your characters, dockets, J.A.P.,
+  form drafts and settings; **Restore backup** puts it all back after showing what will change. If
+  sync is off, the dialog reminds you when there's been no backup for 30 days.
 - **Sync** stores your characters, dockets and J.A.P. on the computer running the app, under a
   private code. Anyone with the code who can reach that computer can read or change them, so keep it
   private. If two devices change the same character, the newer change wins and the other is kept so
