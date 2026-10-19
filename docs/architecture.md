@@ -94,6 +94,7 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
 | Dockets (per character)           | `src/lib/dockets.ts`                     | `lawapp_dockets_<character id>`      |
 | J.A.P. portfolios (per character) | `src/lib/portfolio.ts`                   | `lawapp_jap_<character id>`          |
 | Form drafts                       | `src/lib/formState.ts`, `draftWriter.ts` | `lawapp_draft_<form id>`             |
+| Draft history (LP-89)             | `src/lib/draftHistory.ts`                | `lawapp_history_<form id>`           |
 | Sync state                        | `src/lib/sync.ts`                        | `lawapp_sync_*`                      |
 
 - **KV wrapper** (`src/lib/storage.ts`). The stores never touch `localStorage` directly: they go
@@ -134,6 +135,13 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
     portfolio. Dockets saved before LP-69 keep their GTAW court names and GJ case numbers as filed.
   - **To change a store's shape**, bump its `version` and add a step whose `up` turns the old shape
     into the new one, with a test from the old version.
+- **Undo and draft history** (LP-89). FormView keeps its state in an `Undoable`
+  (`src/lib/formState/undo.ts`): every change is an undo step, except that typing in one field
+  with pauses under a second joins the last step. Ctrl+Z, Ctrl+Y and Ctrl+Shift+Z work while the
+  form (or nothing) has focus. Separately, `draftHistory.ts` keeps snapshots of each form's draft
+  on the keyed store: at the session's first edit, then at most every 3 minutes while editing, and
+  before Clear form or a restore. Each form keeps the last 20, and the oldest are dropped first if
+  storage is full. They're in the full backup but not synced, like drafts.
 - **Startup migrations** (`src/lib/migrations.ts`) run once per load, from `AppLoader` after App's
   code has loaded and before it first renders, never during render: each store's `migrate()`, then
   dropping the pre-FreestyleRP `server` field and `lawapp_server` key (LP-71).

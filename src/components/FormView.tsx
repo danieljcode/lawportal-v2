@@ -9,9 +9,11 @@
 import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { hasDocket } from "@/lib/characters";
 import { docketStore } from "@/lib/dockets";
+import { draftHistory, snapshotTime, SNAPSHOT_EVERY_MS, type Snapshot } from "@/lib/draftHistory";
 import { createDraftWriter, type DraftWriter } from "@/lib/draftWriter";
 import {
   applyPrefills,
+  change,
   COLLAPSED_KEY,
   docketToForm,
   draftKey,
@@ -23,10 +25,14 @@ import {
   missingRequired,
   openState,
   readDraft,
+  redo,
   segments as splitSegments,
+  startUndo,
+  undo,
   writeDraft,
   type FormState,
   type MissingField,
+  type Undoable,
 } from "@/lib/formState";
 import { gameDate } from "@/lib/freestyle";
 import { defaultKV, readJson, writeJson } from "@/lib/storage";
@@ -35,6 +41,7 @@ import { caseNumberPattern, compile, fields, render } from "@/lib/template";
 import type { Character, Docket, Entry, FormDef, Node, Tree } from "@/lib/types";
 import { FormContext, slugId, type FormCtx } from "./fields/FormContext";
 import Sections from "./fields/Sections";
+import DraftHistoryDialog from "./DraftHistoryDialog";
 import type { SafeHtml } from "@/lib/safeHtml";
 import { useDocketVersion } from "./useStore";
 
@@ -152,9 +159,19 @@ export default function FormView({
   const { tree, entries } = compiled;
 
   // R1: the opening state mirrors the reference openForm (draft → blocks → prefills → character fill).
-  const [state, setState] = useState<FormState>(() =>
-    openState(entries, readDraft(defaultKV(), form.id), activeCharacter, now),
+  // Undo and redo (LP-89): the state lives in an Undoable, and every change goes through setState.
+  const [undoable, setUndoable] = useState<Undoable>(() =>
+    startUndo(openState(entries, readDraft(defaultKV(), form.id), activeCharacter, now)),
   );
+  const state = undoable.state;
+  /** Apply a change as an undo step; `key` (the field being typed in) groups typing into one step. */
+  const setState = useCallback((next: FormState | ((s: FormState) => FormState), key: string | null = null) => {
+    const at = Date.now();
+    setUndoable((u) => change(u, typeof next === "function" ? next(u.state) : next, key, at));
+  }, []);
+  const doUndo = useCallback(() => setUndoable(undo), []);
+  const doRedo = useCallback(() => setUndoable(redo), []);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [collapsed, setCollapsed] = useState<Set<string>>(() => readCollapsed(form.id));
   const [flash, setFlash] = useState<{ text: string; bad: boolean } | null>(null);
   const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -190,13 +207,48 @@ export default function FormView({
     [],
   );
 
+  // Draft history (LP-89): a snapshot at most every few minutes while the form is edited.
+  // The opening state isn't an edit, so it's never snapshotted on its own.
+  const opened = useRef(state);
+  const lastSnapshot = useRef<number | null>(null);
+  const keepSnapshot = useCallback(
+    (s: FormState) => {
+      if (draftHistory().add(form.id, s)) lastSnapshot.current = Date.now();
+    },
+    [form.id],
+  );
+  useEffect(() => {
+    if (state === opened.current) return;
+    if (lastSnapshot.current === null) lastSnapshot.current = draftHistory().lastAt(form.id);
+    if (Date.now() - lastSnapshot.current >= SNAPSHOT_EVERY_MS) keepSnapshot(state);
+  }, [state, form.id, keepSnapshot]);
+
+  // Ctrl+Z / Ctrl+Y (and Ctrl+Shift+Z) undo and redo while the form, or nothing, has focus.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+      const k = e.key.toLowerCase();
+      const isUndo = k === "z" && !e.shiftKey;
+      const isRedo = k === "y" || (k === "z" && e.shiftKey);
+      if (!isUndo && !isRedo) return;
+      const target = e.target instanceof Element ? e.target : null;
+      if (target && target !== document.body && !target.closest("#form-view")) return;
+      if (target?.closest("dialog")) return;
+      e.preventDefault();
+      if (isUndo) doUndo();
+      else doRedo();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [doUndo, doRedo]);
+
   // Another active character (or the same one edited/synced): re-fill only what's empty or still ours.
   const charRef = useRef(activeCharacter);
   useEffect(() => {
     if (charRef.current === activeCharacter) return;
     charRef.current = activeCharacter;
     setState((s) => fillFromCharacter(entries, s, activeCharacter, false));
-  }, [activeCharacter, entries]);
+  }, [activeCharacter, entries, setState]);
 
   // Output, derived during render: on mount the deferred values equal the opening state, so the
   // first output is ready in the first commit (no frame needed). Later edits re-render the
@@ -248,7 +300,7 @@ export default function FormView({
     flashTimer.current = setTimeout(() => setFlash(null), 4000);
   };
 
-  const onState = useCallback((fn: (s: FormState) => FormState) => setState(fn), []);
+  const onState = useCallback((fn: (s: FormState) => FormState, key?: string) => setState(fn, key ?? null), [setState]);
   const required = useMemo(() => new Set(form.required), [form.required]);
   const ctx: FormCtx = useMemo(
     () => ({ entries, character: activeCharacter, onState, now, required }),
@@ -285,9 +337,17 @@ export default function FormView({
   };
 
   const clearForm = () => {
-    if (!confirm("Clear everything you've entered in this form?")) return;
+    if (!confirm("Clear everything you've entered in this form? Undo or Draft history can bring it back.")) return;
+    keepSnapshot(state);
     defaultKV().remove(draftKey(form.id));
     setState(openState(entries, null, activeCharacter, now));
+  };
+
+  const restoreSnapshot = (snap: Snapshot) => {
+    keepSnapshot(state);
+    setState(snap.state);
+    setHistoryOpen(false);
+    showFlash("Restored the version from " + snapshotTime(snap.at) + ". Undo puts your draft back.");
   };
 
   /* ---------- docket bar ---------- */
@@ -371,6 +431,36 @@ export default function FormView({
           >
             Fill from character
           </button>
+          <button
+            className="btn"
+            id="undo"
+            type="button"
+            title="Undo (Ctrl+Z)"
+            onClick={doUndo}
+            disabled={!undoable.past.length}
+          >
+            Undo
+          </button>
+          <button
+            className="btn"
+            id="redo"
+            type="button"
+            title="Redo (Ctrl+Y)"
+            onClick={doRedo}
+            disabled={!undoable.future.length}
+          >
+            Redo
+          </button>
+          <button
+            className="btn"
+            id="open-history"
+            type="button"
+            title="Earlier versions of this draft"
+            onClick={() => setHistoryOpen(true)}
+            disabled={!tree}
+          >
+            Draft history
+          </button>
           <button className="btn danger-quiet" id="reset-form" type="button" onClick={clearForm} disabled={!tree}>
             Clear form
           </button>
@@ -422,6 +512,17 @@ export default function FormView({
       )}
 
       <p className="disclaimer form-foot">{S_DISCLAIMER}</p>
+
+      {tree && (
+        <DraftHistoryDialog
+          open={historyOpen}
+          onClose={() => setHistoryOpen(false)}
+          formId={form.id}
+          formTitle={form.title}
+          tree={tree}
+          onRestore={restoreSnapshot}
+        />
+      )}
 
       <div className="status-bar editor-status">
         <span
