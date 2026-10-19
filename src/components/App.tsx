@@ -7,6 +7,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ALL_FORMS } from "@/data";
 import { characterStore, hasDocket } from "@/lib/characters";
+import { draftHistory, hasContent } from "@/lib/draftHistory";
+import type { Filing } from "@/lib/filings";
+import { readDraft, writeDraft } from "@/lib/formState";
+import { defaultKV } from "@/lib/storage";
 import { isCommissioner } from "@/lib/portfolio";
 import { EMPTY_HTML } from "@/lib/safeHtml";
 import * as sync from "@/lib/sync";
@@ -14,7 +18,8 @@ import ChangelogDialog from "./ChangelogDialog";
 import CharactersDialog from "./CharactersDialog";
 import DocketsDialog from "./DocketsDialog";
 import EmptyState from "./EmptyState";
-import FormView, { type FormOutput } from "./FormView";
+import FilingsDialog from "./FilingsDialog";
+import FormView, { type DraftRequest, type FormOutput } from "./FormView";
 import JapOutput from "./JapOutput";
 import JapView from "./JapView";
 import CaseFileView from "./CaseFileView";
@@ -31,7 +36,13 @@ import { useCharacterVersion, useSetAsideVersion, useSyncState } from "./useStor
 export type { DialogName } from "./useDialogs";
 export type { Route } from "./useRoute";
 
-const EMPTY_OUTPUT: FormOutput = { finalHtml: EMPTY_HTML, previewHtml: EMPTY_HTML, missing: [], jumpTo: () => {} };
+const EMPTY_OUTPUT: FormOutput = {
+  finalHtml: EMPTY_HTML,
+  previewHtml: EMPTY_HTML,
+  missing: [],
+  jumpTo: () => {},
+  onFiled: () => {},
+};
 
 export default function App() {
   const { route, form, goHome } = useRoute();
@@ -44,11 +55,36 @@ export default function App() {
     openDockets,
     openCharacters,
     openChangelog,
+    openFilings,
     closeDialog,
     autoSyncDone,
     loadDocketInForm,
   } = useDialogs();
   const [navOpen, setNavOpen] = useState(false);
+  /** Filing history's "Use as new draft" for the form already open (LP-15). */
+  const [draftRequest, setDraftRequest] = useState<DraftRequest | null>(null);
+
+  /**
+   * Open a filing as a new draft of its form (LP-15). The open form takes it as an undo step;
+   * for another form the draft is replaced (after asking, keeping the old one in draft history)
+   * and the form opened.
+   */
+  const openFiling = (f: Filing) => {
+    closeDialog();
+    if (route.kind === "form" && route.id === f.formId) {
+      setDraftRequest((r) => ({ formId: f.formId, state: f.state, at: f.at, seq: (r ? r.seq : 0) + 1 }));
+      return;
+    }
+    const kv = defaultKV();
+    const existing = readDraft(kv, f.formId);
+    if (existing && hasContent(existing.values)) {
+      const question = "Replace your current draft of " + f.formTitle + " with this filing?";
+      if (!confirm(question + " Draft history keeps a copy of your draft.")) return;
+      draftHistory().add(f.formId, existing);
+    }
+    writeDraft(kv, f.formId, f.state);
+    location.hash = "#" + f.formId;
+  };
   const setAsideCount = useSetAsideVersion();
   /** The set-aside count when the notice was last dismissed; a new one shows it again. */
   const [setAsideSeen, setSetAsideSeen] = useState(0);
@@ -199,6 +235,7 @@ export default function App() {
                   onOutput={onOutput}
                   onOutputGone={onOutputGone}
                   docketRequest={docketRequest}
+                  draftRequest={draftRequest}
                   onDocketBar={setDocketBar}
                 />
               </ErrorBoundary>
@@ -213,7 +250,7 @@ export default function App() {
               </ErrorBoundary>
             ) : route.kind === "cases" ? (
               <ErrorBoundary where="the Case File" resetKey={route.caseId}>
-                <CaseFileView caseId={route.caseId} characters={characters} />
+                <CaseFileView caseId={route.caseId} characters={characters} onUseFiling={openFiling} />
               </ErrorBoundary>
             ) : (
               <EmptyState />
@@ -229,6 +266,8 @@ export default function App() {
                 onJump={formOutput.jumpTo}
                 highlight={highlight}
                 onHighlight={setHighlight}
+                onFiled={formOutput.onFiled}
+                onOpenHistory={openFilings}
               />
             </ErrorBoundary>
           )}
@@ -267,6 +306,9 @@ export default function App() {
       </ErrorBoundary>
       <ErrorBoundary where={"What's new"} variant="dialog" resetKey={dialog} onDismiss={closeDialog}>
         <ChangelogDialog open={dialog === "changelog"} onClose={closeDialog} />
+      </ErrorBoundary>
+      <ErrorBoundary where="Filing history" variant="dialog" resetKey={dialog} onDismiss={closeDialog}>
+        <FilingsDialog open={dialog === "filings"} onClose={closeDialog} characters={characters} onUse={openFiling} />
       </ErrorBoundary>
     </>
   );

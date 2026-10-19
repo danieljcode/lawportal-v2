@@ -9,7 +9,8 @@
 // unsent edits), the two copies are merged one character at a time: the newer
 // updatedAt wins, and the J.A.P. goes with its character. Since LP-4 the firm's
 // cases sync alongside, merged one case at a time by their own `updated`; a
-// copy from before LP-4 (dockets inside each character) is read as cases. This
+// copy from before LP-4 (dockets inside each character) is read as cases. The
+// filing history (LP-15) syncs the same way, one filing at a time. This
 // browser's versions that lose are kept under lawapp_sync_lost so the user can
 // restore them.
 //
@@ -17,6 +18,7 @@
 // to /api/ in the Authorization header. Client only: nothing runs at import.
 import { caseStore, casesFromDockets, cleanCase, unifyCases } from "./cases";
 import { characterStore } from "./characters";
+import { cleanFiling, filingStore, type Filing } from "./filings";
 import { docketStore } from "./dockets";
 import { portfolioStore } from "./portfolio";
 import { deleteCharacter } from "./services/characters";
@@ -69,6 +71,8 @@ export interface SyncState {
 export interface SyncDoc {
   characters: Array<Record<string, unknown>>;
   cases: Case[];
+  /** The filing history (LP-15); absent in copies from before it. */
+  filings?: Filing[];
 }
 
 interface ApiBody {
@@ -211,7 +215,15 @@ export function snapshot(): SyncDoc {
     cases: caseStore()
       .list()
       .map((c) => JSON.parse(JSON.stringify(c)) as Case),
+    filings: filingStore().list(),
   };
+}
+
+/** A document's filing history, or null for a copy from before LP-15 (which has none to apply). */
+function filingsOf(doc: unknown): Filing[] | null {
+  const raw = doc && typeof doc === "object" ? (doc as { filings?: unknown }).filings : undefined;
+  if (!Array.isArray(raw)) return null;
+  return raw.map(cleanFiling).filter((f): f is Filing => !!f);
 }
 
 /** A document's cases; one from before LP-4 has dockets inside its characters instead. */
@@ -264,6 +276,8 @@ function apply(doc: unknown): number {
       }
     });
     caseStore().replaceAll(casesOf(doc));
+    const filings = filingsOf(doc);
+    if (filings) filingStore().replaceAll(filings);
   } finally {
     applying = false;
   }
@@ -276,7 +290,13 @@ export function merge(serverDoc: unknown): SyncDoc {
     serverDoc && typeof serverDoc === "object" ? (serverDoc as { characters?: unknown }).characters : undefined;
   const list = Array.isArray(raw) ? raw.filter((c): c is Record<string, unknown> => !!c && typeof c === "object") : [];
   const local = snapshot();
-  const out: SyncDoc = { characters: list.slice(), cases: unifyCases(casesOf(serverDoc), casesOf(local)) };
+  const serverFilings = filingsOf(serverDoc) || [];
+  const haveFiling = new Set(serverFilings.map((f) => f.id));
+  const out: SyncDoc = {
+    characters: list.slice(),
+    cases: unifyCases(casesOf(serverDoc), casesOf(local)),
+    filings: [...serverFilings, ...(local.filings || []).filter((f) => !haveFiling.has(f.id))],
+  };
   const have = new Set(out.characters.map((c) => c.id));
   for (const c of local.characters) if (!have.has(c.id)) out.characters.push(c);
   return out;
@@ -309,6 +329,7 @@ function saveBase(doc: unknown): void {
   const o: Record<string, string> = {};
   for (const c of charactersOf(doc)) if (typeof c.id === "string") o[c.id] = stampOf(c);
   for (const c of casesOf(doc)) o["case:" + c.id] = c.updated;
+  for (const f of filingsOf(doc) || []) o["filing:" + f.id] = f.at;
   lsSet(BASE_KEY, JSON.stringify(o));
 }
 
@@ -367,43 +388,72 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
   }
 
   // Cases (LP-4): the same rules, one case at a time, by each case's own `updated`.
-  const localCases = new Map(
-    caseStore()
-      .list()
-      .map((c) => [c.id, c]),
-  );
-  const caseBase = (id: string) => base?.get("case:" + id);
-  const caseChangedHere = (c: Case) => !base || caseBase(c.id) !== c.updated;
-  const outCases: Case[] = [];
-  const lostCases: Case[] = [];
-  const seenCases = new Set<string>();
-  for (const s of casesOf(serverDoc)) {
-    seenCases.add(s.id);
-    const l = localCases.get(s.id);
+  const cases = resolveList(casesOf(serverDoc), caseStore().list(), base, "case:", (c) => c.updated);
+  // Filings (LP-15) likewise, by when each was filed. A copy from before LP-15 has none:
+  // this browser's are kept and sent.
+  const localFilings = filingStore().list();
+  const serverFilings = filingsOf(serverDoc);
+  const filings = serverFilings
+    ? resolveList(serverFilings, localFilings, base, "filing:", (f) => f.at)
+    : { out: localFilings, lost: [], keptLocal: localFilings.length > 0 };
+  return {
+    // Two devices can make the same case number separately: they become one case.
+    doc: { characters: out, cases: unifyCases(cases.out), filings: filings.out },
+    lost,
+    lostCases: cases.lost,
+    keptLocal: keptLocal || cases.keptLocal || filings.keptLocal,
+  };
+}
+
+/**
+ * Merge one list of items with their own stamps (cases, filings) the way
+ * characters merge: the newer stamp wins and the server wins a tie; `base`
+ * (under `prefix + id`) tells an item added on one side from one deleted on
+ * the other. Returns the result, this browser's losing edits, and whether the
+ * result holds anything of this browser's.
+ */
+function resolveList<T extends { id: string }>(
+  server: T[],
+  local: T[],
+  base: Map<string, string> | null,
+  prefix: string,
+  stamp: (x: T) => string,
+): { out: T[]; lost: T[]; keptLocal: boolean } {
+  const localById = new Map(local.map((x) => [x.id, x]));
+  const baseOf = (id: string) => base?.get(prefix + id);
+  const changedHere = (x: T) => !base || baseOf(x.id) !== stamp(x);
+  const out: T[] = [];
+  const lost: T[] = [];
+  let keptLocal = false;
+  const seen = new Set<string>();
+  for (const s of server) {
+    seen.add(s.id);
+    const l = localById.get(s.id);
     if (!l) {
-      if (caseBase(s.id) === s.updated) keptLocal = true;
-      else outCases.push(s);
+      // Deleted here: that stands unless the other device has changed it since.
+      if (baseOf(s.id) === stamp(s)) keptLocal = true;
+      else out.push(s);
       continue;
     }
-    if (l.updated > s.updated) {
-      outCases.push(l);
+    if (stamp(l) > stamp(s)) {
+      out.push(l);
       keptLocal = true;
     } else {
-      outCases.push(s);
-      if (l.updated !== s.updated && caseChangedHere(l)) lostCases.push(l);
+      out.push(s);
+      if (stamp(l) !== stamp(s) && changedHere(l)) lost.push(l);
     }
   }
-  for (const [id, l] of localCases) {
-    if (seenCases.has(id)) continue;
-    if (caseBase(id) !== undefined) {
-      if (caseChangedHere(l)) lostCases.push(l);
+  for (const [id, l] of localById) {
+    if (seen.has(id)) continue;
+    if (baseOf(id) !== undefined) {
+      // Deleted on the other device; keep this browser's edits to it aside.
+      if (changedHere(l)) lost.push(l);
       continue;
     }
-    outCases.push(l);
+    out.push(l);
     keptLocal = true;
   }
-  // Two devices can make the same case number separately: they become one case.
-  return { doc: { characters: out, cases: unifyCases(outCases) }, lost, lostCases, keptLocal };
+  return { out, lost, keptLocal };
 }
 
 function readLost(): Doc[] {
@@ -674,6 +724,7 @@ export function init(): Promise<void> {
   const unsubs = [
     characterStore().subscribe(changed),
     caseStore().subscribe(changed),
+    filingStore().subscribe(changed),
     portfolioStore().subscribe(changed),
   ];
   const onVisible = () => {
