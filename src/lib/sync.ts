@@ -10,7 +10,8 @@
 // updatedAt wins, and the J.A.P. goes with its character. Since LP-4 the firm's
 // cases sync alongside, merged one case at a time by their own `updated`; a
 // copy from before LP-4 (dockets inside each character) is read as cases. The
-// filing history (LP-15) syncs the same way, one filing at a time. This
+// filing history (LP-15) and the conflict check log (LP-10) sync the same way,
+// one entry at a time. This
 // browser's versions that lose are kept under lawapp_sync_lost so the user can
 // restore them.
 //
@@ -18,6 +19,7 @@
 // to /api/ in the Authorization header. Client only: nothing runs at import.
 import { caseStore, casesFromDockets, cleanCase, unifyCases } from "./cases";
 import { characterStore } from "./characters";
+import { cleanCheck, conflictLog, type ConflictCheck } from "./conflicts";
 import { cleanFiling, filingStore, type Filing } from "./filings";
 import { docketStore } from "./dockets";
 import { portfolioStore } from "./portfolio";
@@ -73,6 +75,8 @@ export interface SyncDoc {
   cases: Case[];
   /** The filing history (LP-15); absent in copies from before it. */
   filings?: Filing[];
+  /** The conflict check log (LP-10); absent in copies from before it. */
+  conflictChecks?: ConflictCheck[];
 }
 
 interface ApiBody {
@@ -216,10 +220,18 @@ export function snapshot(): SyncDoc {
       .list()
       .map((c) => JSON.parse(JSON.stringify(c)) as Case),
     filings: filingStore().list(),
+    conflictChecks: conflictLog().list(),
   };
 }
 
 /** A document's filing history, or null for a copy from before LP-15 (which has none to apply). */
+/** A document's conflict check log, or null for a copy from before LP-10. */
+function checksOf(doc: unknown): ConflictCheck[] | null {
+  const raw = doc && typeof doc === "object" ? (doc as { conflictChecks?: unknown }).conflictChecks : undefined;
+  if (!Array.isArray(raw)) return null;
+  return raw.map(cleanCheck).filter((c): c is ConflictCheck => !!c);
+}
+
 function filingsOf(doc: unknown): Filing[] | null {
   const raw = doc && typeof doc === "object" ? (doc as { filings?: unknown }).filings : undefined;
   if (!Array.isArray(raw)) return null;
@@ -278,6 +290,8 @@ function apply(doc: unknown): number {
     caseStore().replaceAll(casesOf(doc));
     const filings = filingsOf(doc);
     if (filings) filingStore().replaceAll(filings);
+    const checks = checksOf(doc);
+    if (checks) conflictLog().replaceAll(checks);
   } finally {
     applying = false;
   }
@@ -292,10 +306,13 @@ export function merge(serverDoc: unknown): SyncDoc {
   const local = snapshot();
   const serverFilings = filingsOf(serverDoc) || [];
   const haveFiling = new Set(serverFilings.map((f) => f.id));
+  const serverChecks = checksOf(serverDoc) || [];
+  const haveCheck = new Set(serverChecks.map((c) => c.id));
   const out: SyncDoc = {
     characters: list.slice(),
     cases: unifyCases(casesOf(serverDoc), casesOf(local)),
     filings: [...serverFilings, ...(local.filings || []).filter((f) => !haveFiling.has(f.id))],
+    conflictChecks: [...serverChecks, ...(local.conflictChecks || []).filter((c) => !haveCheck.has(c.id))],
   };
   const have = new Set(out.characters.map((c) => c.id));
   for (const c of local.characters) if (!have.has(c.id)) out.characters.push(c);
@@ -330,6 +347,7 @@ function saveBase(doc: unknown): void {
   for (const c of charactersOf(doc)) if (typeof c.id === "string") o[c.id] = stampOf(c);
   for (const c of casesOf(doc)) o["case:" + c.id] = c.updated;
   for (const f of filingsOf(doc) || []) o["filing:" + f.id] = f.at;
+  for (const c of checksOf(doc) || []) o["conflict:" + c.id] = c.at;
   lsSet(BASE_KEY, JSON.stringify(o));
 }
 
@@ -396,12 +414,18 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
   const filings = serverFilings
     ? resolveList(serverFilings, localFilings, base, "filing:", (f) => f.at)
     : { out: localFilings, lost: [], keptLocal: localFilings.length > 0 };
+  // The conflict check log (LP-10), the same way.
+  const localChecks = conflictLog().list();
+  const serverChecks = checksOf(serverDoc);
+  const checks = serverChecks
+    ? resolveList(serverChecks, localChecks, base, "conflict:", (c) => c.at)
+    : { out: localChecks, lost: [], keptLocal: localChecks.length > 0 };
   return {
     // Two devices can make the same case number separately: they become one case.
-    doc: { characters: out, cases: unifyCases(cases.out), filings: filings.out },
+    doc: { characters: out, cases: unifyCases(cases.out), filings: filings.out, conflictChecks: checks.out },
     lost,
     lostCases: cases.lost,
-    keptLocal: keptLocal || cases.keptLocal || filings.keptLocal,
+    keptLocal: keptLocal || cases.keptLocal || filings.keptLocal || checks.keptLocal,
   };
 }
 
@@ -725,6 +749,7 @@ export function init(): Promise<void> {
     characterStore().subscribe(changed),
     caseStore().subscribe(changed),
     filingStore().subscribe(changed),
+    conflictLog().subscribe(changed),
     portfolioStore().subscribe(changed),
   ];
   const onVisible = () => {

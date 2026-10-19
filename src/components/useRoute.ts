@@ -14,13 +14,15 @@ export type Route =
   | { kind: "jap" }
   | { kind: "cases"; caseId: string | null }
   | { kind: "upcoming" }
-  | { kind: "intake" };
+  | { kind: "intake" }
+  | { kind: "conflicts" };
 
 export const APP_TITLE = "Court Filing Generator";
 export const JAP_TITLE = "Judicial Advancement Portfolio";
 export const CASES_TITLE = "Case File";
 export const UPCOMING_TITLE = "Upcoming";
 export const INTAKE_TITLE = "New client intake";
+export const CONFLICTS_TITLE = "Conflict check";
 
 /** The hash for a route ("#cases/<id>" for a case). */
 export function hashFor(r: Route): string {
@@ -29,6 +31,7 @@ export function hashFor(r: Route): string {
   if (r.kind === "cases") return "#cases" + (r.caseId ? "/" + r.caseId : "");
   if (r.kind === "upcoming") return "#upcoming";
   if (r.kind === "intake") return "#intake";
+  if (r.kind === "conflicts") return "#conflicts";
   return "";
 }
 
@@ -43,6 +46,7 @@ function parseRoute(): Route {
   if (id === "cases") return { kind: "cases", caseId: null };
   if (id === "upcoming") return { kind: "upcoming" };
   if (id === "intake") return { kind: "intake" };
+  if (id === "conflicts") return { kind: "conflicts" };
   const m = /^cases\/([a-z0-9]{4,32})$/.exec(id);
   if (m) return { kind: "cases", caseId: m[1] };
   if (id && getForm(id)) return { kind: "form", id };
@@ -133,6 +137,8 @@ export function useRoute(): RouteState {
       document.title = UPCOMING_TITLE + " · " + APP_TITLE;
     } else if (route.kind === "intake") {
       document.title = INTAKE_TITLE + " · " + APP_TITLE;
+    } else if (route.kind === "conflicts") {
+      document.title = CONFLICTS_TITLE + " · " + APP_TITLE;
     } else if (form) {
       document.title = form.title + " · " + APP_TITLE;
     }
