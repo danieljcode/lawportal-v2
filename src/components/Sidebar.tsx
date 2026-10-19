@@ -6,7 +6,7 @@ import { S_CREDIT, S_DISCLAIMER } from "@/lib/strings";
 
 const JAP_NAME = "Judicial Advancement Portfolio";
 const JAP_SEARCH = (JAP_NAME + " j.a.p. jap court commissioners").toLowerCase();
-const CASES_SEARCH = "case file cases firm docket";
+const CASES_SEARCH = "case file cases firm docket upcoming deadlines hearings";
 
 interface Group {
   court: string;
@@ -64,6 +64,7 @@ export default function Sidebar({ forms, current, commissioner }: SidebarProps) 
             <summary>The firm</summary>
             <ul>
               <li>{link("#cases", "Case File", current === "cases")}</li>
+              <li>{link("#upcoming", "Upcoming", current === "upcoming")}</li>
             </ul>
           </details>
         )}

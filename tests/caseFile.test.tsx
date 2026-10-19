@@ -186,7 +186,7 @@ describe("the Case File (LP-101)", () => {
     mount("#cases/case0001");
     expect(must("#case-filings h4").textContent).toBe("Filings");
     expect(must("#case-evidence h4").textContent).toBe("Evidence");
-    expect(must("#case-deadlines h4").textContent).toBe("Deadlines");
+    expect(must("#case-deadlines h4").textContent).toBe("Deadlines and hearings");
     expect(must("#case-filings").textContent).toContain("No filings yet");
   });
 

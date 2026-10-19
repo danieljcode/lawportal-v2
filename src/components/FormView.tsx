@@ -10,6 +10,7 @@
 import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { hasDocket } from "@/lib/characters";
 import { caseStore, filterCases, isMember } from "@/lib/cases";
+import { addDeadlines, formatDay, formDates } from "@/lib/deadlines";
 import { docketStore } from "@/lib/dockets";
 import { draftHistory, snapshotTime, SNAPSHOT_EVERY_MS, type Snapshot } from "@/lib/draftHistory";
 import { createDraftWriter, type DraftWriter } from "@/lib/draftWriter";
@@ -416,6 +417,35 @@ export default function FormView({
     showFlash("Loaded " + d.caseNumber + (filled > 1 ? " (" + filled + " fields filled)." : "."));
   };
 
+  // Deadlines from the form's dates (LP-18), for the firm case with its case number.
+  const [datesOpen, setDatesOpen] = useState(false);
+  const dates = useMemo(
+    () => (currentDocket ? formDates(entries, state.values) : []),
+    [currentDocket, entries, state.values],
+  );
+  const [unpicked, setUnpicked] = useState<Set<string>>(new Set());
+  const openDates = () => {
+    setUnpicked(new Set(dates.filter((d) => !d.suggested).map((d) => d.label)));
+    setDatesOpen((o) => !o);
+  };
+  const addDates = () => {
+    if (!currentDocket) return;
+    const picked = dates.filter((d) => !unpicked.has(d.label));
+    const before = currentDocket.deadlines.length;
+    try {
+      const saved = caseStore().save({ ...currentDocket, deadlines: addDeadlines(currentDocket.deadlines, picked) });
+      const n = saved.deadlines.length - before;
+      setDatesOpen(false);
+      showFlash(
+        n
+          ? "Added " + n + (n === 1 ? " date" : " dates") + " to " + currentDocket.caseNumber + "'s deadlines."
+          : "Those dates are already on " + currentDocket.caseNumber + ".",
+      );
+    } catch (err) {
+      showFlash(err instanceof Error ? err.message : String(err), true);
+    }
+  };
+
   const saveToDocket = () => {
     if (!judge) return;
     const r = formToDocketPatch(form, entries, state.values);
@@ -570,6 +600,59 @@ export default function FormView({
           >
             Save to Case File
           </button>
+          {dates.length > 0 && (
+            <button
+              className="btn"
+              id="dates-open"
+              type="button"
+              aria-expanded={datesOpen}
+              title={"Add this form's dates to " + (currentDocket?.caseNumber || "the case") + "'s deadlines"}
+              onClick={openDates}
+            >
+              Add dates to case
+            </button>
+          )}
+        </div>
+      )}
+
+      {showDocket && datesOpen && currentDocket && dates.length > 0 && (
+        <div className="dates-panel" id="dates-panel">
+          <p className="small">{"Add to " + currentDocket.caseNumber + "'s deadlines (in-game dates):"}</p>
+          <ul>
+            {dates.map((d) => (
+              <li key={d.label}>
+                <label className="field check">
+                  <input
+                    type="checkbox"
+                    checked={!unpicked.has(d.label)}
+                    onChange={(e) =>
+                      setUnpicked((u) => {
+                        const next = new Set(u);
+                        if (e.target.checked) next.delete(d.label);
+                        else next.add(d.label);
+                        return next;
+                      })
+                    }
+                  />
+                  <span>{d.label + " · " + formatDay(d.date)}</span>
+                </label>
+              </li>
+            ))}
+          </ul>
+          <div className="row">
+            <button
+              className="btn primary"
+              type="button"
+              id="dates-add"
+              onClick={addDates}
+              disabled={unpicked.size === dates.length}
+            >
+              {"Add to " + currentDocket.caseNumber}
+            </button>
+            <button className="btn" type="button" onClick={() => setDatesOpen(false)}>
+              Cancel
+            </button>
+          </div>
         </div>
       )}
 
