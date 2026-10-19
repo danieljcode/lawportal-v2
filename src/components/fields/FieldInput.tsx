@@ -43,7 +43,7 @@ export default function FieldInput({
       // Dates computed from this one (e.g. a schedule from the judgement) follow it,
       // using the server-offset `now` so a reflow stays on the active server's year.
       return hasDependents(entries, next.values, f.label) ? applyPrefills(entries, next, now) : next;
-    });
+    }, id);
 
   // Prefilled case numbers end in XXX: select it so typing replaces just that part.
   const selectXXX = () => {
