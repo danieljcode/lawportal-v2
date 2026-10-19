@@ -31,7 +31,12 @@ export default function SyncPanel({ autoEnable = false, onAutoEnableDone }: Sync
   const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoStarted = useRef(false);
 
-  useEffect(() => setError(null), [st]);
+  // A new sync state clears the error (set while rendering, not in an effect).
+  const [errorFor, setErrorFor] = useState(st);
+  if (errorFor !== st) {
+    setErrorFor(st);
+    setError(null);
+  }
 
   useEffect(
     () => () => {
@@ -57,6 +62,8 @@ export default function SyncPanel({ autoEnable = false, onAutoEnableDone }: Sync
     if (!autoEnable || autoStarted.current) return;
     autoStarted.current = true;
     onAutoEnableDone?.();
+    // Starting sync is the effect's job here (the J.A.P.'s "Turn on sync" opened this dialog).
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- turnOn's setBusy marks the request it starts
     if (!sync.code()) void turnOn();
   }, [autoEnable, onAutoEnableDone]);
 

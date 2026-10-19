@@ -2,7 +2,7 @@
 // messages, each with a dark Discord-style preview (or the raw text), its
 // character count and its own Copy button. Mounted only while the tab is shown.
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { copyText } from "@/lib/clipboard";
 import { htmlToDiscordDoc } from "@/lib/discord";
 import { renderDiscordHtml } from "@/lib/discordPreview";
@@ -28,10 +28,9 @@ export default function DiscordPanel({ finalHtml, onStatus }: DiscordPanelProps)
     [finalHtml, tables, limit, markers],
   );
 
+  // A different number of parts starts every part on the preview again (set while rendering, not in an effect).
   const [raw, setRaw] = useState<boolean[]>([]);
-  useEffect(() => {
-    setRaw((r) => (r.length === parts.length ? r : parts.map(() => false)));
-  }, [parts]);
+  if (raw.length !== parts.length) setRaw(parts.map(() => false));
 
   const update = (patch: Partial<DiscordSettings>) => {
     const next = { ...settings, ...patch };
