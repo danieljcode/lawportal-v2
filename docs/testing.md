@@ -67,10 +67,33 @@ using the [reference data](templates-and-forms.md#reference-data) in `.agents/re
 2. `npm ci`, then `npm audit --omit=dev --audit-level=high` (see [Dependencies](dependencies.md)),
    `npm run lint` and `npm run format:check` (see [Development](development.md#code-style-and-editor-set-up)),
    `npm test` (with `LAWAPP_REQUIRE_REFERENCE=1` when the data was checked out) and `npm run build`.
+3. The [end-to-end smoke tests](#end-to-end-smoke-tests-lp-6) against that build. If any fail, their
+   screenshots and traces are uploaded as the `e2e-failures` artefact on the run.
 
 A second workflow, **Conventions** (`.github/workflows/conventions.yml`), runs on pull requests and
 checks every commit message and the PR title against the commit format (LP-84). It's covered by
 `tests/commit-format.test.ts`.
+
+## End-to-end smoke tests (LP-6)
+
+```bash
+npm run build
+npm run test:e2e        # starts the built app on port 3210, runs, and stops it
+```
+
+`e2e/smoke.spec.ts` uses Playwright's test runner (`playwright.config.ts`) to walk the key journeys in
+a real Chromium, at **desktop** (1440×900) and **phone** (Pixel 7) sizes, each from empty storage:
+
+- open a form from the sidebar (behind ☰ on a phone), fill it in, and see the preview follow;
+- **Copy for forum**: the clipboard holds the filing as HTML;
+- **Download .docx**: a real Word file (a zip) downloads;
+- add a character, and it appears in "Filing as";
+- add a case to a judge's docket.
+
+The suite takes a few seconds. It needs Chromium once: `npx playwright install chromium`. The
+server gets a throwaway sync directory (`test-results/sync`). A failing test keeps a screenshot and
+a trace in `test-results/`; open a trace with `npx playwright show-trace <path>/trace.zip`. Locally,
+an app already running on port 3210 is reused.
 
 ## Playwright scripts
 
