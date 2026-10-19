@@ -45,8 +45,9 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
   with Nitro), each with a preview, a character count and its own Copy button.
 - **Characters.** Name, title, contact details, bar number, signature and notes, used to fill forms.
   Export and import them (with dockets and J.A.P.) as `lawapp-characters.json`.
-- **Dockets** for judges and lawyers: a case list per character; load a case into any form with a
-  case number, or save a form's case to the docket.
+- **Dockets** for judges and lawyers: the cases each character works; load a case into any form
+  with a case number, or save a form's case to the docket. Cases belong to the firm, so characters
+  with the same case number share it, and deleting a character keeps its cases.
 - **Judicial Advancement Portfolio (J.A.P.)** for Court Commissioners I and II: task lists, progress,
   and the finished BBCode ready to copy.
 - **Sync** across browsers and devices through this app's own server, with a private sync code.
@@ -56,10 +57,10 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
 
 - Everything is saved in **this browser's local storage**. Nothing leaves the computer unless you
   turn on sync.
-- **Back up everything** (Characters dialog) saves one file with your characters, dockets, J.A.P.,
+- **Back up everything** (Characters dialog) saves one file with your characters, cases, J.A.P.,
   form drafts and settings; **Restore backup** puts it all back after showing what will change. If
   sync is off, the dialog reminds you when there's been no backup for 30 days.
-- **Sync** stores your characters, dockets and J.A.P. on the computer running the app, under a
+- **Sync** stores your characters, cases and J.A.P. on the computer running the app, under a
   private code. Anyone with the code who can reach that computer can read or change them, so keep it
   private. If two devices change the same character, the newer change wins and the other is kept so
   you can restore it. The sync server limits how many codes can be made (5 an hour) and how many

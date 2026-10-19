@@ -126,6 +126,7 @@ export function parseFile(text: string): ParsedFile {
 
 export interface Counts {
   characters: number;
+  /** Cases (LP-4); in a backup from before LP-4, its docket entries. */
   dockets: number;
   portfolios: number;
   drafts: number;
@@ -146,7 +147,10 @@ export function countsOf(data: Record<string, string>): Counts {
   const keys = Object.keys(data);
   return {
     characters: arrayLength(data.lawapp_chars),
-    dockets: keys.filter((k) => k.startsWith("lawapp_dockets_")).reduce((n, k) => n + arrayLength(data[k]), 0),
+    dockets:
+      "lawapp_cases" in data
+        ? arrayLength(data.lawapp_cases)
+        : keys.filter((k) => k.startsWith("lawapp_dockets_")).reduce((n, k) => n + arrayLength(data[k]), 0),
     portfolios: keys.filter((k) => k.startsWith("lawapp_jap_")).length,
     drafts: keys.filter((k) => k.startsWith("lawapp_draft_")).length,
   };
@@ -178,7 +182,7 @@ export function restorePreview(now: Counts, backup: Counts, created: string, syn
     "",
     "This replaces everything saved in this browser:",
     line("Characters", now.characters, backup.characters),
-    line("Docket cases", now.dockets, backup.dockets),
+    line("Cases", now.dockets, backup.dockets),
     line("J.A.P. portfolios", now.portfolios, backup.portfolios),
     line("Form drafts", now.drafts, backup.drafts),
     "• Settings (theme, Discord, What's new): replaced",

@@ -169,6 +169,25 @@ describe("sync API (AC 15)", () => {
     expect((await PUT(put(code, { rev: 0, data: { characters: tooMany.slice(0, 200) } }))).status).toBe(200);
   });
 
+  it("PUT takes the firm's cases next to the characters, up to 2,000 objects (LP-4)", async () => {
+    const code = await newCode();
+    const cases = (n: number) =>
+      Array.from({ length: n }, (_, i) => ({ caseNumber: "90SCCR" + String(i).padStart(5, "0") }));
+    for (const bad of [
+      { characters: [], cases: {} },
+      { characters: [], cases: [1] },
+      { characters: [], cases: cases(2001) },
+    ]) {
+      expect((await PUT(put(code, { rev: 0, data: bad }))).status).toBe(400);
+    }
+    const ok = await PUT(put(code, { rev: 0, data: { characters: [], cases: cases(2) } }));
+    expect(ok.status).toBe(200);
+    const got = (await (await GET(new Request(BASE + "/data", { headers: auth(code) }))).json()) as {
+      data: { cases: unknown[] };
+    };
+    expect(got.data.cases).toHaveLength(2);
+  });
+
   it("body > 1 MiB → 413", async () => {
     const code = await newCode();
     const big = { rev: 0, data: { characters: [{ id: "abcd1234", name: "x".repeat(1_100_000) }] } };

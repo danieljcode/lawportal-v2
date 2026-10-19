@@ -1,99 +1,23 @@
 // Dockets: the cases a judge or lawyer character is handling (INV §e.2).
-// One list per character under lawapp_dockets_<charId>; the key is removed
-// when the list is empty. Behaviour follows the reference js_dockets.js.
-// Saved through the keyed store base (store.ts, LP-99) as schema version 2:
-// {"v": 2, "data": [...]}. Version 1 is the bare list saved before LP-99.
+//
+// Since LP-4, cases belong to the firm (cases.ts) and a character's docket is
+// a view of them: the cases the character leads or is assigned to. This keeps
+// the DocketStore API the Dockets dialog, the docket bar and the J.A.P. use
+// until the Case File program takes over (LP-101, LP-100). Behaviour follows
+// the reference js_dockets.js, with these changes for shared cases:
+//
+// - Saving a case number the firm already has puts the character on that case.
+// - Removing a case from a docket takes the character off it; the case is only
+//   deleted when nobody is left on it.
+// - A deleted character (removeAll) is taken off every case, which stay.
 
-import { DIVISION_COURTS } from "./courts";
-import type { Docket, DocketStatus } from "./types";
-import { defaultKV, isId, ISO_DATE_RE, ISO_TIME_RE, newId, touchCharacter, type KV } from "./storage";
-import { createKeyedStore, type Migration } from "./store";
+import { caseStore, createCaseStore, isMember, members, type CaseStore } from "./cases";
+import { clean, compare, FIELDS } from "./docketFields";
+import { isId, type KV } from "./storage";
+import type { Case, Docket } from "./types";
 
-export const DOCKETS_PREFIX = "lawapp_dockets_";
-/** The saved lists' schema version (LP-99). */
-export const DOCKETS_VERSION = 2;
-
-/** Version 1 was the bare list; version 2 is the same list in the store envelope. */
-export const DOCKET_MIGRATIONS: readonly Migration[] = [{ to: 2, up: (data) => data }];
-
-export const STATUSES: readonly DocketStatus[] = ["Open", "Awaiting arguments", "Awaiting judgement", "Closed"];
-
-export interface DocketField {
-  key: Exclude<keyof Docket, "id" | "updated">;
-  label: string;
-  required?: boolean;
-  type?: "date" | "url";
-  options?: readonly string[];
-  hint?: string;
-  multiline?: boolean;
-}
-
-export const FIELDS: readonly DocketField[] = [
-  { key: "caseNumber", label: "Case number", required: true },
-  { key: "plaintiff", label: "Plaintiff / petitioner" },
-  { key: "defendant", label: "Defendant / respondent" },
-  { key: "court", label: "Court / division" },
-  { key: "filed", label: "Filed on", type: "date" },
-  { key: "status", label: "Status", options: STATUSES },
-  { key: "nextEvent", label: "Next event", hint: "e.g. Openings due, Judgement" },
-  { key: "nextDate", label: "Next date", type: "date" },
-  { key: "link", label: "Forum thread", type: "url" },
-  { key: "notes", label: "Notes", multiline: true },
-];
-
-/** Litigation codes inside a case number (90SCCR00147 → CR). */
-export const DIVISION_CODES: Readonly<Record<string, string>> = {
-  CR: "CRIMINAL DIVISION",
-  CC: "CIVIL DIVISION",
-  TC: "TRAFFIC DIVISION",
-  SM: "SMALL CLAIMS DIVISION",
-};
-
-/**
- * A case's division: from the code in its number, otherwise from the court text
- * saved on the docket, either a FreestyleRP court name ("San Andreas Criminal
- * Court") or one saved before LP-69 ("…- Criminal Division").
- */
-export function divisionFor(d: { caseNumber?: string; court?: string }): string | undefined {
-  const m = /^\d{2}[A-Z]{2}(CR|CC|TC|SM)/i.exec(d.caseNumber || "");
-  if (m) return DIVISION_CODES[m[1].toUpperCase()];
-  const court = (d.court || "").toUpperCase();
-  return Object.values(DIVISION_CODES).find(
-    (name) => court.includes(name) || court === (DIVISION_COURTS[name] || "").toUpperCase(),
-  );
-}
-
-const MAX_TEXT = 4000;
-
-/** Normalise an untrusted docket entry (imports and sync are never trusted). */
-export function clean(input: unknown): Docket {
-  const d = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
-  const out: Record<string, string> = { id: isId(d.id) ? d.id : newId() };
-  for (const f of FIELDS) {
-    const v = d[f.key];
-    if (v === undefined || v === null) continue;
-    const s = String(v).trim();
-    if (s) out[f.key] = s.slice(0, MAX_TEXT);
-  }
-  // Only real web links: an imported file could otherwise plant a javascript: link.
-  if (out.link && !/^https?:\/\//i.test(out.link)) delete out.link;
-  if (!(STATUSES as readonly string[]).includes(out.status)) out.status = STATUSES[0];
-  if (out.nextDate && !ISO_DATE_RE.test(out.nextDate)) delete out.nextDate;
-  if (out.filed && !ISO_DATE_RE.test(out.filed)) delete out.filed;
-  out.updated = typeof d.updated === "string" && ISO_TIME_RE.test(d.updated) ? d.updated : new Date().toISOString();
-  return out as unknown as Docket;
-}
-
-/** Open cases first, then by next date (soonest first, none last), then most recently updated. */
-function compare(a: Docket, b: Docket): number {
-  const ca = a.status === "Closed";
-  const cb = b.status === "Closed";
-  if (ca !== cb) return ca ? 1 : -1;
-  const da = a.nextDate || "9";
-  const db = b.nextDate || "9";
-  if (da !== db) return da < db ? -1 : 1;
-  return a.updated < b.updated ? 1 : -1;
-}
+// Field definitions and helpers that used to live here; imports from "./dockets" keep working.
+export { clean, DIVISION_CODES, divisionFor, DOCKETS_PREFIX, FIELDS, STATUSES, type DocketField } from "./docketFields";
 
 export interface DocketStore {
   list(charId: string): Docket[];
@@ -103,117 +27,131 @@ export interface DocketStore {
   save(charId: string, d: Partial<Docket> | Record<string, unknown>): Docket | null;
   /** Insert or update by case number, keeping fields the patch doesn't mention. */
   upsert(charId: string, patch: Partial<Docket>): Docket | null;
+  /** Take the character off the case (deleting it when nobody is left on it). */
   remove(charId: string, id: string): void;
+  /** Take the character off every case; the cases stay (a deleted character, LP-4). */
   removeAll(charId: string): void;
-  /** Replace a character's whole docket (import and sync). */
+  /** Make a character's docket these cases (a characters import, or a kept-aside sync version). */
   replace(charId: string, items: unknown): void;
-  /** Upgrade every saved docket to the current schema version (LP-99); runs once at start-up. */
-  migrate(): boolean;
   /** Fires after data mutations. */
   subscribe(fn: () => void): () => void;
   version(): number;
 }
 
-/** A saved list: entries without a case number are dropped. */
-function validList(raw: unknown): Docket[] {
-  if (!Array.isArray(raw)) return [];
-  return raw.filter((d): d is Docket => !!d && typeof d === "object" && typeof (d as Docket).caseNumber === "string");
+/** A case as the docket fields only (who works it isn't part of a docket entry). */
+function toDocket(c: Case): Docket {
+  const out: Record<string, unknown> = { id: c.id };
+  for (const f of FIELDS) if (c[f.key] !== undefined) out[f.key] = c[f.key];
+  out.updated = c.updated;
+  return out as unknown as Docket;
 }
 
-export function createDocketStore(kv: KV): DocketStore {
-  const store = createKeyedStore<Docket[]>(kv, {
-    prefix: DOCKETS_PREFIX,
-    isId,
-    version: DOCKETS_VERSION,
-    validate: validList,
-    migrations: DOCKET_MIGRATIONS,
-    isEmpty: (list) => list.length === 0,
-  });
-  const read = store.get;
-  /** Save (or remove, when empty) and tell subscribers. */
-  const write = store.set;
+const upper = (n: string) => n.trim().toUpperCase();
 
-  function findByCase(charId: string, caseNumber: string): Docket | null {
-    if (!isId(charId)) return null;
-    const wanted = String(caseNumber || "")
-      .trim()
-      .toUpperCase();
-    return read(charId).find((d) => d.caseNumber.toUpperCase() === wanted) || null;
+/** A docket view over a case store, or over a fresh one on `kv` (tests). */
+export function createDocketStore(source: CaseStore | KV): DocketStore {
+  const cases: CaseStore = "byNumber" in source ? source : createCaseStore(source);
+  function own(charId: string): Case[] {
+    return isId(charId) ? cases.list().filter((c) => isMember(c, charId)) : [];
   }
 
-  function saveQuiet(charId: string, input: unknown): Docket {
+  function findOwn(charId: string, caseNumber: string): Case | null {
+    const wanted = upper(String(caseNumber || ""));
+    return own(charId).find((c) => upper(c.caseNumber) === wanted) || null;
+  }
+
+  /** Save a docket entry as a case the character is on. */
+  function saveFor(charId: string, input: unknown): Docket {
     const data = clean(input);
-    data.updated = new Date().toISOString();
     if (!data.caseNumber) throw new Error("A docket needs a case number.");
-    const all = read(charId);
-    const upper = data.caseNumber.toUpperCase();
-    if (all.some((x) => x.id !== data.id && x.caseNumber.toUpperCase() === upper)) {
+    const mine = own(charId);
+    if (mine.some((x) => x.id !== data.id && upper(x.caseNumber) === upper(data.caseNumber))) {
       throw new Error(data.caseNumber + " is already on this docket.");
     }
-    const i = all.findIndex((x) => x.id === data.id);
-    if (i >= 0) all[i] = data;
-    else all.push(data);
-    write(charId, all);
-    return data;
+    const same = mine.find((x) => x.id === data.id) || cases.byNumber(data.caseNumber);
+    let saved: Case;
+    if (same) {
+      // The character's own case, or the firm's case with this number: they join it.
+      const joining = !isMember(same, charId);
+      saved = cases.save({
+        ...same,
+        ...data,
+        id: same.id,
+        lead: same.lead ?? (joining ? charId : null),
+        assigned: joining && same.lead ? [...same.assigned, charId] : same.assigned,
+      });
+    } else {
+      saved = cases.save({ ...data, lead: charId, assigned: [] });
+    }
+    return toDocket(saved);
+  }
+
+  function leave(charId: string, c: Case): void {
+    const lead = c.lead === charId ? null : c.lead;
+    const assigned = c.assigned.filter((x) => x !== charId);
+    if (!lead && !assigned.length) cases.remove(c.id);
+    else cases.save({ ...c, lead, assigned });
   }
 
   return {
-    list(charId) {
-      return isId(charId) ? read(charId).sort(compare) : [];
-    },
+    list: (charId) => own(charId).map(toDocket).sort(compare),
     get(charId, id) {
-      if (!isId(charId)) return null;
-      return read(charId).find((d) => d.id === id) || null;
+      const c = own(charId).find((x) => x.id === id);
+      return c ? toDocket(c) : null;
     },
-    findByCase,
+    findByCase(charId, caseNumber) {
+      const c = findOwn(charId, caseNumber);
+      return c ? toDocket(c) : null;
+    },
     save(charId, d) {
-      if (!isId(charId)) return null;
-      const saved = saveQuiet(charId, d);
-      touchCharacter(charId);
-      return saved;
+      return isId(charId) ? saveFor(charId, d) : null;
     },
     upsert(charId, patch) {
       if (!isId(charId)) return null;
-      const existing = findByCase(charId, patch.caseNumber || "");
-      const merged: Record<string, unknown> = { ...clean(existing || {}) };
+      const existing = findOwn(charId, patch.caseNumber || "");
+      const merged: Record<string, unknown> = existing ? { ...toDocket(existing) } : {};
       for (const k of Object.keys(patch)) {
         if (k !== "id" && k !== "__proto__") merged[k] = (patch as Record<string, unknown>)[k];
       }
-      if (!existing) delete merged.id;
-      const saved = saveQuiet(charId, merged);
-      touchCharacter(charId);
-      return saved;
+      return saveFor(charId, merged);
     },
     remove(charId, id) {
-      if (!isId(charId)) return;
-      write(
-        charId,
-        read(charId).filter((d) => d.id !== id),
-      );
-      touchCharacter(charId);
+      const c = own(charId).find((x) => x.id === id);
+      if (c) leave(charId, c);
     },
     removeAll(charId) {
-      if (!isId(charId)) return;
-      write(charId, []);
+      if (isId(charId)) cases.unassign(charId);
     },
     replace(charId, items) {
       if (!isId(charId)) return;
-      const list = (Array.isArray(items) ? items : [])
-        .filter((d) => d && typeof d === "object" && (d as Record<string, unknown>).caseNumber)
-        .map(clean)
-        .filter((d) => d.caseNumber);
-      write(charId, list);
+      const keep = new Set<string>();
+      for (const item of Array.isArray(items) ? items : []) {
+        if (!item || typeof item !== "object" || !(item as Docket).caseNumber) continue;
+        const existing = findOwn(charId, String((item as Docket).caseNumber));
+        try {
+          const saved = saveFor(charId, existing ? { ...item, id: existing.id } : item);
+          keep.add(saved.id);
+        } catch (err) {
+          console.warn("[dockets] skipped a case", err);
+        }
+      }
+      for (const c of own(charId)) if (!keep.has(c.id)) leave(charId, c);
     },
-    migrate: store.migrate,
-    subscribe: store.subscribe,
-    version: store.version,
+    subscribe: cases.subscribe,
+    version: cases.version,
   };
 }
 
 let instance: DocketStore | null = null;
 
-/** The app's docket store (created on first use; client only). */
+/** The app's docket view over the firm's cases (created on first use; client only). */
 export function docketStore(): DocketStore {
-  if (!instance) instance = createDocketStore(defaultKV());
+  if (!instance) instance = createDocketStore(caseStore());
   return instance;
+}
+
+/** Everyone on a docket entry's case: for "shared with" notes until LP-101. */
+export function caseMembers(id: string): string[] {
+  const c = caseStore().get(id);
+  return c ? members(c) : [];
 }

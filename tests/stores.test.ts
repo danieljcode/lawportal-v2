@@ -351,9 +351,10 @@ describe("characters", () => {
     dockets.replace(character.id, source.dockets);
     dockets.replace(source.id as string, source.dockets); // the reference's mistake is a no-op here
     expect(dockets.list(character.id)).toHaveLength(1);
+    // Since LP-4 the docket is cases in lawapp_cases, with the new id on them.
     const keys = (kv as ReturnType<typeof spyKV>).keys();
     expect(keys).not.toContain("lawapp_dockets_../x");
-    expect(keys).toContain("lawapp_dockets_" + character.id);
+    expect(JSON.parse(kv.get("lawapp_cases")!).data).toMatchObject([{ caseNumber: "C1", lead: character.id }]);
   });
 
   it("migrates the legacy character list", () => {

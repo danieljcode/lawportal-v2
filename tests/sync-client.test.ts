@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 // Sync client (AC 26, plus the push/pull/apply behaviour of INV §e.4) with a stubbed fetch.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { caseStore } from "@/lib/cases";
 import { characterStore } from "@/lib/characters";
 import { docketStore } from "@/lib/dockets";
 import { portfolioStore } from "@/lib/portfolio";
@@ -83,7 +84,7 @@ describe("sync.init (AC 26)", () => {
     const winAdd = vi.spyOn(window, "addEventListener");
     const subs = [
       vi.spyOn(characterStore(), "subscribe"),
-      vi.spyOn(docketStore(), "subscribe"),
+      vi.spyOn(caseStore(), "subscribe"),
       vi.spyOn(portfolioStore(), "subscribe"),
     ];
     const active = vi.spyOn(characterStore(), "subscribeActive");
@@ -173,7 +174,9 @@ describe("change tracking", () => {
     expect(body.rev).toBe(0);
     expect(body.data.characters).toHaveLength(1);
     expect(body.data.characters[0]).toMatchObject({ id: c.id, name: "Jane Doe" });
-    expect((body.data.characters[0].dockets as Array<{ caseNumber: string }>)[0].caseNumber).toBe("90SCCR00001");
+    // Since LP-4 cases sync on their own, not inside their character.
+    expect(body.data.characters[0].dockets).toBeUndefined();
+    expect(body.data.cases).toMatchObject([{ caseNumber: "90SCCR00001", lead: c.id }]);
 
     await vi.advanceTimersByTimeAsync(0);
     expect(localStorage.getItem(sync.DIRTY_KEY)).toBeNull();
@@ -318,11 +321,11 @@ describe("synced data from before LP-70 (LP-71)", () => {
 });
 
 describe("conflicts keep unsent edits (LP-64)", () => {
-  it("a docket or J.A.P. change stamps its character", () => {
+  it("a J.A.P. change stamps its character; a docket change stamps its case (LP-4)", () => {
     characterStore().save({ id: "char0001", name: "Jane Doe", updatedAt: T0 }, { keepStamp: true });
     docketStore().save("char0001", { caseNumber: "26CC00001" });
-    const afterDocket = characterStore().get("char0001")?.updatedAt;
-    expect(afterDocket! > T0).toBe(true);
+    expect(characterStore().get("char0001")?.updatedAt).toBe(T0);
+    expect(caseStore().byNumber("26CC00001")!.updated > T0).toBe(true);
     characterStore().save({ id: "char0001", name: "Jane Doe", updatedAt: T0 }, { keepStamp: true });
     portfolioStore().save("char0001", { level: "I" });
     expect((characterStore().get("char0001")?.updatedAt ?? "") > T0).toBe(true);
@@ -364,8 +367,8 @@ describe("conflicts keep unsent edits (LP-64)", () => {
     ).toEqual(["26CC00002"]);
     expect(calls.map((c) => c.method)).toEqual(["GET", "PUT"]);
     expect(calls[1].body).toMatchObject({ rev: 2 });
-    const sent = (calls[1].body as { data: sync.SyncDoc }).data.characters;
-    expect(sent.find((c) => c.id === "char0002")?.dockets).toMatchObject([{ caseNumber: "26CC00002" }]);
+    const sent = (calls[1].body as { data: sync.SyncDoc }).data;
+    expect(sent.cases).toMatchObject([{ caseNumber: "26CC00002", lead: "char0002" }]);
     expect(localStorage.getItem(sync.DIRTY_KEY)).toBeNull();
     expect(sync.getState()).toMatchObject({ status: "synced", lost: 0 });
     expect(localStorage.getItem(sync.LOST_KEY)).toBeNull();
