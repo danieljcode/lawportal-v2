@@ -28,6 +28,12 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      # Fails on high or critical advisories in what ships (devDependencies are left
+      # to Dependabot). See docs/dependencies.md.
+      - name: Security audit
+        run: npm audit --omit=dev --audit-level=high
+
       - run: npm test
         env:
           # With the data checked out, a missing file fails the run instead of skipping.
