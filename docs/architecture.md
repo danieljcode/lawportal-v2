@@ -111,8 +111,25 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
   `duplicateCharacter`, and the characters export and import. The one link the other way is
   `touchCharacter` in `storage.ts`: a docket or J.A.P. change bumps its character's `updatedAt` for
   the sync merge, without the stores importing each other.
-- **Startup migrations** run once per load in `App.tsx`: the old `lawapp.characters.v1` list, and
-  the pre-FreestyleRP `server` field and `lawapp_server` key (LP-71).
+- **The shared store base** (`src/lib/store.ts`, LP-2). `createStore<T>(kv, options)` handles one
+  saved value: load, validate, save, the change channel and its version counter. The options are
+  `key`, `version`, `validate`, `migrations` and `isEmpty` (a value saved as nothing).
+  Characters are built on it; dockets and the J.A.P. move onto it in LP-99.
+  - **Every value carries its schema version**, saved as `{"v": 2, "data": …}`. A bare value (saved
+    before its store moved onto the base) reads as version 1; nothing saved is version 0.
+  - **Migrations** are a list of steps, each `{ to, up(data, kv), after?(kv) }`. On load, the
+    steps from the saved version up run in order. **Reads upgrade in memory and never write**, so
+    old data shows correctly even before it's saved again.
+  - **`migrate()`** saves the upgraded value and runs each step's `after` clean-up (removing an old
+    key, say). It's a no-op once done. Data from a newer version is read as it is and never
+    rewritten.
+  - **Characters** are at version 2: step 1 brings in the old `lawapp.characters.v1` list when
+    nothing's saved (this was `migrateLegacy`), and step 2 wraps the bare array.
+  - **To change a store's shape**, bump its `version` and add a step whose `up` turns the old shape
+    into the new one, with a test from the old version.
+- **Startup migrations** (`src/lib/migrations.ts`) run once per load, from `AppLoader` after App's
+  code has loaded and before it first renders, never during render: each store's `migrate()`, then
+  dropping the pre-FreestyleRP `server` field and `lawapp_server` key (LP-71).
 
 ## Server
 
