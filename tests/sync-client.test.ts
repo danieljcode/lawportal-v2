@@ -312,7 +312,7 @@ describe("conflicts keep unsent edits (LP-64)", () => {
     expect(afterDocket! > T0).toBe(true);
     characterStore().save({ id: "char0001", name: "Jane Doe", updatedAt: T0 }, { keepStamp: true });
     portfolioStore().save("char0001", { level: "I" });
-    expect(characterStore().get("char0001")?.updatedAt! > T0).toBe(true);
+    expect((characterStore().get("char0001")?.updatedAt ?? "") > T0).toBe(true);
   });
 
   it("pull with unsent edits: a docket edit here survives another device's change to a different character", async () => {
@@ -458,7 +458,7 @@ describe("conflicts keep unsent edits (LP-64)", () => {
     expect(sync.getState().lost).toBe(1);
     expect(sync.restoreLost()).toBe(1);
     expect(names()).toEqual(["Mine"]);
-    expect(characterStore().get("char0001")?.updatedAt! > T1).toBe(true);
+    expect((characterStore().get("char0001")?.updatedAt ?? "") > T1).toBe(true);
     expect(docketStore().list("char0001").map((d) => d.caseNumber)).toEqual(["26CC00009"]);
     expect(sync.getState().lost).toBe(0);
     expect(localStorage.getItem(sync.LOST_KEY)).toBeNull();

@@ -137,6 +137,7 @@ export default function FormView({
   // The in-game "now" (FreestyleRP, 36 years back) fed to every date producer: Today, Auto,
   // prefills and the case-number year. Fixed while the form is open (new Date() on every
   // render would thrash the ctx memo); opening a form takes the current date again.
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- form.id is the signal: a new form takes today's date
   const now = useMemo(() => gameDate(new Date()), [form.id]);
 
   // `now` also feeds the case-number placeholder/fallback pattern.
@@ -305,6 +306,7 @@ export default function FormView({
     handledRequest.current = docketRequest.seq;
     loadDocket(docketRequest.docketId);
     // loadDocket reads this render's state; only a new request should trigger it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- deliberately keyed on the request alone
   }, [docketRequest]);
 
   return (
