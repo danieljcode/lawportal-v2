@@ -46,6 +46,23 @@ stops a typed `<script>`, or an `onerror=` on an image, getting into the preview
 - **Don't loosen escaping** to make a form work. If a field needs structure, express it in the
   template (a `list`, `paras` or wrap tag), not in the value.
 
+### SafeHtml: the compiler checks it too (LP-5)
+
+`src/lib/safeHtml.ts` defines `SafeHtml`: a string with a type-only brand meaning "every user value
+in this was escaped". Only the renderers make it: `escapeHtml` and `render()` in `template.ts`, and
+`renderDiscordHtml` in `discordPreview.ts` (each calls `trustAsSafeHtml` after escaping). The places
+HTML goes require it:
+
+- the forum preview (`OutputPaneProps.previewHtml`) and a form's output (`FormOutput`);
+- the Discord preview (`DiscordPanelProps.finalHtml`);
+- the clipboard (`copyRich`);
+- the `.docx` request (`docxRequestBody`).
+
+So passing a plain string to any of them is a type error, and `npm run build` fails. Anything new
+that shows, copies or exports HTML should take `SafeHtml` too, and get its HTML from a renderer.
+`tests/safeHtml.test.ts` fails if any other file calls `trustAsSafeHtml` or casts to `SafeHtml`, or
+if a sink is loosened back to `string`.
+
 ## The template-safety check
 
 `scripts/template-safety.mjs` checks the template HTML itself, fallbacks included. A template fails

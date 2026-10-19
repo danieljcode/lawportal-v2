@@ -10,6 +10,7 @@ import { isUnread, markSeen } from "@/lib/changelog";
 import { characterStore, hasDocket } from "@/lib/characters";
 import { LAST_FORM_KEY } from "@/lib/formState";
 import { isCommissioner } from "@/lib/portfolio";
+import { EMPTY_HTML } from "@/lib/safeHtml";
 import { defaultKV } from "@/lib/storage";
 import * as sync from "@/lib/sync";
 import ChangelogDialog from "./ChangelogDialog";
@@ -33,7 +34,7 @@ export type DialogName = "characters" | "dockets" | "changelog" | null;
 
 const APP_TITLE = "Court Filing Generator";
 const JAP_TITLE = "Judicial Advancement Portfolio";
-const EMPTY_OUTPUT: FormOutput = { finalHtml: "", previewHtml: "" };
+const EMPTY_OUTPUT: FormOutput = { finalHtml: EMPTY_HTML, previewHtml: EMPTY_HTML };
 
 function parseRoute(): Route {
   let id = "";

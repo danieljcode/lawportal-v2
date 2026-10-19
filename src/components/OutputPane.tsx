@@ -4,13 +4,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { fromHtml } from "@/lib/bbcode";
 import { copyRich, copyText } from "@/lib/clipboard";
+import { docxRequestBody } from "@/lib/docx/request";
+import type { SafeHtml } from "@/lib/safeHtml";
 import type { FormDef } from "@/lib/types";
 import DiscordPanel from "./DiscordPanel";
 
 export interface OutputPaneProps {
   form: Pick<FormDef, "id" | "title">;
-  finalHtml: string;
-  previewHtml: string;
+  /** Only rendered HTML can be shown, copied or sent for the .docx (LP-5). */
+  finalHtml: SafeHtml;
+  previewHtml: SafeHtml;
   highlight: boolean;
   onHighlight(on: boolean): void;
 }
@@ -61,7 +64,7 @@ export default function OutputPane({ form, finalHtml, previewHtml, highlight, on
         res = await fetch("/api/docx", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ html: finalHtml, title: form.title, id: form.id }),
+          body: docxRequestBody(finalHtml, form.title, form.id),
         });
       } catch {
         flash("Couldn't build the .docx (server unreachable).", true);

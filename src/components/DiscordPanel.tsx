@@ -8,10 +8,11 @@ import { htmlToDiscordDoc } from "@/lib/discord";
 import { renderDiscordHtml } from "@/lib/discordPreview";
 import { readDiscordSettings, writeDiscordSettings, type DiscordSettings } from "@/lib/discordSettings";
 import { splitDiscord } from "@/lib/discordSplit";
+import type { SafeHtml } from "@/lib/safeHtml";
 import { SAVE_FAILED } from "@/lib/storage";
 
 export interface DiscordPanelProps {
-  finalHtml: string;
+  finalHtml: SafeHtml;
   onStatus(text: string, bad: boolean): void;
 }
 

@@ -4,6 +4,8 @@
 // one go. Over plain http on the LAN `navigator.clipboard` doesn't exist, so
 // both helpers fall back to a selection plus execCommand("copy").
 
+import type { SafeHtml } from "./safeHtml";
+
 function execCopy(): boolean {
   try {
     return document.execCommand("copy");
@@ -49,8 +51,11 @@ function copyTextViaSelection(text: string): boolean {
   }
 }
 
-/** Copy `html` as text/html with `text` as text/plain. Resolves false when every method failed. */
-export async function copyRich(html: string, text: string): Promise<boolean> {
+/**
+ * Copy `html` as text/html with `text` as text/plain. Resolves false when every
+ * method failed. Only rendered HTML can be copied (LP-5).
+ */
+export async function copyRich(html: SafeHtml, text: string): Promise<boolean> {
   const clip = typeof navigator !== "undefined" ? navigator.clipboard : undefined;
   if (clip && typeof clip.write === "function" && typeof ClipboardItem !== "undefined") {
     try {
