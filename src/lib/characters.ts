@@ -4,6 +4,10 @@
 // lawapp_active_char. Behaviour follows the reference js_characters.js, without
 // its cookie limits: there is a hard cap of 200 characters instead. This store
 // only knows characters: work spanning dockets and J.A.P. is in services/characters.ts.
+//
+// The list is saved through the shared store base (store.ts, LP-2) as schema
+// version 2: {"v": 2, "data": [...]}. Version 1 is the bare array saved before
+// LP-2, and the step to 1 brings in the old lawapp.characters.v1 list.
 
 import type { Character } from "./types";
 import {
@@ -13,12 +17,12 @@ import {
   ISO_TIME_RE,
   newId,
   onCharacterTouched,
-  readJson,
   setAside,
   writeJson,
   writeString,
   type KV,
 } from "./storage";
+import { createStore, type Migration } from "./store";
 
 export const CHARS_KEY = "lawapp_chars";
 export const ACTIVE_KEY = "lawapp_active_char";
@@ -26,6 +30,8 @@ export const LEGACY_KEY = "lawapp.characters.v1";
 /** The default server saved before LP-70 (GTAW / FreestyleRP); deleted by migrateServerField. */
 export const LEGACY_SERVER_KEY = "lawapp_server";
 export const MAX_CHARACTERS = 200;
+/** The saved list's schema version (LP-2). */
+export const CHARS_VERSION = 2;
 const MAX_TEXT = 4000;
 
 export const TOO_MANY = "You can keep up to 200 characters.";
@@ -143,7 +149,13 @@ export interface CharacterStore {
   setActive(id: string | null): void;
   exportJson(): ExportDoc;
   importJson(text: string): ImportResult;
-  /** Move characters from the old `lawapp.characters.v1` list; returns the number migrated. */
+  /**
+   * Upgrade the saved list to the current schema version (LP-2): an old bare
+   * list is wrapped, and with nothing saved the old `lawapp.characters.v1` list
+   * is brought in. Runs once at start-up; returns whether anything changed.
+   */
+  migrate(): boolean;
+  /** migrate(), for nothing saved yet: the number of characters brought in from the old list. */
   migrateLegacy(): number;
   /**
    * LP-71: drop the `server` field saved on characters before LP-70 and the saved
@@ -151,7 +163,7 @@ export interface CharacterStore {
    * see an edit). Returns how many characters had the field.
    */
   migrateServerField(): number;
-  /** Fires after data mutations (save, remove, duplicate, move, importJson, migrateLegacy). */
+  /** Fires after data mutations (save, remove, duplicate, move, importJson, migrate). */
   subscribe(fn: () => void): () => void;
   /** Fires when the active character changes (UI only; not synced). */
   subscribeActive(fn: () => void): () => void;
@@ -159,31 +171,102 @@ export interface CharacterStore {
   activeVersion(): number;
 }
 
+/** The saved list, cleaned: entries without a valid id or a name, and repeated ids, are dropped. */
+function validList(raw: unknown): Character[] {
+  if (!Array.isArray(raw)) return [];
+  const seen = new Set<string>();
+  const out: Character[] = [];
+  for (const item of raw) {
+    if (!item || typeof item !== "object") continue;
+    const id = (item as Record<string, unknown>).id;
+    if (!isId(id) || seen.has(id)) continue;
+    const c = clean(item);
+    if (!c.name) continue;
+    seen.add(id);
+    out.push(c);
+  }
+  return out;
+}
+
+function freshId(taken: Set<string>): string {
+  let id = newId();
+  while (taken.has(id)) id = newId();
+  return id;
+}
+
+/** The old lawapp.characters.v1 list (fullName, barNumber, firm…) as characters; undefined if absent or unreadable. */
+function legacyList(kv: KV): Character[] | undefined {
+  const raw = kv.get(LEGACY_KEY);
+  if (raw === null) return undefined;
+  let old: unknown;
+  try {
+    old = JSON.parse(raw);
+  } catch {
+    return undefined;
+  }
+  const arr = Array.isArray(old)
+    ? old
+    : old && typeof old === "object"
+      ? (old as { characters?: unknown }).characters
+      : [];
+  const list: Character[] = [];
+  const ids = new Set<string>();
+  for (const item of Array.isArray(arr) ? arr : []) {
+    if (!item || typeof item !== "object") continue;
+    const o = item as Record<string, unknown>;
+    const firm = typeof o.firm === "string" ? o.firm.trim() : "";
+    const notes = typeof o.notes === "string" ? o.notes.trim() : "";
+    const id = isId(o.id) && !ids.has(o.id) ? o.id : freshId(ids);
+    const mapped = clean({
+      id,
+      name: o.fullName ?? o.name,
+      title: o.title,
+      bar: o.barNumber ?? o.bar,
+      address: o.address,
+      phone: o.phone,
+      email: o.email,
+      notes: firm ? "Firm: " + firm + (notes ? "\n" + notes : "") : notes,
+    });
+    if (!mapped.name || list.length >= MAX_CHARACTERS) continue;
+    ids.add(mapped.id);
+    list.push(mapped);
+  }
+  return list;
+}
+
+/** The characters list's upgrade steps (LP-2). */
+export const CHARACTER_MIGRATIONS: readonly Migration[] = [
+  {
+    // Nothing saved yet: bring in the old lawapp.characters.v1 list, if there is one.
+    to: 1,
+    up: (data, kv) => (data !== undefined ? data : legacyList(kv)),
+    after(kv) {
+      const raw = kv.get(LEGACY_KEY);
+      if (raw === null) return;
+      try {
+        JSON.parse(raw);
+        kv.remove(LEGACY_KEY);
+      } catch {
+        console.warn("[characters] setting aside unreadable " + LEGACY_KEY);
+        if (setAside(kv, LEGACY_KEY, raw)) kv.remove(LEGACY_KEY);
+      }
+    },
+  },
+  // Version 1 was the bare array; version 2 is the same list in the store envelope.
+  { to: 2, up: (data) => data },
+];
+
 export function createCharacterStore(kv: KV): CharacterStore {
-  const changes = createChannel();
+  const store = createStore<Character[]>(kv, {
+    key: CHARS_KEY,
+    version: CHARS_VERSION,
+    validate: validList,
+    migrations: CHARACTER_MIGRATIONS,
+    isEmpty: (list) => list.length === 0,
+  });
   const activeChanges = createChannel();
-
-  function read(): Character[] {
-    const raw = readJson<unknown>(kv, CHARS_KEY);
-    if (!Array.isArray(raw)) return [];
-    const seen = new Set<string>();
-    const out: Character[] = [];
-    for (const item of raw) {
-      if (!item || typeof item !== "object") continue;
-      const id = (item as Record<string, unknown>).id;
-      if (!isId(id) || seen.has(id)) continue;
-      const c = clean(item);
-      if (!c.name) continue;
-      seen.add(id);
-      out.push(c);
-    }
-    return out;
-  }
-
-  function write(list: Character[]): void {
-    if (list.length) writeJson(kv, CHARS_KEY, list);
-    else kv.remove(CHARS_KEY);
-  }
+  const read = store.get;
+  const write = store.set;
 
   /** Insert or replace by id inside `list` (no write). */
   function put(list: Character[], input: unknown, stamp = true): Character {
@@ -197,12 +280,6 @@ export function createCharacterStore(kv: KV): CharacterStore {
       list.push(data);
     }
     return data;
-  }
-
-  function freshId(taken: Set<string>): string {
-    let id = newId();
-    while (taken.has(id)) id = newId();
-    return id;
   }
 
   function activeId(): string | null {
@@ -227,7 +304,6 @@ export function createCharacterStore(kv: KV): CharacterStore {
       const list = read();
       const saved = put(list, c, !opts?.keepStamp);
       write(list);
-      changes.emit();
       return saved;
     },
     touch(id) {
@@ -236,14 +312,12 @@ export function createCharacterStore(kv: KV): CharacterStore {
       if (!c) return;
       c.updatedAt = new Date().toISOString();
       write(list);
-      changes.emit();
     },
     remove(id) {
       const list = read();
       write(list.filter((c) => c.id !== id));
       const wasActive = activeId() === id;
       if (wasActive) setActiveQuiet(null);
-      changes.emit();
       if (wasActive) activeChanges.emit();
     },
     duplicate(id) {
@@ -256,7 +330,6 @@ export function createCharacterStore(kv: KV): CharacterStore {
         name: c.name + " (copy)",
       });
       write(list);
-      changes.emit();
       return copy;
     },
     move(id, delta) {
@@ -266,7 +339,6 @@ export function createCharacterStore(kv: KV): CharacterStore {
       if (i < 0 || j < 0 || j >= list.length) return;
       list.splice(j, 0, list.splice(i, 1)[0]);
       write(list);
-      changes.emit();
     },
     activeId,
     active() {
@@ -312,59 +384,18 @@ export function createCharacterStore(kv: KV): CharacterStore {
       if (ids.size > MAX_CHARACTERS) throw new Error(TOO_MANY);
 
       const saved = incoming.map(({ source, id }) => ({ source, character: put(list, { ...source, id }) }));
-      if (saved.length) {
-        write(list);
-        changes.emit();
-      }
+      if (saved.length) write(list);
       return { count: saved.length, saved };
     },
+    migrate: store.migrate,
     migrateLegacy() {
-      if (kv.get(CHARS_KEY) !== null) return 0;
-      const raw = kv.get(LEGACY_KEY);
-      if (raw === null) return 0;
-      let old: unknown;
-      try {
-        old = JSON.parse(raw);
-      } catch {
-        console.warn("[characters] setting aside unreadable " + LEGACY_KEY);
-        if (setAside(kv, LEGACY_KEY, raw)) kv.remove(LEGACY_KEY);
-        return 0;
-      }
-      const arr = Array.isArray(old)
-        ? old
-        : old && typeof old === "object"
-          ? (old as { characters?: unknown }).characters
-          : [];
-      const list: Character[] = [];
-      const ids = new Set<string>();
-      for (const item of Array.isArray(arr) ? arr : []) {
-        if (!item || typeof item !== "object") continue;
-        const o = item as Record<string, unknown>;
-        const firm = typeof o.firm === "string" ? o.firm.trim() : "";
-        const notes = typeof o.notes === "string" ? o.notes.trim() : "";
-        const id = isId(o.id) && !ids.has(o.id) ? o.id : freshId(ids);
-        const mapped = clean({
-          id,
-          name: o.fullName ?? o.name,
-          title: o.title,
-          bar: o.barNumber ?? o.bar,
-          address: o.address,
-          phone: o.phone,
-          email: o.email,
-          notes: firm ? "Firm: " + firm + (notes ? "\n" + notes : "") : notes,
-        });
-        if (!mapped.name || list.length >= MAX_CHARACTERS) continue;
-        ids.add(mapped.id);
-        list.push(mapped);
-      }
-      write(list);
-      kv.remove(LEGACY_KEY);
-      if (list.length) changes.emit();
-      return list.length;
+      if (store.stored().version !== 0) return 0;
+      store.migrate();
+      return read().length;
     },
     migrateServerField() {
       kv.remove(LEGACY_SERVER_KEY);
-      const raw = readJson<unknown>(kv, CHARS_KEY);
+      const { version, data: raw } = store.stored();
       if (!Array.isArray(raw)) return 0;
       let count = 0;
       const next = raw.map((item) => {
@@ -373,12 +404,13 @@ export function createCharacterStore(kv: KV): CharacterStore {
         const { server: _dropped, ...rest } = item as Record<string, unknown>;
         return rest;
       });
-      if (count) writeJson(kv, CHARS_KEY, next);
+      // Saved back in the format it was found in: migrate() wraps a bare list.
+      if (count) writeJson(kv, CHARS_KEY, version >= 2 ? { v: version, data: next } : next);
       return count;
     },
-    subscribe: changes.subscribe,
+    subscribe: store.subscribe,
     subscribeActive: activeChanges.subscribe,
-    version: changes.version,
+    version: store.version,
     activeVersion: activeChanges.version,
   };
 }

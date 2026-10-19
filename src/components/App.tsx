@@ -32,23 +32,7 @@ export type { Route } from "./useRoute";
 
 const EMPTY_OUTPUT: FormOutput = { finalHtml: EMPTY_HTML, previewHtml: EMPTY_HTML, missing: [], jumpTo: () => {} };
 
-/** One-time data migrations. Each is a no-op once done, so running on every mount is safe. */
-function migrate(): void {
-  characterStore().migrateLegacy();
-  try {
-    characterStore().migrateServerField();
-  } catch (err) {
-    // storage refused the write: the field is ignored anyway, so try again next load
-    console.warn("[characters] couldn't drop the old server field", err);
-  }
-}
-
 export default function App() {
-  // Before anything reads the stores, as when it ran in the route's initialiser.
-  useState(() => {
-    migrate();
-    return true;
-  });
   const { route, form, goHome } = useRoute();
   const {
     dialog,
