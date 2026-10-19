@@ -111,10 +111,15 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
   `duplicateCharacter`, and the characters export and import. The one link the other way is
   `touchCharacter` in `storage.ts`: a docket or J.A.P. change bumps its character's `updatedAt` for
   the sync merge, without the stores importing each other.
-- **The shared store base** (`src/lib/store.ts`, LP-2). `createStore<T>(kv, options)` handles one
-  saved value: load, validate, save, the change channel and its version counter. The options are
-  `key`, `version`, `validate`, `migrations` and `isEmpty` (a value saved as nothing).
-  Characters are built on it; dockets and the J.A.P. move onto it in LP-99.
+- **The shared store base** (`src/lib/store.ts`, LP-2 and LP-99). `createStore<T>(kv, options)`
+  handles one saved value: load, validate, save, the change channel and its version counter. The
+  options are `key`, `version`, `validate`, `migrations` and `isEmpty` (a value saved as nothing).
+  `createKeyedStore<T>` is the same for one value per id under a key prefix (with `prefix` and
+  `isId` instead of `key`): each id is read, saved and upgraded on its own, with one change channel
+  for the lot. All three data stores are built on them: characters on `createStore`, dockets
+  (`lawapp_dockets_<id>`) and the J.A.P. (`lawapp_jap_<id>`) on `createKeyedStore`, so none of
+  them has its own load, save or change-channel code. (Characters keep a second channel for the
+  active character, which isn't saved data.)
   - **Every value carries its schema version**, saved as `{"v": 2, "data": …}`. A bare value (saved
     before its store moved onto the base) reads as version 1; nothing saved is version 0.
   - **Migrations** are a list of steps, each `{ to, up(data, kv), after?(kv) }`. On load, the
@@ -125,6 +130,8 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
     rewritten.
   - **Characters** are at version 2: step 1 brings in the old `lawapp.characters.v1` list when
     nothing's saved (this was `migrateLegacy`), and step 2 wraps the bare array.
+  - **Dockets and the J.A.P.** are at version 2 (LP-99): their only step wraps the bare list or
+    portfolio. Dockets saved before LP-69 keep their GTAW court names and GJ case numbers as filed.
   - **To change a store's shape**, bump its `version` and add a step whose `up` turns the old shape
     into the new one, with a test from the old version.
 - **Startup migrations** (`src/lib/migrations.ts`) run once per load, from `AppLoader` after App's

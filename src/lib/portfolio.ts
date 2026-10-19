@@ -9,19 +9,15 @@
 
 import { DEFAULT_COURTHOUSE } from "./courts";
 import type { Character, Portfolio, PortfolioEntry, PortfolioLevel } from "./types";
-import {
-  createChannel,
-  defaultKV,
-  isId,
-  ISO_DATE_RE,
-  ISO_TIME_RE,
-  readJson,
-  touchCharacter,
-  writeJson,
-  type KV,
-} from "./storage";
+import { defaultKV, isId, ISO_DATE_RE, ISO_TIME_RE, touchCharacter, type KV } from "./storage";
+import { createKeyedStore, type Migration } from "./store";
 
 export const JAP_PREFIX = "lawapp_jap_";
+/** The saved portfolios' schema version (LP-99). */
+export const JAP_VERSION = 2;
+
+/** Version 1 was the bare portfolio; version 2 is the same object in the store envelope. */
+export const JAP_MIGRATIONS: readonly Migration[] = [{ to: 2, up: (data) => data }];
 export const MAX_ENTRIES = 60;
 
 const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
@@ -374,43 +370,44 @@ export interface PortfolioStore {
   remove(charId: string): void;
   /** Replace with a copy from the server or an import (null clears it). */
   replace(charId: string, p: unknown): void;
+  /** Upgrade every saved portfolio to the current schema version (LP-99); runs once at start-up. */
+  migrate(): boolean;
   /** Fires after data mutations. */
   subscribe(fn: () => void): () => void;
   version(): number;
 }
 
 export function createPortfolioStore(kv: KV): PortfolioStore {
-  const changes = createChannel();
-  const key = (charId: string) => JAP_PREFIX + charId;
+  // Saved through the keyed store base (store.ts, LP-99); null is "nothing saved".
+  const store = createKeyedStore<Portfolio | null>(kv, {
+    prefix: JAP_PREFIX,
+    isId,
+    version: JAP_VERSION,
+    validate: (raw) => (raw && typeof raw === "object" ? clean(raw) : null),
+    migrations: JAP_MIGRATIONS,
+    isEmpty: (p) => p === null,
+  });
   return {
-    get(charId) {
-      if (!isId(charId)) return null;
-      const raw = readJson<unknown>(kv, key(charId));
-      return raw && typeof raw === "object" ? clean(raw) : null;
-    },
+    get: store.get,
     save(charId, p) {
       if (!isId(charId)) return null;
       const data = clean(p);
       data.updated = new Date().toISOString();
-      writeJson(kv, key(charId), data);
-      changes.emit();
+      store.set(charId, data);
       touchCharacter(charId);
       return data;
     },
     remove(charId) {
       if (!isId(charId)) return;
-      kv.remove(key(charId));
-      changes.emit();
+      store.set(charId, null);
       touchCharacter(charId);
     },
     replace(charId, p) {
-      if (!isId(charId)) return;
-      if (p && typeof p === "object") writeJson(kv, key(charId), clean(p));
-      else kv.remove(key(charId));
-      changes.emit();
+      store.set(charId, p && typeof p === "object" ? clean(p) : null);
     },
-    subscribe: changes.subscribe,
-    version: changes.version,
+    migrate: store.migrate,
+    subscribe: store.subscribe,
+    version: store.version,
   };
 }
 
