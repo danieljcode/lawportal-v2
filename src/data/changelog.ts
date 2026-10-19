@@ -19,6 +19,24 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-19",
+    title: "Conflict check",
+    items: [
+      {
+        type: "new",
+        text: "Conflict check (in the sidebar) looks for a name, a person or a business, on both sides of every firm case and in the case notes. Capitals don't matter, and part of a name or initials still find it.",
+      },
+      {
+        type: "new",
+        text: "You get a clear verdict, each match's case, side, status and lead, and a short memo to copy or print. Every check is kept in a log that syncs, so the firm can show it was done.",
+      },
+      {
+        type: "new",
+        text: "New client intake has a Run conflict check button for the client and the opposing party.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-19",
     title: "New client intake",
     items: [
       {
