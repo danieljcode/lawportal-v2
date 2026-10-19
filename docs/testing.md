@@ -65,6 +65,7 @@ using the [reference data](templates-and-forms.md#reference-data) in `.agents/re
    read-only token for `danieljcode/lawportal-reference`). Pull requests from forks don't get the
    secret, so they skip the parity tests.
 2. `npm ci`, then `npm audit --omit=dev --audit-level=high` (see [Dependencies](dependencies.md)),
+   `npm run lint` and `npm run format:check` (see [Development](development.md#code-style-and-editor-set-up)),
    `npm test` (with `LAWAPP_REQUIRE_REFERENCE=1` when the data was checked out) and `npm run build`.
 
 A second workflow, **Conventions** (`.github/workflows/conventions.yml`), runs on pull requests and

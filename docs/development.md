@@ -48,6 +48,20 @@ npm start
 
 Both `dev` and `start` bind to `127.0.0.1`, so only this computer can reach the app.
 
+## Code style and editor set-up
+
+Formatting is Prettier's job and ESLint checks for mistakes (LP-86); CI runs both.
+
+- **Prettier** (`.prettierrc.json`): its defaults, with lines up to 120 characters. Generated files
+  are left alone (`.prettierignore`: `forms.json`, snapshots, the lockfile).
+- **ESLint** (`eslint.config.mjs`): Next.js's `core-web-vitals` and TypeScript rules, with style
+  rules turned off in favour of Prettier. A rule is only switched off on a line with a reason:
+  `// eslint-disable-next-line <rule> -- <why>`.
+- **Kiro or VS Code:** `.vscode/settings.json` makes Prettier the formatter and formats on save,
+  using the project's config. Install the two recommended extensions when prompted (Prettier,
+  `esbenp.prettier-vscode`, and ESLint, `dbaeumer.vscode-eslint`; Kiro gets them from Open VSX).
+- Before pushing: `npm run lint` and `npm run format:check`, or `npm run format` to fix formatting.
+
 ## Other devices on your network (LAN mode)
 
 ```bash
@@ -74,6 +88,9 @@ npm run build && npm run start:lan
 | `npm start` | Serves the production build on `127.0.0.1:3000`. |
 | `npm run start:lan` | The same on `0.0.0.0`, API open to the network. |
 | `npm test` | Runs every test suite once (Vitest). See [Testing](testing.md). |
+| `npm run lint` | ESLint (Next.js, React and TypeScript rules); fails on any error or warning. |
+| `npm run format` | Formats every file with Prettier. |
+| `npm run format:check` | Checks formatting without changing anything (what CI runs). |
 | `npm run port-forms` | Regenerates `src/data/forms.json` from the reference data. See [Templates and forms](templates-and-forms.md#regenerating-the-court-forms). |
 | `npm run screenshots` | Screenshots of the running app into `.agents/screenshots/` (Playwright). |
 | `npm run smoke:preview` | Browser smoke test of every form against the running app (Playwright). |

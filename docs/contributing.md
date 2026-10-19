@@ -48,7 +48,7 @@ reviews and merges.
    Skip anything flagged or labelled `blocked`. Before starting a `size-l` issue, split it into
    smaller issues in Jira first.
 2. **Move it to In Progress** and make its branch from an up-to-date `main`.
-3. **Make the change** with its tests, and run `npm test` and `npm run build`.
+3. **Make the change** with its tests, and run `npm test`, `npm run lint`, `npm run format:check` and `npm run build`.
 4. **Open a pull request** (title and description as above). CI must be green.
 5. **After Daniel merges**, update local `main` before anything else:
    ```bash
@@ -102,7 +102,7 @@ Jira version is marked Released: see [Releasing](releasing.md).
 - [ ] Branch starts with the issue key; commits and PR title end with `[LP-<n>]`; PR description
       links the Jira issue
 
-Before calling a change done, run `npm test` and `npm run build`. The parity tests also need the
+Before calling a change done, run `npm test`, `npm run lint`, `npm run format:check` and `npm run build`. The parity tests also need the
 reference data (see [Templates and forms](templates-and-forms.md#reference-data)).
 
 ## Weekly grooming (10 minutes)

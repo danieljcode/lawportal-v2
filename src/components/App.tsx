@@ -110,6 +110,7 @@ export default function App() {
     const store = characterStore();
     return { characters: store.list(), activeId: store.activeId() };
     // The versions are the change signals; the store is read fresh when either moves.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- the versions are the signals, not values used inside
   }, [charVersion, syncState.applied]);
   const active = useMemo(() => (activeId ? characters.find((c) => c.id === activeId) || null : null), [characters, activeId]);
 
