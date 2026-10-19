@@ -27,6 +27,7 @@ with React and drive it through the DOM.
 | Sync | `sync-api.test.ts` (the routes, against a temp directory), `sync-client.test.ts` (stubbed `fetch`), `body.test.ts` |
 | UI | `dialogs.test.ts`, `discordPanel.test.ts` |
 | Releases | `release.test.ts`, `theme-changelog.test.ts` |
+| Conventions | `commit-format.test.ts` (the commit and PR title check) |
 
 ## What `tests/xss.test.ts` protects
 
@@ -65,6 +66,10 @@ using the [reference data](templates-and-forms.md#reference-data) in `.agents/re
    secret, so they skip the parity tests.
 2. `npm ci`, `npm test` (with `LAWAPP_REQUIRE_REFERENCE=1` when the data was checked out),
    `npm run build`.
+
+A second workflow, **Conventions** (`.github/workflows/conventions.yml`), runs on pull requests and
+checks every commit message and the PR title against the commit format (LP-84). It's covered by
+`tests/commit-format.test.ts`.
 
 ## Playwright scripts
 
