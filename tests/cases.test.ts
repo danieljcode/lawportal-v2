@@ -4,7 +4,18 @@
 // view over cases, merging cases from two devices, sync of old copies, backup.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { countsOf, makeBackup } from "@/lib/backup";
-import { caseIdFor, CASES_KEY, caseStore, casesFromDockets, createCaseStore, needsLead, unifyCases } from "@/lib/cases";
+import {
+  caseIdFor,
+  caseProblem,
+  CASES_KEY,
+  caseStore,
+  casesFromDockets,
+  createCaseStore,
+  filterCases,
+  needsLead,
+  NEEDS_LEAD,
+  unifyCases,
+} from "@/lib/cases";
 import { createCharacterStore } from "@/lib/characters";
 import { createDocketStore, DOCKETS_PREFIX } from "@/lib/dockets";
 import { runMigrations } from "@/lib/migrations";
@@ -256,5 +267,48 @@ describe("sync and backup", () => {
     expect(Object.keys(backup.data)).toContain(CASES_KEY);
     expect(countsOf(backup.data).dockets).toBe(1);
     expect(countsOf({ ...OLD }).dockets).toBe(3);
+  });
+});
+
+describe("the Case File's search and checks (LP-101)", () => {
+  const mk = (over: Partial<Case>): Case => ({
+    id: "abcd1234",
+    caseNumber: "90SCCR00001",
+    status: "Open",
+    updated: T1,
+    created: T1,
+    lead: "alice001",
+    assigned: [],
+    ...over,
+  });
+  const LIST = [
+    mk({ id: "case0001", caseNumber: "90SCCR00002", plaintiff: "Ann Lee", status: "Closed" }),
+    mk({ id: "case0002", caseNumber: "90SCCC00001", defendant: "Bo Day", lead: null, assigned: ["bob00001"] }),
+    mk({ id: "case0003", caseNumber: "90SCCR00001", plaintiff: "Cy Ng", assigned: ["bob00001"] }),
+  ];
+  const ids = (l: Case[]) => l.map((c) => c.id);
+
+  it("lists open cases first, then by case number", () => {
+    expect(ids(filterCases(LIST, {}))).toEqual(["case0002", "case0003", "case0001"]);
+  });
+
+  it("searches case numbers and parties, ignoring case", () => {
+    expect(ids(filterCases(LIST, { q: "ann" }))).toEqual(["case0001"]);
+    expect(ids(filterCases(LIST, { q: "bo day" }))).toEqual(["case0002"]);
+    expect(ids(filterCases(LIST, { q: "sccr" }))).toEqual(["case0003", "case0001"]);
+  });
+
+  it("filters by status, by needing a lead, and by character", () => {
+    expect(ids(filterCases(LIST, { status: "Closed" }))).toEqual(["case0001"]);
+    expect(ids(filterCases(LIST, { status: NEEDS_LEAD }))).toEqual(["case0002"]);
+    expect(ids(filterCases(LIST, { charId: "bob00001" }))).toEqual(["case0002", "case0003"]);
+    expect(ids(filterCases(LIST, { charId: "alice001", q: "cy" }))).toEqual(["case0003"]);
+  });
+
+  it("needs a case number no other firm case has", () => {
+    expect(caseProblem({ id: "", caseNumber: " " }, LIST)).toBe("A case needs a case number.");
+    expect(caseProblem({ id: "", caseNumber: "90sccr00002" }, LIST)).toBe("90SCCR00002 is already a firm case.");
+    expect(caseProblem({ id: "case0001", caseNumber: "90SCCR00002" }, LIST)).toBeNull();
+    expect(caseProblem({ id: "", caseNumber: "90SCCR00099" }, LIST)).toBeNull();
   });
 });

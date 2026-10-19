@@ -10,8 +10,8 @@ browser.
 - **One page, client only.** `src/app/page.tsx` renders `AppLoader`, which loads `App` with
   `ssr: false`. The app reads local storage on its first render, so it never renders on the server
   (no hydration mismatches).
-- **Hash routing.** `#civil-complaint` opens a form, `#jap` the J.A.P., an empty hash the start
-  page. `useRoute` owns the route and remembers the last form under `lawapp_last_form`;
+- **Hash routing.** `#civil-complaint` opens a form, `#jap` the J.A.P., `#cases` the Case File and
+  `#cases/<id>` one case in it (LP-101), an empty hash the start page. `useRoute` owns the route and remembers the last form under `lawapp_last_form`;
   `useDialogs` owns the open dialog; `App.tsx` owns the active character and the layout.
 - **Three small API routes** on the same server, all behind a host check (see [Server](#server)):
   sync (`/api/account`, `/api/data`) and the `.docx` export (`/api/docx`).
@@ -146,6 +146,12 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
     id from their number (`c90sccr00147`), the same on every device.
   - **A deleted character** is taken off its cases, which stay; a case it led is left with
     `lead: null` (`needsLead`) for someone to take on.
+  - **The Case File** (`CaseFileView.tsx`, LP-101) is the program for them: every firm case with
+    its lead and others, a search (case number or party) and filters (status, "Needs a lead",
+    character), and a case's details and who's on it. `filterCases` and `caseProblem` in
+    `cases.ts` do the searching and the checks (a case number no other case has). Areas for linked
+    filings, evidence and deadlines are empty until LP-15, LP-12 and LP-18. On a phone the open
+    case replaces the list.
   - **Dockets are a view** (`dockets.ts`): a character's docket is the cases they lead or are
     assigned to, with the same `DocketStore` API the Dockets dialog, docket bar and J.A.P. use until
     the Case File program (LP-101, LP-100). Saving a number the firm already has puts the character

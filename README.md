@@ -45,6 +45,9 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
   with Nitro), each with a preview, a character count and its own Copy button.
 - **Characters.** Name, title, contact details, bar number, signature and notes, used to fill forms.
   Export and import them (with dockets and J.A.P.) as `lawapp-characters.json`.
+- **Case File** (toolbar or sidebar): every firm case, with its lead and the other characters on
+  it. Search by case number or party, filter by status or character, and open a case to edit its
+  details and who's working it.
 - **Dockets** for judges and lawyers: the cases each character works; load a case into any form
   with a case number, or save a form's case to the docket. Cases belong to the firm, so characters
   with the same case number share it, and deleting a character keeps its cases.
