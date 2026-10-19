@@ -207,7 +207,7 @@ describe("the Conflict check program and the intake (LP-10)", () => {
   });
 
   it("says when nothing conflicts, and copies or prints the memo", async () => {
-    const writeText = vi.fn((_text: string) => Promise.resolve());
+    const writeText = vi.fn<(text: string) => Promise<void>>(() => Promise.resolve());
     Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
     const print = vi.fn();
     vi.stubGlobal("print", print);
