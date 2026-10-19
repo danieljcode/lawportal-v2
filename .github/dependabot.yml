@@ -15,6 +15,13 @@ updates:
       prefix-development: chore
       include: scope
     groups:
+      # playwright and @playwright/test must stay on the same version (each wants its
+      # own browser build), so they always move together, majors included.
+      playwright:
+        patterns: ["playwright", "@playwright/test"]
+      # Likewise next and its ESLint config (see LP-97).
+      next:
+        patterns: ["next", "eslint-config-next"]
       # Minor and patch updates arrive as one PR; each major update gets its own,
       # since those need their changelog read first.
       npm-minor-and-patch:
