@@ -102,12 +102,15 @@ const HASH_FILE = /^[0-9a-f]{64}\.json$/;
  */
 export async function sweepUnused(now = Date.now()): Promise<number> {
   const dir = syncDir();
-  const names = (await fs.readdir(dir)).filter((n) => n.endsWith(".json"));
+  // The sync folder is runtime data, set by LAWAPP_SYNC_DIR: nothing for the build to trace.
+  const names = (await fs.readdir(/* turbopackIgnore: true */ dir)).filter((n) => n.endsWith(".json"));
   let left = names.length;
   for (const name of names) {
     if (!HASH_FILE.test(name)) continue;
-    const file = path.join(dir, name);
-    const gone = await withLock(name.slice(0, 64), async () => {
+    // Rebuilt from the hash so the bundler sees a *.json path, not any file in the project.
+    const hash = name.slice(0, 64);
+    const file = path.join(dir, hash + ".json");
+    const gone = await withLock(hash, async () => {
       try {
         if (now - (await fs.stat(file)).mtimeMs < UNUSED_TTL_MS) return false;
         const record = await readFile(file);
