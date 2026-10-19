@@ -104,6 +104,9 @@ export default function CaseFileView({ caseId, characters, onUseFiling = () => {
           <h2 id="case-file-title">Case File</h2>
         </div>
         <div className="form-head-actions">
+          <a className="btn" id="case-intake" href="#intake">
+            New client intake
+          </a>
           <button type="button" className="btn primary" id="case-new" onClick={() => setCreating(true)}>
             New case
           </button>

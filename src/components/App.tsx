@@ -26,6 +26,7 @@ import JapOutput from "./JapOutput";
 import JapView from "./JapView";
 import CaseFileView from "./CaseFileView";
 import UpcomingView from "./UpcomingView";
+import IntakeView from "./IntakeView";
 import ErrorBoundary from "./ErrorBoundary";
 import OutputPane from "./OutputPane";
 import Sidebar from "./Sidebar";
@@ -33,7 +34,7 @@ import Taskbar from "./Taskbar";
 import Toolbar from "./Toolbar";
 import { S_SET_ASIDE, S_SET_ASIDE_HINT } from "@/lib/strings";
 import { useDialogs } from "./useDialogs";
-import { APP_TITLE, CASES_TITLE, JAP_TITLE, UPCOMING_TITLE, useRoute } from "./useRoute";
+import { APP_TITLE, CASES_TITLE, INTAKE_TITLE, JAP_TITLE, UPCOMING_TITLE, useRoute } from "./useRoute";
 import { useCaseVersion, useCharacterVersion, useSetAsideVersion, useSyncState } from "./useStore";
 
 export type { DialogName } from "./useDialogs";
@@ -172,7 +173,9 @@ export default function App() {
           ? CASES_TITLE
           : route.kind === "upcoming"
             ? UPCOMING_TITLE
-            : APP_TITLE;
+            : route.kind === "intake"
+              ? INTAKE_TITLE
+              : APP_TITLE;
   const current = route.kind === "form" ? route.id : route.kind === "home" ? null : route.kind;
   // Deadlines (LP-18): the toolbar dot when the active character has something due within 48 hours.
   const caseVersion = useCaseVersion();
@@ -260,6 +263,10 @@ export default function App() {
                   syncState={syncState}
                   onTurnOnSync={() => openCharacters(true)}
                 />
+              </ErrorBoundary>
+            ) : route.kind === "intake" ? (
+              <ErrorBoundary where="the intake" resetKey={route.kind}>
+                <IntakeView characters={characters} active={active} />
               </ErrorBoundary>
             ) : route.kind === "upcoming" ? (
               <ErrorBoundary where="Upcoming" resetKey={route.kind}>
