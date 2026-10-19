@@ -332,8 +332,8 @@ function checkInvariants(id: string, out: string): void {
 }
 
 describe("toDiscord on every form", () => {
-  it("has all 45 forms", () => {
-    expect(ALL_FORMS.length).toBe(45);
+  it("has all 49 forms", () => {
+    expect(ALL_FORMS.length).toBe(49);
   });
 
   for (const form of ALL_FORMS) {

@@ -30,7 +30,7 @@ src/
   app/            page.tsx (client-only entry), layout.tsx, globals.css, api/{account,data,docx}
   components/     App shell (useRoute, useDialogs hooks), FormView, dialogs, output panes;
                   fields/ for the form editor inputs
-  data/           forms.json (39 court forms, generated), extra-forms.ts (6 templates), changelog.ts
+  data/           forms.json (39 court forms, generated), extra-forms.ts (10 templates), changelog.ts
   lib/            the logic: template engine, converters, stores, sync, settings (see below)
   lib/template/   the template engine: parse, prefill, render, escape, plain (template.ts re-exports)
   lib/discord/    HTML → Discord markdown: model, escape, serialize, dom, builder, tables, convert

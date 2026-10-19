@@ -18,6 +18,20 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-10-20",
+    title: "Firm letters",
+    items: [
+      {
+        type: "new",
+        text: "Four new templates under Additional Templates › Firm Letters: Engagement Letter, Retainer Agreement, Demand Letter and Letter of Representation.",
+      },
+      {
+        type: "new",
+        text: "Each signs off from your character and can load its case from the case bar. The retainer starts with fee defaults ($250 an hour, a $5,000 retainer, invoices due in 14 days) you can change, and the demand letter's deadline defaults to 14 days out.",
+      },
+    ],
+  },
+  {
     date: "2026-10-19",
     title: "Conflict check",
     items: [
