@@ -2785,6 +2785,174 @@ https://example.com/a.png
 (SIGNATURE)"
 `;
 
+exports[`toDiscord on every form > extra-demand-letter > empty, code tables 1`] = `
+"**FIRM NAME**
+FIRM ADDRESS
+PHONE · EMAIL
+────────────────────
+\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+RECIPIENT NAME
+RECIPIENT ADDRESS
+**Re: Demand for payment (Case No. not yet filed)**
+Dear RECIPIENT NAME,
+This firm represents CLIENT NAME in connection with THE MATTER.
+Set out what happened, with dates.
+On behalf of our client, we demand payment of $\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ by \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_.
+If the amount is not paid by that date, our client has instructed us to begin proceedings without further notice, and to seek costs.
+Please direct all communication about this matter to the undersigned. This letter is written without prejudice to our client's rights, all of which are reserved.
+Yours faithfully,
+SIGNATURE
+**\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_**
+Attorney at Law
+Bar No. \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+FIRM NAME"
+`;
+
+exports[`toDiscord on every form > extra-demand-letter > empty, plain-line tables 1`] = `
+"**FIRM NAME**
+FIRM ADDRESS
+PHONE · EMAIL
+────────────────────
+\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+RECIPIENT NAME
+RECIPIENT ADDRESS
+**Re: Demand for payment (Case No. not yet filed)**
+Dear RECIPIENT NAME,
+This firm represents CLIENT NAME in connection with THE MATTER.
+Set out what happened, with dates.
+On behalf of our client, we demand payment of $\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ by \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_.
+If the amount is not paid by that date, our client has instructed us to begin proceedings without further notice, and to seek costs.
+Please direct all communication about this matter to the undersigned. This letter is written without prejudice to our client's rights, all of which are reserved.
+Yours faithfully,
+SIGNATURE
+**\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_**
+Attorney at Law
+Bar No. \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+FIRM NAME"
+`;
+
+exports[`toDiscord on every form > extra-demand-letter > filled, code tables 1`] = `
+"**X\\<&>"1 X2**
+X\\<&>"1 X2
+X\\<&>"1 X2 · X\\<&>"1 X2
+────────────────────
+January 2, 2026
+X\\<&>"1 X2
+X\\<&>"1 X2
+**Re: X\\<&>"1 X2 (Case No. X\\<&>"1 X2)**
+Dear X\\<&>"1 X2,
+This firm represents X\\<&>"1 X2 in connection with X\\<&>"1 X2.
+X\\<&>"1
+X2
+On behalf of our client, we demand payment of X\\<&>"1 X2 by January 2, 2026.
+X\\<&>"1
+
+X2
+Please direct all communication about this matter to the undersigned. This letter is written without prejudice to our client's rights, all of which are reserved.
+Yours faithfully,
+https://example.com/a.png
+**X\\<&>"1 X2**
+X\\<&>"1 X2
+Bar No. X\\<&>"1 X2
+X\\<&>"1 X2"
+`;
+
+exports[`toDiscord on every form > extra-engagement-letter > empty, code tables 1`] = `
+"**FIRM NAME**
+FIRM ADDRESS
+PHONE · EMAIL
+────────────────────
+\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+CLIENT NAME
+CLIENT ADDRESS
+**Re: Engagement of legal services (THE MATTER, Case No. to be assigned)**
+Dear CLIENT NAME,
+Thank you for choosing FIRM NAME. This letter confirms that we will represent you in the matter above, and sets out the terms of that engagement.
+**1. Scope of the representation.**
+Describe what the firm will and will not do for the client.
+**2. Who will work on your matter.** \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ will lead your matter, and other members of the firm may assist where that serves you.
+**3. Fees.** Our fees and the retainer are set out in the Retainer Agreement that accompanies this letter.
+**4. Your part.** Please be truthful and complete with us, keep us informed of anything that may affect your matter, and respond promptly when we need instructions.
+**5. Ending the engagement.** You may end this engagement at any time. We may withdraw where the rules of professional conduct allow, after reasonable notice to you.
+If these terms are acceptable, please sign below and return a copy to us.
+Sincerely,
+SIGNATURE
+**\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_**
+Attorney at Law
+Bar No. \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+FIRM NAME
+────────────────────
+**ACKNOWLEDGED AND AGREED**
+\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+CLIENT NAME
+Date: \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_"
+`;
+
+exports[`toDiscord on every form > extra-engagement-letter > empty, plain-line tables 1`] = `
+"**FIRM NAME**
+FIRM ADDRESS
+PHONE · EMAIL
+────────────────────
+\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+CLIENT NAME
+CLIENT ADDRESS
+**Re: Engagement of legal services (THE MATTER, Case No. to be assigned)**
+Dear CLIENT NAME,
+Thank you for choosing FIRM NAME. This letter confirms that we will represent you in the matter above, and sets out the terms of that engagement.
+**1. Scope of the representation.**
+Describe what the firm will and will not do for the client.
+**2. Who will work on your matter.** \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ will lead your matter, and other members of the firm may assist where that serves you.
+**3. Fees.** Our fees and the retainer are set out in the Retainer Agreement that accompanies this letter.
+**4. Your part.** Please be truthful and complete with us, keep us informed of anything that may affect your matter, and respond promptly when we need instructions.
+**5. Ending the engagement.** You may end this engagement at any time. We may withdraw where the rules of professional conduct allow, after reasonable notice to you.
+If these terms are acceptable, please sign below and return a copy to us.
+Sincerely,
+SIGNATURE
+**\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_**
+Attorney at Law
+Bar No. \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+FIRM NAME
+────────────────────
+**ACKNOWLEDGED AND AGREED**
+\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+CLIENT NAME
+Date: \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_"
+`;
+
+exports[`toDiscord on every form > extra-engagement-letter > filled, code tables 1`] = `
+"**X\\<&>"1 X2**
+X\\<&>"1 X2
+X\\<&>"1 X2 · X\\<&>"1 X2
+────────────────────
+January 2, 2026
+X\\<&>"1 X2
+X\\<&>"1 X2
+**Re: Engagement of legal services (X\\<&>"1 X2, Case No. X\\<&>"1 X2)**
+Dear X\\<&>"1 X2,
+Thank you for choosing X\\<&>"1 X2. This letter confirms that we will represent you in the matter above, and sets out the terms of that engagement.
+**1. Scope of the representation.**
+X\\<&>"1
+X2
+**2. Who will work on your matter.** X\\<&>"1 X2 will lead your matter, and other members of the firm may assist where that serves you.
+**3. Fees.** X\\<&>"1
+
+X2
+**4. Your part.** Please be truthful and complete with us, keep us informed of anything that may affect your matter, and respond promptly when we need instructions.
+**5. Ending the engagement.** You may end this engagement at any time. We may withdraw where the rules of professional conduct allow, after reasonable notice to you.
+If these terms are acceptable, please sign below and return a copy to us.
+Sincerely,
+https://example.com/a.png
+**X\\<&>"1 X2**
+X\\<&>"1 X2
+Bar No. X\\<&>"1 X2
+X\\<&>"1 X2
+────────────────────
+**ACKNOWLEDGED AND AGREED**
+\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+X\\<&>"1 X2
+Date: \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_"
+`;
+
 exports[`toDiscord on every form > extra-general-motion > empty, code tables 1`] = `
 "**SAN ANDREAS COURT, COUNTY OF LOS SANTOS**
 \`\`\`
@@ -3137,6 +3305,137 @@ Respectfully submitted,
 Bar No. X\\<&>"1 X2
 X\\<&>"1 X2
 X\\<&>"1 X2"
+`;
+
+exports[`toDiscord on every form > extra-representation-letter > empty, code tables 1`] = `
+"**FIRM NAME**
+FIRM ADDRESS
+PHONE · EMAIL
+────────────────────
+\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+RECIPIENT NAME
+RECIPIENT ADDRESS
+**Re: PLAINTIFF NAME v. DEFENDANT NAME, Case No. \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_**
+Dear RECIPIENT NAME,
+Please be advised that FIRM NAME now represents CLIENT NAME in the matter above, effective \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_.
+Please direct all further communication, notices and documents in this matter to the undersigned, and do not contact our client directly.
+Please update your records accordingly.
+Sincerely,
+SIGNATURE
+**\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_**
+Attorney at Law
+Bar No. \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+FIRM NAME"
+`;
+
+exports[`toDiscord on every form > extra-representation-letter > empty, plain-line tables 1`] = `
+"**FIRM NAME**
+FIRM ADDRESS
+PHONE · EMAIL
+────────────────────
+\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+RECIPIENT NAME
+RECIPIENT ADDRESS
+**Re: PLAINTIFF NAME v. DEFENDANT NAME, Case No. \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_**
+Dear RECIPIENT NAME,
+Please be advised that FIRM NAME now represents CLIENT NAME in the matter above, effective \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_.
+Please direct all further communication, notices and documents in this matter to the undersigned, and do not contact our client directly.
+Please update your records accordingly.
+Sincerely,
+SIGNATURE
+**\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_**
+Attorney at Law
+Bar No. \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+FIRM NAME"
+`;
+
+exports[`toDiscord on every form > extra-representation-letter > filled, code tables 1`] = `
+"**X\\<&>"1 X2**
+X\\<&>"1 X2
+X\\<&>"1 X2 · X\\<&>"1 X2
+────────────────────
+January 2, 2026
+X\\<&>"1 X2
+X\\<&>"1 X2
+**Re: X\\<&>"1 X2 v. X\\<&>"1 X2, Case No. X\\<&>"1 X2**
+Dear X\\<&>"1 X2,
+Please be advised that X\\<&>"1 X2 now represents X\\<&>"1 X2 in the matter above, effective January 2, 2026.
+Please direct all further communication, notices and documents in this matter to the undersigned, and do not contact our client directly.
+X\\<&>"1
+
+X2
+Sincerely,
+https://example.com/a.png
+**X\\<&>"1 X2**
+X\\<&>"1 X2
+Bar No. X\\<&>"1 X2
+X\\<&>"1 X2"
+`;
+
+exports[`toDiscord on every form > extra-retainer-agreement > empty, code tables 1`] = `
+"## **RETAINER AGREEMENT**
+This Retainer Agreement is made on \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ between FIRM NAME (the "Firm") and CLIENT NAME of CLIENT ADDRESS (the "Client") for representation in THE MATTER (Case No. to be assigned).
+**1. Fees.** The Client will pay the Firm $\\_\\_\\_\\_ per hour for time spent on the matter, billed in increments of 6 minutes.
+**2. Retainer.** The Client will pay a retainer of $\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ before work begins. It is held in the Firm's client trust account and applied to invoices as they fall due. When it falls below $\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_, the Client will bring it back up to the full amount.
+**3. Payment terms.** Invoices are due within 14 days of receipt.
+**4. Costs.** Court fees and other costs paid on the Client's behalf are charged at cost, in addition to the Firm's fees.
+**5. Ending the agreement.** Either party may end this agreement by written notice. Fees earned and costs incurred up to that date remain payable; any unused retainer is returned to the Client.
+**6. No guarantee.** The Firm cannot promise any outcome. Any view it gives on the likely result is an opinion, not a guarantee.
+**7. Governing law.** This agreement is governed by the laws of the State of San Andreas.
+────────────────────
+\`\`\`
+FOR THE FIRM          CLIENT
+SIGNATURE             ____________________
+
+____________________  CLIENT NAME
+Attorney at Law       Date: __________
+Bar No. __________
+\`\`\`"
+`;
+
+exports[`toDiscord on every form > extra-retainer-agreement > empty, plain-line tables 1`] = `
+"## **RETAINER AGREEMENT**
+This Retainer Agreement is made on \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ between FIRM NAME (the "Firm") and CLIENT NAME of CLIENT ADDRESS (the "Client") for representation in THE MATTER (Case No. to be assigned).
+**1. Fees.** The Client will pay the Firm $\\_\\_\\_\\_ per hour for time spent on the matter, billed in increments of 6 minutes.
+**2. Retainer.** The Client will pay a retainer of $\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ before work begins. It is held in the Firm's client trust account and applied to invoices as they fall due. When it falls below $\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_, the Client will bring it back up to the full amount.
+**3. Payment terms.** Invoices are due within 14 days of receipt.
+**4. Costs.** Court fees and other costs paid on the Client's behalf are charged at cost, in addition to the Firm's fees.
+**5. Ending the agreement.** Either party may end this agreement by written notice. Fees earned and costs incurred up to that date remain payable; any unused retainer is returned to the Client.
+**6. No guarantee.** The Firm cannot promise any outcome. Any view it gives on the likely result is an opinion, not a guarantee.
+**7. Governing law.** This agreement is governed by the laws of the State of San Andreas.
+────────────────────
+**FOR THE FIRM**
+**CLIENT**
+SIGNATURE
+\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+Attorney at Law
+Bar No. \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+CLIENT NAME
+Date: \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_"
+`;
+
+exports[`toDiscord on every form > extra-retainer-agreement > filled, code tables 1`] = `
+"## **RETAINER AGREEMENT**
+This Retainer Agreement is made on January 2, 2026 between X\\<&>"1 X2 (the "Firm") and X\\<&>"1 X2 of X\\<&>"1 X2 (the "Client") for representation in X\\<&>"1 X2 (Case No. X\\<&>"1 X2).
+**1. Fees.** The Client will pay the Firm X\\<&>"1 X2 for time spent on the matter, billed in increments of X\\<&>"1 X2.
+**2. Retainer.** The Client will pay a retainer of X\\<&>"1 X2 before work begins. It is held in the Firm's client trust account and applied to invoices as they fall due. When it falls below X\\<&>"1 X2, the Client will bring it back up to the full amount.
+**3. Payment terms.** X\\<&>"1
+
+X2
+**4. Costs.** Court fees and other costs paid on the Client's behalf are charged at cost, in addition to the Firm's fees.
+**5. Ending the agreement.** Either party may end this agreement by written notice. Fees earned and costs incurred up to that date remain payable; any unused retainer is returned to the Client.
+**6. No guarantee.** The Firm cannot promise any outcome. Any view it gives on the likely result is an opinion, not a guarantee.
+**7. Governing law.** This agreement is governed by the laws of X\\<&>"1 X2.
+────────────────────
+\`\`\`
+FOR THE FIRM               CLIENT
+https://example.com/a.png  ____________________
+
+X<&>"1 X2                  X<&>"1 X2
+X<&>"1 X2                  Date: __________
+Bar No. X<&>"1 X2
+\`\`\`"
 `;
 
 exports[`toDiscord on every form > extra-service-contract > empty, code tables 1`] = `

@@ -251,6 +251,150 @@ const serviceContract: FormDef = {
 };
 
 /** Our "Additional Templates" forms, in sidebar order. */
+
+/* ---------- Firm Letters (LP-9) ----------
+ * Letters and agreements the firm sends clients and other parties. Unbranded:
+ * the firm's name and address are plain fields (no letterhead yet, LP-23). The
+ * sign-off fills from the active character. They use a "Letter date", not a
+ * filing date, so saving one to the Case File doesn't record a filing date. */
+
+const LETTER_SECTION = "Firm Letters";
+
+/** The firm's name and address at the top of a letter, and the date. */
+const LETTERHEAD =
+  "{{-- Letterhead}}\n" +
+  '<p style="text-align:center"><strong>{{Firm|FIRM NAME}}</strong><br />\n' +
+  "{{Firm address|FIRM ADDRESS}}<br />\n" +
+  "{{Phone@phone|PHONE}} · {{Email@email|EMAIL}}</p>\n" +
+  "<hr />\n" +
+  "<p>{{Letter date=today:date:long|__________}}</p>\n";
+
+/** The lawyer's sign-off, filled from the active character. */
+function signOff(closing: string): string {
+  return (
+    "{{-- Signature}}\n" +
+    `<p>${closing}</p>\n` +
+    "<p>{{Signature@signature:image|SIGNATURE}}</p>\n" +
+    "<p><strong>{{Name@name|____________________}}</strong><br />\n" +
+    "{{Role@title|Attorney at Law}}<br />\n" +
+    "Bar No. {{Bar number@bar|__________}}<br />\n" +
+    "{{Firm|FIRM NAME}}</p>\n"
+  );
+}
+
+const engagementLetter: FormDef = {
+  id: "extra-engagement-letter",
+  court: COURT,
+  section: LETTER_SECTION,
+  title: "Engagement Letter",
+  required: ["Client name", "Name"],
+  html:
+    LETTERHEAD +
+    "{{-- Client}}\n" +
+    "<p>{{Client name|CLIENT NAME}}<br />\n{{Client address|CLIENT ADDRESS}}</p>\n" +
+    "<p><strong>Re: Engagement of legal services ({{Matter|THE MATTER}}, Case No. {{Case number|to be assigned}})</strong></p>\n" +
+    "<p>Dear {{Client name|CLIENT NAME}},</p>\n" +
+    "{{-- Engagement}}\n" +
+    "<p>Thank you for choosing {{Firm|FIRM NAME}}. This letter confirms that we will represent you in the matter " +
+    "above, and sets out the terms of that engagement.</p>\n" +
+    "<p><strong>1. Scope of the representation.</strong></p>\n" +
+    "{{Scope:paras|<p>Describe what the firm will and will not do for the client.</p>}}\n" +
+    "<p><strong>2. Who will work on your matter.</strong> {{Name@name|____________________}} will lead your matter, " +
+    "and other members of the firm may assist where that serves you.</p>\n" +
+    "<p><strong>3. Fees.</strong> {{Fees:textarea|Our fees and the retainer are set out in the Retainer Agreement that accompanies this letter.}}</p>\n" +
+    "<p><strong>4. Your part.</strong> Please be truthful and complete with us, keep us informed of anything that may " +
+    "affect your matter, and respond promptly when we need instructions.</p>\n" +
+    "<p><strong>5. Ending the engagement.</strong> You may end this engagement at any time. We may withdraw where the " +
+    "rules of professional conduct allow, after reasonable notice to you.</p>\n" +
+    "<p>If these terms are acceptable, please sign below and return a copy to us.</p>\n" +
+    signOff("Sincerely,") +
+    "{{-- Acceptance}}\n" +
+    "<hr />\n" +
+    "<p><strong>ACKNOWLEDGED AND AGREED</strong></p>\n" +
+    "<p>____________________<br />\n{{Client name|CLIENT NAME}}<br />\nDate: __________</p>\n",
+};
+
+const retainerAgreement: FormDef = {
+  id: "extra-retainer-agreement",
+  court: COURT,
+  section: LETTER_SECTION,
+  title: "Retainer Agreement",
+  required: ["Client name", "Hourly rate", "Retainer amount", "Name"],
+  html:
+    "{{-- Parties}}\n" +
+    title("RETAINER AGREEMENT") +
+    '<p>This Retainer Agreement is made on {{Letter date=today:date:long|__________}} between {{Firm|FIRM NAME}} ' +
+    '(the "Firm") and {{Client name|CLIENT NAME}} of {{Client address|CLIENT ADDRESS}} (the "Client") for representation in ' +
+    "{{Matter|THE MATTER}} (Case No. {{Case number|to be assigned}}).</p>\n" +
+    "{{-- Fees}}\n" +
+    "<p><strong>1. Fees.</strong> The Client will pay the Firm {{Hourly rate=$250 per hour|$____ per hour}} for time " +
+    "spent on the matter, billed in increments of {{Billing increment=6 minutes|6 minutes}}.</p>\n" +
+    "<p><strong>2. Retainer.</strong> The Client will pay a retainer of {{Retainer amount=$5,000|$__________}} before work " +
+    "begins. It is held in the Firm's client trust account and applied to invoices as they fall due. When it falls " +
+    "below {{Replenish below=$1,000|$__________}}, the Client will bring it back up to the full amount.</p>\n" +
+    "<p><strong>3. Payment terms.</strong> {{Payment terms=Invoices are due within 14 days of receipt.:textarea|Invoices are due within 14 days of receipt.}}</p>\n" +
+    "<p><strong>4. Costs.</strong> Court fees and other costs paid on the Client's behalf are charged at cost, in " +
+    "addition to the Firm's fees.</p>\n" +
+    "{{-- Terms}}\n" +
+    "<p><strong>5. Ending the agreement.</strong> Either party may end this agreement by written notice. Fees earned " +
+    "and costs incurred up to that date remain payable; any unused retainer is returned to the Client.</p>\n" +
+    "<p><strong>6. No guarantee.</strong> The Firm cannot promise any outcome. Any view it gives on the likely result is " +
+    "an opinion, not a guarantee.</p>\n" +
+    "<p><strong>7. Governing law.</strong> This agreement is governed by the laws of {{Governing law|the State of San Andreas}}.</p>\n" +
+    "{{-- Signatures}}\n" +
+    "<hr />\n" +
+    TABLE_OPEN +
+    "<tr>\n<td><strong>FOR THE FIRM</strong></td>\n<td><strong>CLIENT</strong></td>\n</tr>\n" +
+    "<tr>\n<td>{{Signature@signature:image|SIGNATURE}}</td>\n<td>____________________</td>\n</tr>\n" +
+    "<tr>\n<td>{{Name@name|____________________}}<br />\n{{Role@title|Attorney at Law}}<br />\nBar No. {{Bar number@bar|__________}}</td>\n" +
+    "<td>{{Client name|CLIENT NAME}}<br />\nDate: __________</td>\n</tr>\n" +
+    TABLE_CLOSE,
+};
+
+const demandLetter: FormDef = {
+  id: "extra-demand-letter",
+  court: COURT,
+  section: LETTER_SECTION,
+  title: "Demand Letter",
+  required: ["Recipient name", "Client name", "Amount demanded", "Name"],
+  html:
+    LETTERHEAD +
+    "{{-- Recipient}}\n" +
+    "<p>{{Recipient name|RECIPIENT NAME}}<br />\n{{Recipient address|RECIPIENT ADDRESS}}</p>\n" +
+    "<p><strong>Re: {{Subject|Demand for payment}} (Case No. {{Case number|not yet filed}})</strong></p>\n" +
+    "<p>Dear {{Recipient name|RECIPIENT NAME}},</p>\n" +
+    "{{-- Demand}}\n" +
+    "<p>This firm represents {{Client name|CLIENT NAME}} in connection with {{Matter|THE MATTER}}.</p>\n" +
+    "{{Facts:paras|<p>Set out what happened, with dates.</p>}}\n" +
+    "<p>On behalf of our client, we demand payment of {{Amount demanded|$__________}} " +
+    "by {{Response deadline=today+14:date:long|__________}}.</p>\n" +
+    "<p>{{Consequence:textarea|If the amount is not paid by that date, our client has instructed us to begin proceedings without further notice, and to seek costs.}}</p>\n" +
+    "<p>Please direct all communication about this matter to the undersigned. This letter is written without " +
+    "prejudice to our client's rights, all of which are reserved.</p>\n" +
+    signOff("Yours faithfully,"),
+};
+
+const representationLetter: FormDef = {
+  id: "extra-representation-letter",
+  court: COURT,
+  section: LETTER_SECTION,
+  title: "Letter of Representation",
+  required: ["Recipient name", "Client name", "Name"],
+  html:
+    LETTERHEAD +
+    "{{-- Recipient}}\n" +
+    "<p>{{Recipient name|RECIPIENT NAME}}<br />\n{{Recipient address|RECIPIENT ADDRESS}}</p>\n" +
+    "<p><strong>Re: {{Plaintiff name|PLAINTIFF NAME}} v. {{Defendant name|DEFENDANT NAME}}, Case No. {{Case number|__________}}</strong></p>\n" +
+    "<p>Dear {{Recipient name|RECIPIENT NAME}},</p>\n" +
+    "{{-- Representation}}\n" +
+    "<p>Please be advised that {{Firm|FIRM NAME}} now represents {{Client name|CLIENT NAME}} in the matter above, " +
+    "effective {{Effective date=today:date:long|__________}}.</p>\n" +
+    "<p>Please direct all further communication, notices and documents in this matter to the undersigned, and do " +
+    "not contact our client directly.</p>\n" +
+    "<p>{{Additional notes:textarea|Please update your records accordingly.}}</p>\n" +
+    signOff("Sincerely,"),
+};
+
 export const EXTRA_FORMS: FormDef[] = [
   generalPetition,
   nameChange,
@@ -258,4 +402,8 @@ export const EXTRA_FORMS: FormDef[] = [
   interrogatories,
   subpoena,
   serviceContract,
+  engagementLetter,
+  retainerAgreement,
+  demandLetter,
+  representationLetter,
 ];
