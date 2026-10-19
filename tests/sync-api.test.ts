@@ -210,7 +210,10 @@ describe("sync API (AC 15)", () => {
     expect(refused.status).toBe(421);
     expect(((await refused.json()) as { error: string }).error).toMatch(/only answers on localhost/);
     const post = await POST(
-      new Request("http://evil.example:3000/api/account", { method: "POST", headers: { "Content-Type": "application/json" } }),
+      new Request("http://evil.example:3000/api/account", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      }),
     );
     expect(post.status).toBe(421);
 
@@ -227,7 +230,9 @@ describe("sync API (AC 15)", () => {
 
   it("20 concurrent writes on one rev: 1 succeeds, 19 conflict, no .tmp left", async () => {
     const code = await newCode();
-    const results = await Promise.all(Array.from({ length: 20 }, (_, i) => write(code, 0, doc([{ id: "abcd1234", name: "W" + i }]))));
+    const results = await Promise.all(
+      Array.from({ length: 20 }, (_, i) => write(code, 0, doc([{ id: "abcd1234", name: "W" + i }]))),
+    );
     const ok = results.filter((r) => r !== "missing" && "record" in r);
     const conflicts = results.filter((r) => r !== "missing" && "conflict" in r);
     expect(ok).toHaveLength(1);

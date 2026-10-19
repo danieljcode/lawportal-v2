@@ -122,9 +122,7 @@ export function createDocketStore(kv: KV): DocketStore {
   function read(charId: string): Docket[] {
     const raw = readJson<unknown>(kv, key(charId));
     if (!Array.isArray(raw)) return [];
-    return raw.filter(
-      (d): d is Docket => !!d && typeof d === "object" && typeof (d as Docket).caseNumber === "string",
-    );
+    return raw.filter((d): d is Docket => !!d && typeof d === "object" && typeof (d as Docket).caseNumber === "string");
   }
 
   function write(charId: string, list: Docket[]): void {
@@ -134,7 +132,9 @@ export function createDocketStore(kv: KV): DocketStore {
 
   function findByCase(charId: string, caseNumber: string): Docket | null {
     if (!isId(charId)) return null;
-    const wanted = String(caseNumber || "").trim().toUpperCase();
+    const wanted = String(caseNumber || "")
+      .trim()
+      .toUpperCase();
     return read(charId).find((d) => d.caseNumber.toUpperCase() === wanted) || null;
   }
 
@@ -185,7 +185,10 @@ export function createDocketStore(kv: KV): DocketStore {
     },
     remove(charId, id) {
       if (!isId(charId)) return;
-      write(charId, read(charId).filter((d) => d.id !== id));
+      write(
+        charId,
+        read(charId).filter((d) => d.id !== id),
+      );
       changes.emit();
       touchCharacter(charId);
     },

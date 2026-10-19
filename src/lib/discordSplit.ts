@@ -126,8 +126,7 @@ function splitText(line: Extract<DLine, { kind: "text" }>, budget: number): stri
   let first = true;
   const extra = (p: Piece, prev: Piece | undefined) =>
     prev && sameMarks(prev.marks, p.marks) ? 0 : 2 * p.marks.reduce((n, m) => n + MARKERS[m].length, 0) + 1;
-  const boundOf = (ps: Piece[]) =>
-    ps.reduce((n, p, i) => n + p.text.length + extra(p, ps[i - 1]), PREFIX_MAX);
+  const boundOf = (ps: Piece[]) => ps.reduce((n, p, i) => n + p.text.length + extra(p, ps[i - 1]), PREFIX_MAX);
   const emit = (ps: Piece[]) => {
     const s = measure(ps, first);
     first = false;
@@ -188,9 +187,13 @@ function unitsOf(doc: DiscordDoc, budget: number): Unit[] {
     if (text.length <= budget) {
       units.push({ text, blank, prio });
     } else if (line.kind === "code") {
-      splitCode(line, budget).forEach((t, i) => units.push({ text: t, blank: false, prio: i ? 1 : prio, fresh: false }));
+      splitCode(line, budget).forEach((t, i) =>
+        units.push({ text: t, blank: false, prio: i ? 1 : prio, fresh: false }),
+      );
     } else if (line.kind === "text") {
-      splitText(line, budget).forEach((t, i) => units.push({ text: t, blank: false, prio: i ? 1 : prio, fresh: i === 0 }));
+      splitText(line, budget).forEach((t, i) =>
+        units.push({ text: t, blank: false, prio: i ? 1 : prio, fresh: i === 0 }),
+      );
     } else {
       units.push({ text, blank, prio });
     }
@@ -211,7 +214,13 @@ function pack(units: Unit[], budget: number): string[] {
     let b = us.length;
     while (a < b && us[a].blank) a++;
     while (b > a && us[b - 1].blank) b--;
-    if (b > a) parts.push(us.slice(a, b).map((u) => u.text).join("\n"));
+    if (b > a)
+      parts.push(
+        us
+          .slice(a, b)
+          .map((u) => u.text)
+          .join("\n"),
+      );
   };
   const reset = (us: Unit[]) => {
     let a = 0;

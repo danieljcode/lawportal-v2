@@ -41,7 +41,12 @@ const extraSrc = await readFile(path.join(root, "src", "data", "extra-forms.ts")
 const extraIds = [...extraSrc.matchAll(/^\s*id:\s*"([^"]+)"/gm)].map((m) => m[1]);
 const ids = [...directory.map((f) => f.id), ...extraIds];
 /** Forms that also get the Highlight / BBCode / Copy BBCode checks. */
-const DEEP = new Set(["criminal-arraignment", "small-claims-writ-of-execution", "civil-complaint", "extra-general-motion"]);
+const DEEP = new Set([
+  "criminal-arraignment",
+  "small-claims-writ-of-execution",
+  "civil-complaint",
+  "extra-general-motion",
+]);
 /** Text each form's preview shows with no input. */
 const EXPECT = {
   "civil-complaint": "CIVIL DIVISION",
@@ -95,7 +100,8 @@ function seedInit(seed) {
     sessionStorage.setItem("smoke_seeded", "1");
     localStorage.setItem("lawapp_chars", JSON.stringify(seed.chars));
     localStorage.setItem("lawapp_active_char", seed.chars[0].id);
-    if (seed.dockets && seed.dockets.length) localStorage.setItem("lawapp_dockets_" + seed.chars[0].id, JSON.stringify(seed.dockets));
+    if (seed.dockets && seed.dockets.length)
+      localStorage.setItem("lawapp_dockets_" + seed.chars[0].id, JSON.stringify(seed.dockets));
     if (seed.draft) localStorage.setItem("lawapp_draft_criminal-arraignment", JSON.stringify(seed.draft));
   } catch {
     // storage blocked
@@ -108,11 +114,15 @@ const failures = [];
 let checks = 0;
 
 const previewText = () =>
-  (document.querySelector("#preview")?.textContent || "").replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
+  (document.querySelector("#preview")?.textContent || "")
+    .replace(/\u00a0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 
 async function newContext(browser, theme, mode, seed) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  if (browserName === "chromium") await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin: base });
+  if (browserName === "chromium")
+    await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin: base });
   await context.addInitScript(themeInit, theme);
   if (mode === "throttled") await context.addInitScript(throttleInit);
   else await context.addInitScript(probeInit);
@@ -151,7 +161,12 @@ async function firstDisplay(page, ctx, label, want = [], not = []) {
       .waitForFunction(
         () => {
           if (!document.querySelector("#form-view")) return false;
-          return { text: (document.querySelector("#preview")?.textContent || "").replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim() };
+          return {
+            text: (document.querySelector("#preview")?.textContent || "")
+              .replace(/\u00a0/g, " ")
+              .replace(/\s+/g, " ")
+              .trim(),
+          };
         },
         null,
         { timeout: 15000, polling: 10 },
@@ -189,7 +204,9 @@ async function updated(page, ctx, label, want = [], not = []) {
     );
   } catch {
     const t = await page.evaluate(previewText);
-    failures.push(`${ctx} ${label}: preview never showed ${JSON.stringify(want)} without ${JSON.stringify(not)} (has ${t.length} chars)`);
+    failures.push(
+      `${ctx} ${label}: preview never showed ${JSON.stringify(want)} without ${JSON.stringify(not)} (has ${t.length} chars)`,
+    );
   }
 }
 
@@ -262,7 +279,8 @@ async function phaseNav(browser, theme, mode, ctx) {
     await page.click("#theme-toggle");
     await page.waitForTimeout(50);
     checks++;
-    if (!(await page.evaluate(previewText)).includes("CRIMINAL DIVISION")) failures.push(`${ctx} nav theme toggle ${i + 1}: preview lost`);
+    if (!(await page.evaluate(previewText)).includes("CRIMINAL DIVISION"))
+      failures.push(`${ctx} nav theme toggle ${i + 1}: preview lost`);
   }
   await page.fill("#form-search", "");
 
@@ -371,7 +389,8 @@ async function phaseSidebar(browser, theme, mode, ctx) {
         // The OS clipboard may turn \n into \r\n (Windows), and a textarea normalizes line breaks.
         const norm = (s) => s.replace(/\r\n?/g, "\n");
         const clip = norm(await page.evaluate(() => navigator.clipboard.readText()));
-        if (status !== "BBCode copied." || clip !== norm(bb)) fail(`Copy BBCode: status "${status}", clipboard ${clip.length} vs ${norm(bb).length} chars`);
+        if (status !== "BBCode copied." || clip !== norm(bb))
+          fail(`Copy BBCode: status "${status}", clipboard ${clip.length} vs ${norm(bb).length} chars`);
         copied = "copied";
       }
       await page.click("#tab-preview");
@@ -393,7 +412,13 @@ async function phaseFreestyle(browser, theme, mode, ctx) {
 
   // civil-complaint: FreestyleRP court wording and an in-game SC case number, no GTAW.
   await page.goto(base + "/#civil-complaint");
-  await firstDisplay(page, ctx, "freestyle civil-complaint", ["SAN ANDREAS COURT", GAME_YY + "SCCC"], ["SUPERIOR COURT OF THE STATE", "GJCC"]);
+  await firstDisplay(
+    page,
+    ctx,
+    "freestyle civil-complaint",
+    ["SAN ANDREAS COURT", GAME_YY + "SCCC"],
+    ["SUPERIOR COURT OF THE STATE", "GJCC"],
+  );
   checks++;
   if (await page.$("#active-server")) failures.push(`${ctx} freestyle: the server toggle is still in the toolbar`);
 
@@ -431,4 +456,6 @@ if (failures.length) {
   console.error(`FAIL ${failures.length}:\n` + failures.join("\n"));
   process.exit(1);
 }
-console.log(`OK: ${checks} preview checks (load, reload, restore, back/forward, hash, search, theme, seeded, sidebar) passed.`);
+console.log(
+  `OK: ${checks} preview checks (load, reload, restore, back/forward, hash, search, theme, seeded, sidebar) passed.`,
+);

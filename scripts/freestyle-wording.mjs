@@ -54,8 +54,13 @@ function courthouses(html) {
       .replace(new RegExp(`(YY|##|--)${GTAW_CODE}${DIVISIONS}`, "g"), `$1${code}`)
       // A worked example with a real GTAW year (26GJSM00001): in-game year 1990.
       .replace(new RegExp(`\\b\\d{2}${GTAW_CODE}${DIVISIONS}`, "g"), `90${code}`)
-      .replace(/\{\{Courthouse:select:[^|}]*\|[^}]*\}\}/g, `{{Courthouse:select:${names.join(";")}|${DEFAULT_COURTHOUSE.name}}}`)
-      .replace(/Greg E\.? Joplin Court ?house/gi, (m) => (m === m.toUpperCase() ? DEFAULT_COURTHOUSE.name : titleCase(DEFAULT_COURTHOUSE.name)))
+      .replace(
+        /\{\{Courthouse:select:[^|}]*\|[^}]*\}\}/g,
+        `{{Courthouse:select:${names.join(";")}|${DEFAULT_COURTHOUSE.name}}}`,
+      )
+      .replace(/Greg E\.? Joplin Court ?house/gi, (m) =>
+        m === m.toUpperCase() ? DEFAULT_COURTHOUSE.name : titleCase(DEFAULT_COURTHOUSE.name),
+      )
   );
 }
 

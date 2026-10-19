@@ -8,7 +8,14 @@ import Dialog from "./Dialog";
 
 export default function ChangelogDialog({ open, onClose }: { open: boolean; onClose(): void }) {
   return (
-    <Dialog open={open} onClose={onClose} id="changelog-dialog" className="changelog" titleId="changelog-title" title="What's new">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      id="changelog-dialog"
+      className="changelog"
+      titleId="changelog-title"
+      title="What's new"
+    >
       <p className="muted small" id="app-version">
         Version {APP_VERSION}
       </p>

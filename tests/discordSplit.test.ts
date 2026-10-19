@@ -84,7 +84,10 @@ describe("splitDiscord on every form with a long fixture", { timeout: 60000 }, (
 
 describe("splitDiscord keeps content and structure", () => {
   it("keeps every word", () => {
-    const parts = splitDiscord(doc(`<p>${escapeHtml(LONG_TEXT)}</p><p>${escapeHtml(LONG_TEXT)}</p>`), { limit: 2000, markers: false });
+    const parts = splitDiscord(doc(`<p>${escapeHtml(LONG_TEXT)}</p><p>${escapeHtml(LONG_TEXT)}</p>`), {
+      limit: 2000,
+      markers: false,
+    });
     expect(parts.length).toBeGreaterThan(2);
     const all = parts.join("\n");
     const words = LONG_TEXT.split(/\s+/).filter((w) => /^[A-Za-z]+[.?!]?$/.test(w));
@@ -154,7 +157,10 @@ describe("splitDiscord break points", () => {
   });
 
   it("breaks at a blank line (paragraph) when there are no headings", () => {
-    const html = Array.from({ length: 60 }, (_, i) => `<p>${"text ".repeat(12)}p${i}<br />second line p${i}</p><p>&nbsp;</p>`).join("");
+    const html = Array.from(
+      { length: 60 },
+      (_, i) => `<p>${"text ".repeat(12)}p${i}<br />second line p${i}</p><p>&nbsp;</p>`,
+    ).join("");
     const d = doc(html);
     const whole = d.lines.length ? splitDiscord(d, { limit: 100000, markers: false })[0] : "";
     const parts = splitDiscord(d, { limit: 2000, markers: false });
@@ -167,7 +173,9 @@ describe("splitDiscord break points", () => {
   });
 
   it("breaks a long line after a sentence", () => {
-    const text = Array.from({ length: 150 }, (_, i) => `Sentence number ${i} is here${["." , "?", "!"][i % 3]}`).join(" ");
+    const text = Array.from({ length: 150 }, (_, i) => `Sentence number ${i} is here${[".", "?", "!"][i % 3]}`).join(
+      " ",
+    );
     const parts = splitDiscord(doc(`<p>${text}</p>`), { limit: 2000, markers: false });
     expect(parts.length).toBeGreaterThan(1);
     for (const p of parts.slice(0, -1)) expect(p).toMatch(/[.?!]$/);

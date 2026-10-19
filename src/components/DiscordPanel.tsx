@@ -40,7 +40,10 @@ export default function DiscordPanel({ finalHtml, onStatus }: DiscordPanelProps)
 
   const copy = async (i: number) => {
     const ok = await copyText(parts[i]);
-    onStatus(ok ? `Part ${i + 1} copied. Paste it into Discord.` : "Copy failed: select the text and press Ctrl+C.", !ok);
+    onStatus(
+      ok ? `Part ${i + 1} copied. Paste it into Discord.` : "Copy failed: select the text and press Ctrl+C.",
+      !ok,
+    );
   };
 
   const n = parts.length;
@@ -49,12 +52,20 @@ export default function DiscordPanel({ finalHtml, onStatus }: DiscordPanelProps)
     <div id="discord-pane" role="tabpanel" aria-labelledby="tab-discord">
       <div className="dc-settings">
         <label htmlFor="dc-limit">Limit</label>
-        <select id="dc-limit" value={limit} onChange={(e) => update({ limit: e.target.value === "4000" ? 4000 : 2000 })}>
+        <select
+          id="dc-limit"
+          value={limit}
+          onChange={(e) => update({ limit: e.target.value === "4000" ? 4000 : 2000 })}
+        >
           <option value="2000">2,000 (standard)</option>
           <option value="4000">4,000 (Nitro)</option>
         </select>
         <label htmlFor="dc-tables">Tables</label>
-        <select id="dc-tables" value={tables} onChange={(e) => update({ tables: e.target.value === "lines" ? "lines" : "code" })}>
+        <select
+          id="dc-tables"
+          value={tables}
+          onChange={(e) => update({ tables: e.target.value === "lines" ? "lines" : "code" })}
+        >
           <option value="code">Code block</option>
           <option value="lines">Plain lines</option>
         </select>

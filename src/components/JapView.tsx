@@ -51,8 +51,9 @@ export default function JapView({ commissioner, syncOn, syncState, onTurnOnSync 
           <JapHead level="I" disabled onLevel={() => {}} />
           <div id="jap-gate" className="jap-note">
             <p>
-              The J.A.P. is for Court Commissioners. Pick a character whose title is <strong>Court Commissioner I</strong>{" "}
-              or <strong>Court Commissioner II</strong> under <em>Filing as</em>, or set the title in Characters.
+              The J.A.P. is for Court Commissioners. Pick a character whose title is{" "}
+              <strong>Court Commissioner I</strong> or <strong>Court Commissioner II</strong> under <em>Filing as</em>,
+              or set the title in Characters.
             </p>
           </div>
         </>
@@ -62,7 +63,15 @@ export default function JapView({ commissioner, syncOn, syncState, onTurnOnSync 
   );
 }
 
-function JapHead({ level, disabled, onLevel }: { level: PortfolioLevel; disabled: boolean; onLevel(l: PortfolioLevel): void }) {
+function JapHead({
+  level,
+  disabled,
+  onLevel,
+}: {
+  level: PortfolioLevel;
+  disabled: boolean;
+  onLevel(l: PortfolioLevel): void;
+}) {
   return (
     <div className="form-head">
       <div>
@@ -89,7 +98,10 @@ function JapHead({ level, disabled, onLevel }: { level: PortfolioLevel; disabled
 type Work = Record<PortfolioLevel, Record<string, PortfolioEntry[]>>;
 
 /** The rows on screen: saved entries, padded to each task's count (at least one). */
-function padWork(level: PortfolioLevel, saved: Record<string, PortfolioEntry[]> | undefined): Record<string, PortfolioEntry[]> {
+function padWork(
+  level: PortfolioLevel,
+  saved: Record<string, PortfolioEntry[]> | undefined,
+): Record<string, PortfolioEntry[]> {
   const out: Record<string, PortfolioEntry[]> = {};
   for (const t of tasks(level)) {
     if (!t.kind) continue;
@@ -222,8 +234,8 @@ function JapBody({ character, syncOn, syncState, onTurnOnSync }: BodyProps) {
         <div className="jap-note">
           {level === "I" ? (
             <p id="jap-where">
-              Post this as a new topic titled <strong>{topic}</strong>. When you&apos;re promoted to Court Commissioner II,
-              switch the template to CC II above and reply to that same topic with it.
+              Post this as a new topic titled <strong>{topic}</strong>. When you&apos;re promoted to Court Commissioner
+              II, switch the template to CC II above and reply to that same topic with it.
             </p>
           ) : (
             <p id="jap-where">
@@ -232,8 +244,8 @@ function JapBody({ character, syncOn, syncState, onTurnOnSync }: BodyProps) {
             </p>
           )}
           <p className="small muted">
-            Only completed motions, cases and warrants count. Work done as a Court Commissioner I can&apos;t be used for the
-            Court Commissioner II portfolio, so each template keeps its own list.
+            Only completed motions, cases and warrants count. Work done as a Court Commissioner I can&apos;t be used for
+            the Court Commissioner II portfolio, so each template keeps its own list.
           </p>
         </div>
         <div className={"jap-note jap-server" + (syncOn ? "" : " off")} id="jap-server">
@@ -315,11 +327,7 @@ interface TaskProps {
 
 function JapTask({ task: t, list, saved, onEntry, onMove, onRemove, onAdd }: TaskProps) {
   const n = saved.filter((e) => complete(t.kind, e)).length;
-  const count = t.count
-    ? Math.min(n, t.count) + " of " + t.count + " done"
-    : t.kind && n
-      ? n + " added"
-      : "optional";
+  const count = t.count ? Math.min(n, t.count) + " of " + t.count + " done" : t.kind && n ? n + " added" : "optional";
   const min = t.count || 1;
   const noun = nounFor(t);
   const parts = fieldsFor(t.kind);

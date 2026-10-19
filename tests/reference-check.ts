@@ -13,5 +13,9 @@ export default function setup(): void {
   if (process.env.LAWAPP_REQUIRE_REFERENCE) {
     throw new Error("LAWAPP_REQUIRE_REFERENCE is set but .agents/reference/jsa/ is missing " + missing.join(", "));
   }
-  console.warn("\n[parity] skipped: reference data not found (missing " + missing.join(", ") + "; see docs/templates-and-forms.md, Reference data)\n");
+  console.warn(
+    "\n[parity] skipped: reference data not found (missing " +
+      missing.join(", ") +
+      "; see docs/templates-and-forms.md, Reference data)\n",
+  );
 }

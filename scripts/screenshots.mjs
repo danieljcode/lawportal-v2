@@ -49,7 +49,10 @@ try {
         // No input is entered: the preview must hold the rendered template as soon as the form is there.
         const first = await page
           .waitForFunction(
-            () => document.querySelector("#form-view") && { text: (document.querySelector("#preview")?.textContent || "").trim() },
+            () =>
+              document.querySelector("#form-view") && {
+                text: (document.querySelector("#preview")?.textContent || "").trim(),
+              },
             null,
             { polling: 10 },
           )
