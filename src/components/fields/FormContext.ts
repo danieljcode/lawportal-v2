@@ -9,8 +9,11 @@ export interface FormCtx {
   /** Top-level entries of the form (fields(tree)). */
   entries: Entry[];
   character: Character | null;
-  /** Every edit goes through here as an update-API call on the current state. */
-  onState(fn: (s: FormState) => FormState): void;
+  /**
+   * Every edit goes through here as an update-API call on the current state, and
+   * is an undo step (LP-89). `key` (the input being typed in) groups typing into one step.
+   */
+  onState(fn: (s: FormState) => FormState, key?: string): void;
   /** The (possibly server-offset) current date fed to Today/Auto buttons. */
   now: Date;
   /** Labels the form requires (LP-87): empty ones are marked in the editor. */

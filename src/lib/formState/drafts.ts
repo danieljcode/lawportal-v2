@@ -23,17 +23,21 @@ export function stringMap(v: unknown): Record<string, string> {
   return out;
 }
 
+/** A saved draft (or draft snapshot, LP-89) as a FormState; null when it isn't one. */
+export function toFormState(raw: unknown): FormState | null {
+  if (!isItem(raw) || !isItem((raw as Record<string, unknown>).values)) return null;
+  const d = raw as Record<string, unknown>;
+  return { values: d.values as Values, autofilled: stringMap(d.autofilled), derived: stringMap(d.derived) };
+}
+
 /** The stored draft for a form; an invalid one is discarded and its key removed. */
 export function readDraft(kv: KV, formId: string): FormState | null {
   const key = draftKey(formId);
   const raw = readJson<unknown>(kv, key);
   if (raw === null) return null;
-  if (!isItem(raw) || !isItem((raw as Record<string, unknown>).values)) {
-    kv.remove(key);
-    return null;
-  }
-  const d = raw as Record<string, unknown>;
-  return { values: d.values as Values, autofilled: stringMap(d.autofilled), derived: stringMap(d.derived) };
+  const state = toFormState(raw);
+  if (!state) kv.remove(key);
+  return state;
 }
 
 /** Store a form's draft. Failures are ignored (design §Error handling: draft saves are best-effort). */
