@@ -16,6 +16,7 @@
 import { characterStore } from "./characters";
 import { docketStore } from "./dockets";
 import { portfolioStore } from "./portfolio";
+import { deleteCharacter } from "./services/characters";
 import { defaultKV } from "./storage";
 import { S_SYNC_APPLY_FAIL, S_SYNC_LOST, S_SYNC_MERGED } from "./strings";
 
@@ -231,11 +232,7 @@ function apply(doc: unknown): number {
       }
     }
     for (const c of chars.list()) {
-      if (!keep.has(c.id)) {
-        chars.remove(c.id);
-        dockets.removeAll(c.id);
-        portfolio.remove(c.id);
-      }
+      if (!keep.has(c.id)) deleteCharacter(c.id, { characters: chars, dockets, portfolio });
     }
     order.forEach((id, i) => {
       let at = chars.list().findIndex((c) => c.id === id);

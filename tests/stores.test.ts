@@ -10,6 +10,7 @@ import {
   CHARS_KEY,
 } from "@/lib/characters";
 import { createDocketStore, divisionFor, STATUSES } from "@/lib/dockets";
+import { deleteCharacter } from "@/lib/services/characters";
 import {
   cleanText,
   cleanUrl,
@@ -256,12 +257,16 @@ describe("characters", () => {
     chars.move(b.id, 1); // no-op at the bottom
     expect(chars.list().map((c) => c.id)).toEqual([a.id, copy.id, b.id]);
 
+    // The store removes only the character; deleteCharacter (LP-3) removes its docket and J.A.P. too.
     dockets.save(a.id, { caseNumber: "90SCCR00001" });
     jap.save(a.id, { level: "I" });
     chars.setActive(a.id);
     chars.remove(a.id);
     expect(chars.get(a.id)).toBeNull();
     expect(chars.activeId()).toBeNull();
+    expect(dockets.list(a.id)).toHaveLength(1);
+    expect(jap.get(a.id)).not.toBeNull();
+    deleteCharacter(a.id, { characters: chars, dockets, portfolio: jap });
     expect((kv as ReturnType<typeof spyKV>).keys().filter((k) => k.includes(a.id))).toEqual([]);
   });
 
