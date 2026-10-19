@@ -13,3 +13,7 @@ next-env.d.ts
 
 # npm run release-notes output
 release-notes.md
+
+# Playwright end-to-end output (LP-6)
+/test-results/
+/playwright-report/
