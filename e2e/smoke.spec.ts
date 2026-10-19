@@ -39,7 +39,10 @@ test("Copy for forum puts the filing on the clipboard as HTML", async ({ page, c
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await openForm(page, "civil-complaint");
   await page.locator("#f-plaintiff-name").fill("Ann Lee");
+  // The defendant and case number are still empty (LP-87): the copy asks first.
   await page.locator("#copy-rich").click();
+  await expect(page.locator("#missing-list")).toContainText("Defendant name");
+  await page.locator("#missing-anyway").click();
   await expect(page.locator("#copy-status")).toContainText("Copied");
   const html = await page.evaluate(async () => {
     const [item] = await navigator.clipboard.read();
@@ -51,7 +54,10 @@ test("Copy for forum puts the filing on the clipboard as HTML", async ({ page, c
 
 test("Download .docx gives a Word file", async ({ page }) => {
   await openForm(page, "civil-complaint");
+  // Every required field filled, so it downloads without asking (LP-87).
   await page.locator("#f-plaintiff-name").fill("Ann Lee");
+  await page.locator("#f-defendant-name").fill("Bo Day");
+  await page.locator("#f-case-number").fill("90SCCC00123");
   const [download] = await Promise.all([page.waitForEvent("download"), page.locator("#download-docx").click()]);
   expect(download.suggestedFilename()).toMatch(/\.docx$/);
   const stream = await download.createReadStream();

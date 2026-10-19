@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { checkTemplateHtml } from "./template-safety.mjs";
 import { unwrapBlockedLinks } from "./scrub-links.mjs";
 import { toFreestyle } from "./freestyle-wording.mjs";
+import { requiredFields } from "./required-fields.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const source = path.join(root, ".agents", "reference", "jsa", "js_forms.data.js");
@@ -70,7 +71,14 @@ if (problems.length) {
   fail(`${problems.length} template safety problem(s); nothing written`);
 }
 
-const out = forms.map((f) => ({ id: f.id, court: f.court, section: f.section, title: f.title, html: f.html }));
+const out = forms.map((f) => ({
+  id: f.id,
+  court: f.court,
+  section: f.section,
+  title: f.title,
+  required: requiredFields(f.html),
+  html: f.html,
+}));
 mkdirSync(path.dirname(target), { recursive: true });
 writeFileSync(target, JSON.stringify(out, null, 1), "utf8");
 console.log(`port-forms: wrote ${out.length} forms to ${path.relative(root, target)}`);

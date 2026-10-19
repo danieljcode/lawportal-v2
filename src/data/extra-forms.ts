@@ -57,6 +57,7 @@ const generalPetition: FormDef = {
   court: COURT,
   section: "Petitions",
   title: "General Petition",
+  required: ["Petitioner name", "Case number", "Respondent name", "Name"],
   html:
     "{{-- Court & Caption}}\n" +
     COURT_LINE +
@@ -84,6 +85,7 @@ const nameChange: FormDef = {
   court: COURT,
   section: "Petitions",
   title: "Petition for Name Change",
+  required: ["Petitioner name", "Case number", "Current legal name", "Proposed name", "Name"],
   html:
     "{{-- Court & Caption}}\n" +
     COURT_LINE +
@@ -117,6 +119,7 @@ const generalMotion: FormDef = {
   court: COURT,
   section: "Motions",
   title: "General Motion",
+  required: ["Plaintiff name", "Case number", "Defendant name", "Name"],
   html:
     "{{-- Court & Caption}}\n" +
     ADVERSARY_CAPTION +
@@ -143,6 +146,7 @@ const interrogatories: FormDef = {
   court: COURT,
   section: "Discovery",
   title: "Interrogatories",
+  required: ["Plaintiff name", "Case number", "Defendant name", "Responding party", "Name"],
   html:
     "{{-- Court & Caption}}\n" +
     ADVERSARY_CAPTION +
@@ -179,6 +183,7 @@ const subpoena: FormDef = {
   court: COURT,
   section: "Discovery",
   title: "Subpoena",
+  required: ["Plaintiff name", "Case number", "Defendant name", "Person subpoenaed", "Name"],
   html:
     "{{-- Court & Caption}}\n" +
     ADVERSARY_CAPTION +
@@ -209,6 +214,7 @@ const serviceContract: FormDef = {
   court: COURT,
   section: "Contracts",
   title: "Service Agreement",
+  required: ["Provider name", "Client name", "Provider signatory", "Client signatory"],
   html:
     "{{-- Parties}}\n" +
     title("SERVICES AGREEMENT") +

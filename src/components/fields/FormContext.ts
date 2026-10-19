@@ -13,6 +13,8 @@ export interface FormCtx {
   onState(fn: (s: FormState) => FormState): void;
   /** The (possibly server-offset) current date fed to Today/Auto buttons. */
   now: Date;
+  /** Labels the form requires (LP-87): empty ones are marked in the editor. */
+  required: ReadonlySet<string>;
 }
 
 export const FormContext = createContext<FormCtx | null>(null);

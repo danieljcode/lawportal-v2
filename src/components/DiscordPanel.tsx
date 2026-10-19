@@ -14,11 +14,13 @@ import { SAVE_FAILED } from "@/lib/storage";
 export interface DiscordPanelProps {
   finalHtml: SafeHtml;
   onStatus(text: string, bad: boolean): void;
+  /** Runs a copy, or first asks about empty required fields (LP-87). */
+  guard?(what: string, run: () => void): void;
 }
 
 const fmt = (n: number) => n.toLocaleString("en-US");
 
-export default function DiscordPanel({ finalHtml, onStatus }: DiscordPanelProps) {
+export default function DiscordPanel({ finalHtml, onStatus, guard = (_, run) => run() }: DiscordPanelProps) {
   // App is client-only (AppLoader, ssr: false), so storage can be read in the initializer.
   const [settings, setSettings] = useState<DiscordSettings>(() => readDiscordSettings());
   const { limit, tables, markers } = settings;
@@ -110,7 +112,12 @@ export default function DiscordPanel({ finalHtml, onStatus }: DiscordPanelProps)
                 >
                   Raw
                 </button>
-                <button type="button" className="btn" id={"dc-copy-" + (i + 1)} onClick={() => copy(i)}>
+                <button
+                  type="button"
+                  className="btn"
+                  id={"dc-copy-" + (i + 1)}
+                  onClick={() => guard("Copy", () => void copy(i))}
+                >
                   Copy part {i + 1}
                 </button>
               </div>
