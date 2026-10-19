@@ -10,17 +10,21 @@ It's a Next.js 15 app (React 19, TypeScript) that runs almost entirely in the br
   `ssr: false`. The app reads local storage on its first render, so it never renders on the server
   (no hydration mismatches).
 - **Hash routing.** `#civil-complaint` opens a form, `#jap` the J.A.P., an empty hash the start
-  page. `App.tsx` owns the route, the open dialog and the active character, and remembers the last
-  form under `lawapp_last_form`.
+  page. `useRoute` owns the route and remembers the last form under `lawapp_last_form`;
+  `useDialogs` owns the open dialog; `App.tsx` owns the active character and the layout.
 - **Three small API routes** on the same server, all behind a host check (see [Server](#server)):
   sync (`/api/account`, `/api/data`) and the `.docx` export (`/api/docx`).
 
 ```
 src/
   app/            page.tsx (client-only entry), layout.tsx, globals.css, api/{account,data,docx}
-  components/     App shell, FormView, dialogs, output panes; fields/ for the form editor inputs
+  components/     App shell (useRoute, useDialogs hooks), FormView, dialogs, output panes;
+                  fields/ for the form editor inputs
   data/           forms.json (39 court forms, generated), extra-forms.ts (6 templates), changelog.ts
   lib/            the logic: template engine, converters, stores, sync, settings (see below)
+  lib/template/   the template engine: parse, prefill, render, escape, plain (template.ts re-exports)
+  lib/discord/    HTML → Discord markdown: model, escape, serialize, dom, builder, tables, convert
+  lib/formState/  per-form state: state, update, rules, dockets, layout, drafts
   lib/services/   work spanning several stores (characters.ts: delete, duplicate, export, import)
   lib/server/     server-only: host guard, capped body reader, sync codes, file store
 scripts/          port-forms, FreestyleRP wording, template safety, release notes, Playwright scripts
@@ -47,9 +51,9 @@ flowchart LR
 
 1. **Template.** Each form (`src/data/forms.json`, `src/data/extra-forms.ts`) is the forum post's
    own HTML with `{{tokens}}` for the fields. See [Templates and forms](templates-and-forms.md).
-2. **Compile and fields** (`src/lib/template.ts`). `compile()` parses the template into a tree;
+2. **Compile and fields** (`src/lib/template/`, re-exported by `template.ts`). `compile()` parses the template into a tree;
    `fields()` lists the inputs. `FormView` turns those into the editor (`src/components/fields/`).
-3. **Form state** (`src/lib/formState.ts`). Values, prefills (dates, case numbers), filling from
+3. **Form state** (`src/lib/formState/`, re-exported by `formState.ts`). Values, prefills (dates, case numbers), filling from
    the active character and dockets, repeatable blocks. Drafts save per form under
    `lawapp_draft_<form id>`.
 4. **Render.** `render(tree, values)` produces the final HTML. **Every user value goes through
@@ -61,7 +65,7 @@ flowchart LR
    - **Forum:** the live preview, and Copy for forum (HTML that keeps tables, with BBCode as the
      plain-text fallback).
    - **BBCode** (`src/lib/bbcode.ts`) for editors that only take plain text.
-   - **Discord** (`src/lib/discord.ts`, `discordSplit.ts`, `discordPreview.ts`): markdown split into
+   - **Discord** (`src/lib/discord/`, `discordSplit.ts`, `discordPreview.ts`): markdown split into
      messages of up to 2,000 characters (4,000 with Nitro), never inside formatting or a link.
    - **Word:** the browser posts the HTML to `/api/docx`, and `src/lib/docx/htmlToDocx.ts` builds
      the file on the server. Images become `[Image: <url>]` links; the server never fetches them.
