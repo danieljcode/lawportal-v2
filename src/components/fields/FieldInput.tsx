@@ -28,12 +28,14 @@ export default function FieldInput({
   prefix,
   inline,
 }: ScopeProps & { field: Field; inline?: boolean }) {
-  const { entries, onState, now } = useFormCtx();
+  const { entries, onState, now, required } = useFormCtx();
   const inputRef = useRef<HTMLInputElement>(null);
   const id = slugId(prefix + f.label);
   const raw = scope[f.label];
   const value = typeof raw === "string" ? raw : "";
   const hint = plain(f.fallback);
+  // Required and still empty (LP-87): a quiet tag by the label, and the copy buttons warn.
+  const missing = f.type !== "check" && required.has(f.label) && !value.trim();
 
   const change = (v: string | boolean) =>
     onState((s) => {
@@ -154,9 +156,10 @@ export default function FieldInput({
   const help = HELP[f.type];
 
   return (
-    <div className={"field" + (MULTILINE.test(f.type) ? " wide" : "")}>
+    <div className={"field" + (MULTILINE.test(f.type) ? " wide" : "") + (missing ? " missing" : "")}>
       <label htmlFor={id}>
         {f.label}
+        {missing && <span className="tag req">Required</span>}
         {f.character && (
           <span className="tag" title="Filled from the active character">
             {characterTag(f.character)}

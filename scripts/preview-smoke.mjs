@@ -384,6 +384,8 @@ async function phaseSidebar(browser, theme, mode, ctx) {
       let copied = "skipped";
       if (browserName === "chromium") {
         await page.click("#copy-bbcode");
+        // Empty required fields (LP-87) ask first: copy anyway.
+        if (await page.isVisible("#missing-anyway")) await page.click("#missing-anyway");
         await waitFor(page, () => (document.querySelector("#copy-status")?.textContent || "").length > 0);
         const status = await page.textContent("#copy-status");
         // The OS clipboard may turn \n into \r\n (Windows), and a textarea normalizes line breaks.

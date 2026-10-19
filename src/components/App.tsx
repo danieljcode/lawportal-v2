@@ -29,7 +29,7 @@ import { useCharacterVersion, useSetAsideVersion, useSyncState } from "./useStor
 export type { DialogName } from "./useDialogs";
 export type { Route } from "./useRoute";
 
-const EMPTY_OUTPUT: FormOutput = { finalHtml: EMPTY_HTML, previewHtml: EMPTY_HTML };
+const EMPTY_OUTPUT: FormOutput = { finalHtml: EMPTY_HTML, previewHtml: EMPTY_HTML, missing: [], jumpTo: () => {} };
 
 /** One-time data migrations. Each is a no-op once done, so running on every mount is safe. */
 function migrate(): void {
@@ -215,6 +215,8 @@ export default function App() {
               form={form}
               finalHtml={formOutput.finalHtml}
               previewHtml={formOutput.previewHtml}
+              missing={formOutput.missing}
+              onJump={formOutput.jumpTo}
               highlight={highlight}
               onHighlight={setHighlight}
             />

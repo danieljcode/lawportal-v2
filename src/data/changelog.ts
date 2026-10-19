@@ -19,6 +19,20 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-19",
+    title: "Required fields",
+    items: [
+      {
+        type: "new",
+        text: "Forms now mark the fields a filing needs, such as the case number, the parties and your signature, with a small Required tag until they're filled.",
+      },
+      {
+        type: "new",
+        text: "Copy for forum, Copy BBCode, the Discord copy buttons and Download .docx tell you first if any of those are still empty. Click a field in the list to go straight to it, or copy anyway.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-19",
     title: "Full backup",
     items: [
       {
