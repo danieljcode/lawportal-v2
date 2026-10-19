@@ -12,6 +12,7 @@ export const dynamic = "force-dynamic";
 const MAX_BODY = 1_048_576;
 const MAX_CHARACTERS = 200;
 const MAX_CASES = 2000;
+const MAX_FILINGS = 500;
 const NO_STORE = { "Cache-Control": "no-store" };
 
 function json(body: unknown, status: number): Response {
@@ -32,6 +33,11 @@ function parseDoc(body: unknown): { rev: number; data: SyncRecord["data"] } | nu
   if (!isObject(data) || !Array.isArray(data.characters)) return null;
   if (data.characters.length > MAX_CHARACTERS || !data.characters.every(isObject)) return null;
   if (data.cases !== undefined && (!Array.isArray(data.cases) || data.cases.length > MAX_CASES || !data.cases.every(isObject)))
+    return null;
+  if (
+    data.filings !== undefined &&
+    (!Array.isArray(data.filings) || data.filings.length > MAX_FILINGS || !data.filings.every(isObject))
+  )
     return null;
   return { rev, data: data as SyncRecord["data"] };
 }

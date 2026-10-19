@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { fromHtml } from "@/lib/bbcode";
 import { copyRich, copyText } from "@/lib/clipboard";
 import { docxRequestBody } from "@/lib/docx/request";
+import type { FilingVia } from "@/lib/filings";
 import type { MissingField } from "@/lib/formState";
 import type { SafeHtml } from "@/lib/safeHtml";
 import type { FormDef } from "@/lib/types";
@@ -22,6 +23,10 @@ export interface OutputPaneProps {
   missing?: MissingField[];
   /** Take the user to one of them in the form. */
   onJump?(m: MissingField): void;
+  /** A copy or download went through (filing history, LP-15). */
+  onFiled?(via: FilingVia): void;
+  /** Open Filing history. */
+  onOpenHistory?(): void;
 }
 
 type Tab = "preview" | "bbcode" | "discord";
@@ -37,6 +42,8 @@ export default function OutputPane({
   onHighlight,
   missing = [],
   onJump,
+  onFiled,
+  onOpenHistory,
 }: OutputPaneProps) {
   const [tab, setTab] = useState<Tab>("preview");
   const [status, setStatus] = useState<{ text: string; bad: boolean } | null>(null);
@@ -65,11 +72,13 @@ export default function OutputPane({
   const copyForum = async () => {
     const ok = await copyRich(finalHtml, fromHtml(finalHtml));
     flash(ok ? "Copied. Paste it into the forum editor." : "Copy failed: select the preview and press Ctrl+C.", !ok);
+    if (ok) onFiled?.("forum");
   };
 
   const copyBBCode = async () => {
     const ok = await copyText(bbcode || fromHtml(finalHtml));
     flash(ok ? "BBCode copied." : "Copy failed: select the text and press Ctrl+C.", !ok);
+    if (ok) onFiled?.("bbcode");
   };
 
   const downloadDocx = async () => {
@@ -98,6 +107,7 @@ export default function OutputPane({
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 0);
+      onFiled?.("docx");
     } catch {
       flash("Couldn't build the .docx (server unreachable).", true);
     } finally {
@@ -211,7 +221,7 @@ export default function OutputPane({
               />
             </div>
           ) : tab === "discord" ? (
-            <DiscordPanel finalHtml={finalHtml} onStatus={flash} guard={guard} />
+            <DiscordPanel finalHtml={finalHtml} onStatus={flash} guard={guard} onCopied={() => onFiled?.("discord")} />
           ) : (
             <div id="bbcode-pane" role="tabpanel" aria-labelledby="tab-bbcode">
               <p className="note">
@@ -279,6 +289,11 @@ export default function OutputPane({
         >
           {status ? status.text : ""}
         </span>
+        {onOpenHistory && (
+          <button type="button" className="mini" id="open-filings" onClick={onOpenHistory}>
+            Filing history
+          </button>
+        )}
       </div>
     </aside>
   );

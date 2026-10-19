@@ -13,6 +13,7 @@ import { caseStore, filterCases, isMember } from "@/lib/cases";
 import { docketStore } from "@/lib/dockets";
 import { draftHistory, snapshotTime, SNAPSHOT_EVERY_MS, type Snapshot } from "@/lib/draftHistory";
 import { createDraftWriter, type DraftWriter } from "@/lib/draftWriter";
+import { filingStore, type FilingVia } from "@/lib/filings";
 import {
   applyPrefills,
   change,
@@ -56,6 +57,8 @@ export interface FormOutput {
   missing: MissingField[];
   /** Open the field's section and focus it. */
   jumpTo(m: MissingField): void;
+  /** A copy or download went through: keep it in the filing history (LP-15). */
+  onFiled(via: FilingVia): void;
 }
 
 export interface FormViewProps {
@@ -73,6 +76,16 @@ export interface FormViewProps {
   docketRequest?: DocketRequest | null;
   /** Reports whether the docket bar is shown (so the Dockets dialog can offer "Use in form"). */
   onDocketBar?(shown: boolean): void;
+  /** A filing to open as a new draft of this form (Filing history, LP-15); each new `seq` once. */
+  draftRequest?: DraftRequest | null;
+}
+
+export interface DraftRequest {
+  formId: string;
+  state: FormState;
+  /** When the filing was made, for the message. */
+  at: string;
+  seq: number;
 }
 
 export interface DocketRequest {
@@ -149,6 +162,7 @@ export default function FormView({
   onOutputGone,
   docketRequest,
   onDocketBar,
+  draftRequest,
 }: FormViewProps) {
   // The in-game "now" (FreestyleRP, 36 years back) fed to every date producer: Today, Auto,
   // prefills and the case-number year. Fixed while the form is open (new Date() on every
@@ -276,6 +290,30 @@ export default function FormView({
     el.focus({ preventScroll: true });
   }, [focusKey]);
 
+  // Filing history (LP-15): the state and character at the moment of the copy.
+  const latest = useRef({ state, activeCharacter });
+  useEffect(() => {
+    latest.current = { state, activeCharacter };
+  });
+  const onFiled = useCallback(
+    (via: FilingVia) => {
+      const { state: s, activeCharacter: who } = latest.current;
+      const raw = s.values["Case number"];
+      const caseNumber = typeof raw === "string" && raw.trim() ? raw.trim() : undefined;
+      filingStore().add({
+        formId: form.id,
+        formTitle: form.title,
+        charId: who ? who.id : null,
+        charName: who?.name,
+        caseNumber,
+        caseId: caseNumber ? caseStore().byNumber(caseNumber)?.id || null : null,
+        via,
+        state: s,
+      });
+    },
+    [form.id, form.title],
+  );
+
   const output = useMemo<FormOutput | null>(() => {
     if (!tree) return null;
     const finalHtml = render(tree, deferredValues, {});
@@ -284,8 +322,9 @@ export default function FormView({
       previewHtml: highlight ? render(tree, deferredValues, { highlight: true }) : finalHtml,
       missing: missingRequired(entries, deferredValues, form.required),
       jumpTo,
+      onFiled,
     };
-  }, [tree, entries, deferredValues, highlight, form.required, jumpTo]);
+  }, [tree, entries, deferredValues, highlight, form.required, jumpTo, onFiled]);
 
   // Leaving clears this form's output in App, so reopening it never shows the old instance's.
   // Declared before the publish effect: on a StrictMode re-run the setups run in order, publish last.
@@ -417,6 +456,19 @@ export default function FormView({
     // loadDocket reads this render's state; only a new request should trigger it.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- deliberately keyed on the request alone
   }, [docketRequest]);
+
+  // "Use as new draft" from Filing history while this form is open: an undo step, with the
+  // current draft kept in draft history first.
+  const handledDraft = useRef(draftRequest ? draftRequest.seq : 0);
+  useEffect(() => {
+    if (!draftRequest || draftRequest.seq === handledDraft.current || draftRequest.formId !== form.id) return;
+    handledDraft.current = draftRequest.seq;
+    keepSnapshot(state);
+    setState(draftRequest.state);
+    showFlash("Opened the filing from " + snapshotTime(draftRequest.at) + " as a new draft. Undo puts yours back.");
+    // Reads this render's state; only a new request should trigger it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- deliberately keyed on the request alone
+  }, [draftRequest]);
 
   return (
     <section id="form-view" className="form-view">

@@ -13,8 +13,8 @@ import { generateCode } from "./code";
 export interface SyncRecord {
   rev: number;
   updated: string;
-  /** The characters, and the firm's cases since LP-4 (absent in copies from before it). */
-  data: { characters: unknown[]; cases?: unknown[] };
+  /** The characters, the firm's cases (LP-4) and the filing history (LP-15); either list is absent in older copies. */
+  data: { characters: unknown[]; cases?: unknown[]; filings?: unknown[] };
 }
 
 export type WriteResult = { record: SyncRecord } | { conflict: SyncRecord } | "missing";

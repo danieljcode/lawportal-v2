@@ -6,17 +6,22 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { caseProblem, caseStore, filterCases, members, needsLead, NEEDS_LEAD } from "@/lib/cases";
 import { FIELDS, STATUSES } from "@/lib/docketFields";
+import { filingsForCase, filingStore, type Filing } from "@/lib/filings";
 import type { Case, Character } from "@/lib/types";
-import { useCaseVersion } from "./useStore";
+import { FilingList } from "./FilingsDialog";
+import { useCaseVersion, useFilingVersion } from "./useStore";
 
 export interface CaseFileViewProps {
   /** The case open from the route (#cases/<id>), or null for just the list. */
   caseId: string | null;
   characters: Character[];
+  /** Open a filing as a new draft (LP-15). */
+  onUseFiling?(f: Filing): void;
 }
 
-export default function CaseFileView({ caseId, characters }: CaseFileViewProps) {
+export default function CaseFileView({ caseId, characters, onUseFiling = () => {} }: CaseFileViewProps) {
   const version = useCaseVersion();
+  const filingVersion = useFilingVersion();
   const all = useMemo(() => (version >= 0 ? caseStore().list() : []), [version]);
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("");
@@ -26,6 +31,10 @@ export default function CaseFileView({ caseId, characters }: CaseFileViewProps) 
   const [savedId, setSavedId] = useState<string | null>(null);
   const shown = useMemo(() => filterCases(all, { q, status, charId }), [all, q, status, charId]);
   const selected = caseId ? all.find((c) => c.id === caseId) || null : null;
+  const caseFilings = useMemo(
+    () => (selected && filingVersion >= 0 ? filingsForCase(filingStore().list(), selected) : []),
+    [selected, filingVersion],
+  );
   const nameOf = (id: string) => characters.find((c) => c.id === id)?.name || "Unknown character";
   const filtered = !!(q || status || charId);
 
@@ -64,6 +73,8 @@ export default function CaseFileView({ caseId, characters }: CaseFileViewProps) 
         initial={selected}
         characters={characters}
         saved={savedId === selected.id}
+        filings={caseFilings}
+        onUseFiling={onUseFiling}
         onSaved={onSaved}
         onCancel={() => {}}
       />
@@ -198,12 +209,24 @@ interface CaseEditorProps {
   characters: Character[];
   /** Show "Saved." (this case was just saved). */
   saved?: boolean;
+  /** The case's filings (LP-15), newest first. */
+  filings?: Filing[];
+  onUseFiling?(f: Filing): void;
   onSaved(saved: Case, isNew: boolean): void;
   /** Cancel a new case. */
   onCancel(): void;
 }
 
-function CaseEditor({ initial, characters, saved, onSaved, onCancel }: CaseEditorProps) {
+function CaseEditor({
+  initial,
+  characters,
+  saved,
+  filings = [],
+  onUseFiling = () => {},
+  onSaved,
+  onCancel,
+}: CaseEditorProps) {
+  const [filingStatus, setFilingStatus] = useState<{ text: string; bad: boolean } | null>(null);
   const [values, setValues] = useState<Values>(() => {
     const v: Values = {};
     for (const f of FIELDS) v[f.key] = initial ? (initial[f.key] as string | undefined) || "" : "";
@@ -377,7 +400,23 @@ function CaseEditor({ initial, characters, saved, onSaved, onCancel }: CaseEdito
         <div className="case-links">
           <section className="case-empty" id="case-filings" aria-labelledby="case-filings-title">
             <h4 id="case-filings-title">Filings</h4>
-            <p className="small muted">No filings yet. Filings posted for this case will be listed here.</p>
+            {filings.length ? (
+              <>
+                <FilingList
+                  filings={filings}
+                  hideCase
+                  onUse={onUseFiling}
+                  onStatus={(text, bad) => setFilingStatus({ text, bad })}
+                />
+                <p className={"small" + (filingStatus?.bad ? " bad" : " good")} role="status">
+                  {filingStatus?.text || ""}
+                </p>
+              </>
+            ) : (
+              <p className="small muted">
+                No filings yet. Filings copied or downloaded with this case number will be listed here.
+              </p>
+            )}
           </section>
           <section className="case-empty" id="case-evidence" aria-labelledby="case-evidence-title">
             <h4 id="case-evidence-title">Evidence</h4>

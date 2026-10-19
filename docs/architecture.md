@@ -95,6 +95,7 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
 | J.A.P. portfolios (per character) | `src/lib/portfolio.ts`                   | `lawapp_jap_<character id>`          |
 | Form drafts                       | `src/lib/formState.ts`, `draftWriter.ts` | `lawapp_draft_<form id>`             |
 | Draft history (LP-89)             | `src/lib/draftHistory.ts`                | `lawapp_history_<form id>`           |
+| Filing history (LP-15)            | `src/lib/filings.ts`                     | `lawapp_filings`                     |
 | Sync state                        | `src/lib/sync.ts`                        | `lawapp_sync_*`                      |
 
 - **KV wrapper** (`src/lib/storage.ts`). The stores never touch `localStorage` directly: they go
@@ -162,6 +163,19 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
     `lawapp_dockets_<id>` keys. The pure docket
     fields (`FIELDS`, `clean`, `divisionFor`…) live in `docketFields.ts`, so the two don't import
     each other.
+- **Filing history** (`src/lib/filings.ts`, LP-15). Each successful Copy for forum, Copy BBCode,
+  Discord copy or .docx download keeps a filing: the form, the active character, the case number
+  (and the firm case it matched), when and how, and the form's values. Not its HTML: **Copy again**
+  renders the values with today's template, which keeps entries small enough to sync. Copying the
+  same values again refreshes the newest entry instead of adding one. The newest 150 are kept; if
+  storage is full, the oldest go first.
+  - **Filing history** (`FilingsDialog.tsx`, from the output pane's status bar) searches by form,
+    case number or character, filters by character and case number, and previews a filing.
+  - **Use as new draft** on the open form is an undo step (a `draftRequest` to FormView, after
+    keeping the current draft in draft history). For another form, App replaces that form's saved
+    draft (asking first if it has anything in it, and keeping it in draft history) and opens it.
+  - A case's filings (linked to it, or with its case number) show in its **Filings** area in the
+    Case File, with the same actions.
 - **Undo and draft history** (LP-89). FormView keeps its state in an `Undoable`
   (`src/lib/formState/undo.ts`): every change is an undo step, except that typing in one field
   with pauses under a second joins the last step. Ctrl+Z, Ctrl+Y and Ctrl+Shift+Z work while the
