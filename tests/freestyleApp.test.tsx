@@ -10,6 +10,7 @@ import FormView, { type FormOutput, type FormViewProps } from "@/components/Form
 import Sidebar from "@/components/Sidebar";
 import { ALL_FORMS, getForm } from "@/data";
 import { characterStore } from "@/lib/characters";
+import { runMigrations } from "@/lib/migrations";
 import * as sync from "@/lib/sync";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -193,7 +194,7 @@ describe("App without a server choice (LP-70)", () => {
     expect(must("#form-crumb").textContent).toContain("San Andreas Civil Court");
   });
 
-  it("on load, drops the old server field from saved characters and deletes the saved default (LP-71)", () => {
+  it("on start-up, drops the old server field from saved characters and deletes the saved default (LP-71)", () => {
     localStorage.setItem(
       "lawapp_chars",
       JSON.stringify([
@@ -202,10 +203,14 @@ describe("App without a server choice (LP-70)", () => {
       ]),
     );
     localStorage.setItem("lawapp_server", "gtaw");
+    // AppLoader runs the start-up migrations before App first renders (LP-2).
+    runMigrations();
     mountApp();
     expect(localStorage.getItem("lawapp_server")).toBeNull();
-    const stored = JSON.parse(localStorage.getItem("lawapp_chars")!) as Array<Record<string, unknown>>;
-    expect(stored).toEqual([
+    // Saved in the store envelope since LP-2.
+    const stored = JSON.parse(localStorage.getItem("lawapp_chars")!) as { v: number; data: unknown };
+    expect(stored.v).toBe(2);
+    expect(stored.data).toEqual([
       { id: "oldchar1", name: "Old Gtaw", title: "Judge" },
       { id: "oldchar2", name: "Old Free" },
     ]);
