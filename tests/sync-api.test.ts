@@ -169,6 +169,14 @@ describe("sync API (AC 15)", () => {
     expect((await PUT(put(code, { rev: 0, data: { characters: tooMany.slice(0, 200) } }))).status).toBe(200);
   });
 
+  it("PUT takes the filing history too, up to 500 objects (LP-15)", async () => {
+    const code = await newCode();
+    const filings = (n: number) => Array.from({ length: n }, () => ({ formId: "civil-complaint" }));
+    expect((await PUT(put(code, { rev: 0, data: { characters: [], filings: {} } }))).status).toBe(400);
+    expect((await PUT(put(code, { rev: 0, data: { characters: [], filings: filings(501) } }))).status).toBe(400);
+    expect((await PUT(put(code, { rev: 0, data: { characters: [], filings: filings(3) } }))).status).toBe(200);
+  });
+
   it("PUT takes the firm's cases next to the characters, up to 2,000 objects (LP-4)", async () => {
     const code = await newCode();
     const cases = (n: number) =>

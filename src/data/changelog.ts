@@ -19,6 +19,20 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-19",
+    title: "Filing history",
+    items: [
+      {
+        type: "new",
+        text: "Every filing you copy for the forum, as BBCode or for Discord, or download as .docx is now kept in Filing history (at the bottom of the preview), with its character, case number and time.",
+      },
+      {
+        type: "new",
+        text: "Search filings and filter them by character or case number, preview one, reopen it as a new draft, or copy it again. A case's filings also show on it in the Case File. The newest 150 are kept; they sync and are in your full backup.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-19",
     title: "Forms use the Case File",
     items: [
       {

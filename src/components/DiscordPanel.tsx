@@ -16,11 +16,13 @@ export interface DiscordPanelProps {
   onStatus(text: string, bad: boolean): void;
   /** Runs a copy, or first asks about empty required fields (LP-87). */
   guard?(what: string, run: () => void): void;
+  /** A part was copied (filing history, LP-15). */
+  onCopied?(): void;
 }
 
 const fmt = (n: number) => n.toLocaleString("en-US");
 
-export default function DiscordPanel({ finalHtml, onStatus, guard = (_, run) => run() }: DiscordPanelProps) {
+export default function DiscordPanel({ finalHtml, onStatus, guard = (_, run) => run(), onCopied }: DiscordPanelProps) {
   // App is client-only (AppLoader, ssr: false), so storage can be read in the initializer.
   const [settings, setSettings] = useState<DiscordSettings>(() => readDiscordSettings());
   const { limit, tables, markers } = settings;
@@ -42,6 +44,7 @@ export default function DiscordPanel({ finalHtml, onStatus, guard = (_, run) => 
 
   const copy = async (i: number) => {
     const ok = await copyText(parts[i]);
+    if (ok) onCopied?.();
     onStatus(
       ok ? `Part ${i + 1} copied. Paste it into Discord.` : "Copy failed: select the text and press Ctrl+C.",
       !ok,
