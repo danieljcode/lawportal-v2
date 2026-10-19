@@ -2,11 +2,10 @@
 //
 // One JSON array under lawapp_chars, in display order, plus the active id under
 // lawapp_active_char. Behaviour follows the reference js_characters.js, without
-// its cookie limits: there is a hard cap of 200 characters instead.
+// its cookie limits: there is a hard cap of 200 characters instead. This store
+// only knows characters: work spanning dockets and J.A.P. is in services/characters.ts.
 
 import type { Character } from "./types";
-import { DOCKETS_PREFIX } from "./dockets";
-import { JAP_PREFIX } from "./portfolio";
 import {
   createChannel,
   defaultKV,
@@ -134,7 +133,7 @@ export interface CharacterStore {
   save(c: Partial<Character> | Record<string, unknown>, opts?: { keepStamp?: boolean }): Character;
   /** Stamp updatedAt with now (a docket or J.A.P. change); nothing for an unknown id. */
   touch(id: string): void;
-  /** Also removes the character's dockets and J.A.P., and clears the active id if it was active. */
+  /** Removes only the character (and clears the active id if it was active); deleteCharacter in services/characters.ts also removes its docket and J.A.P. */
   remove(id: string): void;
   duplicate(id: string): Character | null;
   move(id: string, delta: number): void;
@@ -242,10 +241,6 @@ export function createCharacterStore(kv: KV): CharacterStore {
     remove(id) {
       const list = read();
       write(list.filter((c) => c.id !== id));
-      if (isId(id)) {
-        kv.remove(DOCKETS_PREFIX + id);
-        kv.remove(JAP_PREFIX + id);
-      }
       const wasActive = activeId() === id;
       if (wasActive) setActiveQuiet(null);
       changes.emit();

@@ -21,6 +21,7 @@ src/
   components/     App shell, FormView, dialogs, output panes; fields/ for the form editor inputs
   data/           forms.json (39 court forms, generated), extra-forms.ts (6 templates), changelog.ts
   lib/            the logic: template engine, converters, stores, sync, settings (see below)
+  lib/services/   work spanning several stores (characters.ts: delete, duplicate, export, import)
   lib/server/     server-only: host guard, capped body reader, sync codes, file store
 scripts/          port-forms, FreestyleRP wording, template safety, release notes, Playwright scripts
 tests/            vitest suites, snapshots, the reference-data oracle
@@ -88,6 +89,11 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
 - **Clean on the way in.** Every store runs input through a `clean()` function (trimmed strings,
   known fields only, valid ids), so imports, synced copies and old data can't put odd shapes into
   storage.
+- **Stores don't import each other** (LP-3). Work that spans them goes through
+  `src/lib/services/characters.ts`: `deleteCharacter` (the character, its docket and its J.A.P.),
+  `duplicateCharacter`, and the characters export and import. The one link the other way is
+  `touchCharacter` in `storage.ts`: a docket or J.A.P. change bumps its character's `updatedAt` for
+  the sync merge, without the stores importing each other.
 - **Startup migrations** run once per load in `App.tsx`: the old `lawapp.characters.v1` list, and
   the pre-FreestyleRP `server` field and `lawapp_server` key (LP-71).
 

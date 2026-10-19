@@ -15,9 +15,9 @@ import {
   restorePreview,
 } from "@/lib/backup";
 import { checkFileSize, EXPORT_FILENAME, exportText, importedMessage, importText } from "@/lib/characterFile";
+import { deleteCharacter, duplicateCharacter } from "@/lib/services/characters";
 import { characterStore, FIELDS, hasDocket, titleKeepsDocket } from "@/lib/characters";
 import { docketStore } from "@/lib/dockets";
-import { portfolioStore } from "@/lib/portfolio";
 import { backend, defaultKV, listSetAside } from "@/lib/storage";
 import { S_STORAGE_LOCAL, S_STORAGE_MEMORY, S_STORAGE_SYNC } from "@/lib/strings";
 import * as sync from "@/lib/sync";
@@ -148,9 +148,7 @@ function CharactersBody({ characters, activeId, onDockets, autoSync, onAutoSyncD
     const n = docketStore().list(c.id).length;
     const what = n ? " and their " + n + " docket entr" + (n === 1 ? "y" : "ies") : "";
     if (!confirm("Delete " + c.name + what + "? This cannot be undone.")) return;
-    store.remove(c.id);
-    docketStore().removeAll(c.id);
-    portfolioStore().remove(c.id);
+    deleteCharacter(c.id);
     if (editing && editing.id === c.id) setEditing(null);
   };
 
@@ -249,7 +247,7 @@ function CharactersBody({ characters, activeId, onDockets, autoSync, onAutoSyncD
                         {"Dockets (" + docketStore().list(c.id).length + ")"}
                       </button>
                     )}
-                    <button type="button" className="mini" onClick={() => store.duplicate(c.id)}>
+                    <button type="button" className="mini" onClick={() => duplicateCharacter(c.id)}>
                       Duplicate
                     </button>
                     <button
