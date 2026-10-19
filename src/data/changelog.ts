@@ -17,6 +17,12 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  { date: "2026-10-19", title: "Stable & FreestyleRP", version: "0.2.0", items: [
+    { type: "update", text: "The app is now just for FreestyleRP: FreestyleRP court names in every form, the Superior Court in case numbers (for example 90SCCR00XXX), in-game 1990 dates throughout, and no more Server switch." },
+    { type: "fix", text: "When two devices change things before syncing, your unsent edits are no longer lost: the newest copy of each character wins, and your version is kept so you can use Restore my version." },
+    { type: "fix", text: "Saved data that can't be read is set aside instead of deleted, and Download damaged data in the Characters dialog gives you a copy to fix by hand." },
+    { type: "new", text: "What's new shows which version of the app you're using." },
+  ]},
   { date: "2026-10-16", title: "FreestyleRP only", items: [
     { type: "update", text: "The app is now just for FreestyleRP: the Server switch is gone from the toolbar and from characters, and every form uses the in-game year (1990)." },
     { type: "fix", text: "J.A.P. case-number examples now use the Superior Court format (XXSCCR00000) instead of the old GTAW one." },
