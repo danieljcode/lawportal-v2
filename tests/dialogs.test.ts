@@ -113,7 +113,7 @@ describe("Characters dialog", () => {
   it("sets damaged characters aside with a notice and offers Download damaged data (LP-65)", async () => {
     act(() => root.unmount());
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    localStorage.setItem(CHARS_KEY, "[{\"id\":\"abcd1234\",\"name\":\"Half writ");
+    localStorage.setItem(CHARS_KEY, '[{"id":"abcd1234","name":"Half writ');
     root = createRoot(container);
     act(() => root.render(createElement(App)));
     expect(must("#set-aside-notice").textContent).toContain(S_SET_ASIDE);
@@ -130,7 +130,7 @@ describe("Characters dialog", () => {
     click("#download-damaged");
     expect(anchorClick).toHaveBeenCalled();
     const file = JSON.parse(await blob!.text()) as { setAside: Array<{ key: string; raw: string }> };
-    expect(file.setAside).toMatchObject([{ key: CHARS_KEY, raw: "[{\"id\":\"abcd1234\",\"name\":\"Half writ" }]);
+    expect(file.setAside).toMatchObject([{ key: CHARS_KEY, raw: '[{"id":"abcd1234","name":"Half writ' }]);
 
     click("#set-aside-dismiss");
     expect($("#set-aside-notice")).toBeNull();
@@ -232,7 +232,11 @@ describe("Dockets dialog", () => {
     type("#docket-caseNumber", "90SCCC00147");
     type("#docket-plaintiff", "Ann Smith");
     submit("#docket-form");
-    expect(docketStore().list(id).map((d) => d.caseNumber)).toEqual(["90SCCC00147"]);
+    expect(
+      docketStore()
+        .list(id)
+        .map((d) => d.caseNumber),
+    ).toEqual(["90SCCC00147"]);
 
     click("#new-docket");
     type("#docket-caseNumber", "90sccc00147");
@@ -245,12 +249,20 @@ describe("Dockets dialog", () => {
     const buttons = () => [...document.querySelectorAll<HTMLButtonElement>("#docket-list button")];
     expect(buttons().map((b) => b.textContent)).toEqual(["Use in form", "Edit", "Close case", "Delete"]);
 
-    act(() => buttons().find((b) => b.textContent === "Close case")!.click());
+    act(() =>
+      buttons()
+        .find((b) => b.textContent === "Close case")!
+        .click(),
+    );
     expect(must("#docket-list").textContent).toContain("No cases match.");
     choose("#docket-filter", "");
     expect(must("#docket-list").textContent).toContain("Closed");
 
-    act(() => buttons().find((b) => b.textContent === "Use in form")!.click());
+    act(() =>
+      buttons()
+        .find((b) => b.textContent === "Use in form")!
+        .click(),
+    );
     expect(must<HTMLDialogElement>("#dockets-dialog").hasAttribute("open")).toBe(false);
     expect(must<HTMLInputElement>("#f-case-number").value).toBe("90SCCC00147");
     expect(must("#docket-status").textContent).toMatch(/^Loaded 90SCCC00147/);

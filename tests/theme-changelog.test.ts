@@ -60,7 +60,10 @@ describe("changelog", () => {
 
   it("changes the stamp when an entry or an item is added", () => {
     expect(stamp(added)).not.toBe(stamp());
-    const moreItems: ChangelogEntry[] = [{ ...CHANGELOG[0], items: [...CHANGELOG[0].items, { type: "fix", text: "x" }] }, CHANGELOG[1]];
+    const moreItems: ChangelogEntry[] = [
+      { ...CHANGELOG[0], items: [...CHANGELOG[0].items, { type: "fix", text: "x" }] },
+      CHANGELOG[1],
+    ];
     expect(stamp(moreItems)).not.toBe(stamp());
   });
 

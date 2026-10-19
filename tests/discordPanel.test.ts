@@ -128,7 +128,10 @@ describe("Discord tab", () => {
   });
 
   it("switches to the Nitro limit and to plain-line tables", () => {
-    writeDraft(defaultKV(), "civil-complaint", { ...EMPTY_STATE, values: { "Factual background": LONG + "\n" + LONG } });
+    writeDraft(defaultKV(), "civil-complaint", {
+      ...EMPTY_STATE,
+      values: { "Factual background": LONG + "\n" + LONG },
+    });
     mount("civil-complaint");
     click("#tab-discord");
     const before = parts().length;
@@ -150,7 +153,11 @@ describe("Discord tab", () => {
     choose("#dc-limit", "4000");
     choose("#dc-tables", "lines");
     click("#dc-markers");
-    expect(JSON.parse(localStorage.getItem("lawapp_discord") || "null")).toEqual({ limit: 4000, tables: "lines", markers: false });
+    expect(JSON.parse(localStorage.getItem("lawapp_discord") || "null")).toEqual({
+      limit: 4000,
+      tables: "lines",
+      markers: false,
+    });
     unmount();
     mount("criminal-arraignment");
     click("#tab-discord");

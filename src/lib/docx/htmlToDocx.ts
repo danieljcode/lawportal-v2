@@ -234,7 +234,7 @@ class Walker {
     const kept = runs.filter((r) => r.brk || r.text);
     if (!kept.length) return;
     const children: Array<TextRun | ExternalHyperlink> = [];
-    for (let i = 0; i < kept.length; ) {
+    for (let i = 0; i < kept.length;) {
       const link = kept[i].link;
       if (!link) {
         children.push(textRun(kept[i++]));
@@ -247,7 +247,11 @@ class Walker {
     this.out.push(this.paragraph(cur, children));
   }
 
-  private paragraph(p: Omit<Pending, "runs">, children: Array<TextRun | ExternalHyperlink>, extra: { bottomOnly?: boolean } = {}) {
+  private paragraph(
+    p: Omit<Pending, "runs">,
+    children: Array<TextRun | ExternalHyperlink>,
+    extra: { bottomOnly?: boolean } = {},
+  ) {
     const b = p.boxed;
     return new Paragraph({
       children,

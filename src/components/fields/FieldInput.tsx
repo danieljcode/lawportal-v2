@@ -21,7 +21,13 @@ function characterTag(key: string): string {
   return CHARACTER_FIELDS.find((c) => c.key === key)?.label || key;
 }
 
-export default function FieldInput({ field: f, scope, path, prefix, inline }: ScopeProps & { field: Field; inline?: boolean }) {
+export default function FieldInput({
+  field: f,
+  scope,
+  path,
+  prefix,
+  inline,
+}: ScopeProps & { field: Field; inline?: boolean }) {
   const { entries, onState, now } = useFormCtx();
   const inputRef = useRef<HTMLInputElement>(null);
   const id = slugId(prefix + f.label);
@@ -64,7 +70,12 @@ export default function FieldInput({ field: f, scope, path, prefix, inline }: Sc
       break;
     case "select":
       input = (
-        <select id={id} value={value} aria-label={inline ? f.label : undefined} onChange={(e) => change(e.target.value)}>
+        <select
+          id={id}
+          value={value}
+          aria-label={inline ? f.label : undefined}
+          onChange={(e) => change(e.target.value)}
+        >
           <option value="">{hint ? "— keep “" + hint.slice(0, 40) + "” —" : "—"}</option>
           {/* A value from elsewhere (a loaded docket) that isn't an option is still shown, not blanked. */}
           {(value && !f.options.includes(value) ? [...f.options, value] : f.options).map((o) => (
@@ -117,7 +128,12 @@ export default function FieldInput({ field: f, scope, path, prefix, inline }: Sc
   const buttons: React.ReactElement[] = [];
   if (f.type === "date") {
     buttons.push(
-      <button key="today" type="button" className="mini" onClick={() => onState((s) => todayDate(entries, s, path, f.label, now))}>
+      <button
+        key="today"
+        type="button"
+        className="mini"
+        onClick={() => onState((s) => todayDate(entries, s, path, f.label, now))}
+      >
         Today
       </button>,
     );

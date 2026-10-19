@@ -60,7 +60,9 @@ describe("toDiscord: tags", () => {
 
   it("drops <mark>, colours, fonts and alignment", () => {
     expect(
-      md('<p style="text-align:center"><span style="color:#ff0000;font-family:Arial"><mark class="unfilled" title="N">x</mark></span></p>'),
+      md(
+        '<p style="text-align:center"><span style="color:#ff0000;font-family:Arial"><mark class="unfilled" title="N">x</mark></span></p>',
+      ),
     ).toBe("x");
   });
 
@@ -124,7 +126,9 @@ describe("toDiscord: escaping", () => {
   });
 
   it("user text through a template field never formats", () => {
-    const tree = compile("<p><strong>Name:</strong> {{Name|NAME}}</p><ul>{{Items:list|<li>X</li>}}</ul>{{Notes:paras|<p>N</p>}}");
+    const tree = compile(
+      "<p><strong>Name:</strong> {{Name|NAME}}</p><ul>{{Items:list|<li>X</li>}}</ul>{{Notes:paras|<p>N</p>}}",
+    );
     const out = md(render(tree, { Name: MD_TEXT, Items: MD_TEXT, Notes: "# heading\n> quote\n1. item" }));
     const esc = "a\\*b\\_c\\~d\\|e\\`f\\\\g # > [x]\\(https://e.com) @\u200bhere \\<@1>";
     expect(out).toBe(`**Name:** ${esc}\n- ${esc}\n\\# heading\n\\> quote\n1\\. item`);
@@ -149,7 +153,9 @@ describe("toDiscord: headings from font sizes", () => {
 
   it("inherits sizes from ancestors, including an outer table", () => {
     expect(md('<table style="font-size:14px"><tbody><tr><td><p>A</p></td></tr></tbody></table>')).toBe("A");
-    expect(md('<div style="font-size:20px"><p>A</p><p><span style="font-size:14px">B</span></p></div>')).toBe("## A\nB");
+    expect(md('<div style="font-size:20px"><p>A</p><p><span style="font-size:14px">B</span></p></div>')).toBe(
+      "## A\nB",
+    );
     expect(md('<p><span style="font-size:28px"><b>TITLE</b></span></p>')).toBe("# **TITLE**");
   });
 
@@ -186,7 +192,9 @@ describe("toDiscord: links and images", () => {
   });
 
   it("keeps formatting away from a bare URL (Discord's autolink would swallow it), but spoilers stay hidden", () => {
-    expect(md('<p><u>see <a href="https://e.com/a">https://e.com/a</a> now</u></p>')).toBe("__see__ https://e.com/a __now__");
+    expect(md('<p><u>see <a href="https://e.com/a">https://e.com/a</a> now</u></p>')).toBe(
+      "__see__ https://e.com/a __now__",
+    );
     expect(md(SPOILER('<p><img src="https://e.com/a.png" /></p>'))).toBe("|| https://e.com/a.png ||");
   });
 
@@ -197,11 +205,15 @@ describe("toDiscord: links and images", () => {
   });
 
   it("encodes parentheses in the URL and escapes the link text", () => {
-    expect(md('<p><a href="https://e.com/a_(b)">x [y] *z*</a></p>')).toBe("[x \\[y\\] \\*z\\*](https://e.com/a_%28b%29)");
+    expect(md('<p><a href="https://e.com/a_(b)">x [y] *z*</a></p>')).toBe(
+      "[x \\[y\\] \\*z\\*](https://e.com/a_%28b%29)",
+    );
   });
 
   it("puts an http(s) image URL on its own line and drops other images", () => {
-    expect(md('<p>before <img src="https://e.com/a.png" alt="" /> after</p>')).toBe("before\nhttps://e.com/a.png\nafter");
+    expect(md('<p>before <img src="https://e.com/a.png" alt="" /> after</p>')).toBe(
+      "before\nhttps://e.com/a.png\nafter",
+    );
     expect(md('<p>a<img src="data:image/png;base64,xx" />b<img src="x.png" /></p>')).toBe("ab");
   });
 });
@@ -276,7 +288,9 @@ describe("toDiscord: tables", () => {
   });
 
   it("doesn't count an image as a grid column", () => {
-    const out = md(`<table><tbody><tr><td>${px(28, "COURT")}</td><td><img src="https://e.com/seal.png" /></td></tr></tbody></table>`);
+    const out = md(
+      `<table><tbody><tr><td>${px(28, "COURT")}</td><td><img src="https://e.com/seal.png" /></td></tr></tbody></table>`,
+    );
     expect(out).toBe("# COURT\nhttps://e.com/seal.png");
   });
 

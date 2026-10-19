@@ -41,7 +41,9 @@ describe("checkHeader", () => {
   it("accepts the titles Dependabot makes with .github/dependabot.yml (LP-85)", () => {
     const config = readFileSync(path.resolve(process.cwd(), ".github/dependabot.yml"), "utf8");
     // npm: prefix chore with the scope; Actions: prefix ci with the scope.
-    expect(config).toMatch(/package-ecosystem: npm[\s\S]*?prefix: chore[\s\S]*?prefix-development: chore[\s\S]*?include: scope/);
+    expect(config).toMatch(
+      /package-ecosystem: npm[\s\S]*?prefix: chore[\s\S]*?prefix-development: chore[\s\S]*?include: scope/,
+    );
     expect(config).toMatch(/package-ecosystem: github-actions[\s\S]*?prefix: ci[\s\S]*?include: scope/);
     for (const h of [
       "chore(deps): bump the npm-minor-and-patch group with 3 updates",
@@ -55,7 +57,9 @@ describe("checkHeader", () => {
   });
 
   it("only looks at the first line", () => {
-    expect(checkHeader(EXAMPLE + "\n\nBody text that is long enough to go well past seventy-two characters.")).toEqual([]);
+    expect(checkHeader(EXAMPLE + "\n\nBody text that is long enough to go well past seventy-two characters.")).toEqual(
+      [],
+    );
   });
 
   it("explains each kind of mistake", () => {
@@ -78,7 +82,9 @@ describe("checkHeader", () => {
     expect(checkHeader("fix(sync): merge conflicts (LP-64)")[0]).toMatch(/doesn't end with the Jira key/);
     expect(checkHeader("fix(sync): [LP-64]")).toEqual(["It has no summary between the colon and the key."]);
     expect(checkHeader("fix(sync): Merge conflicts [LP-64]")[0]).toMatch(/starts with a capital letter/);
-    expect(checkHeader("fix(sync): merge conflicts. [LP-64]")).toEqual(["The summary ends with a full stop; leave it off."]);
+    expect(checkHeader("fix(sync): merge conflicts. [LP-64]")).toEqual([
+      "The summary ends with a full stop; leave it off.",
+    ]);
   });
 
   it("allows an acronym to lead the summary", () => {
@@ -91,7 +97,9 @@ describe("checkHeader", () => {
     expect(at).toHaveLength(MAX_LENGTH);
     expect(checkHeader(at)).toEqual([]);
     const over = at.replace(" [LP-64]", "b [LP-64]");
-    expect(checkHeader(over)).toEqual([`It's ${MAX_LENGTH + 1} characters; the limit is ${MAX_LENGTH}, including the key.`]);
+    expect(checkHeader(over)).toEqual([
+      `It's ${MAX_LENGTH + 1} characters; the limit is ${MAX_LENGTH}, including the key.`,
+    ]);
   });
 
   it("reports every problem at once", () => {

@@ -48,6 +48,20 @@ npm start
 
 Both `dev` and `start` bind to `127.0.0.1`, so only this computer can reach the app.
 
+## Code style and editor set-up
+
+Formatting is Prettier's job and ESLint checks for mistakes (LP-86); CI runs both.
+
+- **Prettier** (`.prettierrc.json`): its defaults, with lines up to 120 characters. Generated files
+  are left alone (`.prettierignore`: `forms.json`, snapshots, the lockfile).
+- **ESLint** (`eslint.config.mjs`): Next.js's `core-web-vitals` and TypeScript rules, with style
+  rules turned off in favour of Prettier. A rule is only switched off on a line with a reason:
+  `// eslint-disable-next-line <rule> -- <why>`.
+- **Kiro or VS Code:** `.vscode/settings.json` makes Prettier the formatter and formats on save,
+  using the project's config. Install the two recommended extensions when prompted (Prettier,
+  `esbenp.prettier-vscode`, and ESLint, `dbaeumer.vscode-eslint`; Kiro gets them from Open VSX).
+- Before pushing: `npm run lint` and `npm run format:check`, or `npm run format` to fix formatting.
+
 ## Other devices on your network (LAN mode)
 
 ```bash
@@ -66,29 +80,32 @@ npm run build && npm run start:lan
 
 ## Scripts
 
-| Command | What it does |
-|---|---|
-| `npm run dev` | Development server on `127.0.0.1:3000`, with hot reload. |
-| `npm run dev:lan` | The same on `0.0.0.0`, API open to the network. |
-| `npm run build` | Type-checks the app and tests, and makes a production build. |
-| `npm start` | Serves the production build on `127.0.0.1:3000`. |
-| `npm run start:lan` | The same on `0.0.0.0`, API open to the network. |
-| `npm test` | Runs every test suite once (Vitest). See [Testing](testing.md). |
-| `npm run port-forms` | Regenerates `src/data/forms.json` from the reference data. See [Templates and forms](templates-and-forms.md#regenerating-the-court-forms). |
-| `npm run screenshots` | Screenshots of the running app into `.agents/screenshots/` (Playwright). |
-| `npm run smoke:preview` | Browser smoke test of every form against the running app (Playwright). |
-| `npm run release-notes` | Prints the GitHub Release notes for the version in `package.json`. See [Releasing](releasing.md). |
-| `npm run prepare` | Runs on `npm install`: turns on the commit-message hook in `.githooks/`. |
+| Command                 | What it does                                                                                                                               |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `npm run dev`           | Development server on `127.0.0.1:3000`, with hot reload.                                                                                   |
+| `npm run dev:lan`       | The same on `0.0.0.0`, API open to the network.                                                                                            |
+| `npm run build`         | Type-checks the app and tests, and makes a production build.                                                                               |
+| `npm start`             | Serves the production build on `127.0.0.1:3000`.                                                                                           |
+| `npm run start:lan`     | The same on `0.0.0.0`, API open to the network.                                                                                            |
+| `npm test`              | Runs every test suite once (Vitest). See [Testing](testing.md).                                                                            |
+| `npm run lint`          | ESLint (Next.js, React and TypeScript rules); fails on any error or warning.                                                               |
+| `npm run format`        | Formats every file with Prettier.                                                                                                          |
+| `npm run format:check`  | Checks formatting without changing anything (what CI runs).                                                                                |
+| `npm run port-forms`    | Regenerates `src/data/forms.json` from the reference data. See [Templates and forms](templates-and-forms.md#regenerating-the-court-forms). |
+| `npm run screenshots`   | Screenshots of the running app into `.agents/screenshots/` (Playwright).                                                                   |
+| `npm run smoke:preview` | Browser smoke test of every form against the running app (Playwright).                                                                     |
+| `npm run release-notes` | Prints the GitHub Release notes for the version in `package.json`. See [Releasing](releasing.md).                                          |
+| `npm run prepare`       | Runs on `npm install`: turns on the commit-message hook in `.githooks/`.                                                                   |
 
 ## Environment variables
 
-| Variable | Used by | Effect |
-|---|---|---|
-| `LAWAPP_ALLOW_LAN=1` | API routes | Answer requests from any host, not only `localhost`. The `:lan` scripts set it. |
-| `LAWAPP_SYNC_DIR` | Sync API | Where sync files go (default `data/sync/`). |
-| `LAWAPP_REQUIRE_REFERENCE=1` | Tests | Fail instead of skipping when the reference data is missing. CI sets it. |
-| `PLAYWRIGHT_CHANNEL` | Playwright scripts | Use an installed browser, e.g. `msedge`. |
-| `BASE_URL` | Playwright scripts | The app's address, instead of passing it as an argument. |
+| Variable                     | Used by            | Effect                                                                          |
+| ---------------------------- | ------------------ | ------------------------------------------------------------------------------- |
+| `LAWAPP_ALLOW_LAN=1`         | API routes         | Answer requests from any host, not only `localhost`. The `:lan` scripts set it. |
+| `LAWAPP_SYNC_DIR`            | Sync API           | Where sync files go (default `data/sync/`).                                     |
+| `LAWAPP_REQUIRE_REFERENCE=1` | Tests              | Fail instead of skipping when the reference data is missing. CI sets it.        |
+| `PLAYWRIGHT_CHANNEL`         | Playwright scripts | Use an installed browser, e.g. `msedge`.                                        |
+| `BASE_URL`                   | Playwright scripts | The app's address, instead of passing it as an argument.                        |
 
 ## Where things are saved
 
@@ -99,13 +116,13 @@ npm run build && npm run start:lan
 
 ## Common problems
 
-| Symptom | Cause and fix |
-|---|---|
-| Another device gets errors, or the API answers `421` | The app wasn't started in LAN mode. Use `npm run start:lan`. |
-| Copy doesn't work on another device | Expected over plain http: the app falls back to a text selection, so paste should still work. |
-| `[parity] skipped: reference data not found` | Normal without access to the reference data. With access, clone it into `.agents/reference/jsa` (see above). |
-| `port-forms: the reference forms aren't here` | The same: `port-forms` needs the reference data. |
-| `bad option: --experimental-strip-types` | Node is older than 22.6. Upgrade Node. |
-| Snapshot files show as changed after running tests on Windows | Only line endings changed: `git checkout -- tests/__snapshots__`. |
-| A commit is refused with "doesn't follow the convention" | The commit-message hook. Fix the message as it explains, or see [Contributing](contributing.md). |
-| "Some saved data couldn't be read and was set aside." | A saved value was damaged. See [Sync, storage and recovery](sync.md#damaged-data). |
+| Symptom                                                       | Cause and fix                                                                                                |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Another device gets errors, or the API answers `421`          | The app wasn't started in LAN mode. Use `npm run start:lan`.                                                 |
+| Copy doesn't work on another device                           | Expected over plain http: the app falls back to a text selection, so paste should still work.                |
+| `[parity] skipped: reference data not found`                  | Normal without access to the reference data. With access, clone it into `.agents/reference/jsa` (see above). |
+| `port-forms: the reference forms aren't here`                 | The same: `port-forms` needs the reference data.                                                             |
+| `bad option: --experimental-strip-types`                      | Node is older than 22.6. Upgrade Node.                                                                       |
+| Snapshot files show as changed after running tests on Windows | Only line endings changed: `git checkout -- tests/__snapshots__`.                                            |
+| A commit is refused with "doesn't follow the convention"      | The commit-message hook. Fix the message as it explains, or see [Contributing](contributing.md).             |
+| "Some saved data couldn't be read and was set aside."         | A saved value was damaged. See [Sync, storage and recovery](sync.md#damaged-data).                           |

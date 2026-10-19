@@ -15,10 +15,15 @@ export default function CondSection({ entry, scope, path, prefix }: ScopeProps &
   return (
     <fieldset className="cond">
       <label className="field check cond-toggle" htmlFor={id}>
-        <input id={id} type="checkbox" checked={on} onChange={(e) => {
-          const checked = e.target.checked;
-          onState((s) => setCond(s, path, name, checked));
-        }} />
+        <input
+          id={id}
+          type="checkbox"
+          checked={on}
+          onChange={(e) => {
+            const checked = e.target.checked;
+            onState((s) => setCond(s, path, name, checked));
+          }}
+        />
         <span>
           Include: <strong>{name}</strong>
         </span>

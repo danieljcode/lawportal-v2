@@ -29,7 +29,13 @@ export const EMPTY_STATE: FormState = Object.freeze({
   derived: Object.freeze({}) as Record<string, string>,
 });
 
-export const PLAINTIFF_LABELS = ["Plaintiff name", "Plaintiff name(s)", "Petitioner name", "Appellant name", "Petitioners (names)"];
+export const PLAINTIFF_LABELS = [
+  "Plaintiff name",
+  "Plaintiff name(s)",
+  "Petitioner name",
+  "Appellant name",
+  "Petitioners (names)",
+];
 export const DEFENDANT_LABELS = ["Defendant name", "Defendant name(s)"];
 export const FILED_LABELS = ["Action filed", "Filing date"];
 
@@ -193,9 +199,7 @@ export function addItem(s: FormState, path: ScopePath, block: string): FormState
 
 /** Remove item `i`; any block can go down to 0 items. */
 export function removeItem(s: FormState, path: ScopePath, block: string, i: number): FormState {
-  return editItems(s, path, block, (items) =>
-    i >= 0 && i < items.length ? items.filter((_x, j) => j !== i) : null,
-  );
+  return editItems(s, path, block, (items) => (i >= 0 && i < items.length ? items.filter((_x, j) => j !== i) : null));
 }
 
 /** Swap item `i` with its neighbour; a no-op at the ends. */
@@ -485,7 +489,10 @@ export function layout(entries: Entry[]): LayoutItem[] {
 }
 
 /** "2 of 5 filled · 3 ticked" counts for a section header. */
-export function sectionMeta(entries: Entry[], values: Values): { filled: number; total: number; ticked: number; done: boolean } {
+export function sectionMeta(
+  entries: Entry[],
+  values: Values,
+): { filled: number; total: number; ticked: number; done: boolean } {
   let filled = 0;
   let total = 0;
   let ticked = 0;

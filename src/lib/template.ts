@@ -13,18 +13,7 @@
 // untouched form reproduces the directory template exactly. Behaviour follows
 // the reference engine; see .agents/tasks/jsa-investigation.md §b.
 
-import type {
-  BlockEntry,
-  BlockNode,
-  CondEntry,
-  CondNode,
-  Entry,
-  Field,
-  FieldType,
-  Node,
-  Tree,
-  Values,
-} from "./types";
+import type { BlockEntry, BlockNode, CondEntry, CondNode, Entry, Field, FieldType, Node, Tree, Values } from "./types";
 
 export const TYPES: readonly FieldType[] = [
   "text",
@@ -54,19 +43,57 @@ export const CHARACTER_LABELS: Readonly<Record<string, string>> = {
 };
 
 const MONTH_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 const NUMBER_WORDS = [
-  "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
-  "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen",
-  "Eighteen", "Nineteen", "Twenty",
+  "One",
+  "Two",
+  "Three",
+  "Four",
+  "Five",
+  "Six",
+  "Seven",
+  "Eight",
+  "Nine",
+  "Ten",
+  "Eleven",
+  "Twelve",
+  "Thirteen",
+  "Fourteen",
+  "Fifteen",
+  "Sixteen",
+  "Seventeen",
+  "Eighteen",
+  "Nineteen",
+  "Twenty",
 ];
 
 const ROMAN_STEPS: Array<[number, string]> = [
-  [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"],
-  [50, "L"], [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"],
+  [1000, "M"],
+  [900, "CM"],
+  [500, "D"],
+  [400, "CD"],
+  [100, "C"],
+  [90, "XC"],
+  [50, "L"],
+  [40, "XL"],
+  [10, "X"],
+  [9, "IX"],
+  [5, "V"],
+  [4, "IV"],
+  [1, "I"],
 ];
 
 /** Tags that start a new template line (used for `field.line` and check indents). */
@@ -75,11 +102,7 @@ const IMAGE_URL = /^https?:\/\/\S+\.(png|jpe?g|gif|webp)(\?\S*)?$/i;
 const ANY_URL = /^https?:\/\/\S+$/i;
 
 export function escapeHtml(s: unknown): string {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 export function characterLabel(key: string): string {
@@ -125,7 +148,14 @@ function parseField(token: string): Omit<Field, "line"> {
     throw new Error(`Unknown field type '${type}' in {{${spec}}}`);
   }
   // Options are re-joined on ":" first so values like "text-align:justify" survive.
-  const options = parts.length > 2 ? parts.slice(2).join(":").split(";").map((o) => o.trim()) : [];
+  const options =
+    parts.length > 2
+      ? parts
+          .slice(2)
+          .join(":")
+          .split(";")
+          .map((o) => o.trim())
+      : [];
   if (!label) throw new Error(`Field without a label: {{${spec}}}`);
 
   const field: Omit<Field, "line"> = { fallback, label, type: type as FieldType, options };
@@ -416,17 +446,28 @@ export function formatDate(value: string, fmt?: string): string {
   if (month === undefined) return value;
   const mon = month.slice(0, 3).toUpperCase();
   switch ((fmt || "long").toLowerCase()) {
-    case "short": return `${pad2(d)}/${mon}/${y}`;
-    case "daymon": return `${pad2(d)}/${mon}`;
-    case "us": return `${pad2(mo)}/${pad2(d)}/${y}`;
-    case "day": return String(d);
-    case "ordinal": return ordinal(d);
-    case "month": return month;
-    case "year": return String(y);
-    case "monthday": return `${month} ${d}`;
-    case "dmy": return `${d} ${month} ${y}`;
-    case "dmyc": return `${d}, ${month}, ${y}`;
-    default: return `${month} ${d}, ${y}`;
+    case "short":
+      return `${pad2(d)}/${mon}/${y}`;
+    case "daymon":
+      return `${pad2(d)}/${mon}`;
+    case "us":
+      return `${pad2(mo)}/${pad2(d)}/${y}`;
+    case "day":
+      return String(d);
+    case "ordinal":
+      return ordinal(d);
+    case "month":
+      return month;
+    case "year":
+      return String(y);
+    case "monthday":
+      return `${month} ${d}`;
+    case "dmy":
+      return `${d} ${month} ${y}`;
+    case "dmyc":
+      return `${d}, ${month}, ${y}`;
+    default:
+      return `${month} ${d}, ${y}`;
   }
 }
 
@@ -445,7 +486,9 @@ function richLines(value: unknown): string[] {
 function spoilerHtml(inner: string): string {
   return (
     '<div class="ipsSpoiler" data-ipsspoiler=""><div class="ipsSpoiler_header"><span>Spoiler</span></div>' +
-    '<div class="ipsSpoiler_contents">' + inner + "</div></div>"
+    '<div class="ipsSpoiler_contents">' +
+    inner +
+    "</div></div>"
   );
 }
 
@@ -472,9 +515,7 @@ function renderValue(f: Field, value: unknown, opts: RenderOptions): string {
   }
   if (isEmpty(value)) {
     if (!f.fallback) return "";
-    return opts.highlight
-      ? `<mark class="unfilled" title="${escapeHtml(f.label)}">${f.fallback}</mark>`
-      : f.fallback;
+    return opts.highlight ? `<mark class="unfilled" title="${escapeHtml(f.label)}">${f.fallback}</mark>` : f.fallback;
   }
   const text = String(value);
   switch (f.type) {
@@ -500,7 +541,11 @@ function renderValue(f: Field, value: unknown, opts: RenderOptions): string {
         .join("\n");
     }
     case "spoiler":
-      return spoilerHtml(richLines(text).map((l) => `<p>${l || "&nbsp;"}</p>`).join(""));
+      return spoilerHtml(
+        richLines(text)
+          .map((l) => `<p>${l || "&nbsp;"}</p>`)
+          .join(""),
+      );
     case "image": {
       const t = text.trim();
       return ANY_URL.test(t) ? `<img src="${escapeHtml(t)}" alt="" />` : escapeHtml(text);
@@ -521,11 +566,16 @@ function renderField(f: Field, value: unknown, opts: RenderOptions): string {
 
 function renderPos(what: string, values: Values, index: number, defaultCount?: number): string {
   switch (what) {
-    case "index": return String(index + 1);
-    case "word": return NUMBER_WORDS[index] || String(index + 1);
-    case "WORD": return (NUMBER_WORDS[index] || String(index + 1)).toUpperCase();
-    case "letter": return String.fromCharCode(65 + index);
-    case "roman": return roman(index + 1);
+    case "index":
+      return String(index + 1);
+    case "word":
+      return NUMBER_WORDS[index] || String(index + 1);
+    case "WORD":
+      return (NUMBER_WORDS[index] || String(index + 1)).toUpperCase();
+    case "letter":
+      return String.fromCharCode(65 + index);
+    case "roman":
+      return roman(index + 1);
   }
   if (/^roman after /.test(what)) {
     const items = values["#" + what.slice("roman after ".length).trim()];
@@ -600,11 +650,14 @@ function fromCodePoint(code: number, raw: string): string {
 export function plain(html: string): string {
   return String(html)
     .replace(/<[^>]*>/g, "")
-    .replace(/&(?:(nbsp|amp|lt|gt|quot|apos)|#(\d+)|#[xX]([0-9a-fA-F]+));/g, (raw, name?: string, dec?: string, hex?: string) => {
-      if (name) return NAMED_ENTITIES[name];
-      if (dec) return fromCodePoint(parseInt(dec, 10), raw);
-      return fromCodePoint(parseInt(hex as string, 16), raw);
-    })
+    .replace(
+      /&(?:(nbsp|amp|lt|gt|quot|apos)|#(\d+)|#[xX]([0-9a-fA-F]+));/g,
+      (raw, name?: string, dec?: string, hex?: string) => {
+        if (name) return NAMED_ENTITIES[name];
+        if (dec) return fromCodePoint(parseInt(dec, 10), raw);
+        return fromCodePoint(parseInt(hex as string, 16), raw);
+      },
+    )
     .replace(/[\s\u00a0]+/g, " ")
     .trim()
     .slice(0, 160);

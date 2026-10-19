@@ -42,7 +42,11 @@ describe("unwrapBlockedLinks", () => {
   });
 
   it("leaves other links alone", () => {
-    for (const html of ['<a href="https://example.com/">x</a>', '<a href="https://notgta.world.example/">x</a>', "<a>x</a>"]) {
+    for (const html of [
+      '<a href="https://example.com/">x</a>',
+      '<a href="https://notgta.world.example/">x</a>',
+      "<a>x</a>",
+    ]) {
       expect(unwrapBlockedLinks(html)).toBe(html);
     }
   });

@@ -44,7 +44,11 @@ function deepFreeze<T>(o: T): T {
   return o;
 }
 
-const state = (values: Values = {}, autofilled: Record<string, string> = {}, derived: Record<string, string> = {}): FormState => ({
+const state = (
+  values: Values = {},
+  autofilled: Record<string, string> = {},
+  derived: Record<string, string> = {},
+): FormState => ({
   values,
   autofilled,
   derived,
@@ -58,7 +62,15 @@ describe("update API (AC 29)", () => {
   it("setValue on a nested item changes only that item and never mutates", () => {
     const entries = entriesOf("civil-complaint");
     const s = deepFreeze(openState(entries, null, null, NOW));
-    const next = setValue(s, [{ block: "Defendants", index: 1 }, { block: "Accusations", index: 0 }], "Accusation", "Fraud");
+    const next = setValue(
+      s,
+      [
+        { block: "Defendants", index: 1 },
+        { block: "Accusations", index: 0 },
+      ],
+      "Accusation",
+      "Fraud",
+    );
     const d0 = items(s.values, "Defendants")[0];
     const d1 = items(next.values, "Defendants")[1];
     expect(items(d1, "Accusations")[0]).toEqual({ Accusation: "Fraud" });
@@ -154,7 +166,9 @@ describe("Division and the case code (R2)", () => {
   it("swapCaseCode needs a known division and a matching number", () => {
     const scope = { "Case number": "90SCCR00147" };
     expect(swapCaseCode(scope, "NOWHERE", undefined)).toBe(scope);
-    expect(swapCaseCode({ "Case number": "2026-CV-1" }, "CIVIL DIVISION", undefined)).toEqual({ "Case number": "2026-CV-1" });
+    expect(swapCaseCode({ "Case number": "2026-CV-1" }, "CIVIL DIVISION", undefined)).toEqual({
+      "Case number": "2026-CV-1",
+    });
     expect(swapCaseCode(scope, "TRAFFIC DIVISION", undefined)).toEqual({ "Case number": "90SCTC00147" });
     expect(swapCaseCode(scope, "TRAFFIC DIVISION", "90SCCR00147")).toBe(scope);
   });
@@ -286,9 +300,7 @@ describe("dockets ↔ form", () => {
 
   it("docketToForm fills the civil-complaint fields it has", () => {
     const entries = entriesOf("civil-complaint");
-    const s = deepFreeze(
-      openState(entries, null, char({ name: "Ann" }), NOW),
-    );
+    const s = deepFreeze(openState(entries, null, char({ name: "Ann" }), NOW));
     const { state: next, filled } = docketToForm(
       entries,
       s,
@@ -337,14 +349,18 @@ describe("dockets ↔ form", () => {
     const se = fields(compile(sched.html));
     const s = applyPrefills(se, state({ "Case number": "90SCCR00147", "Plaintiff name": "People" }), NOW);
     const p = formToDocketPatch(sched, se, s.values);
-    expect(p).toMatchObject({ patch: { plaintiff: "People", nextEvent: "Judgement", nextDate: "2026-03-31", filed: "2026-03-10" } });
+    expect(p).toMatchObject({
+      patch: { plaintiff: "People", nextEvent: "Judgement", nextDate: "2026-03-31", filed: "2026-03-10" },
+    });
     expect("patch" in p && p.patch.status).toBeFalsy();
   });
 
   it("formToDocketPatch needs a real case number", () => {
     const f = getForm("civil-complaint")!;
     const e = fields(compile(f.html));
-    expect(formToDocketPatch(f, e, { "Case number": "90SCCC00XXX" })).toEqual({ error: "Enter the case number first." });
+    expect(formToDocketPatch(f, e, { "Case number": "90SCCC00XXX" })).toEqual({
+      error: "Enter the case number first.",
+    });
     expect(formToDocketPatch(f, e, {})).toEqual({ error: "Enter the case number first." });
   });
 
@@ -354,7 +370,9 @@ describe("dockets ↔ form", () => {
       const p = formToDocketPatch({ id: "x", court }, e, { "Case number": "2026-CV-0042" });
       expect(p).toEqual({ patch: { caseNumber: "2026-CV-0042" } });
     }
-    const p = formToDocketPatch({ id: "x", court: "San Andreas Appellate Court" }, e, { "Case number": "2026-CV-0042" });
+    const p = formToDocketPatch({ id: "x", court: "San Andreas Appellate Court" }, e, {
+      "Case number": "2026-CV-0042",
+    });
     expect("patch" in p && p.patch.court).toBe("San Andreas Appellate Court");
   });
 
@@ -372,7 +390,13 @@ describe("section meta and helpers", () => {
   it("counts filled, ticked and XXX prefills as unfilled", () => {
     const entries = entriesOf("criminal-case-schedule");
     const s = applyPrefills(entries, state(), NOW);
-    const first = sectionMeta(entries.slice(0, entries.findIndex((e) => "section" in e)), s.values);
+    const first = sectionMeta(
+      entries.slice(
+        0,
+        entries.findIndex((e) => "section" in e),
+      ),
+      s.values,
+    );
     expect(first.total).toBe(5);
     expect(first.filled).toBe(1); // Filing date; Case number still holds XXX
     expect(first.done).toBe(false);

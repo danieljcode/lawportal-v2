@@ -15,7 +15,12 @@ function records(items: LayoutItem[]): ItemRecord[] {
       case "checklist":
         return {
           kind: "checklist",
-          rows: it.rows.map((r) => ({ check: r.check.label, text: r.text, sub: r.sub, details: r.details.map((d) => d.label) })),
+          rows: it.rows.map((r) => ({
+            check: r.check.label,
+            text: r.text,
+            sub: r.sub,
+            details: r.details.map((d) => d.label),
+          })),
         };
       case "block":
         return { kind: "block", name: it.entry.block.name, items: records(layout(it.entry.fields)) };

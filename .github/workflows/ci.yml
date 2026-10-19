@@ -34,6 +34,10 @@ jobs:
       - name: Security audit
         run: npm audit --omit=dev --audit-level=high
 
+      # ESLint with no warnings allowed, and Prettier formatting (LP-86).
+      - run: npm run lint
+      - run: npm run format:check
+
       - run: npm test
         env:
           # With the data checked out, a missing file fails the run instead of skipping.
