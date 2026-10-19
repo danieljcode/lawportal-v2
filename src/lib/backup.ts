@@ -13,6 +13,7 @@
 
 import { APP_VERSION } from "./version";
 import { SAVE_FAILED, type KV } from "./storage";
+import { unwrap } from "./store";
 
 export const BACKUP_APP = "jsa-form-generator";
 export const BACKUP_KIND = "backup";
@@ -130,9 +131,10 @@ export interface Counts {
   drafts: number;
 }
 
+/** Items in a saved list, bare or in a store envelope (LP-2). */
 function arrayLength(raw: string | undefined): number {
   try {
-    const v: unknown = JSON.parse(raw ?? "null");
+    const v: unknown = unwrap(JSON.parse(raw ?? "null"));
     return Array.isArray(v) ? v.length : 0;
   } catch {
     return 0;
