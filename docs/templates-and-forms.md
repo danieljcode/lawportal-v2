@@ -36,6 +36,27 @@ Special labels:
 - **`Courthouse`**, **`Division`**, plaintiff/defendant and filing-date labels are filled when a
   case is loaded from a docket (`docketToForm` in `src/lib/formState.ts`).
 
+## Required fields (LP-87)
+
+A form's `required` list names the labels that must be filled before posting. It sits beside the
+template, not in it, so the token syntax, the template-safety check and the parity tests are
+unaffected.
+
+- **In the editor**, an empty required field shows a small **Required** tag by its label.
+- **Copy for forum, Copy BBCode, the Discord copy buttons and Download .docx** check first. If any
+  are empty, a dialog lists them (each links to its field, opening its section) with **Go back** and
+  **Copy anyway** (or **Download anyway**).
+- **What counts as empty:** nothing but spaces. Fields in an optional section that's switched off
+  don't count; in a repeatable block each item is checked. Tick boxes are never required.
+  The check is `missingRequired` in `src/lib/formState/required.ts`.
+- **The court forms** get theirs from `port-forms`, by the rule in `scripts/required-fields.mjs`:
+  the case number, the parties' names (plaintiff, defendant, appellant, petitioner, respondent),
+  and any name or signature filled from the character. To change it, edit the rule and re-run
+  `npm run port-forms`.
+- **The Additional Templates** list theirs by hand (`required: [...]` in `extra-forms.ts`).
+- `tests/required.test.ts` fails if a list names a label the form doesn't have, if one names a tick
+  box, or if `forms.json` doesn't match the rule.
+
 ## Escaping: why user text can't become markup
 
 `render()` passes **every value a user types through `escapeHtml`** (`&`, `<`, `>` and `"` become
@@ -86,6 +107,7 @@ Add a `FormDef` to `src/data/extra-forms.ts`:
   court: "Additional Templates",
   section: "Motions",               // sidebar sub-label
   title: "My Form",
+  required: ["Case number"],        // must be filled before copying (LP-87)
   html: `<p><strong>{{Court|SAN ANDREAS COURT}}</strong></p>
 <p>Case No. {{Case number|XXX}}</p>
 <p>{{Body:paras|Text of the motion.}}</p>
@@ -123,7 +145,9 @@ writes `src/data/forms.json`:
 3. Applies FreestyleRP wording (`scripts/freestyle-wording.mjs`): court names and phrases (for
    example "Superior Court of the State of San Andreas" → "San Andreas Court"), and the reference
    forms' courthouses and case-number code → the values in `courts.ts`.
-4. Runs the template-safety check, and writes nothing if any form fails.
+4. Works out each form's required fields (`scripts/required-fields.mjs`, see
+   [Required fields](#required-fields-lp-87)).
+5. Runs the template-safety check, and writes nothing if any form fails.
 
 So `forms.json` holds exactly what gets posted; the app does no translation at run time. Run
 `npm test` afterwards: a test fails if `forms.json` isn't exactly what `port-forms` would write now

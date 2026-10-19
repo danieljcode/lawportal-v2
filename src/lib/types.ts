@@ -6,6 +6,8 @@ export interface FormDef {
   court: string;
   section: string;
   title: string;
+  /** Labels that must be filled before copying (LP-87); the copy buttons warn if any are empty. */
+  required?: string[];
   html: string;
 }
 
