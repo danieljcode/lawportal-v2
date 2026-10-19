@@ -152,10 +152,14 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
     `cases.ts` do the searching and the checks (a case number no other case has). Areas for linked
     filings, evidence and deadlines are empty until LP-15, LP-12 and LP-18. On a phone the open
     case replaces the list.
+  - **The docket bar in forms** (LP-100) lists the firm's cases, the active character's first
+    ("<name>'s cases", then "Other firm cases"), loads any of them, and **Save to Case File** updates
+    the firm's case with that number (putting the character on it) or adds one with them as lead.
   - **Dockets are a view** (`dockets.ts`): a character's docket is the cases they lead or are
-    assigned to, with the same `DocketStore` API the Dockets dialog, docket bar and J.A.P. use until
-    the Case File program (LP-101, LP-100). Saving a number the firm already has puts the character
-    on that case; removing one takes them off it, deleting it when nobody is left. The pure docket
+    assigned to, with the `DocketStore` API the Dockets dialog, the docket bar's saving and the
+    J.A.P. use. Saving a number the firm already has puts the character on that case; removing one
+    takes them off it, deleting it when nobody is left. Only the LP-4 migration reads the old
+    `lawapp_dockets_<id>` keys. The pure docket
     fields (`FIELDS`, `clean`, `divisionFor`…) live in `docketFields.ts`, so the two don't import
     each other.
 - **Undo and draft history** (LP-89). FormView keeps its state in an `Undoable`

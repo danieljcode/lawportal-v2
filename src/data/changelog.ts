@@ -19,6 +19,20 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-19",
+    title: "Forms use the Case File",
+    items: [
+      {
+        type: "update",
+        text: "The case bar in forms now lists the firm's cases from the Case File, with your character's cases first, so you can load any firm case into a form.",
+      },
+      {
+        type: "update",
+        text: "Save to Case File updates the firm's case with that number (and puts your character on it), or adds a new case with you as lead.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-19",
     title: "Case File",
     items: [
       {

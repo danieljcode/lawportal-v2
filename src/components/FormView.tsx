@@ -1,4 +1,5 @@
 // One open form: header, docket bar, generated inputs (FR4, FR11 form part).
+// The docket bar picks from and saves to the firm's Case File (LP-100).
 //
 // App renders <FormView key={form.id}>, so every form mounts with fresh state
 // (plan §R R1). Edits go through the pure formState update API; the draft is
@@ -8,6 +9,7 @@
 
 import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { hasDocket } from "@/lib/characters";
+import { caseStore, filterCases, isMember } from "@/lib/cases";
 import { docketStore } from "@/lib/dockets";
 import { draftHistory, snapshotTime, SNAPSHOT_EVERY_MS, type Snapshot } from "@/lib/draftHistory";
 import { createDraftWriter, type DraftWriter } from "@/lib/draftWriter";
@@ -43,7 +45,7 @@ import { FormContext, slugId, type FormCtx } from "./fields/FormContext";
 import Sections from "./fields/Sections";
 import DraftHistoryDialog from "./DraftHistoryDialog";
 import type { SafeHtml } from "@/lib/safeHtml";
-import { useDocketVersion } from "./useStore";
+import { useCaseVersion } from "./useStore";
 
 export interface FormOutput {
   /** Final HTML (no highlight): Copy for forum, BBCode, .docx. Rendered, so SafeHtml (LP-5). */
@@ -352,20 +354,21 @@ export default function FormView({
 
   /* ---------- docket bar ---------- */
 
-  const docketVersion = useDocketVersion();
+  const caseVersion = useCaseVersion();
   const judge = hasDocket(activeCharacter) ? activeCharacter : null;
   const showDocket = !!(judge && tree && hasField(entries, state.values, "Case number"));
-  const dockets = useMemo(
-    // docketVersion is a dependency so the list is re-read after any docket change.
-    () => (showDocket && judge && docketVersion >= 0 ? docketStore().list(judge.id) : []),
-    [showDocket, judge, docketVersion],
-  );
+  // The firm's cases: this character's first, then everyone else's (LP-100).
+  const caseLists = useMemo(() => {
+    if (!showDocket || !judge || caseVersion < 0) return { mine: [], others: [] };
+    const all = filterCases(caseStore().list(), {});
+    return { mine: all.filter((c) => isMember(c, judge.id)), others: all.filter((c) => !isMember(c, judge.id)) };
+  }, [showDocket, judge, caseVersion]);
   const caseNumber = typeof state.values["Case number"] === "string" ? (state.values["Case number"] as string) : "";
-  const currentDocket = showDocket && judge && caseNumber ? docketStore().findByCase(judge.id, caseNumber) : null;
+  const currentDocket = showDocket && caseNumber ? caseStore().byNumber(caseNumber) : null;
 
-  const loadDocket = (docketId: string) => {
+  const loadDocket = (caseId: string) => {
     if (!judge) return;
-    const d = docketStore().get(judge.id, docketId);
+    const d = caseStore().get(caseId);
     if (!d) return;
     const { state: loaded, filled } = docketToForm(entries, state, d);
     // A loaded judgement date reflows the case schedule.
@@ -381,10 +384,19 @@ export default function FormView({
       showFlash(r.error, true);
       return;
     }
-    const existed = !!docketStore().findByCase(judge.id, r.patch.caseNumber);
+    const before = caseStore().byNumber(r.patch.caseNumber);
     try {
+      // Through the docket view: the firm's case with this number is updated (with this
+      // character put on it), or a new case is added with them as lead.
       docketStore().upsert(judge.id, r.patch);
-      showFlash((existed ? "Updated " : "Added ") + r.patch.caseNumber + " on " + judge.name + "'s docket.");
+      const n = r.patch.caseNumber;
+      showFlash(
+        !before
+          ? "Added " + n + " to the Case File, with " + judge.name + " as lead."
+          : isMember(before, judge.id)
+            ? "Updated " + n + " in the Case File."
+            : "Updated " + n + " in the Case File and put " + judge.name + " on it.",
+      );
     } catch (err) {
       showFlash(err instanceof Error ? err.message : String(err), true);
     }
@@ -469,7 +481,7 @@ export default function FormView({
 
       {showDocket && judge && (
         <div className="docket-bar" id="docket-bar">
-          <label htmlFor="docket-pick">Docket</label>
+          <label htmlFor="docket-pick">Case</label>
           <select
             id="docket-pick"
             value={currentDocket ? currentDocket.id : ""}
@@ -477,21 +489,34 @@ export default function FormView({
               if (e.target.value) loadDocket(e.target.value);
             }}
           >
-            <option value="">{"— load a case from " + judge.name + "'s docket —"}</option>
-            {dockets.map((d) => (
-              <option key={d.id} value={d.id}>
-                {docketLabel(d)}
-              </option>
-            ))}
+            <option value="">— load a case from the Case File —</option>
+            {caseLists.mine.length > 0 && (
+              <optgroup label={judge.name + "'s cases"}>
+                {caseLists.mine.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {docketLabel(d)}
+                  </option>
+                ))}
+              </optgroup>
+            )}
+            {caseLists.others.length > 0 && (
+              <optgroup label="Other firm cases">
+                {caseLists.others.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {docketLabel(d)}
+                  </option>
+                ))}
+              </optgroup>
+            )}
           </select>
           <button
             className="btn"
             id="docket-save"
             type="button"
-            title="Add this case to your docket, or update it"
+            title="Add this case to the Case File, or update it"
             onClick={saveToDocket}
           >
-            Save to docket
+            Save to Case File
           </button>
         </div>
       )}
