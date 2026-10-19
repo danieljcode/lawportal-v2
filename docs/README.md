@@ -12,5 +12,6 @@ the [main README](../README.md).
 | [Testing](testing.md) | The test suites, what the XSS test protects, snapshots, parity tests, CI, the Playwright scripts. |
 | [Contributing](contributing.md) | How we work: Jira, branches, commit and PR conventions, the Definition of Done. |
 | [Releasing](releasing.md) | Shipping a version: version bump, What's new, tag, GitHub Release, Jira. |
+| [Dependencies](dependencies.md) | Dependabot update PRs and how to handle them, the security audit in CI, the current npm overrides. |
 
 `screenshots/` holds the images used in the main README.

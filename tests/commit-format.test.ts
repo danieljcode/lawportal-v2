@@ -1,6 +1,6 @@
 // The commit and PR title check (LP-84): <type>(<area>): <summary> [LP-<n>].
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -32,6 +32,22 @@ describe("checkHeader", () => {
       'Revert "fix(sync): merge conflicts per character [LP-64]"',
       "chore(deps): bump next from 15.5.27 to 15.5.30",
       "chore(deps-dev): bump the dev-dependencies group across 1 directory with 4 updates",
+      "ci(deps): bump actions/checkout from 4 to 5",
+    ]) {
+      expect(checkHeader(h), h).toEqual([]);
+    }
+  });
+
+  it("accepts the titles Dependabot makes with .github/dependabot.yml (LP-85)", () => {
+    const config = readFileSync(path.resolve(process.cwd(), ".github/dependabot.yml"), "utf8");
+    // npm: prefix chore with the scope; Actions: prefix ci with the scope.
+    expect(config).toMatch(/package-ecosystem: npm[\s\S]*?prefix: chore[\s\S]*?prefix-development: chore[\s\S]*?include: scope/);
+    expect(config).toMatch(/package-ecosystem: github-actions[\s\S]*?prefix: ci[\s\S]*?include: scope/);
+    for (const h of [
+      "chore(deps): bump the npm-minor-and-patch group with 3 updates",
+      "chore(deps): bump next from 15.5.27 to 16.4.2",
+      "chore(deps-dev): bump vitest from 5.0.3 to 6.0.0",
+      "ci(deps): bump the github-actions group with 2 updates",
       "ci(deps): bump actions/checkout from 4 to 5",
     ]) {
       expect(checkHeader(h), h).toEqual([]);
