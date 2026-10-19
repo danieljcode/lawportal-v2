@@ -17,6 +17,7 @@ import EmptyState from "./EmptyState";
 import FormView, { type FormOutput } from "./FormView";
 import JapOutput from "./JapOutput";
 import JapView from "./JapView";
+import ErrorBoundary from "./ErrorBoundary";
 import OutputPane from "./OutputPane";
 import Sidebar from "./Sidebar";
 import Taskbar from "./Taskbar";
@@ -132,13 +133,16 @@ export default function App() {
   // Another form's output (only within the render before FormView's layout effect publishes) shows as empty;
   // null only when this form's template failed to compile (the pane hides).
   const formOutput = form && output && output.formId === form.id ? output.out : EMPTY_OUTPUT;
+  // A form whose panel crashed (LP-88) shows no preview, so nothing half-made can be copied.
+  const [crashedForm, setCrashedForm] = useState<string | null>(null);
+  const formCrashed = !!form && crashedForm === form.id;
 
   const commissioner = isCommissioner(active);
   const syncOn = !!sync.code();
   const task = route.kind === "form" && form ? form.title : route.kind === "jap" ? JAP_TITLE : APP_TITLE;
   const current = route.kind === "form" ? route.id : route.kind === "jap" ? "jap" : null;
   const showJapOutput = route.kind === "jap" && commissioner && !!active;
-  const showOutput = (route.kind === "form" && !!form && formOutput !== null) || showJapOutput;
+  const showOutput = (route.kind === "form" && !!form && formOutput !== null && !formCrashed) || showJapOutput;
   // "Use in form" only for the active character's own docket, into a form that shows the docket bar.
   const canUseDocket = route.kind === "form" && docketBar && !!active && docketsFor === active.id;
 
@@ -189,39 +193,54 @@ export default function App() {
           <Sidebar forms={ALL_FORMS} current={current} commissioner={commissioner} />
           <main className="editor" id="editor" ref={editorRef}>
             {route.kind === "form" && form ? (
-              <FormView
-                key={form.id}
-                form={form}
-                activeCharacter={active}
-                highlight={highlight}
-                onOutput={onOutput}
-                onOutputGone={onOutputGone}
-                docketRequest={docketRequest}
-                onDocketBar={setDocketBar}
-              />
+              <ErrorBoundary
+                where="this form"
+                resetKey={form.id}
+                onError={() => setCrashedForm(form.id)}
+                onReset={() => setCrashedForm(null)}
+              >
+                <FormView
+                  key={form.id}
+                  form={form}
+                  activeCharacter={active}
+                  highlight={highlight}
+                  onOutput={onOutput}
+                  onOutputGone={onOutputGone}
+                  docketRequest={docketRequest}
+                  onDocketBar={setDocketBar}
+                />
+              </ErrorBoundary>
             ) : route.kind === "jap" ? (
-              <JapView
-                commissioner={commissioner ? active : null}
-                syncOn={syncOn}
-                syncState={syncState}
-                onTurnOnSync={() => openCharacters(true)}
-              />
+              <ErrorBoundary where="the J.A.P." resetKey={route.kind}>
+                <JapView
+                  commissioner={commissioner ? active : null}
+                  syncOn={syncOn}
+                  syncState={syncState}
+                  onTurnOnSync={() => openCharacters(true)}
+                />
+              </ErrorBoundary>
             ) : (
               <EmptyState />
             )}
           </main>
-          {route.kind === "form" && form && formOutput && (
-            <OutputPane
-              form={form}
-              finalHtml={formOutput.finalHtml}
-              previewHtml={formOutput.previewHtml}
-              missing={formOutput.missing}
-              onJump={formOutput.jumpTo}
-              highlight={highlight}
-              onHighlight={setHighlight}
-            />
+          {route.kind === "form" && form && formOutput && !formCrashed && (
+            <ErrorBoundary where="the forum preview" resetKey={form.id}>
+              <OutputPane
+                form={form}
+                finalHtml={formOutput.finalHtml}
+                previewHtml={formOutput.previewHtml}
+                missing={formOutput.missing}
+                onJump={formOutput.jumpTo}
+                highlight={highlight}
+                onHighlight={setHighlight}
+              />
+            </ErrorBoundary>
           )}
-          {showJapOutput && active && <JapOutput character={active} />}
+          {showJapOutput && active && (
+            <ErrorBoundary where="the J.A.P. output" resetKey={active.id}>
+              <JapOutput character={active} />
+            </ErrorBoundary>
+          )}
         </div>
       </div>
       <Taskbar task={task} onHome={goHome} />
@@ -230,23 +249,29 @@ export default function App() {
           <option key={c.id} value={c.name} />
         ))}
       </datalist>
-      <CharactersDialog
-        open={dialog === "characters"}
-        onClose={closeDialog}
-        characters={characters}
-        activeId={active ? active.id : null}
-        onDockets={(id) => openDockets(id)}
-        autoSync={autoSync}
-        onAutoSyncDone={autoSyncDone}
-      />
-      <DocketsDialog
-        open={dialog === "dockets"}
-        onClose={closeDialog}
-        charId={docketsFor}
-        canUse={canUseDocket}
-        onUse={loadDocketInForm}
-      />
-      <ChangelogDialog open={dialog === "changelog"} onClose={closeDialog} />
+      <ErrorBoundary where="the Characters dialog" variant="dialog" resetKey={dialog} onDismiss={closeDialog}>
+        <CharactersDialog
+          open={dialog === "characters"}
+          onClose={closeDialog}
+          characters={characters}
+          activeId={active ? active.id : null}
+          onDockets={(id) => openDockets(id)}
+          autoSync={autoSync}
+          onAutoSyncDone={autoSyncDone}
+        />
+      </ErrorBoundary>
+      <ErrorBoundary where="the Dockets dialog" variant="dialog" resetKey={dialog} onDismiss={closeDialog}>
+        <DocketsDialog
+          open={dialog === "dockets"}
+          onClose={closeDialog}
+          charId={docketsFor}
+          canUse={canUseDocket}
+          onUse={loadDocketInForm}
+        />
+      </ErrorBoundary>
+      <ErrorBoundary where={"What's new"} variant="dialog" resetKey={dialog} onDismiss={closeDialog}>
+        <ChangelogDialog open={dialog === "changelog"} onClose={closeDialog} />
+      </ErrorBoundary>
     </>
   );
 }
