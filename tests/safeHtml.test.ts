@@ -59,7 +59,13 @@ describe("SafeHtml sources", () => {
   });
 
   it("only the renderers mark HTML as safe", () => {
-    const allowed = ["src/lib/safeHtml.ts", "src/lib/template.ts", "src/lib/discordPreview.ts"];
+    // The renderers: escapeHtml and render() (template/, LP-7) and the Discord preview.
+    const allowed = [
+      "src/lib/safeHtml.ts",
+      "src/lib/template/escape.ts",
+      "src/lib/template/render.ts",
+      "src/lib/discordPreview.ts",
+    ];
     const root = path.resolve(process.cwd(), "src");
     const files: string[] = [];
     const walk = (dir: string) => {
