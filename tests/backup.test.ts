@@ -125,7 +125,7 @@ describe("the restore preview", () => {
     );
     expect(text).toContain("This replaces everything saved in this browser:");
     expect(text).toContain("• Characters: 3 now → 5 in the backup");
-    expect(text).toContain("• Docket cases: 7 now → 9 in the backup");
+    expect(text).toContain("• Cases: 7 now → 9 in the backup");
     expect(text).toContain("• Form drafts: 4 now → 6 in the backup");
     expect(text).toContain("the restored data will be sent to the sync server");
     expect(text).toContain("This can't be undone");

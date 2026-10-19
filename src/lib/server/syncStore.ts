@@ -13,7 +13,8 @@ import { generateCode } from "./code";
 export interface SyncRecord {
   rev: number;
   updated: string;
-  data: { characters: unknown[] };
+  /** The characters, and the firm's cases since LP-4 (absent in copies from before it). */
+  data: { characters: unknown[]; cases?: unknown[] };
 }
 
 export type WriteResult = { record: SyncRecord } | { conflict: SyncRecord } | "missing";

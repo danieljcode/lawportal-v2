@@ -23,14 +23,16 @@ lost. Sync is optional and runs entirely on the computer that runs the app.
 - **One JSON file per code** in `data/sync/` (or `LAWAPP_SYNC_DIR`), named by the **SHA-256 hash of
   the code**. The raw code never reaches the file system or the logs (logs show the first 8 hex
   characters of the hash at most).
-- **A record** is `{ rev, updated, data: { characters } }`. Each character carries its dockets and
-  J.A.P. inside it (`dockets`, `jap`), the same shape as a characters export.
+- **A record** is `{ rev, updated, data: { characters, cases } }`. Each character carries its J.A.P.
+  inside it (`jap`); the firm's cases (LP-4) sit beside the characters. A copy saved before LP-4
+  has no `cases` and each character's docket inside it (`dockets`): the client reads that as cases,
+  the same way the local migration does.
 - **Per-hash locks.** Every operation on a code runs after the previous one on the same hash has
   settled, so two requests can't interleave on one file.
 - **Atomic writes.** A write goes to a temp file and is renamed over the real one, retried briefly
   while Windows (antivirus, indexing) holds the target.
-- **Limits.** At most 1,000 sync files (`POST` answers `503` after that), a 1 MB body and 200
-  characters per `PUT`.
+- **Limits.** At most 1,000 sync files (`POST` answers `503` after that), a 1 MB body, and 200
+  characters and 2,000 cases per `PUT`.
 - **Rate limits** (LP-8, `src/lib/server/rateLimit.ts`), answered with `429` and a `Retry-After`:
   - new codes: 5 an hour per IP, and 5 an hour across the whole server;
   - requests with a malformed or unknown code: 30 a minute per IP. Once over, that IP's sync
@@ -62,8 +64,12 @@ lost. Sync is optional and runs entirely on the computer that runs the app.
 A conflict is a `409` on push, or a pull that finds a newer `rev` while this browser has unsent
 edits. Instead of replacing local data, `resolve()` merges **one character at a time**:
 
-- Each character has an `updatedAt`. Saving it, or changing one of its dockets or its J.A.P., moves
-  it. **The newer copy wins, with its dockets and J.A.P.**; the server wins a tie.
+- Each character has an `updatedAt`. Saving it, or changing its J.A.P., moves it. **The newer copy
+  wins, with its J.A.P.**; the server wins a tie.
+- **Cases merge the same way, one case at a time** (LP-4), by their own `updated`, with deletions
+  and kept-aside versions handled as for characters (the base remembers them as `case:<id>`).
+  Afterwards, cases with the same case number from two devices become one (`unifyCases`): the
+  newer copy's fields win, gaps are filled from the other, and everyone working either stays on it.
 - **Deletions stand.** `lawapp_sync_base` remembers the last server copy this browser saw, so the
   merge can tell a character added on one side from one deleted on the other. A character deleted
   on one device but edited on the other since is kept.
@@ -82,8 +88,10 @@ in the server copy pushes a clean copy back, so every device ends up clean.
 
 `src/lib/backup.ts`, offered in the Characters dialog. Unlike the characters **Export**, which holds
 only characters with their dockets and J.A.P., a backup holds everything this browser has saved.
+(Since LP-4 a characters export still lists each character's docket, read from the firm's cases;
+importing it puts the character back on those cases.)
 
-- **What's in it:** every `lawapp_` key, each value exactly as stored: characters, dockets, J.A.P.,
+- **What's in it:** every `lawapp_` key, each value exactly as stored: characters, cases, J.A.P.,
   form drafts, settings (theme, Discord, collapsed sections, last form, What's new), set-aside damaged
   data and kept sync versions (`lawapp_sync_lost`).
 - **What's left out:** the sync code, and this device's own sync bookkeeping (`lawapp_sync_rev`,

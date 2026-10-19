@@ -134,9 +134,12 @@ function CharactersBody({ characters, activeId, onDockets, autoSync, onAutoSyncD
   };
 
   const remove = (c: Character) => {
+    // Cases belong to the firm (LP-4): they stay, and any this character led need a new lead.
     const n = docketStore().list(c.id).length;
-    const what = n ? " and their " + n + " docket entr" + (n === 1 ? "y" : "ies") : "";
-    if (!confirm("Delete " + c.name + what + "? This cannot be undone.")) return;
+    const cases = n
+      ? " Their " + (n === 1 ? "case stays" : n + " cases stay") + " with the firm; any they lead will need a new lead."
+      : "";
+    if (!confirm("Delete " + c.name + "? This cannot be undone." + cases)) return;
     deleteCharacter(c.id);
     if (editing && editing.id === c.id) setEditing(null);
   };

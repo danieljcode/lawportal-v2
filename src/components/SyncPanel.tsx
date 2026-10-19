@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { copyText } from "@/lib/clipboard";
-import { S_SYNC_OFF, S_SYNC_ON_PARTS } from "@/lib/strings";
+import { S_LOST_ITEMS, S_SYNC_OFF, S_SYNC_ON_PARTS } from "@/lib/strings";
 import * as sync from "@/lib/sync";
 import { useSyncState } from "./useStore";
 
@@ -194,12 +194,12 @@ export default function SyncPanel({ autoEnable = false, onAutoEnableDone }: Sync
       <p className={"small sync-message" + (warn ? " warn" : "")} id="sync-message" role="status" aria-live="polite">
         {message}
       </p>
-      {st.lost > 0 && (
+      {st.lost + st.lostCases > 0 && (
         <div className="row sync-lost" id="sync-lost">
           <span className="small warn">
-            {st.lost === 1
-              ? "Your version of 1 character was replaced by another device's."
-              : `Your versions of ${st.lost} characters were replaced by another device's.`}
+            {st.lost + st.lostCases === 1
+              ? "Your version of " + S_LOST_ITEMS(st.lost, st.lostCases) + " was replaced by another device's."
+              : "Your versions of " + S_LOST_ITEMS(st.lost, st.lostCases) + " were replaced by another device's."}
           </span>
           <button className="mini" id="sync-restore" type="button" onClick={() => sync.restoreLost()}>
             Restore my version
