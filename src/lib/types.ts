@@ -143,6 +143,19 @@ export interface Case extends Docket {
   assigned: string[];
   /** ISO timestamp. */
   created: string;
+  /** Deadlines and hearing dates (LP-18), soonest first. */
+  deadlines: Deadline[];
+}
+
+/** A dated entry on a case (LP-18): an in-game date, a label and a note. */
+export interface Deadline {
+  id: string;
+  /** In-game date, YYYY-MM-DD (the 1990 calendar). */
+  date: string;
+  label: string;
+  note?: string;
+  /** Dealt with: no longer upcoming or overdue. */
+  done?: boolean;
 }
 
 export type PortfolioLevel = "I" | "II";
