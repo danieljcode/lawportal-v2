@@ -17,6 +17,7 @@ import EmptyState from "./EmptyState";
 import FormView, { type FormOutput } from "./FormView";
 import JapOutput from "./JapOutput";
 import JapView from "./JapView";
+import CaseFileView from "./CaseFileView";
 import ErrorBoundary from "./ErrorBoundary";
 import OutputPane from "./OutputPane";
 import Sidebar from "./Sidebar";
@@ -24,7 +25,7 @@ import Taskbar from "./Taskbar";
 import Toolbar from "./Toolbar";
 import { S_SET_ASIDE, S_SET_ASIDE_HINT } from "@/lib/strings";
 import { useDialogs } from "./useDialogs";
-import { APP_TITLE, JAP_TITLE, useRoute } from "./useRoute";
+import { APP_TITLE, CASES_TITLE, JAP_TITLE, useRoute } from "./useRoute";
 import { useCharacterVersion, useSetAsideVersion, useSyncState } from "./useStore";
 
 export type { DialogName } from "./useDialogs";
@@ -123,8 +124,15 @@ export default function App() {
 
   const commissioner = isCommissioner(active);
   const syncOn = !!sync.code();
-  const task = route.kind === "form" && form ? form.title : route.kind === "jap" ? JAP_TITLE : APP_TITLE;
-  const current = route.kind === "form" ? route.id : route.kind === "jap" ? "jap" : null;
+  const task =
+    route.kind === "form" && form
+      ? form.title
+      : route.kind === "jap"
+        ? JAP_TITLE
+        : route.kind === "cases"
+          ? CASES_TITLE
+          : APP_TITLE;
+  const current = route.kind === "form" ? route.id : route.kind === "jap" || route.kind === "cases" ? route.kind : null;
   const showJapOutput = route.kind === "jap" && commissioner && !!active;
   const showOutput = (route.kind === "form" && !!form && formOutput !== null && !formCrashed) || showJapOutput;
   // "Use in form" only for the active character's own docket, into a form that shows the docket bar.
@@ -202,6 +210,10 @@ export default function App() {
                   syncState={syncState}
                   onTurnOnSync={() => openCharacters(true)}
                 />
+              </ErrorBoundary>
+            ) : route.kind === "cases" ? (
+              <ErrorBoundary where="the Case File" resetKey={route.caseId}>
+                <CaseFileView caseId={route.caseId} characters={characters} />
               </ErrorBoundary>
             ) : (
               <EmptyState />

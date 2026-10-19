@@ -2080,3 +2080,145 @@ dialog.changelog {
     max-height: 30vh;
   }
 }
+
+/* ---------- Case File (LP-101) ---------- */
+.case-layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 2fr) minmax(0, 3fr);
+  gap: 12px;
+  align-items: start;
+}
+.case-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.case-filters input[type="search"] {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+.case-filters select {
+  flex: 1 1 110px;
+  min-width: 0;
+}
+.case-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.case-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  border: 1px solid var(--shadow);
+  border-left: 3px solid var(--shadow);
+  background: var(--field);
+  color: var(--text);
+  text-decoration: none;
+}
+.case-row:hover,
+.case-row:focus-visible {
+  border-left-color: var(--select-bg);
+}
+.case-row.current {
+  border-left: 5px solid var(--select-bg);
+}
+.case-row-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.case-status {
+  font-size: 12px;
+  color: var(--muted);
+}
+.case-parties {
+  overflow-wrap: anywhere;
+}
+.case-detail {
+  min-width: 0;
+}
+.case-back {
+  display: none;
+  margin-bottom: 8px;
+}
+.case-placeholder {
+  margin: 8px 0;
+}
+.case-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.case-form h3 {
+  margin: 0;
+}
+.case-flag {
+  margin: 0;
+  padding: 4px 8px;
+  border: 1px solid var(--missing);
+  color: var(--missing);
+}
+.case-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+.case-fields .field.wide {
+  grid-column: 1 / -1;
+}
+.case-people {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  border: 1px solid var(--shadow);
+}
+.case-assigned {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+.case-links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 4px;
+}
+.case-empty {
+  padding: 6px 8px;
+  border: 1px dashed var(--shadow);
+}
+.case-empty h4 {
+  margin: 0 0 4px;
+}
+.case-empty p {
+  margin: 0;
+}
+@media (max-width: 800px) {
+  .case-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* On a phone the open case replaces the list, with a link back. */
+  .case-file.has-detail .case-list-pane {
+    display: none;
+  }
+  .case-file:not(.has-detail) .case-detail {
+    display: none;
+  }
+  .case-back {
+    display: inline-block;
+  }
+  .case-fields,
+  .case-links {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

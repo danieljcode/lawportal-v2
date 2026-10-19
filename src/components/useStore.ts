@@ -5,6 +5,7 @@
 // re-subscribes on render, and the stores are created lazily on first use.
 
 import { useSyncExternalStore } from "react";
+import { caseStore } from "@/lib/cases";
 import { characterStore } from "@/lib/characters";
 import { docketStore } from "@/lib/dockets";
 import { portfolioStore } from "@/lib/portfolio";
@@ -35,6 +36,14 @@ const docketSnapshot = () => docketStore().version();
 
 export function useDocketVersion(): number {
   return useSyncExternalStore(subscribeDockets, docketSnapshot, docketSnapshot);
+}
+
+const subscribeCases = (fn: () => void) => caseStore().subscribe(fn);
+const caseSnapshot = () => caseStore().version();
+
+/** Bumps on every change to the firm's cases (LP-101). */
+export function useCaseVersion(): number {
+  return useSyncExternalStore(subscribeCases, caseSnapshot, caseSnapshot);
 }
 
 const subscribePortfolio = (fn: () => void) => portfolioStore().subscribe(fn);
