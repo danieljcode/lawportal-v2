@@ -4,6 +4,7 @@
 // produces. Every piece of text goes through escapeHtml, and the only attribute
 // built from content is an escaped http(s) href.
 
+import { trustAsSafeHtml, type SafeHtml } from "./safeHtml";
 import { escapeHtml } from "./template";
 
 const PUNCT = /[!-/:-@[-`{-~]/;
@@ -159,7 +160,7 @@ function renderLine(l: string): string {
   return `<div class="dc-line">${inline(l)}</div>`;
 }
 
-/** One message's markdown → preview HTML. */
-export function renderDiscordHtml(markdown: string): string {
-  return renderLines(markdown.split("\n"));
+/** One message's markdown → preview HTML; every piece of text is escaped, so it's SafeHtml (LP-5). */
+export function renderDiscordHtml(markdown: string): SafeHtml {
+  return trustAsSafeHtml(renderLines(markdown.split("\n")));
 }

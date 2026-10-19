@@ -53,7 +53,10 @@ flowchart LR
    the active character and dockets, repeatable blocks. Drafts save per form under
    `lawapp_draft_<form id>`.
 4. **Render.** `render(tree, values)` produces the final HTML. **Every user value goes through
-   `escapeHtml`**, so typed text can never become markup; `tests/xss.test.ts` is the backstop.
+   `escapeHtml`**, so typed text can never become markup; `tests/xss.test.ts` is the backstop. The
+   result is typed `SafeHtml`, and every output below only accepts `SafeHtml`, so the compiler
+   rejects HTML that didn't come from a renderer (LP-5, see
+   [Templates and forms](templates-and-forms.md#safehtml-the-compiler-checks-it-too-lp-5)).
 5. **Outputs**, all from that HTML:
    - **Forum:** the live preview, and Copy for forum (HTML that keeps tables, with BBCode as the
      plain-text fallback).

@@ -18,7 +18,7 @@ with React and drive it through the DOM.
 | Area             | Suites                                                                                                             |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------ |
 | Template engine  | `template.test.ts`, `template.parity.test.ts`, `layout.test.ts`                                                    |
-| Safety           | `xss.test.ts`, `template-safety.test.ts`                                                                           |
+| Safety           | `xss.test.ts`, `template-safety.test.ts`, `safeHtml.test.ts`                                                       |
 | Wording          | `strings.test.ts` (no outside branding or links in the app's own text)                                             |
 | Outputs          | `bbcode.test.ts`, `discord*.test.ts`, `docx.test.ts`, `preview.test.ts`                                            |
 | Forms and state  | `formState.test.ts`, `formView.test.ts`, `extra-forms.test.ts`, `draftWriter.test.ts`                              |
