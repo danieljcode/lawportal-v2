@@ -26,6 +26,22 @@ it so each change can be traced back to its issue.
 Nothing is pushed or merged to `main` directly: every change goes through a pull request, and Daniel
 reviews and merges.
 
+### Checked automatically (LP-84)
+
+- **Before each commit:** `npm install` points git at `.githooks/`, whose `commit-msg` hook rejects a
+  message that doesn't follow the format and says what's wrong, with an example.
+- **On every pull request:** the Conventions workflow (`.github/workflows/conventions.yml`) checks
+  every commit in the PR and the PR title, so commits made without the hook are caught too. It
+  re-runs when the title is edited.
+- **New pull requests** open with `.github/pull_request_template.md`: the Jira link, What changed,
+  How it was tested and the Definition of Done.
+- Allowed as they are: GitHub's `Merge pull request …` commits, `Revert "…"` commits, local
+  `fixup!`/`squash!` commits, and dependency updates (`chore(deps): …`, `chore(deps-dev): …`,
+  `ci(deps): …`), which have no Jira key.
+- The checker is `scripts/commit-format.mjs`. To check a message by hand:
+  `node scripts/commit-format.mjs --file <file>`, or a PR title with
+  `PR_TITLE="…" node scripts/commit-format.mjs --title`.
+
 ## Working on an issue
 
 1. **Pick one issue at a time** from the top of the board: To Do, then Backlog, in rank order.

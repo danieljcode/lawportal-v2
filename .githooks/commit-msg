@@ -1,0 +1,4 @@
+#!/bin/sh
+# Checks the commit message against the convention (docs/contributing.md, LP-84).
+# Installed by `npm install` (scripts/install-hooks.mjs sets core.hooksPath).
+exec node scripts/commit-format.mjs --file "$1"

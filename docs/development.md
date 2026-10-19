@@ -28,6 +28,10 @@ Open http://localhost:3000. The page is client-only, so it shows "Loading…" br
 loads. Your characters, dockets and drafts live in this browser's local storage; nothing needs
 setting up first.
 
+`npm install` also runs `prepare`, which points git at `.githooks/` (`git config core.hooksPath
+.githooks`), so the commit-message check runs before every commit (see
+[Contributing](contributing.md#checked-automatically-lp-84)).
+
 Check the set-up:
 
 ```bash
@@ -74,6 +78,7 @@ npm run build && npm run start:lan
 | `npm run screenshots` | Screenshots of the running app into `.agents/screenshots/` (Playwright). |
 | `npm run smoke:preview` | Browser smoke test of every form against the running app (Playwright). |
 | `npm run release-notes` | Prints the GitHub Release notes for the version in `package.json`. See [Releasing](releasing.md). |
+| `npm run prepare` | Runs on `npm install`: turns on the commit-message hook in `.githooks/`. |
 
 ## Environment variables
 
@@ -102,4 +107,5 @@ npm run build && npm run start:lan
 | `port-forms: the reference forms aren't here` | The same: `port-forms` needs the reference data. |
 | `bad option: --experimental-strip-types` | Node is older than 22.6. Upgrade Node. |
 | Snapshot files show as changed after running tests on Windows | Only line endings changed: `git checkout -- tests/__snapshots__`. |
+| A commit is refused with "doesn't follow the convention" | The commit-message hook. Fix the message as it explains, or see [Contributing](contributing.md). |
 | "Some saved data couldn't be read and was set aside." | A saved value was damaged. See [Sync, storage and recovery](sync.md#damaged-data). |
