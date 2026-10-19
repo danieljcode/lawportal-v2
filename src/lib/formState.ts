@@ -25,5 +25,7 @@ export {
 } from "./formState/rules";
 export { docketToForm, formToDocketPatch, hasField } from "./formState/dockets";
 export { layout, sectionMeta, segments, singular } from "./formState/layout";
+export { missingRequired } from "./formState/required";
+export type { MissingField } from "./formState/required";
 export type { ChecklistRow, LayoutItem, Segment } from "./formState/layout";
 export { COLLAPSED_KEY, LAST_FORM_KEY, draftKey, readDraft, writeDraft } from "./formState/drafts";

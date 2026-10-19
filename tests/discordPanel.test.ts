@@ -173,8 +173,11 @@ describe("Discord tab", () => {
     mount("extra-general-motion");
     click("#tab-discord");
     const raw2 = rawPart(2);
+    // The motion still has empty required fields (LP-87), so the copy asks first.
+    click("#dc-copy-2");
+    expect(must("#missing-dialog").hasAttribute("open")).toBe(true);
     await act(async () => {
-      must("#dc-copy-2").click();
+      must("#missing-anyway").click();
       await new Promise((r) => setTimeout(r, 0));
     });
     expect(writeText).toHaveBeenCalledWith(raw2);
@@ -189,8 +192,9 @@ describe("Discord tab", () => {
     Object.defineProperty(document, "execCommand", { value: () => false, configurable: true });
     mount("civil-complaint");
     click("#tab-discord");
+    click("#dc-copy-1");
     await act(async () => {
-      must("#dc-copy-1").click();
+      must("#missing-anyway").click();
       await new Promise((r) => setTimeout(r, 0));
     });
     expect(must("#copy-status").textContent).toBe("Copy failed: select the text and press Ctrl+C.");
