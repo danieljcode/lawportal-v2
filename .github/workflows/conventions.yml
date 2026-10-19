@@ -1,0 +1,28 @@
+name: Conventions
+
+# Commit messages and the PR title follow <type>(<area>): <summary> [LP-<n>]
+# (docs/contributing.md). Separate from CI so editing a title re-runs only this.
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  commit-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check commit messages
+        run: node scripts/commit-format.mjs --range "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
+
+      - name: Check the pull request title
+        env:
+          # Through the environment, never inlined, so a title can't inject shell.
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: node scripts/commit-format.mjs --title
