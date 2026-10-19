@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-// AC 24 (unit part): the six Additional Templates.
+// AC 24 (unit part): the Additional Templates, with the four Firm Letters (LP-9).
 import { describe, expect, it } from "vitest";
 import { ALL_FORMS, COURTS, getForm } from "@/data";
 import { EXTRA_FORMS } from "@/data/extra-forms";
@@ -55,6 +55,30 @@ const SPEC: Record<string, { title: string; section: string; sections: string[];
       "IN WITNESS WHEREOF",
     ],
   },
+  "extra-engagement-letter": {
+    title: "Engagement Letter",
+    section: "Firm Letters",
+    sections: ["Letterhead", "Client", "Engagement", "Signature", "Acceptance"],
+    headings: ["Re: Engagement of legal services", "Scope of the representation", "ACKNOWLEDGED AND AGREED"],
+  },
+  "extra-retainer-agreement": {
+    title: "Retainer Agreement",
+    section: "Firm Letters",
+    sections: ["Parties", "Fees", "Terms", "Signatures"],
+    headings: ["RETAINER AGREEMENT", "Retainer.", "Payment terms.", "No guarantee."],
+  },
+  "extra-demand-letter": {
+    title: "Demand Letter",
+    section: "Firm Letters",
+    sections: ["Letterhead", "Recipient", "Demand", "Signature"],
+    headings: ["This firm represents", "we demand payment of", "without prejudice", "Yours faithfully,"],
+  },
+  "extra-representation-letter": {
+    title: "Letter of Representation",
+    section: "Firm Letters",
+    sections: ["Letterhead", "Recipient", "Representation", "Signature"],
+    headings: ["Please be advised that", "do not contact our client directly", "Sincerely,"],
+  },
 };
 
 const parse = (html: string) => new DOMParser().parseFromString(html, "text/html");
@@ -64,11 +88,11 @@ function allFields(entries: Entry[]): Field[] {
 }
 
 describe("Additional Templates", () => {
-  it("adds six forms after the 39 directory forms", () => {
-    expect(ALL_FORMS).toHaveLength(45);
+  it("adds ten forms after the 39 directory forms", () => {
+    expect(ALL_FORMS).toHaveLength(49);
     expect(EXTRA_FORMS.map((f) => f.id)).toEqual(Object.keys(SPEC));
     expect(ALL_FORMS.slice(39).map((f) => f.id)).toEqual(Object.keys(SPEC));
-    expect(new Set(ALL_FORMS.map((f) => f.id)).size).toBe(45);
+    expect(new Set(ALL_FORMS.map((f) => f.id)).size).toBe(49);
     expect(COURTS).not.toContain("Additional Templates");
   });
 
@@ -148,6 +172,72 @@ describe("Additional Templates", () => {
       ).toBe(true);
     }
     expect(hasField(fields(compile(getForm("extra-service-contract")!.html)), {}, "Case number")).toBe(false);
+  });
+
+  describe("Firm Letters (LP-9)", () => {
+    const LETTERS = [
+      "extra-engagement-letter",
+      "extra-retainer-agreement",
+      "extra-demand-letter",
+      "extra-representation-letter",
+    ];
+    const characterKeys = (id: string) =>
+      Object.fromEntries(
+        allFields(fields(compile(getForm(id)!.html)))
+          .filter((f) => f.character)
+          .map((f) => [f.label, f.character]),
+      );
+
+    it("sign off from the active character: name, title, bar number and signature", () => {
+      for (const id of LETTERS) {
+        expect(characterKeys(id), id).toMatchObject({
+          Name: "name",
+          Role: "title",
+          "Bar number": "bar",
+          Signature: "signature",
+        });
+      }
+    });
+
+    it("carry a case number for the case bar, and the representation letter both parties", () => {
+      for (const id of LETTERS) expect(hasField(fields(compile(getForm(id)!.html)), {}, "Case number"), id).toBe(true);
+      const rep = fields(compile(getForm("extra-representation-letter")!.html));
+      expect(PLAINTIFF_LABELS.some((l) => hasField(rep, {}, l))).toBe(true);
+      expect(DEFENDANT_LABELS.some((l) => hasField(rep, {}, l))).toBe(true);
+    });
+
+    it("use a letter date, not a filing date, so saving to the Case File records no filing", () => {
+      for (const id of LETTERS) {
+        const entries = fields(compile(getForm(id)!.html));
+        expect(hasField(entries, {}, "Filing date"), id).toBe(false);
+        const form = getForm(id)!;
+        const res = formToDocketPatch(form, entries, { "Case number": "90SCCC00001", "Letter date": "1990-10-19" });
+        // The court still comes from the case number's division code, as for every form.
+        expect(res, id).toEqual({ patch: { caseNumber: "90SCCC00001", court: "San Andreas Civil Court" } });
+      }
+    });
+
+    it("the retainer starts with fee defaults", () => {
+      const prefills = Object.fromEntries(
+        allFields(fields(compile(getForm("extra-retainer-agreement")!.html)))
+          .filter((f) => f.prefill)
+          .map((f) => [f.label, f.prefill]),
+      );
+      expect(prefills).toMatchObject({
+        "Hourly rate": "$250 per hour",
+        "Billing increment": "6 minutes",
+        "Retainer amount": "$5,000",
+        "Replenish below": "$1,000",
+        "Payment terms": "Invoices are due within 14 days of receipt.",
+      });
+    });
+
+    it("the demand letter's deadline defaults to 14 days out", () => {
+      const f = allFields(fields(compile(getForm("extra-demand-letter")!.html))).find(
+        (x) => x.label === "Response deadline",
+      )!;
+      expect(f).toMatchObject({ type: "date", prefill: "today+14" });
+    });
   });
 
   it("Save to docket on extra-general-motion never writes a court", () => {
