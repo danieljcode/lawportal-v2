@@ -48,6 +48,9 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
 - **Case File** (toolbar or sidebar): every firm case, with its lead and the other characters on
   it. Search by case number or party, filter by status or character, and open a case to edit its
   details and who's working it.
+- **Deadlines and hearings** on each case, added by hand or from a form's dates (a case
+  schedule fills in the whole timetable). **Upcoming** lists the next 14 days, overdue first, and
+  the Case File button shows a dot when something is due within 48 hours.
 - **Dockets** for judges and lawyers: the cases each character works. Any form with a case number
   can load a firm case (yours listed first) or save its case to the Case File. Cases belong to the firm, so characters
   with the same case number share it, and deleting a character keeps its cases.

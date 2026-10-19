@@ -11,7 +11,7 @@ browser.
   `ssr: false`. The app reads local storage on its first render, so it never renders on the server
   (no hydration mismatches).
 - **Hash routing.** `#civil-complaint` opens a form, `#jap` the J.A.P., `#cases` the Case File and
-  `#cases/<id>` one case in it (LP-101), an empty hash the start page. `useRoute` owns the route and remembers the last form under `lawapp_last_form`;
+  `#cases/<id>` one case in it (LP-101), `#upcoming` what's due (LP-18), an empty hash the start page. `useRoute` owns the route and remembers the last form under `lawapp_last_form`;
   `useDialogs` owns the open dialog; `App.tsx` owns the active character and the layout.
 - **Three small API routes** on the same server, all behind a host check (see [Server](#server)):
   sync (`/api/account`, `/api/data`) and the `.docx` export (`/api/docx`).
@@ -163,6 +163,20 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
     `lawapp_dockets_<id>` keys. The pure docket
     fields (`FIELDS`, `clean`, `divisionFor`…) live in `docketFields.ts`, so the two don't import
     each other.
+- **Deadlines and hearing dates** (`src/lib/deadlines.ts`, LP-18) live on each case
+  (`deadlines`: an in-game date, a label, a note, done), so they sync and back up with it; merging
+  two copies of a case keeps both copies' deadlines. Dates are on the 1990 calendar, as forms fill
+  them: "today" is `gameToday()`, from `gameDate()`.
+  - **On a case** (`CaseDeadlines.tsx`): add, tick off and remove, each saved straight away. The
+    case details form above only reloads when the case's details change, so unsaved edits there
+    survive a deadline change.
+  - **Upcoming** (`#upcoming`, `UpcomingView.tsx`): the next 14 days on the active character's
+    cases (every case with no character), overdue first.
+  - **The toolbar dot** on Case File (`dueSoonCount`) shows when something on the active
+    character's cases is due within 48 hours or overdue; the button then opens Upcoming.
+  - **From a form**: with a firm case for its case number, **Add dates to case** in the case bar
+    lists the form's filled-in date fields (`formDates`), with computed ones (a case schedule's,
+    `today+21`) and ones named like a hearing or deadline ticked.
 - **Filing history** (`src/lib/filings.ts`, LP-15). Each successful Copy for forum, Copy BBCode,
   Discord copy or .docx download keeps a filing: the form, the active character, the case number
   (and the firm case it matched), when and how, and the form's values. Not its HTML: **Copy again**
