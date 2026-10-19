@@ -19,6 +19,20 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-19",
+    title: "New client intake",
+    items: [
+      {
+        type: "new",
+        text: "New client intake (in the sidebar and the Case File) takes a new client's details, the matter and a summary in one form. Open case adds it to the Case File with the right court and parties, your character as lead and the intake in its notes.",
+      },
+      {
+        type: "new",
+        text: "Print client sheet prints the intake as a one-page sheet.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-19",
     title: "Deadlines and hearings",
     items: [
       {
