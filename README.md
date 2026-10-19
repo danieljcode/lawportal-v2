@@ -62,7 +62,8 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
 - **Sync** stores your characters, dockets and J.A.P. on the computer running the app, under a
   private code. Anyone with the code who can reach that computer can read or change them, so keep it
   private. If two devices change the same character, the newer change wins and the other is kept so
-  you can restore it.
+  you can restore it. The sync server limits how many codes can be made (5 an hour) and how many
+  wrong codes one device can try, so others on your network can't fill it up.
 - If saved data is ever damaged, it's **set aside rather than deleted**, and the Characters dialog
   offers **Download damaged data**.
 

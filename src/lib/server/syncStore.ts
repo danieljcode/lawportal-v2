@@ -90,11 +90,44 @@ async function readFile(file: string): Promise<SyncRecord | null> {
   }
 }
 
+/** How long a code that was never written to keeps its file (LP-8). */
+export const UNUSED_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+const HASH_FILE = /^[0-9a-f]{64}\.json$/;
+
+/**
+ * Delete files still at rev 0 (created, never written) that are older than
+ * UNUSED_TTL_MS, so made-up codes can't hold the MAX_FILES cap forever.
+ * Returns how many files are left. Unreadable files are kept and counted.
+ */
+export async function sweepUnused(now = Date.now()): Promise<number> {
+  const dir = syncDir();
+  const names = (await fs.readdir(dir)).filter((n) => n.endsWith(".json"));
+  let left = names.length;
+  for (const name of names) {
+    if (!HASH_FILE.test(name)) continue;
+    const file = path.join(dir, name);
+    const gone = await withLock(name.slice(0, 64), async () => {
+      try {
+        if (now - (await fs.stat(file)).mtimeMs < UNUSED_TTL_MS) return false;
+        const record = await readFile(file);
+        if (!record || record.rev !== 0) return false;
+        await fs.unlink(file);
+        return true;
+      } catch {
+        return false;
+      }
+    });
+    if (gone) left--;
+  }
+  return left;
+}
+
 /** A new sync code with an empty record, or "full" when the directory holds MAX_FILES records. */
 export async function create(): Promise<{ code: string } | "full"> {
   const dir = syncDir();
   await fs.mkdir(dir, { recursive: true });
-  const existing = (await fs.readdir(dir)).filter((n) => n.endsWith(".json")).length;
+  const existing = await sweepUnused();
   if (existing >= MAX_FILES) return "full";
   const record: SyncRecord = { rev: 0, updated: new Date().toISOString(), data: { characters: [] } };
   for (let attempt = 1; ; attempt++) {
