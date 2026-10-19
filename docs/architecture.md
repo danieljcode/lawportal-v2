@@ -11,7 +11,7 @@ browser.
   `ssr: false`. The app reads local storage on its first render, so it never renders on the server
   (no hydration mismatches).
 - **Hash routing.** `#civil-complaint` opens a form, `#jap` the J.A.P., `#cases` the Case File and
-  `#cases/<id>` one case in it (LP-101), `#upcoming` what's due (LP-18), an empty hash the start page. `useRoute` owns the route and remembers the last form under `lawapp_last_form`;
+  `#cases/<id>` one case in it (LP-101), `#upcoming` what's due (LP-18), `#intake` the new client intake (LP-19), an empty hash the start page. `useRoute` owns the route and remembers the last form under `lawapp_last_form`;
   `useDialogs` owns the open dialog; `App.tsx` owns the active character and the layout.
 - **Three small API routes** on the same server, all behind a host check (see [Server](#server)):
   sync (`/api/account`, `/api/data`) and the `.docx` export (`/api/docx`).
@@ -163,6 +163,13 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
     `lawapp_dockets_<id>` keys. The pure docket
     fields (`FIELDS`, `clean`, `divisionFor`…) live in `docketFields.ts`, so the two don't import
     each other.
+- **New client intake** (`#intake`, `IntakeView.tsx`; `src/lib/intake.ts`, LP-19): the client's details,
+  how they found the firm, the matter, the opposing party, a summary and the urgency. **Open case**
+  makes the Case File case: the matter type sets the court and which side the client is on
+  (criminal and traffic clients are defendants), the chosen character leads, status is Open, and
+  the intake goes in the notes. A blank case number becomes `PENDING-<n>` until the court gives one.
+  **Print client sheet** prints just the sheet beside the form (a print stylesheet scoped with
+  `:has(#intake-sheet)`). A conflict check (LP-10) will plug in here.
 - **Deadlines and hearing dates** (`src/lib/deadlines.ts`, LP-18) live on each case
   (`deadlines`: an in-game date, a label, a note, done), so they sync and back up with it; merging
   two copies of a case keeps both copies' deadlines. Dates are on the 1990 calendar, as forms fill
