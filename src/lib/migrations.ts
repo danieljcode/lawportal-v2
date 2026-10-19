@@ -4,13 +4,14 @@
 // reads upgrade in memory without writing.
 
 import { characterStore } from "./characters";
-import { docketStore } from "./dockets";
+import { caseStore } from "./cases";
 import { portfolioStore } from "./portfolio";
 
 /** Each store's migrate(), in turn (LP-2, LP-99). */
 const STORES: Array<[string, () => { migrate(): boolean }]> = [
   ["characters", characterStore],
-  ["dockets", docketStore],
+  // Cases before anything else reads dockets: the old per-character dockets become cases (LP-4).
+  ["cases", caseStore],
   ["J.A.P. portfolios", portfolioStore],
 ];
 

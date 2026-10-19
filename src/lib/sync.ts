@@ -7,17 +7,21 @@
 // back into view (at most every 20 s unless forced). If another device saved
 // in between (a 409 on push, or a newer rev on pull while this browser has
 // unsent edits), the two copies are merged one character at a time: the newer
-// updatedAt wins, and dockets and J.A.P. go with their character. This
+// updatedAt wins, and the J.A.P. goes with its character. Since LP-4 the firm's
+// cases sync alongside, merged one case at a time by their own `updated`; a
+// copy from before LP-4 (dockets inside each character) is read as cases. This
 // browser's versions that lose are kept under lawapp_sync_lost so the user can
 // restore them.
 //
 // The code lives in local storage under lawapp_sync_code and is only ever sent
 // to /api/ in the Authorization header. Client only: nothing runs at import.
+import { caseStore, casesFromDockets, cleanCase, unifyCases } from "./cases";
 import { characterStore } from "./characters";
 import { docketStore } from "./dockets";
 import { portfolioStore } from "./portfolio";
 import { deleteCharacter } from "./services/characters";
 import { defaultKV } from "./storage";
+import type { Case } from "./types";
 import { S_SYNC_APPLY_FAIL, S_SYNC_LOST, S_SYNC_MERGED } from "./strings";
 
 export const CODE_KEY = "lawapp_sync_code";
@@ -57,11 +61,14 @@ export interface SyncState {
   applied: number;
   /** How many of this browser's characters are kept aside after losing a merge (0: nothing to restore). */
   lost: number;
+  /** The same for cases (LP-4). */
+  lostCases: number;
 }
 
-/** The sync document: the export shape, with dockets and J.A.P. inside each character. */
+/** The sync document: the export shape, with the J.A.P. inside each character, and the firm's cases (LP-4). */
 export interface SyncDoc {
   characters: Array<Record<string, unknown>>;
+  cases: Case[];
 }
 
 interface ApiBody {
@@ -75,7 +82,14 @@ interface ApiBody {
 const PUSH_DELAY = 700;
 const PULL_THROTTLE = 20_000;
 
-const INITIAL: SyncState = Object.freeze({ status: "off", message: "", updated: null, applied: 0, lost: 0 });
+const INITIAL: SyncState = Object.freeze({
+  status: "off",
+  message: "",
+  updated: null,
+  applied: 0,
+  lost: 0,
+  lostCases: 0,
+});
 
 let state: SyncState = INITIAL;
 const listeners = new Set<(s: SyncState) => void>();
@@ -134,8 +148,8 @@ function set(status: SyncStatus, message = "", updated?: string): void {
   notify();
 }
 
-function setLost(lost: number): void {
-  state = Object.freeze({ ...state, lost });
+function setLost(lost: number, lostCases: number): void {
+  state = Object.freeze({ ...state, lost, lostCases });
   notify();
 }
 
@@ -184,26 +198,35 @@ async function request(
 
 /** This browser's data as a sync document. */
 export function snapshot(): SyncDoc {
-  const dockets = docketStore();
   const portfolio = portfolioStore();
   return {
     characters: characterStore()
       .list()
       .map((c) => {
         const copy = JSON.parse(JSON.stringify(c)) as Record<string, unknown>;
-        const d = dockets.list(c.id);
-        if (d.length) copy.dockets = d;
         const jap = portfolio.get(c.id);
         if (jap) copy.jap = jap;
         return copy;
       }),
+    cases: caseStore()
+      .list()
+      .map((c) => JSON.parse(JSON.stringify(c)) as Case),
   };
+}
+
+/** A document's cases; one from before LP-4 has dockets inside its characters instead. */
+function casesOf(doc: unknown): Case[] {
+  const raw = doc && typeof doc === "object" ? (doc as { cases?: unknown }).cases : undefined;
+  if (Array.isArray(raw)) {
+    return raw.filter((c): c is Doc => !!c && typeof c === "object" && !!(c as Doc).caseNumber).map(cleanCase);
+  }
+  return casesFromDockets(charactersOf(doc).map((c): [string, unknown] => [String(c.id), c.dockets]));
 }
 
 /**
  * Make this browser match a server document: save each character (through the
- * stores' clean()), replace its dockets and J.A.P., remove characters the
- * document doesn't have, and keep the server's order. Returns how many
+ * stores' clean()), replace its J.A.P., remove characters the document doesn't
+ * have, keep the server's order, then replace the cases. Returns how many
  * characters couldn't be stored.
  */
 function apply(doc: unknown): number {
@@ -224,7 +247,6 @@ function apply(doc: unknown): number {
         const saved = chars.save(c, { keepStamp: true });
         keep.add(saved.id);
         order.push(saved.id);
-        dockets.replace(saved.id, Array.isArray(c.dockets) ? c.dockets : []);
         portfolio.replace(saved.id, c.jap || null);
       } catch (err) {
         failed++;
@@ -241,6 +263,7 @@ function apply(doc: unknown): number {
         at--;
       }
     });
+    caseStore().replaceAll(casesOf(doc));
   } finally {
     applying = false;
   }
@@ -252,9 +275,10 @@ export function merge(serverDoc: unknown): SyncDoc {
   const raw =
     serverDoc && typeof serverDoc === "object" ? (serverDoc as { characters?: unknown }).characters : undefined;
   const list = Array.isArray(raw) ? raw.filter((c): c is Record<string, unknown> => !!c && typeof c === "object") : [];
-  const out: SyncDoc = { characters: list.slice() };
+  const local = snapshot();
+  const out: SyncDoc = { characters: list.slice(), cases: unifyCases(casesOf(serverDoc), casesOf(local)) };
   const have = new Set(out.characters.map((c) => c.id));
-  for (const c of snapshot().characters) if (!have.has(c.id)) out.characters.push(c);
+  for (const c of local.characters) if (!have.has(c.id)) out.characters.push(c);
   return out;
 }
 
@@ -280,9 +304,11 @@ function readBase(): Map<string, string> | null {
   }
 }
 
-function saveBase(chars: Doc[]): void {
+/** Remember the server copy's stamps: characters by id, cases as "case:<id>" (LP-4). */
+function saveBase(doc: unknown): void {
   const o: Record<string, string> = {};
-  for (const c of chars) if (typeof c.id === "string") o[c.id] = stampOf(c);
+  for (const c of charactersOf(doc)) if (typeof c.id === "string") o[c.id] = stampOf(c);
+  for (const c of casesOf(doc)) o["case:" + c.id] = c.updated;
   lsSet(BASE_KEY, JSON.stringify(o));
 }
 
@@ -290,6 +316,8 @@ export interface Resolved {
   doc: SyncDoc;
   /** This browser's versions that lost and had changed here since the last server copy. */
   lost: Doc[];
+  /** The same for cases (LP-4). */
+  lostCases: Case[];
   /** True when the result holds anything of this browser's, so it must be pushed. */
   keptLocal: boolean;
 }
@@ -337,13 +365,61 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
     out.push(l);
     keptLocal = true;
   }
-  return { doc: { characters: out }, lost, keptLocal };
+
+  // Cases (LP-4): the same rules, one case at a time, by each case's own `updated`.
+  const localCases = new Map(
+    caseStore()
+      .list()
+      .map((c) => [c.id, c]),
+  );
+  const caseBase = (id: string) => base?.get("case:" + id);
+  const caseChangedHere = (c: Case) => !base || caseBase(c.id) !== c.updated;
+  const outCases: Case[] = [];
+  const lostCases: Case[] = [];
+  const seenCases = new Set<string>();
+  for (const s of casesOf(serverDoc)) {
+    seenCases.add(s.id);
+    const l = localCases.get(s.id);
+    if (!l) {
+      if (caseBase(s.id) === s.updated) keptLocal = true;
+      else outCases.push(s);
+      continue;
+    }
+    if (l.updated > s.updated) {
+      outCases.push(l);
+      keptLocal = true;
+    } else {
+      outCases.push(s);
+      if (l.updated !== s.updated && caseChangedHere(l)) lostCases.push(l);
+    }
+  }
+  for (const [id, l] of localCases) {
+    if (seenCases.has(id)) continue;
+    if (caseBase(id) !== undefined) {
+      if (caseChangedHere(l)) lostCases.push(l);
+      continue;
+    }
+    outCases.push(l);
+    keptLocal = true;
+  }
+  // Two devices can make the same case number separately: they become one case.
+  return { doc: { characters: out, cases: unifyCases(outCases) }, lost, lostCases, keptLocal };
 }
 
 function readLost(): Doc[] {
   try {
     const o: unknown = JSON.parse(lsGet(LOST_KEY) || "null");
     return o && typeof o === "object" ? charactersOf(o) : [];
+  } catch {
+    return [];
+  }
+}
+
+function readLostCases(): Case[] {
+  try {
+    const o: unknown = JSON.parse(lsGet(LOST_KEY) || "null");
+    const raw = o && typeof o === "object" ? (o as { cases?: unknown }).cases : undefined;
+    return Array.isArray(raw) ? casesOf({ cases: raw }) : [];
   } catch {
     return [];
   }
@@ -362,11 +438,20 @@ export function restoreLost(): number {
   for (const c of readLost()) {
     try {
       const saved = chars.save(c);
-      dockets.replace(saved.id, Array.isArray(c.dockets) ? c.dockets : []);
+      // A version kept aside before LP-4 still has its docket inside.
+      if (Array.isArray(c.dockets)) dockets.replace(saved.id, c.dockets);
       portfolio.replace(saved.id, c.jap || null);
       restored++;
     } catch (err) {
       console.warn("[sync] couldn't restore a character", err);
+    }
+  }
+  for (const c of readLostCases()) {
+    try {
+      caseStore().save(c); // a fresh `updated`, so it wins the next merge
+      restored++;
+    } catch (err) {
+      console.warn("[sync] couldn't restore a case", err);
     }
   }
   discardLost();
@@ -376,7 +461,7 @@ export function restoreLost(): number {
 /** Forget the kept-aside versions. */
 export function discardLost(): void {
   lsSet(LOST_KEY, null);
-  setLost(0);
+  setLost(0, 0);
 }
 
 /** Set `status` after applying a server copy, unless some characters failed to store. */
@@ -394,29 +479,31 @@ function setAfterApply(failed: number, status: SyncStatus, message: string, upda
  */
 function takeServer(b: ApiBody, dirty: boolean): boolean {
   lsSet(REV_KEY, String(b.rev));
-  const server = charactersOf(b.data);
   if (!dirty) {
     const failed = apply(b.data);
-    saveBase(server);
+    saveBase(b.data);
     lsSet(DIRTY_KEY, null);
     setAfterApply(failed, "synced", "Updated from the server.", b.updated);
     return false;
   }
-  const { doc, lost, keptLocal } = resolve(b.data);
-  saveBase(server);
-  if (lost.length) {
-    // Add to anything not yet restored; a newer copy of the same character replaces the older one.
+  const { doc, lost, lostCases, keptLocal } = resolve(b.data);
+  saveBase(b.data);
+  const anyLost = lost.length + lostCases.length > 0;
+  if (anyLost) {
+    // Add to anything not yet restored; a newer copy of the same character or case replaces the older one.
     const ids = new Set(lost.map((c) => c.id));
     const all = [...readLost().filter((c) => !ids.has(c.id)), ...lost];
-    lsSet(LOST_KEY, JSON.stringify({ at: new Date().toISOString(), characters: all }));
-    setLost(all.length);
+    const caseIds = new Set(lostCases.map((c) => c.id));
+    const allCases = [...readLostCases().filter((c) => !caseIds.has(c.id)), ...lostCases];
+    lsSet(LOST_KEY, JSON.stringify({ at: new Date().toISOString(), characters: all, cases: allCases }));
+    setLost(all.length, allCases.length);
   }
   const failed = apply(doc);
   lsSet(DIRTY_KEY, keptLocal ? "1" : null);
   setAfterApply(
     failed,
-    lost.length ? "conflict" : "synced",
-    lost.length ? S_SYNC_LOST(lost.length) : keptLocal ? S_SYNC_MERGED : "Updated from the server.",
+    anyLost ? "conflict" : "synced",
+    anyLost ? S_SYNC_LOST(lost.length, lostCases.length) : keptLocal ? S_SYNC_MERGED : "Updated from the server.",
     b.updated,
   );
   return keptLocal;
@@ -441,7 +528,7 @@ function send(retry: boolean): Promise<void> {
         if (r.status === 200) {
           lsSet(REV_KEY, String(b.rev));
           lsSet(DIRTY_KEY, null);
-          saveBase(sent.characters);
+          saveBase(sent);
           set("synced", "", b.updated);
           return;
         }
@@ -497,7 +584,7 @@ export async function pull(force = false): Promise<boolean> {
         pushed = true;
       }
     } else {
-      saveBase(charactersOf(b.data)); // the copy this browser last synced with
+      saveBase(b.data); // the copy this browser last synced with
       if (lsGet(DIRTY_KEY)) {
         await push(); // send edits made while offline
         pushed = true;
@@ -586,7 +673,7 @@ export function init(): Promise<void> {
   if (initPromise) return initPromise;
   const unsubs = [
     characterStore().subscribe(changed),
-    docketStore().subscribe(changed),
+    caseStore().subscribe(changed),
     portfolioStore().subscribe(changed),
   ];
   const onVisible = () => {
@@ -603,7 +690,8 @@ export function init(): Promise<void> {
     () => window.removeEventListener("online", onOnline),
   ];
   const lost = readLost().length;
-  if (lost) setLost(lost);
+  const lostCases = readLostCases().length;
+  if (lost || lostCases) setLost(lost, lostCases);
   initPromise = (async () => {
     if (code()) {
       set("loading", "Loading from the server…");

@@ -19,6 +19,20 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-19",
+    title: "Cases belong to the firm",
+    items: [
+      {
+        type: "update",
+        text: "Docket cases now belong to the firm rather than to one character. Characters with the same case number on their dockets share one case, so an edit by one shows for the others. Your existing dockets were moved over with nothing lost.",
+      },
+      {
+        type: "update",
+        text: "Deleting a character keeps their cases: they're taken off them instead, and any case they led is kept for someone else to take on.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-19",
     title: "Undo and draft history",
     items: [
       {

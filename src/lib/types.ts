@@ -132,6 +132,19 @@ export interface Docket {
   updated: string;
 }
 
+/**
+ * A firm-owned case (LP-4): the docket fields, plus who works it. A character's
+ * docket is the cases they're lead on or assigned to.
+ */
+export interface Case extends Docket {
+  /** The lead character's id; null when the lead was deleted and the case needs a new one. */
+  lead: string | null;
+  /** Other characters working the case (never the lead). */
+  assigned: string[];
+  /** ISO timestamp. */
+  created: string;
+}
+
 export type PortfolioLevel = "I" | "II";
 
 /** One J.A.P. line; which keys are used depends on the task's kind. */
