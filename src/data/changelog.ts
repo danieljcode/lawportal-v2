@@ -17,6 +17,20 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  {
+    date: "2026-10-19",
+    title: "Full backup",
+    items: [
+      {
+        type: "new",
+        text: "Back up everything in the Characters dialog saves one file with your characters, dockets, J.A.P., form drafts and settings. Restore backup shows what will change, then puts it all back.",
+      },
+      {
+        type: "new",
+        text: "If sync is off and you haven't made a backup for 30 days, the Characters dialog reminds you.",
+      },
+    ],
+  },
   { date: "2026-10-19", title: "Stable & FreestyleRP", version: "0.2.0", items: [
     { type: "update", text: "The app is now just for FreestyleRP: FreestyleRP court names in every form, the Superior Court in case numbers (for example 90SCCR00XXX), in-game 1990 dates throughout, and no more Server switch." },
     { type: "fix", text: "When two devices change things before syncing, your unsent edits are no longer lost: the newest copy of each character wins, and your version is kept so you can use Restore my version." },
