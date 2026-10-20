@@ -93,7 +93,7 @@ describe("the Case File (LP-101)", () => {
     expect(must<HTMLAnchorElement>('#sidebar a[href="#cases"]').textContent).toBe("Case File");
     go("#cases");
     expect(must("#case-file-title").textContent).toBe("Case File");
-    expect(document.title).toBe("Case File · Court Filing Generator");
+    expect(document.title).toBe("Case File · Friedman & Associates: Court Filing System");
     expect(rows()).toEqual(["90SCCR00147", "90SCTC00009", "90SCCC00001"]); // open first
     const first = must(".case-row");
     expect(first.textContent).toContain("Ann v. Bo");

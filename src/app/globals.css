@@ -2777,3 +2777,31 @@ dialog.changelog {
 .boot-setting {
   margin: 12px 0;
 }
+
+/* ---------- About (LP-22) ---------- */
+.help-btn {
+  font-weight: 700;
+}
+.about-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.about-head p {
+  margin: 0;
+}
+.about-logo {
+  width: 48px;
+  height: 48px;
+  flex: none;
+}
+.about-mark {
+  display: grid;
+  place-items: center;
+  border: 2px solid #c0c0c0;
+  font-size: 28px;
+}
+.about-credits {
+  margin: 0;
+  padding-left: 18px;
+}

@@ -7,7 +7,7 @@ import { isUnread, markSeen } from "@/lib/changelog";
 import type { DocketRequest } from "./FormView";
 
 /** Which dialog is open (one at a time). */
-export type DialogName = "characters" | "dockets" | "changelog" | "filings" | null;
+export type DialogName = "characters" | "dockets" | "changelog" | "filings" | "about" | null;
 
 export interface Dialogs {
   dialog: DialogName;
@@ -24,6 +24,8 @@ export interface Dialogs {
   openChangelog(): void;
   /** Filing history (LP-15). */
   openFilings(): void;
+  /** Help → About (LP-22). */
+  openAbout(): void;
   closeDialog(): void;
   autoSyncDone(): void;
   /** Close the Dockets dialog and ask the open form to load this docket. */
@@ -57,6 +59,7 @@ export function useDialogs(): Dialogs {
   };
 
   const openFilings = () => setDialog("filings");
+  const openAbout = () => setDialog("about");
 
   const openChangelog = () => {
     markSeen();
@@ -74,6 +77,7 @@ export function useDialogs(): Dialogs {
     openCharacters,
     openChangelog,
     openFilings,
+    openAbout,
     closeDialog,
     autoSyncDone,
     loadDocketInForm,
