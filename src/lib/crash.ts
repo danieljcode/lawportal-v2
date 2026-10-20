@@ -8,6 +8,7 @@
 import { backupFilename, backupText, isBackedUp, BACKUP_APP, BACKUP_KIND, BACKUP_VERSION } from "./backup";
 import type { KV } from "./storage";
 import { APP_VERSION } from "./version";
+import { BRANDING } from "@/branding";
 
 const SYNC_CODE = /JSA(?:-[A-Z0-9]{4}){5}/gi;
 /**
@@ -63,7 +64,7 @@ export function errorDetails({ error, componentStack, where, userAgent, now = ne
   let message = redact(err ? err.message : String(error));
   if (message.length > MAX_MESSAGE) message = message.slice(0, MAX_MESSAGE) + "…";
   const lines = [
-    "Court Filing Generator " + APP_VERSION + ": error report",
+    BRANDING.productName + " " + APP_VERSION + ": error report",
     "Where: " + where,
     "When: " + now.toISOString(),
     "Browser: " + (userAgent || "unknown"),

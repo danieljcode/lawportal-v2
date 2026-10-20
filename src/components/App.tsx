@@ -16,6 +16,7 @@ import { defaultKV } from "@/lib/storage";
 import { isCommissioner } from "@/lib/portfolio";
 import { EMPTY_HTML } from "@/lib/safeHtml";
 import * as sync from "@/lib/sync";
+import AboutDialog from "./AboutDialog";
 import ChangelogDialog from "./ChangelogDialog";
 import CharactersDialog from "./CharactersDialog";
 import DocketsDialog from "./DocketsDialog";
@@ -71,6 +72,7 @@ export default function App() {
     openDockets,
     openCharacters,
     openChangelog,
+    openAbout,
     openFilings,
     closeDialog,
     autoSyncDone,
@@ -233,6 +235,7 @@ export default function App() {
           onDockets={() => openDockets(activeId)}
           onCharacters={() => openCharacters()}
           onChangelog={openChangelog}
+          onAbout={openAbout}
           casesDue={casesDue}
         />
         {setAsideCount > setAsideSeen && (
@@ -361,6 +364,9 @@ export default function App() {
       </ErrorBoundary>
       <ErrorBoundary where={"What's new"} variant="dialog" resetKey={dialog} onDismiss={closeDialog}>
         <ChangelogDialog open={dialog === "changelog"} onClose={closeDialog} />
+      </ErrorBoundary>
+      <ErrorBoundary where="About" variant="dialog" resetKey={dialog} onDismiss={closeDialog}>
+        <AboutDialog open={dialog === "about"} onClose={closeDialog} />
       </ErrorBoundary>
       <ErrorBoundary where="Filing history" variant="dialog" resetKey={dialog} onDismiss={closeDialog}>
         <FilingsDialog open={dialog === "filings"} onClose={closeDialog} characters={characters} onUse={openFiling} />

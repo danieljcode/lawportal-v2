@@ -6,6 +6,10 @@ A personal, local web app for writing San Andreas court filings on the **Freesty
 server. Pick a form, fill in the fields, and copy the finished filing straight into a forum editor (as
 formatted HTML or as BBCode), into Discord, or download it as a Word `.docx`.
 
+It's set up as **Friedman & Associates: Court Filing System**, the firm's in-house system. The firm's
+name, logo and colours live in one file, `src/branding.ts`. Filings posted to the forum carry no
+firm branding.
+
 It carries 39 court forms plus six of our own templates (petitions, a motion, discovery and a
 contract), all in FreestyleRP's court names, and it looks like a 1990s Windows desktop. FreestyleRP
 is set in 1990, so every date the app fills in is 36 years back from today's real date.

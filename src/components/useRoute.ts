@@ -4,6 +4,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
 import { getForm } from "@/data";
+import { appTitle } from "@/branding";
 import { LAST_FORM_KEY } from "@/lib/formState";
 import { defaultKV } from "@/lib/storage";
 import type { FormDef } from "@/lib/types";
@@ -18,7 +19,8 @@ export type Route =
   | { kind: "conflicts" }
   | { kind: "library" };
 
-export const APP_TITLE = "Court Filing Generator";
+/** The window title and the browser tab's suffix, from the firm's branding (LP-22). */
+export const APP_TITLE = appTitle();
 export const JAP_TITLE = "Judicial Advancement Portfolio";
 export const CASES_TITLE = "Case File";
 export const UPCOMING_TITLE = "Upcoming";
