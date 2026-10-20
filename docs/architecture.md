@@ -192,6 +192,14 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
   title now, so it's escaped like any other value and works in every output. FormView also
   refreshes the editor's text when the exhibits change (`refreshExhibitRefs`, not an undo step).
   Filing history and draft history previews resolve them against the case as it is now.
+- **Chain of custody** (`src/lib/custody.ts`, `ExhibitCustody.tsx`, LP-14) lives on each exhibit
+  (`custody`, absent when empty): in-game local time to the minute (`1990-10-20T14:05`, `gameNow`),
+  an action (received, reviewed, copied, filed, returned), who (the name at the time, plus the
+  character id when it's one of ours) and a note. Kept in time order; the UI only adds entries, and
+  editing an exhibit's details keeps its log. A merge keeps every entry from both copies
+  (`unionExhibits` → `unionCustody`). Copy for filing renders the list through the template engine
+  (`custodyHtml`), so it's SafeHtml with every value escaped; Print renders a sheet only while the
+  print dialog is open, shown alone by a `:has(#custody-sheet)` print stylesheet.
 - **Deadlines and hearing dates** (`src/lib/deadlines.ts`, LP-18) live on each case
   (`deadlines`: an in-game date, a label, a note, done), so they sync and back up with it; merging
   two copies of a case keeps both copies' deadlines. Dates are on the 1990 calendar, as forms fill

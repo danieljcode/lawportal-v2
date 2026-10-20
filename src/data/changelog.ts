@@ -19,6 +19,20 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-20",
+    title: "Chain of custody",
+    items: [
+      {
+        type: "new",
+        text: "Each exhibit has a chain-of-custody log: open Custody on an exhibit to record when it was received, reviewed, copied, filed or returned, by whom, with a note. Times are in-game (1990).",
+      },
+      {
+        type: "new",
+        text: "Entries can't be changed or removed, so the log holds up in court: correct a mistake with a new entry. Copy for filing puts the log on the clipboard as a numbered list, and Print prints just the log.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-20",
     title: "Exhibits in filings",
     items: [
       {
