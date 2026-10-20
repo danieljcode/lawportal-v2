@@ -2569,3 +2569,9 @@ dialog.changelog {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Insert exhibit under a form's text boxes (LP-13): only as wide as it needs. */
+.field .exhibit-insert {
+  width: auto;
+  max-width: 100%;
+}

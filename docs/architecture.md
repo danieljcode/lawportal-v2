@@ -186,6 +186,12 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
   Links are kept only if they're http(s) (`safeLink`), shown with `rel="noopener noreferrer"`, and
   never fetched. The case page's Evidence area adds, edits, reorders and deletes them (after asking),
   each change saved straight away.
+- **Exhibit references** (LP-13): a form whose case number is a firm case gets its exhibits
+  (`exhibitRefs`). **Insert exhibit** under text fields adds `[Exhibit C: Title #<id>]`; before
+  rendering, `resolveExhibitRefs` turns each into "Exhibit C (Title)" by id, with the letter and
+  title now, so it's escaped like any other value and works in every output. FormView also
+  refreshes the editor's text when the exhibits change (`refreshExhibitRefs`, not an undo step).
+  Filing history and draft history previews resolve them against the case as it is now.
 - **Deadlines and hearing dates** (`src/lib/deadlines.ts`, LP-18) live on each case
   (`deadlines`: an in-game date, a label, a note, done), so they sync and back up with it; merging
   two copies of a case keeps both copies' deadlines. Dates are on the 1990 calendar, as forms fill

@@ -155,6 +155,29 @@ function isEmpty(value: unknown): boolean {
 export interface RenderOptions {
   /** Wrap unfilled fallbacks in `<mark class="unfilled" title="Label">`. */
   highlight?: boolean;
+  /** The loaded case's exhibits, for an `{{Exhibits@exhibits}}` list (LP-13). */
+  exhibits?: ReadonlyArray<{ letter: string; title: string; link?: string }>;
+}
+
+/** The exhibit list: each exhibit's letter, title and (http(s) only) link, all escaped. */
+function renderExhibits(f: Field, opts: RenderOptions): string {
+  const list = opts.exhibits || [];
+  if (!list.length) {
+    if (!f.fallback) return "";
+    return opts.highlight ? `<mark class="unfilled" title="${escapeHtml(f.label)}">${f.fallback}</mark>` : f.fallback;
+  }
+  const items = list.map((e) => {
+    const link = e.link && ANY_URL.test(e.link.trim()) ? e.link.trim() : "";
+    return (
+      "<li><strong>Exhibit " +
+      escapeHtml(e.letter) +
+      "</strong>: " +
+      escapeHtml(e.title) +
+      (link ? ` (<a href="${escapeHtml(link)}">${escapeHtml(link)}</a>)` : "") +
+      "</li>"
+    );
+  });
+  return "<ul>\n" + items.join("\n") + "\n</ul>";
 }
 
 function renderValue(f: Field, value: unknown, opts: RenderOptions): string {
@@ -210,6 +233,8 @@ function renderValue(f: Field, value: unknown, opts: RenderOptions): string {
 }
 
 function renderField(f: Field, value: unknown, opts: RenderOptions): string {
+  // `{{Label@exhibits}}` is filled from the loaded case's evidence, not typed (LP-13).
+  if (f.character === "exhibits") return renderExhibits(f, opts);
   const html = renderValue(f, value, opts);
   return f.wrap && !isEmpty(value) && f.type !== "check" ? `<${f.wrap}>${html}</${f.wrap}>` : html;
 }

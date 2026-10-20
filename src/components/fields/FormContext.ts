@@ -3,6 +3,7 @@
 
 import { createContext, useContext } from "react";
 import type { FormState } from "@/lib/formState";
+import type { ExhibitRef } from "@/lib/exhibits";
 import type { Character, Entry } from "@/lib/types";
 
 export interface FormCtx {
@@ -18,6 +19,8 @@ export interface FormCtx {
   now: Date;
   /** Labels the form requires (LP-87): empty ones are marked in the editor. */
   required: ReadonlySet<string>;
+  /** The exhibits of the firm case with this form's case number (LP-13), for Insert exhibit. */
+  exhibits: readonly ExhibitRef[];
 }
 
 export const FormContext = createContext<FormCtx | null>(null);

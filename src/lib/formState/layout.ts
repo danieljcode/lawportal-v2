@@ -93,6 +93,7 @@ export function sectionMeta(
       return;
     }
     if (checkLines.has(f.line)) return; // an inline "Other: ___" box belongs to its checkbox
+    if (f.character === "exhibits") return; // filled from the case's evidence, not typed (LP-13)
     total++;
     const v = scope[f.label];
     if (v && !(f.prefill && typeof v === "string" && /XXX/.test(v))) filled++;
