@@ -35,7 +35,8 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
 - **Forms.** 39 court forms grouped by court (Criminal, Civil, Traffic, Small Claims, Appellate,
   Supreme, general), plus **Additional Templates**: General Petition, Petition for Name Change,
   General Motion, Interrogatories, Subpoena and Service Agreement, and **Firm Letters**: Engagement
-  Letter, Retainer Agreement, Demand Letter and Letter of Representation. Search by title, court or
+  Letter, Retainer Agreement, Demand Letter and Letter of Representation, and **Judge** templates:
+  Ruling on Motion, Sentencing Order and Warrant Decision. Search by title, court or
   section.
 - **Form editor.** Inputs built from the form: collapsible sections with "x of y filled" counts,
   checkbox lists, repeatable items, optional sections, dates with Today/Auto. Case numbers show the

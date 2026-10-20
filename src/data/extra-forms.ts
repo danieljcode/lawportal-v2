@@ -395,6 +395,119 @@ const representationLetter: FormDef = {
     signOff("Sincerely,"),
 };
 
+
+/* ---------- Judge (LP-90) ----------
+ * Orders a judge issues that forms.json doesn't already have (Order Decree,
+ * the judgements and the schedules cover the rest; see LP-90). Posted to the
+ * forum, so unbranded. The judge's name, title and signature fill from the
+ * active character; "Court name" fills from a case loaded from the case bar.
+ * They use an "Order date", not a filing date, so saving one to the Case File
+ * leaves the case's filed date alone. */
+
+const JUDGE_SECTION = "Judge";
+
+/** The court, then Plaintiff v. Defendant with the case number. */
+const JUDGE_CAPTION =
+  '<p style="text-align:center"><strong>{{Court name|SAN ANDREAS COURT}}</strong><br />\nCOUNTY OF LOS SANTOS</p>\n' +
+  TABLE_OPEN +
+  "<tr>\n<td>{{Plaintiff name|PLAINTIFF NAME}},<br />\nPlaintiff,</td>\n<td>)</td>\n<td></td>\n</tr>\n" +
+  `<tr>\n<td style="text-align:center">v.</td>\n<td>)</td>\n<td>${CASE_NO}</td>\n</tr>\n` +
+  "<tr>\n<td>{{Defendant name|DEFENDANT NAME}},<br />\nDefendant.</td>\n<td>)</td>\n<td></td>\n</tr>\n" +
+  TABLE_CLOSE;
+
+/** The judge's signature, filled from the active character. */
+const JUDGE_SIGNATURE =
+  "{{-- Signature}}\n" +
+  "<p><strong>IT IS SO ORDERED.</strong></p>\n" +
+  "<p>Dated: {{Order date=today:date:long|__________}}</p>\n" +
+  "<p>{{Judge signature@signature:image|SIGNATURE}}</p>\n" +
+  "<p><strong>{{Judge name@name|____________________}}</strong><br />\n" +
+  "{{Judge title@title|Judge of the Superior Court}}<br />\n" +
+  "{{Court name|SAN ANDREAS COURT}}</p>\n";
+
+const rulingOnMotion: FormDef = {
+  id: "extra-ruling-on-motion",
+  court: COURT,
+  section: JUDGE_SECTION,
+  title: "Ruling on Motion",
+  required: ["Case number", "Motion", "Ruling", "Judge name"],
+  html:
+    "{{-- Court & Caption}}\n" +
+    JUDGE_CAPTION +
+    title("ORDER ON MOTION") +
+    "{{-- Motion}}\n" +
+    "<p>The Court has considered the {{Motion|MOTION TITLE}} filed by {{Moving party|THE MOVING PARTY}} on " +
+    "{{Motion filed:date:long|__________}}{{?Opposition}}, and the opposition filed by {{Opposing party|THE OPPOSING PARTY}}{{/Opposition}}.</p>\n" +
+    "{{-- Ruling}}\n" +
+    "<p>The motion is <strong>{{Ruling:select:GRANTED;DENIED;GRANTED IN PART AND DENIED IN PART|GRANTED / DENIED}}</strong>.</p>\n" +
+    heading("REASONS") +
+    "{{Reasons:paras|<p>The Court's reasons for the ruling.</p>}}\n" +
+    heading("ORDER") +
+    "<p>It is hereby ORDERED:</p>\n" +
+    "{{Orders:list|What the parties must do, one order per line.}}\n" +
+    JUDGE_SIGNATURE,
+};
+
+const sentencingOrder: FormDef = {
+  id: "extra-sentencing-order",
+  court: COURT,
+  section: JUDGE_SECTION,
+  title: "Sentencing Order",
+  required: ["Case number", "Defendant name", "Judge name"],
+  html:
+    "{{-- Court & Caption}}\n" +
+    '<p style="text-align:center"><strong>{{Court name|SAN ANDREAS COURT}}</strong><br />\nCOUNTY OF LOS SANTOS</p>\n' +
+    TABLE_OPEN +
+    "<tr>\n<td>{{Plaintiff name|THE PEOPLE OF THE STATE OF SAN ANDREAS}},<br />\nPlaintiff,</td>\n<td>)</td>\n<td></td>\n</tr>\n" +
+    `<tr>\n<td style="text-align:center">v.</td>\n<td>)</td>\n<td>${CASE_NO}</td>\n</tr>\n` +
+    "<tr>\n<td>{{Defendant name|DEFENDANT NAME}},<br />\nDefendant.</td>\n<td>)</td>\n<td></td>\n</tr>\n" +
+    TABLE_CLOSE +
+    title("SENTENCING ORDER") +
+    "{{-- Conviction}}\n" +
+    "<p>The Defendant, {{Defendant name|DEFENDANT NAME}}, was convicted on {{Conviction date:date:long|__________}} by " +
+    "{{Convicted by:select:verdict;plea of guilty;plea of no contest|verdict}} of:</p>\n" +
+    "{{Offences:list|Each offence, one per line.}}\n" +
+    "{{-- Sentence}}\n" +
+    "<p>IT IS ADJUDGED that the Defendant is sentenced as follows.</p>\n" +
+    "{{?Custody}}<p><strong>Custody:</strong> {{Custody|__ days}} in the county jail, with credit for " +
+    "{{Time served|0 days}} already served.</p>\n{{/Custody}}" +
+    "{{?Fine}}<p><strong>Fine:</strong> {{Fine amount|$____}}, payable to the Court.</p>\n{{/Fine}}" +
+    "{{?Restitution|off}}<p><strong>Restitution:</strong> {{Restitution amount|$____}} to {{Restitution to|THE VICTIM}}.</p>\n{{/Restitution}}" +
+    "{{?Community service|off}}<p><strong>Community service:</strong> {{Service hours|__}} hours, to be completed by " +
+    "{{Service by:date:long|__________}}.</p>\n{{/Community service}}" +
+    "{{?Probation|off}}<p><strong>Probation:</strong> {{Probation length|__ months}}, on these conditions:</p>\n" +
+    "{{Probation conditions:list|Each condition, one per line.}}\n{{/Probation}}" +
+    "{{-- Further orders}}\n" +
+    "<p>{{Further orders:textarea|The Defendant is remanded to custody to begin the sentence.}}</p>\n" +
+    JUDGE_SIGNATURE,
+};
+
+const warrantDecision: FormDef = {
+  id: "extra-warrant-decision",
+  court: COURT,
+  section: JUDGE_SECTION,
+  title: "Warrant Decision",
+  required: ["Warrant number", "Applicant", "Subject", "Decision", "Judge name"],
+  html:
+    "{{-- Court & Application}}\n" +
+    '<p style="text-align:center"><strong>{{Court name|SAN ANDREAS COURT}}</strong><br />\nCOUNTY OF LOS SANTOS</p>\n' +
+    title("{{Warrant type:select:SEARCH WARRANT;ARREST WARRANT|SEARCH WARRANT}}") +
+    "<p>Warrant No. {{Warrant number|__________}} · Case No. {{Case number|none yet}}</p>\n" +
+    "<p>Application by {{Applicant|OFFICER NAME, BADGE NO.}} of {{Agency|AGENCY}}, received " +
+    "{{Application date=today:date:long|__________}}.</p>\n" +
+    "<p><strong>Subject:</strong> {{Subject|NAME OR PROPERTY}}<br />\n" +
+    "<strong>Location:</strong> {{Location|ADDRESS OR DESCRIPTION}}</p>\n" +
+    "{{-- Decision}}\n" +
+    "<p>Having reviewed the application and the supporting affidavit, the Court finds that probable cause " +
+    "{{Probable cause:select:HAS;HAS NOT|HAS / HAS NOT}} been shown. The application is " +
+    "<strong>{{Decision:select:APPROVED;DENIED|APPROVED / DENIED}}</strong>.</p>\n" +
+    "{{?Terms of the warrant}}<p><strong>Scope:</strong></p>\n" +
+    "{{Scope:paras|<p>What may be searched or seized, or who may be arrested.</p>}}\n" +
+    "<p><strong>Valid until:</strong> {{Valid until=today+3:date:long|__________}}</p>\n{{/Terms of the warrant}}" +
+    "<p>{{Reasons:textarea|The Court's reasons.}}</p>\n" +
+    JUDGE_SIGNATURE,
+};
+
 export const EXTRA_FORMS: FormDef[] = [
   generalPetition,
   nameChange,
@@ -406,4 +519,7 @@ export const EXTRA_FORMS: FormDef[] = [
   retainerAgreement,
   demandLetter,
   representationLetter,
+  rulingOnMotion,
+  sentencingOrder,
+  warrantDecision,
 ];
