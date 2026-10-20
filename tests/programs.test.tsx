@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // The program shell (LP-103): routes prefixed by program, the old hashes
 // redirected, the registry, and through the App: each program in its own
-// window with its title bar and File / View / Help menus, the Start menu, and
+// window with its title bar and File / View / Help menus, the Program Manager (LP-104), and
 // the active character in the taskbar in every program.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
@@ -88,8 +88,9 @@ describe("the program registry", () => {
       "J.A.P.",
       "Control Panel",
     ]);
-    for (const p of PROGRAMS) expect(programFor(parseHash(p.start)).id, p.id).toBe(p.id);
-    expect(programFor({ program: "home" }).id).toBe("filings");
+    for (const p of PROGRAMS) expect(programFor(parseHash(p.start))?.id, p.id).toBe(p.id);
+    expect(programFor({ program: "home" })).toBeNull();
+    expect(PROGRAMS.filter((p) => p.group === "main").map((p) => p.id)).toEqual(["control"]);
   });
 
   it("shows the J.A.P. only to Court Commissioners", () => {
@@ -208,7 +209,7 @@ describe("the program shell (LP-103)", () => {
     click("#menu-file");
     click("#menu-exit");
     expect(location.hash).toBe("");
-    expect(must("#empty-state")).toBeTruthy();
+    expect(must("#program-manager")).toBeTruthy();
   });
 
   it("closes a menu with Esc and moves through its items with the arrow keys", () => {
@@ -227,26 +228,14 @@ describe("the program shell (LP-103)", () => {
     expect(document.activeElement).toBe(must("#menu-view"));
   });
 
-  it("lists the programs in the Start menu, with the J.A.P. only for a Court Commissioner", () => {
+  it("opens on the Program Manager, and Start returns to it", () => {
     mount("#cases");
+    expect(must("#task-btn").textContent).toBe("🗀Case File");
     click("#start-btn");
-    const names = () => [...document.querySelectorAll("#start-menu [role=menuitem]")].map((a) => a.textContent);
-    expect(names()).toEqual([
-      "⚖Court Filings",
-      "🗀Case File",
-      "☺Clients",
-      "§Law Library",
-      "⚙Control Panel",
-      "⌂Start page",
-    ]);
-    expect(must("#start-cases").getAttribute("aria-current")).toBe("page");
-    act(() => document.body.dispatchEvent(new Event("pointerdown", { bubbles: true })));
-    expect(document.querySelector("#start-menu")).toBeNull();
-
-    act(() => characterStore().setActive("carl0001"));
-    click("#start-btn");
-    expect(names()).toContain("★J.A.P.");
-    expect(must<HTMLAnchorElement>("#start-jap").getAttribute("href")).toBe("#jap");
+    expect(location.hash).toBe("");
+    expect(title()).toBe("Program Manager - Friedman & Associates");
+    expect(must("#task-btn").textContent).toBe("▦Program Manager");
+    expect(must("#program-manager")).toBeTruthy();
   });
 
   it("shows the active character in every program, in the taskbar", () => {
@@ -272,5 +261,72 @@ describe("the program shell (LP-103)", () => {
     go("#cases");
     expect(must(".app-window").className).not.toContain("nav-open");
     expect(document.querySelector("#toggle-nav")).toBeNull();
+  });
+});
+
+describe("the Program Manager (LP-104)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+    markBooted();
+    vi.stubGlobal("requestAnimationFrame", () => 0);
+    vi.stubGlobal("cancelAnimationFrame", () => {});
+    vi.spyOn(sync, "init").mockResolvedValue(undefined);
+    characterStore().save({ id: "alice001", name: "Alice Lawyer" });
+    characterStore().save({ id: "carl0001", name: "Carl Commissioner", title: "Court Commissioner" });
+    characterStore().setActive("alice001");
+  });
+
+  afterEach(() => {
+    unmount();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  const groups = () =>
+    [...document.querySelectorAll(".pm-group")].map((g) => [
+      g.querySelector(".pm-group-title")!.textContent,
+      [...g.querySelectorAll(".pm-label")].map((l) => l.textContent),
+    ]);
+
+  it("shows each program's icon and name in its group, with the J.A.P. only for a Court Commissioner", () => {
+    mount("");
+    expect(groups()).toEqual([
+      ["Court Work", ["Court Filings", "Case File", "Clients", "Law Library"]],
+      ["Main", ["Control Panel", "What's new"]],
+    ]);
+    act(() => characterStore().setActive("carl0001"));
+    expect(groups()[0][1]).toContain("J.A.P.");
+    expect(must("#pm-jap").getAttribute("href")).toBe("#jap");
+  });
+
+  it("opens a program from its icon, and What's new as a dialog", () => {
+    mount("");
+    expect(must<HTMLAnchorElement>("#pm-library").getAttribute("href")).toBe("#library/penal-code");
+    expect(must("#pm-changelog").getAttribute("aria-label")).toBe("What's new (unread)");
+    click("#pm-changelog");
+    expect(must<HTMLDialogElement>("#changelog-dialog").open).toBe(true);
+  });
+
+  it("moves between icons with the arrow keys", () => {
+    mount("");
+    const icons = [...document.querySelectorAll<HTMLElement>(".pm-icon")];
+    // jsdom lays nothing out, so give each icon a place: four to a row.
+    icons.forEach((el, i) => {
+      el.getBoundingClientRect = () => ({ top: Math.floor(i / 4) * 80, left: (i % 4) * 100 }) as DOMRect;
+    });
+    act(() => icons[0].focus());
+    const key = (k: string) =>
+      act(() => document.activeElement!.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true })));
+    key("ArrowRight");
+    expect(document.activeElement).toBe(icons[1]);
+    key("ArrowDown");
+    expect(document.activeElement).toBe(icons[5]);
+    key("ArrowLeft");
+    expect(document.activeElement).toBe(icons[4]);
+    key("ArrowUp");
+    expect(document.activeElement).toBe(icons[0]);
+    key("End");
+    expect(document.activeElement).toBe(icons[icons.length - 1]);
   });
 });
