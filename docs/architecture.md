@@ -43,9 +43,12 @@ browser.
   character, the same in every program). The programs are one registry,
   `src/components/programs/registry.ts` (id, title, icon, where it opens, who can see it, whether
   it has a navigation pane, its component); each gets the shell's state and actions as `Shell`
-  (`programs/shell.ts`). Court Filings has the forms list as its navigation pane (a drawer at phone
-  width) and owns the open form's output; the others are single-pane for now (LP-105 to LP-109
-  give each its own layout and menus).
+  (`programs/shell.ts`). Court Filings has the court forms (only, since LP-105) as its navigation
+  pane (a drawer at phone width) and owns the open form's output. Its **Form** menu (LP-105) holds
+  the open form's filing tools: FormView reports them up through `onTools` (`FormTools`: Draft
+  history, the Law Library dialog, focus the docket bar's case picker, and the firm case its case
+  number matches for Open case in Case File), and Filing history; the buttons in the form stay.
+  The other programs are single-pane for now (LP-106 to LP-109 give each its own layout and menus).
 - **Hash routing** (`useRoute.ts`). Routes are prefixed by program: `#filings` and
   `#filings/<formId>`, `#cases`, `#cases/<id>` and `#cases/upcoming`, `#clients/intake` and
   `#clients/conflicts`, `#library/penal-code` and `#library/precedents`, `#jap`, `#control`; an

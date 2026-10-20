@@ -78,7 +78,7 @@ const gameYY = () => gameYear().slice(-2);
 
 describe("Sidebar court headings", () => {
   it("shows FreestyleRP court headings straight from the form data (LP-69)", () => {
-    act(() => root.render(createElement(Sidebar, { forms: ALL_FORMS, current: null, commissioner: false })));
+    act(() => root.render(createElement(Sidebar, { forms: ALL_FORMS, current: null })));
     const summaries = [...document.querySelectorAll("#form-list summary")].map((s) => s.textContent);
     for (const court of [
       "San Andreas Criminal Court",
