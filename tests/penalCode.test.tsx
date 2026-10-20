@@ -236,6 +236,14 @@ describe("the Penal Code in the Law Library (LP-17)", () => {
     expect(copy).toHaveBeenCalledWith("PC 1001 Assault");
   });
 
+  it("is found from the sidebar search", () => {
+    mount("#library");
+    for (const q of ["library", "penal", "precedents"]) {
+      setValue("#form-search", q);
+      expect(document.querySelector('#form-list a[href="#library"]'), q).not.toBeNull();
+    }
+  });
+
   it("keeps the firm's precedents on their own tab", () => {
     mount("#library");
     click(must("#library-tab-precedents"));
