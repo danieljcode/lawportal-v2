@@ -21,6 +21,7 @@ import { caseStore, casesFromDockets, cleanCase, unifyCases } from "./cases";
 import { characterStore } from "./characters";
 import { cleanCheck, conflictLog, type ConflictCheck } from "./conflicts";
 import { cleanFiling, filingStore, type Filing } from "./filings";
+import { cleanPrecedent, precedentStore, type Precedent } from "./precedents";
 import { docketStore } from "./dockets";
 import { portfolioStore } from "./portfolio";
 import { deleteCharacter } from "./services/characters";
@@ -77,6 +78,8 @@ export interface SyncDoc {
   filings?: Filing[];
   /** The conflict check log (LP-10); absent in copies from before it. */
   conflictChecks?: ConflictCheck[];
+  /** The Law Library's precedents (LP-16); absent in copies from before it. */
+  precedents?: Precedent[];
 }
 
 interface ApiBody {
@@ -221,7 +224,15 @@ export function snapshot(): SyncDoc {
       .map((c) => JSON.parse(JSON.stringify(c)) as Case),
     filings: filingStore().list(),
     conflictChecks: conflictLog().list(),
+    precedents: precedentStore().list(),
   };
+}
+
+/** A document's precedents, or null for a copy from before LP-16. */
+function precedentsOf(doc: unknown): Precedent[] | null {
+  const raw = doc && typeof doc === "object" ? (doc as { precedents?: unknown }).precedents : undefined;
+  if (!Array.isArray(raw)) return null;
+  return raw.map((p) => cleanPrecedent(p)).filter((p): p is Precedent => !!p);
 }
 
 /** A document's filing history, or null for a copy from before LP-15 (which has none to apply). */
@@ -292,6 +303,8 @@ function apply(doc: unknown): number {
     if (filings) filingStore().replaceAll(filings);
     const checks = checksOf(doc);
     if (checks) conflictLog().replaceAll(checks);
+    const precedents = precedentsOf(doc);
+    if (precedents) precedentStore().replaceAll(precedents);
   } finally {
     applying = false;
   }
@@ -308,11 +321,14 @@ export function merge(serverDoc: unknown): SyncDoc {
   const haveFiling = new Set(serverFilings.map((f) => f.id));
   const serverChecks = checksOf(serverDoc) || [];
   const haveCheck = new Set(serverChecks.map((c) => c.id));
+  const serverPrecedents = precedentsOf(serverDoc) || [];
+  const havePrecedent = new Set(serverPrecedents.map((p) => p.id));
   const out: SyncDoc = {
     characters: list.slice(),
     cases: unifyCases(casesOf(serverDoc), casesOf(local)),
     filings: [...serverFilings, ...(local.filings || []).filter((f) => !haveFiling.has(f.id))],
     conflictChecks: [...serverChecks, ...(local.conflictChecks || []).filter((c) => !haveCheck.has(c.id))],
+    precedents: [...serverPrecedents, ...(local.precedents || []).filter((p) => !havePrecedent.has(p.id))],
   };
   const have = new Set(out.characters.map((c) => c.id));
   for (const c of local.characters) if (!have.has(c.id)) out.characters.push(c);
@@ -348,6 +364,7 @@ function saveBase(doc: unknown): void {
   for (const c of casesOf(doc)) o["case:" + c.id] = c.updated;
   for (const f of filingsOf(doc) || []) o["filing:" + f.id] = f.at;
   for (const c of checksOf(doc) || []) o["conflict:" + c.id] = c.at;
+  for (const p of precedentsOf(doc) || []) o["precedent:" + p.id] = p.updated;
   lsSet(BASE_KEY, JSON.stringify(o));
 }
 
@@ -420,12 +437,24 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
   const checks = serverChecks
     ? resolveList(serverChecks, localChecks, base, "conflict:", (c) => c.at)
     : { out: localChecks, lost: [], keptLocal: localChecks.length > 0 };
+  // Precedents (LP-16): edited like cases, so the newer `updated` wins each ruling.
+  const localPrecedents = precedentStore().list();
+  const serverPrecedents = precedentsOf(serverDoc);
+  const precedents = serverPrecedents
+    ? resolveList(serverPrecedents, localPrecedents, base, "precedent:", (p) => p.updated)
+    : { out: localPrecedents, lost: [], keptLocal: localPrecedents.length > 0 };
   return {
     // Two devices can make the same case number separately: they become one case.
-    doc: { characters: out, cases: unifyCases(cases.out), filings: filings.out, conflictChecks: checks.out },
+    doc: {
+      characters: out,
+      cases: unifyCases(cases.out),
+      filings: filings.out,
+      conflictChecks: checks.out,
+      precedents: precedents.out,
+    },
     lost,
     lostCases: cases.lost,
-    keptLocal: keptLocal || cases.keptLocal || filings.keptLocal || checks.keptLocal,
+    keptLocal: keptLocal || cases.keptLocal || filings.keptLocal || checks.keptLocal || precedents.keptLocal,
   };
 }
 
@@ -750,6 +779,7 @@ export function init(): Promise<void> {
     caseStore().subscribe(changed),
     filingStore().subscribe(changed),
     conflictLog().subscribe(changed),
+    precedentStore().subscribe(changed),
     portfolioStore().subscribe(changed),
   ];
   const onVisible = () => {

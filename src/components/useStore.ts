@@ -8,6 +8,7 @@ import { useSyncExternalStore } from "react";
 import { caseStore } from "@/lib/cases";
 import { characterStore } from "@/lib/characters";
 import { conflictLog } from "@/lib/conflicts";
+import { precedentStore } from "@/lib/precedents";
 import { filingStore } from "@/lib/filings";
 import { docketStore } from "@/lib/dockets";
 import { portfolioStore } from "@/lib/portfolio";
@@ -81,4 +82,12 @@ const subscribeSync = (fn: () => void) => sync.onChange(() => fn());
 /** The sync client's state (a new object on every change). */
 export function useSyncState(): sync.SyncState {
   return useSyncExternalStore(subscribeSync, sync.getState, sync.getState);
+}
+
+const subscribePrecedents = (fn: () => void) => precedentStore().subscribe(fn);
+const precedentSnapshot = () => precedentStore().version();
+
+/** Bumps on every change to the Law Library's precedents (LP-16). */
+export function usePrecedentVersion(): number {
+  return useSyncExternalStore(subscribePrecedents, precedentSnapshot, precedentSnapshot);
 }

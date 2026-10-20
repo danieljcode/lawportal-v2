@@ -14,6 +14,7 @@ const MAX_CHARACTERS = 200;
 const MAX_CASES = 2000;
 const MAX_FILINGS = 500;
 const MAX_CONFLICT_CHECKS = 500;
+const MAX_PRECEDENTS = 1000;
 const NO_STORE = { "Cache-Control": "no-store" };
 
 function json(body: unknown, status: number): Response {
@@ -42,6 +43,12 @@ function parseDoc(body: unknown): { rev: number; data: SyncRecord["data"] } | nu
     return null;
   const checks = data.conflictChecks;
   if (checks !== undefined && (!Array.isArray(checks) || checks.length > MAX_CONFLICT_CHECKS || !checks.every(isObject)))
+    return null;
+  const precedents = data.precedents;
+  if (
+    precedents !== undefined &&
+    (!Array.isArray(precedents) || precedents.length > MAX_PRECEDENTS || !precedents.every(isObject))
+  )
     return null;
   return { rev, data: data as SyncRecord["data"] };
 }

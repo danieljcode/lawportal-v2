@@ -18,6 +18,9 @@ const HELP: Partial<Record<Field["type"], string>> = {
 
 const MULTILINE = /^(textarea|list|spoiler|paras)$/;
 
+/** Fields a Law Library citation can go into (LP-16): written text, not numbers, dates or links. */
+const TAKES_CITATION = /^(text|textarea|list|paras)$/;
+
 /** Fields that take an "Insert exhibit" reference (LP-13): the written boxes, not names, dates or links. */
 const TAKES_EXHIBITS = /^(textarea|list|paras)$/;
 
@@ -32,7 +35,7 @@ export default function FieldInput({
   prefix,
   inline,
 }: ScopeProps & { field: Field; inline?: boolean }) {
-  const { entries, onState, now, required, exhibits } = useFormCtx();
+  const { entries, onState, now, required, exhibits, onFieldFocus } = useFormCtx();
   const inputRef = useRef<HTMLInputElement>(null);
   const areaRef = useRef<HTMLTextAreaElement>(null);
   const id = slugId(prefix + f.label);
@@ -87,6 +90,24 @@ export default function FieldInput({
     }, 0);
   };
 
+  // Focusing a written field makes it the Law Library's Insert citation target (LP-16). It reads
+  // the field as it is when the citation goes in, so typing after focusing isn't lost.
+  const remember = (el: HTMLInputElement | HTMLTextAreaElement) => {
+    if (!TAKES_CITATION.test(f.type)) return;
+    onFieldFocus({
+      label: f.label,
+      insert(text) {
+        const start = el.selectionStart ?? el.value.length;
+        const end = el.selectionEnd ?? start;
+        change(el.value.slice(0, start) + text + el.value.slice(end));
+        setTimeout(() => {
+          el.focus();
+          el.setSelectionRange(start + text.length, start + text.length);
+        }, 0);
+      },
+    });
+  };
+
   let input: React.ReactElement;
   switch (f.type) {
     case "textarea":
@@ -102,6 +123,7 @@ export default function FieldInput({
           value={value}
           aria-label={inline ? f.label : undefined}
           onChange={(e) => change(e.target.value)}
+          onFocus={(e) => remember(e.currentTarget)}
         />
       );
       break;
@@ -153,7 +175,10 @@ export default function FieldInput({
           aria-label={inline ? f.label : undefined}
           value={value}
           onChange={(e) => change(e.target.value)}
-          onFocus={f.prefill ? () => setTimeout(selectXXX, 0) : undefined}
+          onFocus={(e) => {
+            remember(e.currentTarget);
+            if (f.prefill) setTimeout(selectXXX, 0);
+          }}
           onMouseUp={f.prefill ? selectXXX : undefined}
         />
       );

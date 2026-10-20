@@ -18,6 +18,24 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-10-21",
+    title: "Law Library",
+    items: [
+      {
+        type: "new",
+        text: "Law Library (in the sidebar): keep the firm's precedents, with the case, court, date, judge, key holding, summary, forum link and topics.",
+      },
+      {
+        type: "new",
+        text: "Search by keyword, case number, judge or court (matches are highlighted), filter by topic, and copy a citation such as “Smith v. Jones, 90SCCV00123 (San Andreas Civil Court 1990)”.",
+      },
+      {
+        type: "new",
+        text: "In a form, click in a field, then Law Library and Insert citation to put the citation where your cursor was. Precedents sync and are in your full backup.",
+      },
+    ],
+  },
+  {
     date: "2026-10-20",
     title: "Chain of custody",
     items: [
