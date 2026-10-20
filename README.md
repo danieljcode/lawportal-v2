@@ -39,12 +39,13 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
 - **Programs.** Each part of the office system is its own program, opened full-screen in a Windows
   3.x-style window with its own title bar and **File**, **View** and **Help** menus: **Court
   Filings**, **Case File**, **Clients**, **Law Library**, **J.A.P.** (Court Commissioners) and
-  **Control Panel**. Open them from the taskbar's **Start** button. The character you're filing as
-  is in the taskbar, so it's the same in every program. Links are by program (`#filings/<form>`,
+  **Control Panel**. The home screen is a Windows 3.x **Program Manager**: groups of program icons
+  (Case File's shows a dot when something is due within 48 hours), and **Start** always comes back
+  to it. The character you're filing as is in the taskbar, so it's the same in every program. Links are by program (`#filings/<form>`,
   `#cases/<case>`, `#clients/intake`, `#library/penal-code`…); older links still work.
 - **Startup screen.** Once per browser session, the Friedman & Associates Office System boots
   DOS-style (memory test, drive checks, `C:\>`) for under 2 seconds while the app loads. Any key or
-  click skips it, and the start page has a setting to turn it off.
+  click skips it, and the Control Panel has a setting to turn it off.
 - **Forms.** 39 court forms grouped by court (Criminal, Civil, Traffic, Small Claims, Appellate,
   Supreme, general), plus **Additional Templates**: General Petition, Petition for Name Change,
   General Motion, Interrogatories, Subpoena and Service Agreement, and **Firm Letters**: Engagement

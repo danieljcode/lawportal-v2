@@ -12,8 +12,6 @@ export interface ToolbarProps {
   showDockets: boolean;
   /** J.A.P. link (the active character is a Court Commissioner). */
   showJap: boolean;
-  /** Deadlines due within 48 hours or overdue on the active character's cases (LP-18): a dot on Case File. */
-  casesDue?: number;
   /** Sync status for the dot; null while sync is off on this device. */
   syncStatus: SyncStatus | null;
   changelogUnread: boolean;
@@ -66,14 +64,9 @@ export default function Toolbar(p: ToolbarProps) {
             Dockets
           </button>
         )}
-        <a
-          className="btn"
-          id="open-cases"
-          href={p.casesDue ? "#cases/upcoming" : "#cases"}
-          title={p.casesDue ? p.casesDue + " due within 48 hours: see Upcoming" : "The firm's cases"}
-        >
+        {/* What's due shows on the Program Manager's Case File icon (LP-104). */}
+        <a className="btn" id="open-cases" href="#cases" title="The firm's cases">
           Case File
-          {!!p.casesDue && <span className="changelog-dot due-dot" id="due-dot" aria-label="Something is due soon" />}
         </a>
         {p.showJap && (
           <a className="btn" id="open-jap" href="#jap" title="Judicial Advancement Portfolio">

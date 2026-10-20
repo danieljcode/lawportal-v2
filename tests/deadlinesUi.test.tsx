@@ -24,7 +24,8 @@ function must<T extends Element = HTMLElement>(sel: string): T {
 }
 
 function mount(hash: string): void {
-  history.replaceState(null, "", hash);
+  // An empty string would keep the current URL: the start page needs the bare path.
+  history.replaceState(null, "", hash || location.pathname);
   container = document.createElement("div");
   document.body.appendChild(container);
   root = createRoot(container);
@@ -121,15 +122,23 @@ describe("Upcoming and the toolbar dot (LP-18)", () => {
     expect(document.querySelectorAll(".upcoming-item")).toHaveLength(1);
   });
 
-  it("shows a dot on Case File when something is due within 48 hours, leading to Upcoming", () => {
-    mount("#cases");
+  it("shows a dot on Case File in the Program Manager when something is due within 48 hours, leading to Upcoming", () => {
+    mount("");
     expect(document.querySelector("#due-dot")).toBeNull();
+    expect(must("#pm-cases").getAttribute("href")).toBe("#cases");
     act(() => {
       withDeadlines([{ date: "1990-10-20", label: "Hearing" }]);
     });
-    expect(must("#due-dot")).toBeTruthy();
-    expect(must("#open-cases").getAttribute("href")).toBe("#cases/upcoming");
+    expect(must("#pm-cases #due-dot")).toBeTruthy();
+    expect(must("#pm-cases").getAttribute("href")).toBe("#cases/upcoming");
+    expect(must("#pm-cases").getAttribute("aria-label")).toBe("Case File (1 due soon)");
+    // The toolbar's Case File button no longer carries the dot (LP-104).
+    expect(must("#open-cases").getAttribute("href")).toBe("#cases");
     // The Case File program's File menu leads there too (LP-103).
+    act(() => {
+      history.pushState(null, "", "#cases");
+      window.dispatchEvent(new HashChangeEvent("hashchange"));
+    });
     act(() => must("#menu-file").click());
     expect(must('.menu-list a[href="#cases/upcoming"]').textContent).toBe("Upcoming");
   });

@@ -1,6 +1,7 @@
 // The programs (LP-103): one entry each, so a program is added in one place.
-// The shell draws the open one full-screen in its own window, lists the
-// visible ones in the Start menu, and gives each the File, View and Help menus.
+// The shell draws the open one full-screen in its own window and gives each the
+// File, View and Help menus; the Program Manager (LP-104) shows the visible
+// ones as icons, in their group.
 
 import type { ComponentType } from "react";
 import type { ProgramId, Route } from "../useRoute";
@@ -12,14 +13,20 @@ import JapProgram from "./JapProgram";
 import LibraryProgram from "./LibraryProgram";
 import type { ProgramProps } from "./shell";
 
+/** The Program Manager's groups, in order. */
+export const GROUPS = { court: "Court Work", main: "Main" } as const;
+export type ProgramGroup = keyof typeof GROUPS;
+
 export interface ProgramDef {
   id: ProgramId;
   title: string;
-  /** A one-character icon for the title bar, Start menu and taskbar. */
+  /** A one-character icon for the title bar, the Program Manager and the taskbar. */
   icon: string;
+  /** The Program Manager group it's in. */
+  group: ProgramGroup;
   /** Where it opens. */
   start: string;
-  /** Who can see it in the Start menu (anyone can open a link to it). */
+  /** Who can see it in the Program Manager (anyone can open a link to it). */
   visible(who: { commissioner: boolean }): boolean;
   /** It has a navigation pane, shown as a drawer at phone width. */
   nav?: boolean;
@@ -33,17 +40,35 @@ export const PROGRAMS: readonly ProgramDef[] = [
     id: "filings",
     title: "Court Filings",
     icon: "⚖",
+    group: "court",
     start: "#filings",
     visible: everyone,
     nav: true,
     View: CourtFilingsProgram,
   },
-  { id: "cases", title: "Case File", icon: "🗀", start: "#cases", visible: everyone, View: CaseFileProgram },
-  { id: "clients", title: "Clients", icon: "☺", start: "#clients/intake", visible: everyone, View: ClientsProgram },
+  {
+    id: "cases",
+    title: "Case File",
+    icon: "🗀",
+    group: "court",
+    start: "#cases",
+    visible: everyone,
+    View: CaseFileProgram,
+  },
+  {
+    id: "clients",
+    title: "Clients",
+    icon: "☺",
+    group: "court",
+    start: "#clients/intake",
+    visible: everyone,
+    View: ClientsProgram,
+  },
   {
     id: "library",
     title: "Law Library",
     icon: "§",
+    group: "court",
     start: "#library/penal-code",
     visible: everyone,
     View: LibraryProgram,
@@ -52,15 +77,24 @@ export const PROGRAMS: readonly ProgramDef[] = [
     id: "jap",
     title: "J.A.P.",
     icon: "★",
+    group: "court",
     start: "#jap",
     visible: (who) => who.commissioner,
     View: JapProgram,
   },
-  { id: "control", title: "Control Panel", icon: "⚙", start: "#control", visible: everyone, View: ControlPanelProgram },
+  {
+    id: "control",
+    title: "Control Panel",
+    icon: "⚙",
+    group: "main",
+    start: "#control",
+    visible: everyone,
+    View: ControlPanelProgram,
+  },
 ];
 
-/** The program a route belongs to; home is Court Filings' start page until the Program Manager (LP-104). */
-export function programFor(route: Route): ProgramDef {
-  const id = route.program === "home" ? "filings" : route.program;
-  return PROGRAMS.find((p) => p.id === id)!;
+/** The program a route belongs to; null for home (the Program Manager). */
+export function programFor(route: Route): ProgramDef | null {
+  if (route.program === "home") return null;
+  return PROGRAMS.find((p) => p.id === route.program)!;
 }

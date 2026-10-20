@@ -267,9 +267,10 @@ async function phaseNav(browser, theme, mode, ctx) {
   });
   await firstDisplay(page, ctx, "nav typed hash -> writ", ["Writ of Execution"], ["CRIMINAL DIVISION"]);
 
-  // Home, then a search result.
+  // Home (the Program Manager, LP-104), Court Filings, then a search result.
   await page.click("a.brand");
   await page.waitForSelector("#form-view", { state: "detached" });
+  await page.click("#pm-filings");
   await page.fill("#form-search", "arraign");
   await resetProbe(page);
   await page.click('#form-list a[href="#filings/criminal-arraignment"]');
@@ -327,6 +328,7 @@ async function phaseSeeded(browser, theme, mode, ctx) {
   await page.click("a.brand");
   await page.waitForSelector("#form-view", { state: "detached" });
   await page.selectOption("#active-character", CHAR_B.id);
+  await page.click("#pm-filings");
   await sidebar(page, "civil-complaint");
   await firstDisplay(page, ctx, "seeded reopen after switch", ["CIVIL DIVISION", CHAR_B.name], [CHAR_A.name]);
 
@@ -352,7 +354,7 @@ async function phaseSidebar(browser, theme, mode, ctx) {
   const errors = [];
   const context = await newContext(browser, theme, mode);
   const page = await newPage(context, errors);
-  await page.goto(base + "/", { waitUntil: "networkidle" });
+  await page.goto(base + "/#filings", { waitUntil: "networkidle" });
   await page.waitForSelector(".app-window");
   const appliedTheme = await page.evaluate(() => document.documentElement.dataset.theme || "");
 

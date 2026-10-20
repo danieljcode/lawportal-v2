@@ -2842,8 +2842,7 @@ dialog.changelog {
   color: var(--select-text);
   outline: none;
 }
-.menu-list,
-.start-menu {
+.menu-list {
   position: absolute;
   margin: 0;
   padding: 2px;
@@ -2860,8 +2859,7 @@ dialog.changelog {
   left: 0;
 }
 .menu-list a,
-.menu-list button,
-.start-menu a {
+.menu-list button {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -2880,9 +2878,7 @@ dialog.changelog {
 .menu-list a:hover,
 .menu-list button:hover,
 .menu-list a:focus,
-.menu-list button:focus,
-.start-menu a:hover,
-.start-menu a:focus {
+.menu-list button:focus {
   background: var(--select-bg);
   color: var(--select-text);
   outline: none;
@@ -2901,25 +2897,6 @@ dialog.changelog {
   margin: 3px 2px;
   border-top: 1px solid var(--shadow);
   border-bottom: 1px solid var(--hilite);
-}
-
-/* The Start menu opens upwards from the taskbar. */
-.start {
-  position: relative;
-}
-.start-menu {
-  bottom: calc(100% + 4px);
-  left: 0;
-}
-.start-menu a {
-  padding-left: 8px;
-}
-.start-menu a[aria-current="page"] {
-  font-weight: 700;
-}
-.start-icon {
-  width: 18px;
-  text-align: center;
 }
 
 /* The active character in the tray, in every program. */
@@ -2978,4 +2955,79 @@ dialog.changelog {
   .task-btn {
     display: none;
   }
+}
+
+/* ---------- Program Manager (LP-104) ---------- */
+.program-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  background: var(--desktop, #008080);
+}
+.pm-group {
+  background: var(--field);
+  color: var(--text);
+  padding: 3px;
+}
+.pm-group-title {
+  margin: 0;
+  font-size: 13px;
+}
+.pm-icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 10px 6px;
+  list-style: none;
+}
+.pm-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 6px 2px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.pm-glyph {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--shadow);
+  background: var(--face);
+  font-size: 22px;
+  line-height: 1;
+}
+.pm-label {
+  padding: 0 3px;
+  font-size: 12px;
+}
+.pm-icon:hover .pm-label,
+.pm-icon:focus-visible .pm-label {
+  background: var(--select-bg);
+  color: var(--select-text);
+}
+.pm-icon:focus-visible {
+  outline: 1px dotted var(--text);
+  outline-offset: -1px;
+}
+.pm-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--text);
+  border-radius: 50%;
+  background: var(--notify);
 }

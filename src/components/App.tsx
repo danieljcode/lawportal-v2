@@ -1,8 +1,9 @@
 "use client";
 
-// The program shell (LP-103; design §UI components): one program at a time,
-// full-screen, in a Windows 3.x-style window with its own title bar and menu
-// bar, the taskbar with Start and the active character, and the dialogs. The
+// The program shell (LP-103; design §UI components): the Program Manager at
+// home (LP-104), or one program at a time, full-screen, in a Windows 3.x-style
+// window with its own title bar and menu bar; the taskbar with Start (back to
+// the Program Manager) and the active character; and the dialogs. The
 // programs are in programs/registry.ts; routing is useRoute.ts and the dialogs
 // useDialogs.ts (LP-7).
 
@@ -27,13 +28,14 @@ import ErrorBoundary from "./ErrorBoundary";
 import FilingsDialog from "./FilingsDialog";
 import type { DraftRequest } from "./FormView";
 import MenuBar, { type Menu, type MenuItem } from "./MenuBar";
-import { PROGRAMS, programFor } from "./programs/registry";
+import ProgramManager from "./ProgramManager";
+import { programFor } from "./programs/registry";
 import type { Shell } from "./programs/shell";
 import Taskbar from "./Taskbar";
 import Toolbar from "./Toolbar";
 import { S_SET_ASIDE, S_SET_ASIDE_HINT } from "@/lib/strings";
 import { useDialogs } from "./useDialogs";
-import { APP_TITLE, pageTitle, useRoute } from "./useRoute";
+import { pageTitle, useRoute } from "./useRoute";
 import { useCaseVersion, useCharacterVersion, useSetAsideVersion, useSyncState } from "./useStore";
 
 export type { DialogName } from "./useDialogs";
@@ -146,10 +148,9 @@ export default function App() {
 
   const commissioner = isCommissioner(active);
   const syncOn = !!sync.code();
+  /** The open program; null at home, where the Program Manager is. */
   const program = programFor(route);
-  const home = route.program === "home";
-  const visible = PROGRAMS.filter((p) => p.visible({ commissioner }));
-  // Deadlines (LP-18): the toolbar dot when the active character has something due within 48 hours.
+  // Deadlines (LP-18): Case File's badge in the Program Manager when the active character has something due within 48 hours.
   const caseVersion = useCaseVersion();
   const today = gameToday();
   const casesDue = useMemo(
@@ -199,7 +200,7 @@ export default function App() {
       { label: "Precedents", href: "#library/precedents" },
     ],
   };
-  const fileItems = own[program.id] || [];
+  const fileItems = (program && own[program.id]) || [];
   const menus: Menu[] = [
     {
       label: "File",
@@ -207,8 +208,8 @@ export default function App() {
         ...fileItems,
         ...(fileItems.length ? (["-"] as MenuItem[]) : []),
         { label: "Characters…", id: "menu-characters", onSelect: () => openCharacters() },
-        "-",
-        { label: "Exit", id: "menu-exit", onSelect: () => goHome() },
+        // Exit closes the program, back to the Program Manager.
+        ...(program ? (["-", { label: "Exit", id: "menu-exit", onSelect: () => goHome() }] as MenuItem[]) : []),
       ],
     },
     {
@@ -233,16 +234,17 @@ export default function App() {
     },
   ];
 
-  const windowTitle = home ? APP_TITLE : program.title + " - " + BRANDING.firmName;
-  const task = home ? APP_TITLE : pageTitle(route, form) || program.title;
-  const View = program.View;
+  const windowTitle = (program ? program.title : "Program Manager") + " - " + BRANDING.firmName;
+  const task = program ? pageTitle(route, form) || program.title : "Program Manager";
+  const icon = program ? program.icon : "▦";
+  const View = program?.View;
 
   return (
     <>
-      <div className={"app-window program-" + program.id + (navOpen ? " nav-open" : "")}>
+      <div className={"app-window program-" + (program ? program.id : "home") + (navOpen ? " nav-open" : "")}>
         <div className="title-bar app-title">
           <span className="title-bar-icon" aria-hidden="true">
-            {program.icon}
+            {icon}
           </span>
           <span className="title-bar-text">{windowTitle}</span>
           <span className="title-bar-controls" aria-hidden="true">
@@ -258,7 +260,7 @@ export default function App() {
           syncStatus={syncOn ? syncState.status : null}
           changelogUnread={changelogUnread}
           navOpen={navOpen}
-          hasNav={!!program.nav}
+          hasNav={!!program?.nav}
           theme={theme}
           onTheme={setTheme}
           onHome={goHome}
@@ -267,7 +269,6 @@ export default function App() {
           onCharacters={() => openCharacters()}
           onChangelog={openChangelog}
           onAbout={openAbout}
-          casesDue={casesDue}
         />
         {setAsideCount > setAsideSeen && (
           <div className="set-aside-notice" id="set-aside-notice" role="alert">
@@ -282,14 +283,21 @@ export default function App() {
             </button>
           </div>
         )}
-        <ErrorBoundary where={program.title} resetKey={program.id}>
-          <View shell={shell} />
+        <ErrorBoundary where={program ? program.title : "the Program Manager"} resetKey={program ? program.id : "home"}>
+          {View ? (
+            <View shell={shell} />
+          ) : (
+            <ProgramManager
+              commissioner={commissioner}
+              casesDue={casesDue}
+              changelogUnread={changelogUnread}
+              openChangelog={openChangelog}
+            />
+          )}
         </ErrorBoundary>
       </div>
       <Taskbar
-        programs={visible}
-        current={home ? null : program.id}
-        icon={program.icon}
+        icon={icon}
         task={task}
         characters={characters}
         activeId={active ? active.id : null}
