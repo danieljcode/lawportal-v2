@@ -1,6 +1,7 @@
 // The main window's toolbar: every control of the reference topbar (FR6, INV §a Topbar).
 
 import { useState, type MouseEvent } from "react";
+import { BRANDING } from "@/branding";
 import type { Character } from "@/lib/types";
 import { BADGES, type SyncStatus } from "@/lib/sync";
 import { cycle, getTheme, ICONS, themeLabel, type ThemeMode } from "@/lib/theme";
@@ -24,6 +25,8 @@ export interface ToolbarProps {
   onDockets(): void;
   onCharacters(): void;
   onChangelog(): void;
+  /** Help → About (LP-22). */
+  onAbout(): void;
 }
 
 export default function Toolbar(p: ToolbarProps) {
@@ -43,13 +46,13 @@ export default function Toolbar(p: ToolbarProps) {
       >
         ☰
       </button>
-      <a className="brand" href="./" aria-label="Court Filing Generator home" onClick={p.onHome}>
+      <a className="brand" href="./" aria-label={BRANDING.productName + " home"} onClick={p.onHome}>
         <span className="brand-mark" aria-hidden="true">
           ⚖
         </span>
         <span className="brand-text">
-          <span className="brand-name">Court Filing Generator</span>
-          <span className="brand-sub">San Andreas court filings</span>
+          <span className="brand-name">{BRANDING.firmName}</span>
+          <span className="brand-sub">{BRANDING.productName}</span>
         </span>
       </a>
       <div className="toolbar-sep" aria-hidden="true" />
@@ -117,6 +120,16 @@ export default function Toolbar(p: ToolbarProps) {
             </g>
           </svg>
           {p.changelogUnread && <span className="changelog-dot" id="changelog-dot" aria-hidden="true" />}
+        </button>
+        <button
+          type="button"
+          className="btn icon-btn help-btn"
+          id="open-about"
+          aria-label="Help: About"
+          title="Help: About"
+          onClick={p.onAbout}
+        >
+          ?
         </button>
         <button
           type="button"

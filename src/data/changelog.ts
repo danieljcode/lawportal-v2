@@ -19,6 +19,28 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-21",
+    title: "Friedman & Associates",
+    items: [
+      {
+        type: "update",
+        text: "The app is now the Friedman & Associates Court Filing System: the firm's name is in the window title, the browser tab and the toolbar.",
+      },
+      {
+        type: "new",
+        text: "Help (the ? button) → About shows who the system is licensed to, the version and the credits.",
+      },
+      {
+        type: "update",
+        text: "Filings you post stay exactly as before, with no firm branding, so they look official.",
+      },
+      {
+        type: "fix",
+        text: "After a reload, the browser tab shows the page you're on (e.g. Case File) again, not just the app's name.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-21",
     title: "Startup screen",
     items: [
       {
