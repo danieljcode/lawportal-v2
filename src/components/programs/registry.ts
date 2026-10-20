@@ -28,8 +28,8 @@ export interface ProgramDef {
   start: string;
   /** Who can see it in the Program Manager (anyone can open a link to it). */
   visible(who: { commissioner: boolean }): boolean;
-  /** It has a navigation pane, shown as a drawer at phone width. */
-  nav?: boolean;
+  /** Its navigation pane, shown as a drawer at phone width: the pane's id and what it lists. */
+  nav?: { id: string; label: string };
   View: ComponentType<ProgramProps>;
 }
 
@@ -43,7 +43,7 @@ export const PROGRAMS: readonly ProgramDef[] = [
     group: "court",
     start: "#filings",
     visible: everyone,
-    nav: true,
+    nav: { id: "sidebar", label: "form list" },
     View: CourtFilingsProgram,
   },
   {
@@ -53,6 +53,7 @@ export const PROGRAMS: readonly ProgramDef[] = [
     group: "court",
     start: "#cases",
     visible: everyone,
+    nav: { id: "case-nav", label: "Case File pages" },
     View: CaseFileProgram,
   },
   {

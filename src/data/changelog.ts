@@ -19,6 +19,20 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-21",
+    title: "Case File",
+    items: [
+      {
+        type: "new",
+        text: "The Case File has its own side pane: All cases, Upcoming (with how many are due soon) and the case you have open. On a phone it's behind ☰.",
+      },
+      {
+        type: "new",
+        text: "New case from intake and Run conflict check take you straight to the Clients program.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-21",
     title: "Court Filings",
     items: [
       {

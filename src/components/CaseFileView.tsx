@@ -118,8 +118,12 @@ export default function CaseFileView({
           <h2 id="case-file-title">Case File</h2>
         </div>
         <div className="form-head-actions">
+          {/* Across to the Clients program (LP-106). */}
           <a className="btn" id="case-intake" href="#clients/intake">
-            New client intake
+            New case from intake
+          </a>
+          <a className="btn" id="case-conflicts" href="#clients/conflicts">
+            Run conflict check
           </a>
           <button type="button" className="btn primary" id="case-new" onClick={() => setCreating(true)}>
             New case

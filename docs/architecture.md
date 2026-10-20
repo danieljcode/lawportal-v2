@@ -48,7 +48,11 @@ browser.
   the open form's filing tools: FormView reports them up through `onTools` (`FormTools`: Draft
   history, the Law Library dialog, focus the docket bar's case picker, and the firm case its case
   number matches for Open case in Case File), and Filing history; the buttons in the form stay.
-  The other programs are single-pane for now (LP-106 to LP-109 give each its own layout and menus).
+  The Case File (`CaseFileProgram.tsx`, LP-106) has a navigation pane too: All cases, Upcoming
+  (with how many are due soon) and the open case, and links across to Clients (New case from
+  intake, Run conflict check). A registry entry's `nav` is its pane's id and label, which the
+  toolbar's ☰ controls at phone width. The other programs are single-pane for now (LP-107 to
+  LP-109 give each its own layout and menus).
 - **Hash routing** (`useRoute.ts`). Routes are prefixed by program: `#filings` and
   `#filings/<formId>`, `#cases`, `#cases/<id>` and `#cases/upcoming`, `#clients/intake` and
   `#clients/conflicts`, `#library/penal-code` and `#library/precedents`, `#jap`, `#control`; an
