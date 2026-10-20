@@ -81,6 +81,20 @@ export interface FormViewProps {
   onDocketBar?(shown: boolean): void;
   /** A filing to open as a new draft of this form (Filing history, LP-15); each new `seq` once. */
   draftRequest?: DraftRequest | null;
+  /** This form's filing tools, for the Court Filings program's Form menu (LP-105); null when it goes. */
+  onTools?(tools: FormTools | null): void;
+}
+
+/** What the open form offers the Court Filings program's Form menu (LP-105). */
+export interface FormTools {
+  /** The template compiled (Draft history needs it). */
+  ready: boolean;
+  openDraftHistory(): void;
+  openLibrary(): void;
+  /** Focus the docket bar's case picker; null when the form has no docket bar. */
+  pickCase: (() => void) | null;
+  /** The firm case with this form's case number, if any (Open case in Case File). */
+  caseId: string | null;
 }
 
 export interface DraftRequest {
@@ -166,6 +180,7 @@ export default function FormView({
   docketRequest,
   onDocketBar,
   draftRequest,
+  onTools,
 }: FormViewProps) {
   // The in-game "now" (FreestyleRP, 36 years back) fed to every date producer: Today, Auto,
   // prefills and the case-number year. Fixed while the form is open (new Date() on every
@@ -326,10 +341,12 @@ export default function FormView({
   const caseVersion = useCaseVersion();
   const rawNumber = state.values["Case number"];
   const exhibitCase = typeof rawNumber === "string" ? rawNumber.trim() : "";
-  const exhibits = useMemo<ExhibitRef[]>(() => {
-    const c = exhibitCase && caseVersion >= 0 ? caseStore().byNumber(exhibitCase) : null;
-    return c ? exhibitRefs(c.exhibits) : [];
-  }, [exhibitCase, caseVersion]);
+  /** The firm case with this form's case number (LP-13, LP-105), for its exhibits and the Form menu. */
+  const linkedCase = useMemo(
+    () => (exhibitCase && caseVersion >= 0 ? caseStore().byNumber(exhibitCase) : null),
+    [exhibitCase, caseVersion],
+  );
+  const exhibits = useMemo<ExhibitRef[]>(() => (linkedCase ? exhibitRefs(linkedCase.exhibits) : []), [linkedCase]);
   // References in the editor follow the exhibits (a reorder's new letters, a renamed title),
   // on opening and whenever they change. Adjusted during render, not an undo step: it only
   // brings the reading text up to date, the ids don't change.
@@ -504,6 +521,21 @@ export default function FormView({
     return () => onDocketBar(false);
   }, [showDocket, onDocketBar]);
 
+  // The Form menu's tools (LP-105): the same actions as the buttons here, reported when they change.
+  const linkedCaseId = linkedCase ? linkedCase.id : null;
+  const ready = !!tree;
+  useEffect(() => {
+    if (!onTools) return;
+    onTools({
+      ready,
+      openDraftHistory: () => setHistoryOpen(true),
+      openLibrary: () => setLibraryOpen(true),
+      pickCase: showDocket ? () => document.getElementById("docket-pick")?.focus() : null,
+      caseId: linkedCaseId,
+    });
+  }, [onTools, ready, showDocket, linkedCaseId]);
+  useEffect(() => (onTools ? () => onTools(null) : undefined), [onTools]);
+
   // "Use in form" from the Dockets dialog: load each request once (a request older than this view is skipped).
   const handledRequest = useRef(docketRequest ? docketRequest.seq : 0);
   useEffect(() => {
@@ -637,6 +669,11 @@ export default function FormView({
           >
             Save to Case File
           </button>
+          {currentDocket && (
+            <a className="btn" id="docket-open-case" href={"#cases/" + currentDocket.id} title="Open this case">
+              Open in Case File
+            </a>
+          )}
           {dates.length > 0 && (
             <button
               className="btn"

@@ -1,6 +1,7 @@
-// The Court Filings program (LP-103): the forms list as its navigation pane, the
-// open form (or the start page) and its forum preview. The output of the open
-// form, and whether its panel crashed, live here.
+// The Court Filings program (LP-103, LP-105): the court forms as its navigation
+// pane, the open form (or the "pick a form" page) and its forum preview. The
+// output of the open form, and whether its panel crashed, live here; the form's
+// filing tools go up to the shell's Form menu.
 
 import { useCallback, useState } from "react";
 import { ALL_FORMS } from "@/data";
@@ -22,7 +23,7 @@ const EMPTY_OUTPUT: FormOutput = {
 };
 
 export default function CourtFilingsProgram({ shell }: ProgramProps) {
-  const { form, active, commissioner } = shell;
+  const { form, active } = shell;
   const [highlight, setHighlight] = useState(true);
   /** The last output FormView reported, with the form it belongs to (out is null when that template failed to compile). */
   const [output, setOutput] = useState<{ formId: string; out: FormOutput | null } | null>(null);
@@ -40,7 +41,7 @@ export default function CourtFilingsProgram({ shell }: ProgramProps) {
   return (
     // "with-output" adds the third grid column (the form's preview).
     <div className={"layout" + (showOutput ? " with-output" : "")}>
-      <Sidebar forms={ALL_FORMS} current={hashFor(shell.route).slice(1)} commissioner={commissioner} />
+      <Sidebar forms={ALL_FORMS} current={hashFor(shell.route).slice(1)} />
       <main className="editor" id="editor">
         {form ? (
           <ErrorBoundary
@@ -59,6 +60,7 @@ export default function CourtFilingsProgram({ shell }: ProgramProps) {
               docketRequest={shell.docketRequest}
               draftRequest={shell.draftRequest}
               onDocketBar={shell.onDocketBar}
+              onTools={shell.onFormTools}
             />
           </ErrorBoundary>
         ) : (
