@@ -1,13 +1,15 @@
 // A case's exhibits (LP-12): lettered by their order (A, B… Z, AA…), with a
 // title, description, link and date obtained. Add, edit, reorder and delete;
 // each change saves the case straight away (like its deadlines). Links are
-// shown only when they're http(s), and are never fetched.
+// shown only when they're http(s), and are never fetched. Each exhibit has a
+// chain-of-custody log (LP-14), opened with its Custody button.
 
 import { useState, type FormEvent } from "react";
 import { caseStore } from "@/lib/cases";
 import { formatDay } from "@/lib/deadlines";
 import { cleanExhibit, exhibitLetter, MAX_EXHIBITS, moveExhibit, safeLink } from "@/lib/exhibits";
-import type { Case, Exhibit } from "@/lib/types";
+import type { Case, Character, Exhibit } from "@/lib/types";
+import ExhibitCustody from "./ExhibitCustody";
 
 interface Draft {
   title: string;
@@ -25,11 +27,26 @@ const draftOf = (e: Exhibit): Draft => ({
   obtained: e.obtained || "",
 });
 
-export default function CaseEvidence({ c }: { c: Case }) {
+export interface CaseEvidenceProps {
+  c: Case;
+  /** For the custody log's "Handled by" (LP-14). */
+  characters?: Character[];
+  active?: Character | null;
+}
+
+export default function CaseEvidence({ c, characters = [], active = null }: CaseEvidenceProps) {
   /** The exhibit being edited, or "new" for the add form. */
   const [editing, setEditing] = useState<string | null>(null);
   const [draft, setDraft] = useState<Draft>(EMPTY);
   const [error, setError] = useState("");
+  /** Exhibits with their custody log open. */
+  const [custodyOpen, setCustodyOpen] = useState<ReadonlySet<string>>(() => new Set());
+  const toggleCustody = (id: string) =>
+    setCustodyOpen((s) => {
+      const next = new Set(s);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
 
   const saveList = (exhibits: Exhibit[]): boolean => {
     try {
@@ -64,7 +81,9 @@ export default function CaseEvidence({ c }: { c: Case }) {
       setError("A case can hold up to " + MAX_EXHIBITS + " exhibits.");
       return;
     }
-    const e = cleanExhibit({ ...draft, id: isNew ? undefined : editing });
+    // Editing keeps the exhibit's custody log; only the details change.
+    const before = isNew ? undefined : c.exhibits.find((x) => x.id === editing);
+    const e = cleanExhibit({ ...before, ...draft, id: isNew ? undefined : editing });
     if (!e) return;
     const list = isNew ? [...c.exhibits, e] : c.exhibits.map((x) => (x.id === e.id ? e : x));
     if (saveList(list)) open(null);
@@ -151,6 +170,14 @@ export default function CaseEvidence({ c }: { c: Case }) {
                     >
                       ↓
                     </button>
+                    <button
+                      type="button"
+                      className="mini"
+                      aria-expanded={custodyOpen.has(e.id)}
+                      onClick={() => toggleCustody(e.id)}
+                    >
+                      {"Custody (" + (e.custody?.length || 0) + ")"}
+                    </button>
                     <button type="button" className="mini" onClick={() => open(e.id)}>
                       Edit
                     </button>
@@ -172,6 +199,15 @@ export default function CaseEvidence({ c }: { c: Case }) {
                 )}
                 {e.description && <p className="small exhibit-description">{e.description}</p>}
                 {editing === e.id && form}
+                {custodyOpen.has(e.id) && (
+                  <ExhibitCustody
+                    exhibit={e}
+                    letter={letter}
+                    characters={characters}
+                    active={active}
+                    onSave={(custody) => saveList(c.exhibits.map((x) => (x.id === e.id ? { ...x, custody } : x)))}
+                  />
+                )}
               </li>
             );
           })}

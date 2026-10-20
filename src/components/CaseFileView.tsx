@@ -17,11 +17,18 @@ export interface CaseFileViewProps {
   /** The case open from the route (#cases/<id>), or null for just the list. */
   caseId: string | null;
   characters: Character[];
+  /** The character filing now: the custody log's default handler (LP-14). */
+  activeCharacter?: Character | null;
   /** Open a filing as a new draft (LP-15). */
   onUseFiling?(f: Filing): void;
 }
 
-export default function CaseFileView({ caseId, characters, onUseFiling = () => {} }: CaseFileViewProps) {
+export default function CaseFileView({
+  caseId,
+  characters,
+  activeCharacter = null,
+  onUseFiling = () => {},
+}: CaseFileViewProps) {
   const version = useCaseVersion();
   const filingVersion = useFilingVersion();
   const all = useMemo(() => (version >= 0 ? caseStore().list() : []), [version]);
@@ -80,7 +87,13 @@ export default function CaseFileView({ caseId, characters, onUseFiling = () => {
           onSaved={onSaved}
           onCancel={() => {}}
         />
-        <CaseLinks c={selected} filings={caseFilings} onUseFiling={onUseFiling} />
+        <CaseLinks
+          c={selected}
+          filings={caseFilings}
+          onUseFiling={onUseFiling}
+          characters={characters}
+          active={activeCharacter}
+        />
       </>
     );
   } else if (caseId) {
@@ -215,7 +228,19 @@ function detailsStamp(c: Case): string {
 }
 
 /** A case's linked areas: its deadlines (LP-18), filings (LP-15) and evidence (LP-12). */
-function CaseLinks({ c, filings, onUseFiling }: { c: Case; filings: Filing[]; onUseFiling(f: Filing): void }) {
+function CaseLinks({
+  c,
+  filings,
+  onUseFiling,
+  characters,
+  active,
+}: {
+  c: Case;
+  filings: Filing[];
+  onUseFiling(f: Filing): void;
+  characters: Character[];
+  active: Character | null;
+}) {
   const [filingStatus, setFilingStatus] = useState<{ text: string; bad: boolean } | null>(null);
   return (
     <div className="case-links">
@@ -245,7 +270,7 @@ function CaseLinks({ c, filings, onUseFiling }: { c: Case; filings: Filing[]; on
       </section>
       <section className="case-empty" id="case-evidence" aria-labelledby="case-evidence-title">
         <h4 id="case-evidence-title">Evidence</h4>
-        <CaseEvidence c={c} />
+        <CaseEvidence c={c} characters={characters} active={active} />
       </section>
     </div>
   );

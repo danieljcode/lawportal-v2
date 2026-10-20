@@ -5,6 +5,7 @@
 // to an exhibit (LP-13) keep its id, not its letter. They live on the case, so
 // they sync and back up with it. Pure: no storage.
 
+import { cleanCustody, unionCustody } from "./custody";
 import { isId, ISO_DATE_RE, newId } from "./storage";
 import type { Exhibit } from "./types";
 
@@ -33,12 +34,14 @@ export function cleanExhibit(input: unknown): Exhibit | null {
   const description = text(o.description, 4000);
   const link = safeLink(o.link);
   const obtained = typeof o.obtained === "string" && ISO_DATE_RE.test(o.obtained) ? o.obtained : undefined;
+  const custody = cleanCustody(o.custody);
   return {
     id: isId(o.id) ? o.id : newId(),
     title,
     ...(description ? { description } : {}),
     ...(link ? { link } : {}),
     ...(obtained ? { obtained } : {}),
+    ...(custody.length ? { custody } : {}),
   };
 }
 
@@ -77,10 +80,19 @@ export function moveExhibit(list: Exhibit[], id: string, delta: number): Exhibit
   return next;
 }
 
-/** Two copies of one case's exhibits as one list: the first copy's order, then any only the second has. */
+/**
+ * Two copies of one case's exhibits as one list: the first copy's order and details, then any
+ * only the second has. An exhibit in both keeps every custody entry either copy has (LP-14).
+ */
 export function unionExhibits(first: Exhibit[], second: Exhibit[]): Exhibit[] {
+  const other = new Map(second.map((e) => [e.id, e]));
+  const merged = first.map((e) => {
+    const o = other.get(e.id);
+    if (!o?.custody?.length) return e;
+    return { ...e, custody: unionCustody(e.custody || [], o.custody) };
+  });
   const ids = new Set(first.map((e) => e.id));
-  return [...first, ...second.filter((e) => !ids.has(e.id))].slice(0, MAX_EXHIBITS);
+  return [...merged, ...second.filter((e) => !ids.has(e.id))].slice(0, MAX_EXHIBITS);
 }
 
 /* ---------- references in filings (LP-13) ---------- */
