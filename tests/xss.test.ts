@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 // AC 7: user values never become markup.
 import { describe, expect, it } from "vitest";
+import { resolveExhibitRefs } from "@/lib/exhibits";
 import { compile, render } from "@/lib/template";
 
 const TEMPLATE = [
@@ -60,5 +61,29 @@ describe("XSS", () => {
       for (const attr of Array.from(el.attributes)) expect(attr.value).not.toContain("javascript:");
     }
     expect(doc.body.textContent?.split(JS_URL).length).toBe(3);
+  });
+});
+
+describe("XSS in exhibits (LP-13)", () => {
+  const tree = compile("{{Exhibits@exhibits|<p>None</p>}}<p>{{Grounds:textarea|G}}</p>");
+
+  it("escapes exhibit titles and refuses unsafe links in the exhibit list", () => {
+    const exhibits = [
+      { id: "exh00001", letter: "A", title: PAYLOAD, link: JS_URL },
+      { id: "exh00002", letter: "<b>B", title: "Fine", link: 'https://x.y/"onmouseover="alert(1)' },
+    ];
+    for (const highlight of [false, true]) {
+      const doc = assertInert(render(tree, {}, { highlight, exhibits }));
+      expect(doc.body.textContent).toContain(PAYLOAD);
+      expect(doc.querySelector("b")).toBeNull();
+      expect(doc.body.innerHTML).not.toContain("javascript:");
+    }
+  });
+
+  it("escapes exhibit titles that a reference brings into the text", () => {
+    const refs = [{ id: "exh00001", letter: "A", title: PAYLOAD }];
+    const values = resolveExhibitRefs({ Grounds: "See [Exhibit A: x #exh00001]" }, refs);
+    const doc = assertInert(render(tree, values, { exhibits: refs }));
+    expect(doc.querySelector("p:last-child")!.textContent).toBe("See Exhibit A (" + PAYLOAD + ")");
   });
 });

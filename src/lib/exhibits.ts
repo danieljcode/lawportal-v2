@@ -82,3 +82,92 @@ export function unionExhibits(first: Exhibit[], second: Exhibit[]): Exhibit[] {
   const ids = new Set(first.map((e) => e.id));
   return [...first, ...second.filter((e) => !ids.has(e.id))].slice(0, MAX_EXHIBITS);
 }
+
+/* ---------- references in filings (LP-13) ---------- */
+
+/** What a filing needs to show an exhibit: its id, current letter, title and link. */
+export interface ExhibitRef {
+  id: string;
+  letter: string;
+  title: string;
+  link?: string;
+}
+
+/** A case's exhibits as they stand now, lettered. */
+export function exhibitRefs(exhibits: readonly Exhibit[]): ExhibitRef[] {
+  return exhibits.map((e, i) => ({
+    id: e.id,
+    letter: exhibitLetter(i),
+    title: e.title,
+    ...(e.link ? { link: e.link } : {}),
+  }));
+}
+
+/**
+ * A reference typed into a form's text: "[Exhibit C: Dashcam footage #<id>]".
+ * The id is what counts; the letter and title are only for reading it in the
+ * editor, and are brought up to date when the exhibits change.
+ */
+const REF = /\[Exhibit ([^\]\n#]*?)\s*#([a-z0-9]{4,32})\]/g;
+
+export function exhibitMarker(ref: ExhibitRef): string {
+  return "[Exhibit " + ref.letter + ": " + ref.title.replace(/[\]#\n]/g, " ") + " #" + ref.id + "]";
+}
+
+/** Apply `fn` to every string in the values (inside repeatable blocks too); the same object when nothing changes. */
+function mapStrings<T>(value: T, fn: (s: string) => string): T {
+  if (typeof value === "string") return fn(value) as unknown as T;
+  if (Array.isArray(value)) {
+    let changed = false;
+    const out = value.map((v) => {
+      const n = mapStrings(v, fn);
+      if (n !== v) changed = true;
+      return n;
+    });
+    return (changed ? out : value) as unknown as T;
+  }
+  if (value && typeof value === "object") {
+    let changed = false;
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) {
+      const n = mapStrings(v, fn);
+      if (n !== v) changed = true;
+      out[k] = n;
+    }
+    return (changed ? out : value) as T;
+  }
+  return value;
+}
+
+/**
+ * The text a filing shows for each reference: "Exhibit C (Dashcam footage)",
+ * with the exhibit's letter and title now. A reference to an exhibit that's
+ * gone keeps what it said, without the id. Done before rendering, so the text
+ * is escaped like any other value.
+ */
+export function resolveExhibitRefs<T>(values: T, refs: readonly ExhibitRef[]): T {
+  const byId = new Map(refs.map((r) => [r.id, r]));
+  return mapStrings(values, (s) =>
+    s.includes("[Exhibit ")
+      ? s.replace(REF, (_, said: string, id: string) => {
+          const r = byId.get(id);
+          if (r) return "Exhibit " + r.letter + " (" + r.title + ")";
+          const [letter, ...title] = said.split(":");
+          return "Exhibit " + letter.trim() + (title.join(":").trim() ? " (" + title.join(":").trim() + ")" : "");
+        })
+      : s,
+  );
+}
+
+/** The references' editor text brought up to date (letters after a reorder, renamed titles). */
+export function refreshExhibitRefs<T>(values: T, refs: readonly ExhibitRef[]): T {
+  const byId = new Map(refs.map((r) => [r.id, r]));
+  return mapStrings(values, (s) =>
+    s.includes("[Exhibit ")
+      ? s.replace(REF, (whole: string, _said: string, id: string) => {
+          const r = byId.get(id);
+          return r ? exhibitMarker(r) : whole;
+        })
+      : s,
+  );
+}

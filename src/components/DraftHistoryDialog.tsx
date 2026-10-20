@@ -3,6 +3,8 @@
 // draft after asking (and Undo, or the snapshot kept first, brings it back).
 
 import { useMemo, useState } from "react";
+import { caseStore } from "@/lib/cases";
+import { exhibitRefs, resolveExhibitRefs } from "@/lib/exhibits";
 import { draftHistory, filledCount, snapshotTime, type Snapshot } from "@/lib/draftHistory";
 import { render } from "@/lib/template";
 import type { Tree } from "@/lib/types";
@@ -39,7 +41,14 @@ function HistoryBody({ formId, tree, onRestore }: DraftHistoryDialogProps) {
   const [picked, setPicked] = useState(0);
   const snap = snapshots[picked] as Snapshot | undefined;
   // Engine output: every value is escaped (SafeHtml, LP-5).
-  const preview = useMemo(() => (snap ? render(tree, snap.state.values) : null), [tree, snap]);
+  // Exhibit references read as the case's exhibits are now (LP-13).
+  const preview = useMemo(() => {
+    if (!snap) return null;
+    const n = snap.state.values["Case number"];
+    const c = typeof n === "string" && n.trim() ? caseStore().byNumber(n.trim()) : null;
+    const exhibits = c ? exhibitRefs(c.exhibits) : [];
+    return render(tree, resolveExhibitRefs(snap.state.values, exhibits), { exhibits });
+  }, [tree, snap]);
 
   if (!snapshots.length) {
     return (
