@@ -15,6 +15,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "port-forms": "node --experimental-strip-types --no-warnings scripts/port-forms.mjs",
+    "penal-code": "node scripts/import-penal-code.mjs",
     "screenshots": "node scripts/screenshots.mjs",
     "smoke:preview": "node scripts/preview-smoke.mjs",
     "release-notes": "node --experimental-strip-types --no-warnings scripts/release-notes.mjs",

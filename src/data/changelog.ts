@@ -19,6 +19,24 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-21",
+    title: "Penal code",
+    items: [
+      {
+        type: "new",
+        text: "The Law Library now has the FreestyleRP penal code: every charge with its class, sentence, fine and description, and when the code was last updated. It's the revised draft, so it may still change.",
+      },
+      {
+        type: "new",
+        text: "Search by section number, keyword or title (matches are highlighted), filter by chapter or class, and copy a citation such as “PC 1001 Assault”.",
+      },
+      {
+        type: "new",
+        text: "In a form, Law Library → Penal Code → Insert citation puts the charge where your cursor was.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-21",
     title: "Law Library",
     items: [
       {
