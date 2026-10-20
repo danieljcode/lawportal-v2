@@ -27,6 +27,7 @@ import JapView from "./JapView";
 import CaseFileView from "./CaseFileView";
 import UpcomingView from "./UpcomingView";
 import IntakeView from "./IntakeView";
+import BootScreen from "./BootScreen";
 import ConflictCheckView from "./ConflictCheckView";
 import LawLibraryView from "./LawLibraryView";
 import ErrorBoundary from "./ErrorBoundary";
@@ -331,6 +332,8 @@ export default function App() {
         </div>
       </div>
       <Taskbar task={task} onHome={goHome} />
+      {/* The DOS-style boot screen (LP-21), over the app once per session. */}
+      <BootScreen />
       <datalist id="character-names">
         {characters.map((c) => (
           <option key={c.id} value={c.name} />

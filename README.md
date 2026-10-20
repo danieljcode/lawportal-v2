@@ -32,6 +32,9 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
 
 ## Features
 
+- **Startup screen.** Once per browser session, the Friedman & Associates Office System boots
+  DOS-style (memory test, drive checks, `C:>`) for under 2 seconds while the app loads. Any key or
+  click skips it, and the start page has a setting to turn it off.
 - **Forms.** 39 court forms grouped by court (Criminal, Civil, Traffic, Small Claims, Appellate,
   Supreme, general), plus **Additional Templates**: General Petition, Petition for Name Change,
   General Motion, Interrogatories, Subpoena and Service Agreement, and **Firm Letters**: Engagement
