@@ -19,6 +19,20 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-20",
+    title: "Judge templates",
+    items: [
+      {
+        type: "new",
+        text: "Three new templates for judges under Additional Templates › Judge: Ruling on Motion (granted, denied or in part), Sentencing Order (custody, fine, restitution, community service, probation) and Warrant Decision (approve or deny a search or arrest warrant).",
+      },
+      {
+        type: "new",
+        text: "They sign as your character, and loading a case from the case bar fills in the court, case number and parties.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-20",
     title: "Firm letters",
     items: [
       {
