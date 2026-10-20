@@ -281,7 +281,12 @@ export default function App() {
               </ErrorBoundary>
             ) : route.kind === "cases" ? (
               <ErrorBoundary where="the Case File" resetKey={route.caseId}>
-                <CaseFileView caseId={route.caseId} characters={characters} onUseFiling={openFiling} />
+                <CaseFileView
+                  caseId={route.caseId}
+                  characters={characters}
+                  activeCharacter={active}
+                  onUseFiling={openFiling}
+                />
               </ErrorBoundary>
             ) : (
               <EmptyState />
