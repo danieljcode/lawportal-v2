@@ -67,6 +67,7 @@ export default function Sidebar({ forms, current, commissioner }: SidebarProps) 
               <li>{link("#upcoming", "Upcoming", current === "upcoming")}</li>
               <li>{link("#intake", "New client intake", current === "intake")}</li>
               <li>{link("#conflicts", "Conflict check", current === "conflicts")}</li>
+              <li>{link("#library", "Law Library", current === "library")}</li>
             </ul>
           </details>
         )}

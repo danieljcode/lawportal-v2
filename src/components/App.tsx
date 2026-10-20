@@ -28,6 +28,7 @@ import CaseFileView from "./CaseFileView";
 import UpcomingView from "./UpcomingView";
 import IntakeView from "./IntakeView";
 import ConflictCheckView from "./ConflictCheckView";
+import LawLibraryView from "./LawLibraryView";
 import ErrorBoundary from "./ErrorBoundary";
 import OutputPane from "./OutputPane";
 import Sidebar from "./Sidebar";
@@ -35,7 +36,16 @@ import Taskbar from "./Taskbar";
 import Toolbar from "./Toolbar";
 import { S_SET_ASIDE, S_SET_ASIDE_HINT } from "@/lib/strings";
 import { useDialogs } from "./useDialogs";
-import { APP_TITLE, CASES_TITLE, CONFLICTS_TITLE, INTAKE_TITLE, JAP_TITLE, UPCOMING_TITLE, useRoute } from "./useRoute";
+import {
+  APP_TITLE,
+  CASES_TITLE,
+  CONFLICTS_TITLE,
+  INTAKE_TITLE,
+  JAP_TITLE,
+  LIBRARY_TITLE,
+  UPCOMING_TITLE,
+  useRoute,
+} from "./useRoute";
 import { useCaseVersion, useCharacterVersion, useSetAsideVersion, useSyncState } from "./useStore";
 
 export type { DialogName } from "./useDialogs";
@@ -178,7 +188,9 @@ export default function App() {
               ? INTAKE_TITLE
               : route.kind === "conflicts"
                 ? CONFLICTS_TITLE
-                : APP_TITLE;
+                : route.kind === "library"
+                  ? LIBRARY_TITLE
+                  : APP_TITLE;
   const current = route.kind === "form" ? route.id : route.kind === "home" ? null : route.kind;
   // Deadlines (LP-18): the toolbar dot when the active character has something due within 48 hours.
   const caseVersion = useCaseVersion();
@@ -266,6 +278,10 @@ export default function App() {
                   syncState={syncState}
                   onTurnOnSync={() => openCharacters(true)}
                 />
+              </ErrorBoundary>
+            ) : route.kind === "library" ? (
+              <ErrorBoundary where="the Law Library" resetKey={route.kind}>
+                <LawLibraryView />
               </ErrorBoundary>
             ) : route.kind === "conflicts" ? (
               <ErrorBoundary where="the conflict check" resetKey={route.kind}>

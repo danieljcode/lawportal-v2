@@ -2641,3 +2641,65 @@ dialog.changelog {
     font-size: 12pt;
   }
 }
+
+/* ---------- law library (LP-16) ---------- */
+.precedents-head {
+  justify-content: space-between;
+  align-items: center;
+}
+.precedent-filters input[type="search"] {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+.precedent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 6px 0;
+  padding: 0;
+  list-style: none;
+}
+.precedent {
+  padding: 4px 8px;
+  border: 1px solid var(--shadow);
+  border-left: 3px solid var(--select-bg);
+  background: var(--field);
+  color: var(--text);
+}
+.precedent p {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+.precedent-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 8px;
+}
+.precedent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.precedent-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+.precedent-tag {
+  cursor: pointer;
+  font: inherit;
+}
+.precedent-tag.on {
+  background: var(--select-bg);
+  color: var(--select-text);
+}
+.precedent mark {
+  background: var(--mark);
+  color: inherit;
+}
+.precedent-form {
+  margin: 6px 0 10px;
+}

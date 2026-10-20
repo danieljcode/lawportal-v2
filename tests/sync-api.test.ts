@@ -177,6 +177,14 @@ describe("sync API (AC 15)", () => {
     expect((await PUT(put(code, { rev: 0, data: { characters: [], conflictChecks: checks(2) } }))).status).toBe(200);
   });
 
+  it("PUT takes the Law Library's precedents too, up to 1000 objects (LP-16)", async () => {
+    const code = await newCode();
+    const rulings = (n: number) => Array.from({ length: n }, () => ({ caseName: "Smith v. Jones" }));
+    expect((await PUT(put(code, { rev: 0, data: { characters: [], precedents: "x" } }))).status).toBe(400);
+    expect((await PUT(put(code, { rev: 0, data: { characters: [], precedents: rulings(1001) } }))).status).toBe(400);
+    expect((await PUT(put(code, { rev: 0, data: { characters: [], precedents: rulings(2) } }))).status).toBe(200);
+  });
+
   it("PUT takes the filing history too, up to 500 objects (LP-15)", async () => {
     const code = await newCode();
     const filings = (n: number) => Array.from({ length: n }, () => ({ formId: "civil-complaint" }));

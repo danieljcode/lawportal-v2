@@ -1,6 +1,6 @@
 // Hash routing for the app shell (LP-7, from App.tsx): which page is open, the
 // last form reopened on boot, back/forward, the page title, and going home.
-// #cases is the Case File, #cases/<id> one case in it (LP-101).
+// #cases is the Case File, #cases/<id> one case in it (LP-101); #library the Law Library (LP-16).
 
 import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
 import { getForm } from "@/data";
@@ -15,7 +15,8 @@ export type Route =
   | { kind: "cases"; caseId: string | null }
   | { kind: "upcoming" }
   | { kind: "intake" }
-  | { kind: "conflicts" };
+  | { kind: "conflicts" }
+  | { kind: "library" };
 
 export const APP_TITLE = "Court Filing Generator";
 export const JAP_TITLE = "Judicial Advancement Portfolio";
@@ -23,6 +24,7 @@ export const CASES_TITLE = "Case File";
 export const UPCOMING_TITLE = "Upcoming";
 export const INTAKE_TITLE = "New client intake";
 export const CONFLICTS_TITLE = "Conflict check";
+export const LIBRARY_TITLE = "Law Library";
 
 /** The hash for a route ("#cases/<id>" for a case). */
 export function hashFor(r: Route): string {
@@ -32,6 +34,7 @@ export function hashFor(r: Route): string {
   if (r.kind === "upcoming") return "#upcoming";
   if (r.kind === "intake") return "#intake";
   if (r.kind === "conflicts") return "#conflicts";
+  if (r.kind === "library") return "#library";
   return "";
 }
 
@@ -47,6 +50,7 @@ function parseRoute(): Route {
   if (id === "upcoming") return { kind: "upcoming" };
   if (id === "intake") return { kind: "intake" };
   if (id === "conflicts") return { kind: "conflicts" };
+  if (id === "library") return { kind: "library" };
   const m = /^cases\/([a-z0-9]{4,32})$/.exec(id);
   if (m) return { kind: "cases", caseId: m[1] };
   if (id && getForm(id)) return { kind: "form", id };
@@ -139,6 +143,8 @@ export function useRoute(): RouteState {
       document.title = INTAKE_TITLE + " · " + APP_TITLE;
     } else if (route.kind === "conflicts") {
       document.title = CONFLICTS_TITLE + " · " + APP_TITLE;
+    } else if (route.kind === "library") {
+      document.title = LIBRARY_TITLE + " · " + APP_TITLE;
     } else if (form) {
       document.title = form.title + " · " + APP_TITLE;
     }
