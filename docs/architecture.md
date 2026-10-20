@@ -179,6 +179,13 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
   the intake goes in the notes. A blank case number becomes `PENDING-<n>` until the court gives one.
   **Print client sheet** prints just the sheet beside the form (a print stylesheet scoped with
   `:has(#intake-sheet)`). **Run conflict check** checks the client and the opposing party (LP-10).
+- **Exhibits** (`src/lib/exhibits.ts`, `CaseEvidence.tsx`, LP-12) live on each case (`exhibits`, in order:
+  a title, description, link and in-game date obtained), so they sync and back up with it; a merge
+  keeps both copies'. An exhibit's letter comes from its place (A… Z, AA, AB…), so reordering
+  relabels them, and anything referring to an exhibit should keep its id, not its letter (LP-13).
+  Links are kept only if they're http(s) (`safeLink`), shown with `rel="noopener noreferrer"`, and
+  never fetched. The case page's Evidence area adds, edits, reorders and deletes them (after asking),
+  each change saved straight away.
 - **Deadlines and hearing dates** (`src/lib/deadlines.ts`, LP-18) live on each case
   (`deadlines`: an in-game date, a label, a note, done), so they sync and back up with it; merging
   two copies of a case keeps both copies' deadlines. Dates are on the 1990 calendar, as forms fill

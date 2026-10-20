@@ -145,6 +145,19 @@ export interface Case extends Docket {
   created: string;
   /** Deadlines and hearing dates (LP-18), soonest first. */
   deadlines: Deadline[];
+  /** The evidence, in exhibit order (LP-12); an exhibit's letter comes from its place. */
+  exhibits: Exhibit[];
+}
+
+/** A piece of evidence on a case (LP-12). */
+export interface Exhibit {
+  id: string;
+  title: string;
+  description?: string;
+  /** http(s) only; stored, never fetched. */
+  link?: string;
+  /** In-game date obtained, YYYY-MM-DD. */
+  obtained?: string;
 }
 
 /** A dated entry on a case (LP-18): an in-game date, a label and a note. */

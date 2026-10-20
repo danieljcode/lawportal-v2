@@ -9,6 +9,7 @@
 // File program takes over (LP-101, LP-100).
 
 import { cleanDeadlines, unionDeadlines } from "./deadlines";
+import { cleanExhibits, unionExhibits } from "./exhibits";
 import { clean as cleanDocket, DOCKETS_PREFIX } from "./docketFields";
 import { defaultKV, isId, ISO_TIME_RE, newId, setAside, type KV } from "./storage";
 import { createStore, unwrap, type Migration } from "./store";
@@ -55,7 +56,7 @@ export function cleanCase(input: unknown): Case {
     ? [...new Set(o.assigned.filter((x): x is string => isId(x) && x !== lead))]
     : [];
   const created = typeof o.created === "string" && ISO_TIME_RE.test(o.created) ? o.created : d.updated;
-  return { ...d, lead, assigned, created, deadlines: cleanDeadlines(o.deadlines) };
+  return { ...d, lead, assigned, created, deadlines: cleanDeadlines(o.deadlines), exhibits: cleanExhibits(o.exhibits) };
 }
 
 function validList(raw: unknown): Case[] {
@@ -88,6 +89,7 @@ function combine(newer: Case, older: Case): Case {
   out.assigned = [...new Set(all.filter((id) => id !== out.lead))];
   out.created = newer.created < older.created ? newer.created : older.created;
   out.deadlines = unionDeadlines(newer.deadlines, older.deadlines);
+  out.exhibits = unionExhibits(newer.exhibits, older.exhibits);
   return out;
 }
 
@@ -137,6 +139,7 @@ export function casesFromDockets(byCharacter: Iterable<[string, unknown]>): Case
         assigned: [],
         created: d.updated,
         deadlines: [],
+        exhibits: [],
       });
     }
   }
