@@ -32,6 +32,8 @@ const mk = (id: string, over: Partial<Case>): Case => ({
   lead: "alice001",
   assigned: [],
   deadlines: [],
+
+  exhibits: [],
   ...over,
 });
 

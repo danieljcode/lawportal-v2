@@ -209,6 +209,8 @@ describe("cases from two devices", () => {
     status: "Open",
     updated: T1,
     deadlines: [],
+
+    exhibits: [],
     created: T1,
     lead: "alice001",
     assigned: [],
@@ -278,6 +280,8 @@ describe("the Case File's search and checks (LP-101)", () => {
     status: "Open",
     updated: T1,
     deadlines: [],
+
+    exhibits: [],
     created: T1,
     lead: "alice001",
     assigned: [],

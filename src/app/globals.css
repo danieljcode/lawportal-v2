@@ -2512,3 +2512,60 @@ dialog.changelog {
     font-size: 12pt;
   }
 }
+
+/* ---------- evidence (LP-12) ---------- */
+.case-links #case-evidence {
+  grid-column: 1 / -1;
+}
+.exhibit-list {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.exhibit {
+  padding: 4px 8px;
+  border: 1px solid var(--shadow);
+  border-left: 3px solid var(--select-bg);
+  background: var(--field);
+  color: var(--text);
+}
+.exhibit p {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+.exhibit-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+.exhibit-title {
+  flex: 1 1 140px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.exhibit-actions {
+  display: flex;
+  gap: 4px;
+}
+.exhibit-description {
+  white-space: pre-wrap;
+}
+.exhibit-form {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 1fr);
+  gap: 6px;
+  margin: 6px 0;
+}
+.exhibit-form textarea,
+.exhibit-form .row {
+  grid-column: 1 / -1;
+}
+@media (max-width: 700px) {
+  .exhibit-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
