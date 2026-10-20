@@ -49,6 +49,8 @@ export function docketToForm(entries: Entry[], s: FormState, d: Docket): { state
   const div = divisionFor(d);
   put("Division", div);
   put("Court division", div ? titleWords(div.replace(/ DIVISION$/, "")) : undefined);
+  // The judge templates' court line (LP-90); no other form has this label.
+  put("Court name", d.court ? d.court.toUpperCase() : undefined);
   if (d.plaintiff) put("Plaintiff label", plural(d.plaintiff) ? "Plaintiffs" : "Plaintiff");
   if (d.defendant) put("Defendant label", plural(d.defendant) ? "Defendants" : "Defendant");
 
