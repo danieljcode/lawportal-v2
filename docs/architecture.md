@@ -10,6 +10,17 @@ browser.
 - **One page, client only.** `src/app/page.tsx` renders `AppLoader`, which loads `App` with
   `ssr: false`. The app reads local storage on its first render, so it never renders on the server
   (no hydration mismatches).
+- **Branding** (`src/branding.ts`, LP-22). One config holds the firm's name ("Friedman &
+  Associates"), short name ("F&A"), the product name ("Court Filing System"), logo, colours and
+  wallpaper, so another firm could be set up when it's hosted. The app's chrome reads it: the window
+  title and browser tab (`appTitle()`, also `APP_TITLE` in `useRoute`), the toolbar, the favicon
+  (`iconHref()`: the logo, or scales in the firm's colours), the boot screen, the crash report and
+  Help → About (`AboutDialog.tsx`, the toolbar's **?**). Court forms, the forum preview and
+  everything posted stay unbranded; `tests/branding.test.tsx` renders every form to check.
+  Changing the firm means editing that file only (the backup format's `BACKUP_APP` id stays).
+  The starting tab title is set by a head script (`titleScript()`), not
+  Next's `metadata`: Next owned the `<title>` and put it back over the page's own title ("Case File ·
+  …") on first load.
 - **Boot screen** (`BootScreen.tsx`, `src/lib/boot.ts`, LP-21). `App` draws a DOS-style screen over
   itself, once per browser session (`lawapp_booted` in session storage), unless the start page's
   setting turned it off (`lawapp_boot_screen` = `off`). The app renders underneath at the same

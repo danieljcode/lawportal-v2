@@ -5,6 +5,8 @@
 // reduced motion it shows the finished screen briefly instead. Pure timing
 // and wording here; BootScreen.tsx draws it.
 
+import { BRANDING } from "@/branding";
+
 export const BOOT_OFF_KEY = "lawapp_boot_screen";
 export const BOOTED_KEY = "lawapp_booted";
 
@@ -64,8 +66,8 @@ export function memoryAt(ms: number): number {
 export function bootLines(ms: number): string[] {
   const t = BOOT_TIMES;
   const lines = [
-    "Friedman & Associates Office System",
-    "BIOS Version 1.02  (C) 1990 Friedman & Associates",
+    BRANDING.firmName + " Office System",
+    "BIOS Version 1.02  (C) 1990 " + BRANDING.firmName,
     "",
     "Memory Test: " + memoryAt(ms) + "K" + (ms >= t.memoryEnd ? " OK" : ""),
   ];
