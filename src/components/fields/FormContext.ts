@@ -6,6 +6,13 @@ import type { FormState } from "@/lib/formState";
 import type { ExhibitRef } from "@/lib/exhibits";
 import type { Character, Entry } from "@/lib/types";
 
+/** A form field that can take inserted text (a citation from the Law Library, LP-16). */
+export interface FieldTarget {
+  label: string;
+  /** Insert at the field's cursor, or in place of its selection. */
+  insert(text: string): void;
+}
+
 export interface FormCtx {
   /** Top-level entries of the form (fields(tree)). */
   entries: Entry[];
@@ -21,6 +28,8 @@ export interface FormCtx {
   required: ReadonlySet<string>;
   /** The exhibits of the firm case with this form's case number (LP-13), for Insert exhibit. */
   exhibits: readonly ExhibitRef[];
+  /** A text field was focused: it's where Insert citation goes (LP-16). */
+  onFieldFocus(target: FieldTarget): void;
 }
 
 export const FormContext = createContext<FormCtx | null>(null);

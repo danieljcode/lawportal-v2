@@ -44,9 +44,10 @@ import { defaultKV, readJson, writeJson } from "@/lib/storage";
 import { S_DISCLAIMER } from "@/lib/strings";
 import { caseNumberPattern, compile, fields, render } from "@/lib/template";
 import type { Character, Docket, Entry, FormDef, Node, Tree } from "@/lib/types";
-import { FormContext, slugId, type FormCtx } from "./fields/FormContext";
+import { FormContext, slugId, type FieldTarget, type FormCtx } from "./fields/FormContext";
 import Sections from "./fields/Sections";
 import DraftHistoryDialog from "./DraftHistoryDialog";
+import LawLibraryDialog from "./LawLibraryDialog";
 import type { SafeHtml } from "@/lib/safeHtml";
 import { useCaseVersion } from "./useStore";
 
@@ -190,6 +191,9 @@ export default function FormView({
   const doUndo = useCallback(() => setUndoable(undo), []);
   const doRedo = useCallback(() => setUndoable(redo), []);
   const [historyOpen, setHistoryOpen] = useState(false);
+  // The Law Library (LP-16): Insert citation goes into the written field last focused.
+  const [libraryOpen, setLibraryOpen] = useState(false);
+  const [citeTarget, setCiteTarget] = useState<FieldTarget | null>(null);
   const [collapsed, setCollapsed] = useState<Set<string>>(() => readCollapsed(form.id));
   const [flash, setFlash] = useState<{ text: string; bad: boolean } | null>(null);
   const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -369,7 +373,7 @@ export default function FormView({
   const onState = useCallback((fn: (s: FormState) => FormState, key?: string) => setState(fn, key ?? null), [setState]);
   const required = useMemo(() => new Set(form.required), [form.required]);
   const ctx: FormCtx = useMemo(
-    () => ({ entries, character: activeCharacter, onState, now, required, exhibits }),
+    () => ({ entries, character: activeCharacter, onState, now, required, exhibits, onFieldFocus: setCiteTarget }),
     [entries, activeCharacter, onState, now, required, exhibits],
   );
 
@@ -578,6 +582,16 @@ export default function FormView({
           >
             Draft history
           </button>
+          <button
+            className="btn"
+            id="open-library"
+            type="button"
+            title="Search the firm's precedents and insert a citation"
+            onClick={() => setLibraryOpen(true)}
+            disabled={!tree}
+          >
+            Law Library
+          </button>
           <button className="btn danger-quiet" id="reset-form" type="button" onClick={clearForm} disabled={!tree}>
             Clear form
           </button>
@@ -696,6 +710,7 @@ export default function FormView({
 
       <p className="disclaimer form-foot">{S_DISCLAIMER}</p>
 
+      <LawLibraryDialog open={libraryOpen} onClose={() => setLibraryOpen(false)} target={citeTarget} />
       {tree && (
         <DraftHistoryDialog
           open={historyOpen}

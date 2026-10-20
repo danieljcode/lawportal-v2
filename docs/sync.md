@@ -23,7 +23,7 @@ lost. Sync is optional and runs entirely on the computer that runs the app.
 - **One JSON file per code** in `data/sync/` (or `LAWAPP_SYNC_DIR`), named by the **SHA-256 hash of
   the code**. The raw code never reaches the file system or the logs (logs show the first 8 hex
   characters of the hash at most).
-- **A record** is `{ rev, updated, data: { characters, cases, filings, conflictChecks } }`. Each character carries
+- **A record** is `{ rev, updated, data: { characters, cases, filings, conflictChecks, precedents } }`. Each character carries
   its J.A.P. inside it (`jap`); the firm's cases (LP-4) and the filing history (LP-15) sit beside
   the characters. A copy without `filings` (from before LP-15) leaves this browser's history alone. A copy saved before LP-4
   has no `cases` and each character's docket inside it (`dockets`): the client reads that as cases,
@@ -73,7 +73,8 @@ edits. Instead of replacing local data, `resolve()` merges **one character at a 
   Afterwards, cases with the same case number from two devices become one (`unifyCases`): the
   newer copy's fields win, gaps are filled from the other, and everyone working either stays on it.
 - **Filings merge one at a time too** (LP-15), by when each was filed (`filing:<id>` in the base),
-  and so does the conflict check log (LP-10, `conflict:<id>`). They all use `resolveList` in
+  and so does the conflict check log (LP-10, `conflict:<id>`). The Law Library's precedents (LP-16)
+  are edited like cases, so each ruling's newer `updated` wins (`precedent:<id>`). They all use `resolveList` in
   `sync.ts`. A copy without one of these lists leaves this browser's alone.
 - **Deletions stand.** `lawapp_sync_base` remembers the last server copy this browser saw, so the
   merge can tell a character added on one side from one deleted on the other. A character deleted
