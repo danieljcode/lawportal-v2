@@ -19,6 +19,20 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-20",
+    title: "Evidence",
+    items: [
+      {
+        type: "new",
+        text: "Each case in the Case File has an Evidence area: add exhibits with a title, description, link (an image, video or document) and the date obtained.",
+      },
+      {
+        type: "new",
+        text: "Exhibits are lettered automatically (A, B, C…, then AA) and relettered when you move them up or down. Edit or delete them any time; they sync and are in your full backup.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-20",
     title: "Judge templates",
     items: [
       {
