@@ -96,6 +96,7 @@ npm run build && npm run start:lan
 | `npm run format`        | Formats every file with Prettier.                                                                                                               |
 | `npm run format:check`  | Checks formatting without changing anything (what CI runs).                                                                                     |
 | `npm run port-forms`    | Regenerates `src/data/forms.json` from the reference data. See [Templates and forms](templates-and-forms.md#regenerating-the-court-forms).      |
+| `npm run penal-code`    | Updates `src/data/penal-code.json` from the FreestyleRP penal code sheet (or `-- file.csv`). See [Architecture](architecture.md).               |
 | `npm run screenshots`   | Screenshots of the running app into `.agents/screenshots/` (Playwright).                                                                        |
 | `npm run smoke:preview` | Browser smoke test of every form against the running app (Playwright).                                                                          |
 | `npm run release-notes` | Prints the GitHub Release notes for the version in `package.json`. See [Releasing](releasing.md).                                               |
