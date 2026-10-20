@@ -128,8 +128,10 @@ describe("Upcoming and the toolbar dot (LP-18)", () => {
       withDeadlines([{ date: "1990-10-20", label: "Hearing" }]);
     });
     expect(must("#due-dot")).toBeTruthy();
-    expect(must("#open-cases").getAttribute("href")).toBe("#upcoming");
-    expect(must('#sidebar a[href="#upcoming"]').textContent).toBe("Upcoming");
+    expect(must("#open-cases").getAttribute("href")).toBe("#cases/upcoming");
+    // The Case File program's File menu leads there too (LP-103).
+    act(() => must("#menu-file").click());
+    expect(must('.menu-list a[href="#cases/upcoming"]').textContent).toBe("Upcoming");
   });
 
   it("says when nothing is coming up", () => {

@@ -57,7 +57,7 @@ export default function LawLibraryDialog({ open, onClose, target }: LawLibraryDi
         />
       )}
       <p className="small muted">
-        <a href="#library" onClick={onClose}>
+        <a href="#library/penal-code" onClick={onClose}>
           Open the Law Library
         </a>{" "}
         to add or edit the firm&apos;s rulings.

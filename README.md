@@ -36,8 +36,14 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
 
 ## Features
 
+- **Programs.** Each part of the office system is its own program, opened full-screen in a Windows
+  3.x-style window with its own title bar and **File**, **View** and **Help** menus: **Court
+  Filings**, **Case File**, **Clients**, **Law Library**, **J.A.P.** (Court Commissioners) and
+  **Control Panel**. Open them from the taskbar's **Start** button. The character you're filing as
+  is in the taskbar, so it's the same in every program. Links are by program (`#filings/<form>`,
+  `#cases/<case>`, `#clients/intake`, `#library/penal-code`…); older links still work.
 - **Startup screen.** Once per browser session, the Friedman & Associates Office System boots
-  DOS-style (memory test, drive checks, `C:>`) for under 2 seconds while the app loads. Any key or
+  DOS-style (memory test, drive checks, `C:\>`) for under 2 seconds while the app loads. Any key or
   click skips it, and the start page has a setting to turn it off.
 - **Forms.** 39 court forms grouped by court (Criminal, Civil, Traffic, Small Claims, Appellate,
   Supreme, general), plus **Additional Templates**: General Petition, Petition for Name Change,
@@ -55,17 +61,17 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
   with Nitro), each with a preview, a character count and its own Copy button.
 - **Characters.** Name, title, contact details, bar number, signature and notes, used to fill forms.
   Export and import them (with dockets and J.A.P.) as `lawapp-characters.json`.
-- **Case File** (toolbar or sidebar): every firm case, with its lead and the other characters on
+- **Case File** (a program; also the toolbar button): every firm case, with its lead and the other characters on
   it. Search by case number or party, filter by status or character, and open a case to edit its
   details and who's working it.
-- **Conflict check** (sidebar): check a new client's name (and the other side's) against every firm
+- **Conflict check** (in **Clients**): check a new client's name (and the other side's) against every firm
   case, with a clear verdict, the matches, and a memo to copy or print. Every check is logged.
-- **Law Library** (sidebar): the FreestyleRP **penal code**, searchable by section number, keyword
+- **Law Library** (a program): the FreestyleRP **penal code**, searchable by section number, keyword
   or title, with each charge's class, sentence, fine and description; and the firm's
   **precedents**: add rulings with the case, court, date, judge, key holding, summary, forum link
   and topics, then search them or filter by topic. Matches are highlighted. In a form, **Law
   Library** inserts a citation ("PC 1001 Assault", or a ruling) into the field you last clicked in.
-- **New client intake** (sidebar, or the Case File): take a new client's details and the matter in
+- **New client intake** (in **Clients**, or from the Case File): take a new client's details and the matter in
   one form, then **Open case** creates the case with the intake in its notes. Print it as a one-page
   client sheet.
 - **Evidence** on each case: exhibits with a title, description, link and date obtained, lettered

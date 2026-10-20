@@ -131,7 +131,8 @@ describe("the intake program (LP-19)", () => {
 
   it("is reached from the sidebar and the Case File, and leads with the active character", () => {
     expect(must("#intake-title").textContent).toBe("New client intake");
-    expect(must('#sidebar a[href="#intake"]').textContent).toBe("New client intake");
+    expect(location.hash).toBe("#clients/intake");
+    expect(must("#clients-tab-intake").getAttribute("aria-current")).toBe("page");
     expect(must<HTMLSelectElement>("#intake-lead").value).toBe("alice001");
   });
 

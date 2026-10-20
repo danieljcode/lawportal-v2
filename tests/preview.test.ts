@@ -233,7 +233,7 @@ describe("forum preview with no frames and no input", () => {
   it("is rendered when the last form is restored on boot", () => {
     defaultKV().set(LAST_FORM_KEY, "criminal-arraignment");
     mount();
-    expect(location.hash).toBe("#criminal-arraignment");
+    expect(location.hash).toBe("#filings/criminal-arraignment");
     expectRendered(COURT, "CRIMINAL DIVISION", "People of the State of San Andreas");
   });
 

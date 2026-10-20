@@ -2805,3 +2805,177 @@ dialog.changelog {
   margin: 0;
   padding-left: 18px;
 }
+
+/* ---------- program shell (LP-103) ---------- */
+/* Programs without a navigation pane: the page, and its output beside it. */
+.layout.no-nav {
+  grid-template-columns: minmax(0, 1fr);
+}
+.layout.no-nav.with-output {
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 40%);
+}
+
+/* The menu bar: File, View, Help, as in Windows 3.x. */
+.menu-bar {
+  display: flex;
+  flex: none;
+  gap: 0;
+  padding: 1px 2px;
+  position: relative;
+  z-index: 25;
+}
+.menu {
+  position: relative;
+}
+.menu-top {
+  padding: 2px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.menu-top:hover,
+.menu-top.open,
+.menu-top:focus-visible {
+  background: var(--select-bg);
+  color: var(--select-text);
+  outline: none;
+}
+.menu-list,
+.start-menu {
+  position: absolute;
+  margin: 0;
+  padding: 2px;
+  list-style: none;
+  min-width: 190px;
+  background: var(--face);
+  color: var(--text);
+  border: 1px solid var(--text);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+  z-index: 50;
+}
+.menu-list {
+  top: 100%;
+  left: 0;
+}
+.menu-list a,
+.menu-list button,
+.start-menu a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 3px 18px 3px 22px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  position: relative;
+}
+.menu-list a:hover,
+.menu-list button:hover,
+.menu-list a:focus,
+.menu-list button:focus,
+.start-menu a:hover,
+.start-menu a:focus {
+  background: var(--select-bg);
+  color: var(--select-text);
+  outline: none;
+}
+.menu-list [aria-checked="true"]::before {
+  content: "•";
+  position: absolute;
+  left: 9px;
+}
+.menu-list [aria-disabled="true"] {
+  color: var(--shadow);
+  cursor: default;
+}
+.menu-sep {
+  height: 0;
+  margin: 3px 2px;
+  border-top: 1px solid var(--shadow);
+  border-bottom: 1px solid var(--hilite);
+}
+
+/* The Start menu opens upwards from the taskbar. */
+.start {
+  position: relative;
+}
+.start-menu {
+  bottom: calc(100% + 4px);
+  left: 0;
+}
+.start-menu a {
+  padding-left: 8px;
+}
+.start-menu a[aria-current="page"] {
+  font-weight: 700;
+}
+.start-icon {
+  width: 18px;
+  text-align: center;
+}
+
+/* The active character in the tray, in every program. */
+.tray {
+  gap: 10px;
+  padding: 0 6px 0 10px;
+}
+.tray-char select {
+  max-width: 220px;
+  min-width: 140px;
+  height: 21px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* The Control Panel, for now a list of the system's settings. */
+.control-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 8px 0;
+  padding: 0;
+  list-style: none;
+}
+.control-items li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.control-theme {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 760px) {
+  .tray-char .muted,
+  .clock {
+    display: none;
+  }
+  .tray {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0 2px 0 4px;
+  }
+  .tray-char {
+    flex: 1;
+    min-width: 0;
+  }
+  .tray-char select {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+  .task-btn {
+    display: none;
+  }
+}

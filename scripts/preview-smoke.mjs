@@ -213,7 +213,7 @@ async function updated(page, ctx, label, want = [], not = []) {
 /** Navigate by clicking the sidebar link (popstate + hashchange in the browser). */
 async function sidebar(page, id) {
   await resetProbe(page);
-  await page.click(`#sidebar a[href="#${id}"]`);
+  await page.click(`#sidebar a[href="#filings/${id}"]`);
 }
 
 function flushErrors(ctx, phase, errors) {
@@ -236,7 +236,8 @@ async function phaseLoad(browser, theme, mode, ctx) {
     await page.goto(base + "/");
     await firstDisplay(page, ctx, `restore / -> ${id}`, want);
     const hash = await page.evaluate(() => location.hash);
-    if (hash !== "#" + id) failures.push(`${ctx} restore ${id}: hash is "${hash}"`);
+    // The old hash it was loaded from comes back as the program's own (LP-103).
+    if (hash !== "#filings/" + id) failures.push(`${ctx} restore ${id}: hash is "${hash}"`);
     flushErrors(ctx, "load " + id, errors);
     await context.close();
   }
@@ -271,7 +272,7 @@ async function phaseNav(browser, theme, mode, ctx) {
   await page.waitForSelector("#form-view", { state: "detached" });
   await page.fill("#form-search", "arraign");
   await resetProbe(page);
-  await page.click('#form-list a[href="#criminal-arraignment"]');
+  await page.click('#form-list a[href="#filings/criminal-arraignment"]');
   await firstDisplay(page, ctx, "nav search result -> arraignment", ["CRIMINAL DIVISION"]);
 
   // Theme toggle x3 (auto, light, dark in some order) keeps the preview.
@@ -426,7 +427,7 @@ async function phaseFreestyle(browser, theme, mode, ctx) {
 
   // criminal-case-schedule: a today prefill and an SC criminal case number.
   await resetProbe(page);
-  await page.click(`#sidebar a[href="#criminal-case-schedule"]`);
+  await page.click(`#sidebar a[href="#filings/criminal-case-schedule"]`);
   await firstDisplay(page, ctx, "freestyle criminal-case-schedule", [GAME_YY + "SCCR"], ["GJCR"]);
 
   flushErrors(ctx, "freestyle", errors);
