@@ -200,6 +200,15 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
   (`unionExhibits` → `unionCustody`). Copy for filing renders the list through the template engine
   (`custodyHtml`), so it's SafeHtml with every value escaped; Print renders a sheet only while the
   print dialog is open, shown alone by a `:has(#custody-sheet)` print stylesheet.
+- **Precedents** (`src/lib/precedents.ts`, `LawLibraryView.tsx`, LP-16): the Law Library at
+  `#library`. One list under `lawapp_precedents` (store base, v1, up to 1,000 rulings, newest ruling
+  first): case name, number, court, in-game date, judge, summary, holding, an http(s)-only forum
+  link (`safeLink`) and lower-case topic tags. Search (`filterPrecedents`) needs every word
+  somewhere in the ruling; `highlightParts` splits text for `<mark>`, rendered by React as text.
+  Sync merges each ruling by `updated` (`precedent:<id>`); the server takes up to 1,000.
+  In a form, focusing a text, textarea, list or paras field registers it (`FormCtx.onFieldFocus`);
+  the **Law Library** dialog's Insert citation puts `citation(p)` at that field's cursor, reading
+  the field as it is then. Citations are plain text, so they're escaped like any other value.
 - **Deadlines and hearing dates** (`src/lib/deadlines.ts`, LP-18) live on each case
   (`deadlines`: an in-game date, a label, a note, done), so they sync and back up with it; merging
   two copies of a case keeps both copies' deadlines. Dates are on the 1990 calendar, as forms fill

@@ -14,7 +14,13 @@ export interface SyncRecord {
   rev: number;
   updated: string;
   /** The characters, the firm's cases (LP-4), filing history (LP-15) and conflict log (LP-10); the lists are absent in older copies. */
-  data: { characters: unknown[]; cases?: unknown[]; filings?: unknown[]; conflictChecks?: unknown[] };
+  data: {
+    characters: unknown[];
+    cases?: unknown[];
+    filings?: unknown[];
+    conflictChecks?: unknown[];
+    precedents?: unknown[];
+  };
 }
 
 export type WriteResult = { record: SyncRecord } | { conflict: SyncRecord } | "missing";
