@@ -1,20 +1,16 @@
-// The taskbar (design D8; LP-103): Start opens the list of programs, the open
-// program's button, and the tray with the active character (the same in every
-// program) and a clock.
+// The taskbar (design D8; LP-103, LP-104): Start returns to the Program
+// Manager, the open program's icon and name, and the tray with the active
+// character (the same in every program) and a clock.
 
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import type { Character } from "@/lib/types";
-import type { ProgramDef } from "./programs/registry";
 
 function clock(d = new Date()): string {
   return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
 }
 
 export interface TaskbarProps {
-  /** The programs this character can see, for the Start menu. */
-  programs: readonly ProgramDef[];
-  /** The open program's id, or null on the start page. */
-  current: string | null;
+  /** The open program's icon and name ("Program Manager" at home). */
   icon: string;
   task: string;
   characters: Character[];
@@ -25,95 +21,28 @@ export interface TaskbarProps {
 
 export default function Taskbar(p: TaskbarProps) {
   const [time, setTime] = useState(clock);
-  const [startOpen, setStartOpen] = useState(false);
-  const startRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const id = setInterval(() => setTime(clock()), 15_000);
     return () => clearInterval(id);
   }, []);
 
-  // A click elsewhere or Esc closes the Start menu.
-  useEffect(() => {
-    if (!startOpen) return;
-    const away = (e: PointerEvent) => {
-      if (!startRef.current?.contains(e.target as Node)) setStartOpen(false);
-    };
-    const esc = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      setStartOpen(false);
-      startRef.current?.querySelector<HTMLElement>(".start-btn")?.focus();
-    };
-    window.addEventListener("pointerdown", away);
-    window.addEventListener("keydown", esc);
-    return () => {
-      window.removeEventListener("pointerdown", away);
-      window.removeEventListener("keydown", esc);
-    };
-  }, [startOpen]);
-
   return (
     <footer className="taskbar">
-      <div className="start" ref={startRef}>
-        <button
-          type="button"
-          className="start-btn"
-          id="start-btn"
-          aria-haspopup="menu"
-          aria-expanded={startOpen}
-          aria-pressed={startOpen}
-          title="Open a program"
-          onClick={() => setStartOpen((o) => !o)}
-        >
-          <span className="start-logo" aria-hidden="true">
-            <i />
-            <i />
-            <i />
-            <i />
-          </span>
-          Start
-        </button>
-        {startOpen && (
-          <ul className="start-menu" id="start-menu" role="menu" aria-label="Programs">
-            {p.programs.map((prog) => (
-              <li key={prog.id} role="none">
-                <a
-                  href={prog.start}
-                  role="menuitem"
-                  id={"start-" + prog.id}
-                  aria-current={p.current === prog.id ? "page" : undefined}
-                  onClick={() => setStartOpen(false)}
-                >
-                  <span className="start-icon" aria-hidden="true">
-                    {prog.icon}
-                  </span>
-                  {prog.title}
-                </a>
-              </li>
-            ))}
-            <li className="menu-sep" role="separator" />
-            <li role="none">
-              <a
-                href="./"
-                role="menuitem"
-                id="start-home"
-                onClick={(e) => {
-                  setStartOpen(false);
-                  p.onHome(e);
-                }}
-              >
-                <span className="start-icon" aria-hidden="true">
-                  ⌂
-                </span>
-                Start page
-              </a>
-            </li>
-          </ul>
-        )}
-      </div>
+      <button type="button" className="start-btn" id="start-btn" title="Back to the Program Manager" onClick={p.onHome}>
+        <span className="start-logo" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+          <i />
+        </span>
+        Start
+      </button>
       <span className="taskbar-sep" aria-hidden="true" />
-      <span className="task-btn" aria-hidden="true">
-        <span className="task-icon">{p.icon}</span>
+      <span className="task-btn" id="task-btn">
+        <span className="task-icon" aria-hidden="true">
+          {p.icon}
+        </span>
         <span className="task-title">{p.task}</span>
       </span>
       <span className="tray">

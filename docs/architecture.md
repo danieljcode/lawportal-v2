@@ -27,11 +27,20 @@ browser.
   time and clicks pass through (`pointer-events: none`), so it never holds anything up; any key or
   click ends it, and it ends by itself after 1.8 s (0.7 s on the finished screen with reduced motion).
   It's `aria-hidden`: decoration only.
+- **Program Manager** (`ProgramManager.tsx`, LP-104): the home screen (an empty hash). The registry's
+  programs as icons in their `group` (Court Work, Main), only those the active character can see,
+  plus What's new (a dialog, not a program). Click or Enter opens one; the arrow keys move between
+  icons (left and right along the row, up and down to the nearest icon in the next row). Case File's
+  icon carries the LP-18 due dot and opens on Upcoming while something is due; What's new shows a
+  dot while unread. The taskbar's **Start** returns here. Court Filings with no form open
+  (`#filings`) shows the three steps that used to be the start page; the startup screen setting is
+  in the Control Panel.
 - **Programs** (LP-103). `App.tsx` is the shell: one program at a time, full-screen, in a window
-  with its title bar ("Case File - Friedman & Associates"; the start page keeps the LP-22 title),
-  a menu bar (`MenuBar.tsx`: File, View, Help, plus each program's own File items), the toolbar,
-  and the taskbar (`Taskbar.tsx`: Start lists the programs the active character can see, and the
-  tray holds the active character, the same in every program). The programs are one registry,
+  with its title bar ("Case File - Friedman & Associates"; at home, "Program Manager - Friedman &
+  Associates", while the browser tab keeps the LP-22 title), a menu bar (`MenuBar.tsx`: File, View,
+  Help, plus each program's own File items), the toolbar, and the taskbar (`Taskbar.tsx`: Start
+  returns to the Program Manager, the open program's icon and name, and the tray with the active
+  character, the same in every program). The programs are one registry,
   `src/components/programs/registry.ts` (id, title, icon, where it opens, who can see it, whether
   it has a navigation pane, its component); each gets the shell's state and actions as `Shell`
   (`programs/shell.ts`). Court Filings has the forms list as its navigation pane (a drawer at phone
@@ -40,7 +49,7 @@ browser.
 - **Hash routing** (`useRoute.ts`). Routes are prefixed by program: `#filings` and
   `#filings/<formId>`, `#cases`, `#cases/<id>` and `#cases/upcoming`, `#clients/intake` and
   `#clients/conflicts`, `#library/penal-code` and `#library/precedents`, `#jap`, `#control`; an
-  empty hash is the start page. `parseHash` also reads the old flat hashes (`#cases`, `#upcoming`,
+  empty hash is the Program Manager. `parseHash` also reads the old flat hashes (`#cases`, `#upcoming`,
   `#intake`, `#conflicts`, `#library`, `#jap`, `#<formId>`), and the hook rewrites them to the
   new ones with `replaceState`. The last place is remembered under `lawapp_last_form` as a hash
   without "#" (a bare form id or `jap`/`cases`/`upcoming` from before still reopens).

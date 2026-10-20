@@ -72,8 +72,8 @@ describe("when the boot screen shows", () => {
 let container: HTMLDivElement | null = null;
 let root: Root | null = null;
 
-function mount(): void {
-  history.replaceState(null, "", "#");
+function mount(hash = "#"): void {
+  history.replaceState(null, "", hash);
   container = document.createElement("div");
   document.body.appendChild(container);
   root = createRoot(container);
@@ -114,7 +114,7 @@ describe("the boot screen in the App (LP-21)", () => {
     expect(screen()!.textContent).toContain("Friedman & Associates Office System");
     expect(screen()!.getAttribute("aria-hidden")).toBe("true");
     // The app is already there underneath.
-    expect(document.querySelector("#empty-state")).not.toBeNull();
+    expect(document.querySelector("#program-manager")).not.toBeNull();
     act(() => vi.advanceTimersByTime(BOOT_TIMES.prompt + 60));
     expect(screen()!.textContent).toContain("Memory Test: 4096K OK");
     expect(screen()!.textContent).toContain("C:\\>");
@@ -144,16 +144,16 @@ describe("the boot screen in the App (LP-21)", () => {
     expect(screen()).toBeNull();
   });
 
-  it("can be turned off from the start page", () => {
+  it("can be turned off in the Control Panel", () => {
     markBooted();
-    mount();
+    mount("#control");
     const box = document.querySelector<HTMLInputElement>("#boot-setting")!;
     expect(box.checked).toBe(true);
     act(() => box.click());
     expect(localStorage.getItem(BOOT_OFF_KEY)).toBe("off");
     unmount();
     sessionStorage.clear();
-    mount();
+    mount("#control");
     expect(screen()).toBeNull();
     expect(document.querySelector<HTMLInputElement>("#boot-setting")!.checked).toBe(false);
   });
