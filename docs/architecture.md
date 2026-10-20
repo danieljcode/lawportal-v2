@@ -27,9 +27,24 @@ browser.
   time and clicks pass through (`pointer-events: none`), so it never holds anything up; any key or
   click ends it, and it ends by itself after 1.8 s (0.7 s on the finished screen with reduced motion).
   It's `aria-hidden`: decoration only.
-- **Hash routing.** `#civil-complaint` opens a form, `#jap` the J.A.P., `#cases` the Case File and
-  `#cases/<id>` one case in it (LP-101), `#upcoming` what's due (LP-18), `#intake` the new client intake (LP-19), `#conflicts` the conflict check (LP-10), an empty hash the start page. `useRoute` owns the route and remembers the last form under `lawapp_last_form`;
-  `useDialogs` owns the open dialog; `App.tsx` owns the active character and the layout.
+- **Programs** (LP-103). `App.tsx` is the shell: one program at a time, full-screen, in a window
+  with its title bar ("Case File - Friedman & Associates"; the start page keeps the LP-22 title),
+  a menu bar (`MenuBar.tsx`: File, View, Help, plus each program's own File items), the toolbar,
+  and the taskbar (`Taskbar.tsx`: Start lists the programs the active character can see, and the
+  tray holds the active character, the same in every program). The programs are one registry,
+  `src/components/programs/registry.ts` (id, title, icon, where it opens, who can see it, whether
+  it has a navigation pane, its component); each gets the shell's state and actions as `Shell`
+  (`programs/shell.ts`). Court Filings has the forms list as its navigation pane (a drawer at phone
+  width) and owns the open form's output; the others are single-pane for now (LP-105 to LP-109
+  give each its own layout and menus).
+- **Hash routing** (`useRoute.ts`). Routes are prefixed by program: `#filings` and
+  `#filings/<formId>`, `#cases`, `#cases/<id>` and `#cases/upcoming`, `#clients/intake` and
+  `#clients/conflicts`, `#library/penal-code` and `#library/precedents`, `#jap`, `#control`; an
+  empty hash is the start page. `parseHash` also reads the old flat hashes (`#cases`, `#upcoming`,
+  `#intake`, `#conflicts`, `#library`, `#jap`, `#<formId>`), and the hook rewrites them to the
+  new ones with `replaceState`. The last place is remembered under `lawapp_last_form` as a hash
+  without "#" (a bare form id or `jap`/`cases`/`upcoming` from before still reopens).
+  `useDialogs` owns the open dialog.
 - **Three small API routes** on the same server, all behind a host check (see [Server](#server)):
   sync (`/api/account`, `/api/data`) and the `.docx` export (`/api/docx`).
 - **Error boundaries** (`ErrorBoundary.tsx`, LP-88). One wraps the whole app in `AppLoader`; inside
@@ -181,7 +196,7 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
     `lawapp_dockets_<id>` keys. The pure docket
     fields (`FIELDS`, `clean`, `divisionFor`…) live in `docketFields.ts`, so the two don't import
     each other.
-- **Conflict check** (`#conflicts`, `ConflictCheckView.tsx`; `src/lib/conflicts.ts`, LP-10): names (people
+- **Conflict check** (`#clients/conflicts`, `ConflictCheckView.tsx`; `src/lib/conflicts.ts`, LP-10): names (people
   or businesses) against both parties of every firm case and the case notes. Matching ignores
   capitals, punctuation and business suffixes (LLC, Inc…); in the parties, part of a name (3+
   letters) and initials match too, marked partial; in the notes only the whole name. A clear verdict
@@ -189,7 +204,7 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
   status and lead, and a memo to copy or print. Every check is logged (who, when, the names, the
   result) in `lawapp_conflict_log` (the newest 300), which syncs. `runConflictCheck` in
   `services/conflicts.ts` searches the cases and logs, since it spans two stores.
-- **New client intake** (`#intake`, `IntakeView.tsx`; `src/lib/intake.ts`, LP-19): the client's details,
+- **New client intake** (`#clients/intake`, `IntakeView.tsx`; `src/lib/intake.ts`, LP-19): the client's details,
   how they found the firm, the matter, the opposing party, a summary and the urgency. **Open case**
   makes the Case File case: the matter type sets the court and which side the client is on
   (criminal and traffic clients are defendants), the chosen character leads, status is Open, and
@@ -228,7 +243,7 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
   `sentenceText` words the sentence; `chargeCitation` is "PC 1001 Assault". Insert citation works
   as for precedents.
 - **Precedents** (`src/lib/precedents.ts`, `LawLibraryView.tsx`, LP-16): the Law Library's second tab, at
-  `#library`. One list under `lawapp_precedents` (store base, v1, up to 1,000 rulings, newest ruling
+  `#library/precedents`. One list under `lawapp_precedents` (store base, v1, up to 1,000 rulings, newest ruling
   first): case name, number, court, in-game date, judge, summary, holding, an http(s)-only forum
   link (`safeLink`) and lower-case topic tags. Search (`filterPrecedents`) needs every word
   somewhere in the ruling; `highlightParts` splits text for `<mark>`, rendered by React as text.
@@ -243,7 +258,7 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
   - **On a case** (`CaseDeadlines.tsx`): add, tick off and remove, each saved straight away. The
     case details form above only reloads when the case's details change, so unsaved edits there
     survive a deadline change.
-  - **Upcoming** (`#upcoming`, `UpcomingView.tsx`): the next 14 days on the active character's
+  - **Upcoming** (`#cases/upcoming`, `UpcomingView.tsx`): the next 14 days on the active character's
     cases (every case with no character), overdue first.
   - **The toolbar dot** on Case File (`dueSoonCount`) shows when something on the active
     character's cases is due within 48 hours or overdue; the button then opens Upcoming.

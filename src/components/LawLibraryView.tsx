@@ -358,10 +358,23 @@ function PrecedentForm({ editing, onDone }: { editing: Precedent | null; onDone(
   );
 }
 
-export default function LawLibraryView() {
+const TAB_HASH: Record<LibraryTab, string> = { code: "#library/penal-code", precedents: "#library/precedents" };
+
+/** The Law Library program's page; `tab` comes from the route (#library/penal-code, #library/precedents). */
+export default function LawLibraryView({ tab: routeTab = "code" }: { tab?: LibraryTab }) {
   /** The ruling being edited, "new" for the add form, or null. */
   const [editing, setEditing] = useState<Precedent | "new" | null>(null);
-  const [tab, setTab] = useState<LibraryTab>("code");
+  // The tab switches at once, and the URL follows (back and forward come in through the route).
+  const [tab, setTab] = useState<LibraryTab>(routeTab);
+  const [seenTab, setSeenTab] = useState(routeTab);
+  if (routeTab !== seenTab) {
+    setSeenTab(routeTab);
+    setTab(routeTab);
+  }
+  const pickTab = (t: LibraryTab) => {
+    setTab(t);
+    if (location.hash !== TAB_HASH[t]) location.hash = TAB_HASH[t];
+  };
 
   return (
     <section id="library" className="form-view library">
@@ -371,7 +384,7 @@ export default function LawLibraryView() {
           <h2 id="library-title">Law Library</h2>
         </div>
       </div>
-      <LibraryTabs tab={tab} onTab={setTab} idPrefix="library" />
+      <LibraryTabs tab={tab} onTab={pickTab} idPrefix="library" />
       {tab === "code" ? (
         <section aria-labelledby="code-title" className="penal-code-section">
           <h3 id="code-title">Penal Code</h3>

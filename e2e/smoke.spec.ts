@@ -9,7 +9,7 @@ async function openForm(page: Page, id: string): Promise<void> {
   await expect(page.locator(".app-window")).toBeVisible();
   const toggle = page.locator("#toggle-nav");
   if (await toggle.isVisible()) await toggle.click();
-  await page.locator(`#sidebar a[href="#${id}"]`).click();
+  await page.locator(`#sidebar a[href="#filings/${id}"]`).click();
   await expect(page.locator("#form-view")).toBeVisible();
 }
 

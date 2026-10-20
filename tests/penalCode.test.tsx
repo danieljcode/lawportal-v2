@@ -237,10 +237,10 @@ describe("the Penal Code in the Law Library (LP-17)", () => {
   });
 
   it("is found from the sidebar search", () => {
-    mount("#library");
+    mount("#filings");
     for (const q of ["library", "penal", "precedents"]) {
       setValue("#form-search", q);
-      expect(document.querySelector('#form-list a[href="#library"]'), q).not.toBeNull();
+      expect(document.querySelector('#form-list a[href="#library/penal-code"]'), q).not.toBeNull();
     }
   });
 
