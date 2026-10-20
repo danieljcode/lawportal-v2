@@ -10,6 +10,12 @@ browser.
 - **One page, client only.** `src/app/page.tsx` renders `AppLoader`, which loads `App` with
   `ssr: false`. The app reads local storage on its first render, so it never renders on the server
   (no hydration mismatches).
+- **Boot screen** (`BootScreen.tsx`, `src/lib/boot.ts`, LP-21). `App` draws a DOS-style screen over
+  itself, once per browser session (`lawapp_booted` in session storage), unless the start page's
+  setting turned it off (`lawapp_boot_screen` = `off`). The app renders underneath at the same
+  time and clicks pass through (`pointer-events: none`), so it never holds anything up; any key or
+  click ends it, and it ends by itself after 1.8 s (0.7 s on the finished screen with reduced motion).
+  It's `aria-hidden`: decoration only.
 - **Hash routing.** `#civil-complaint` opens a form, `#jap` the J.A.P., `#cases` the Case File and
   `#cases/<id>` one case in it (LP-101), `#upcoming` what's due (LP-18), `#intake` the new client intake (LP-19), `#conflicts` the conflict check (LP-10), an empty hash the start page. `useRoute` owns the route and remembers the last form under `lawapp_last_form`;
   `useDialogs` owns the open dialog; `App.tsx` owns the active character and the layout.

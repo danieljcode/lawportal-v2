@@ -2735,3 +2735,45 @@ dialog.changelog {
   width: auto;
   max-width: 100%;
 }
+
+/* ---------- boot screen (LP-21): a DOS screen, the same in every theme ---------- */
+.boot-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+  background: #000;
+  color: #c0c0c0;
+  font-family: var(--mono);
+  font-size: 16px;
+  pointer-events: none;
+}
+.boot-screen pre {
+  margin: 0;
+  font: inherit;
+  white-space: pre-wrap;
+}
+.boot-skip {
+  margin: 0;
+  color: #808080;
+  font-size: 14px;
+}
+.boot-cursor {
+  animation: boot-blink 1s steps(1) infinite;
+}
+@keyframes boot-blink {
+  50% {
+    visibility: hidden;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .boot-cursor {
+    animation: none;
+  }
+}
+.boot-setting {
+  margin: 12px 0;
+}
