@@ -153,7 +153,7 @@ describe("filing history (LP-15)", () => {
     await act(async () => buttonIn("#filings-dialog .filing", "Use as new draft").click());
     expect(confirmSpy.mock.calls.at(-1)![0]).toContain("Replace your current draft of Civil Complaint");
     act(() => window.dispatchEvent(new HashChangeEvent("hashchange")));
-    expect(location.hash).toBe("#" + FORM);
+    expect(location.hash).toBe("#filings/" + FORM);
     expect(readDraft(defaultKV(), FORM)?.values).toMatchObject(FILLED);
     expect(draftHistory().list(FORM)[0].state.values["Plaintiff name"]).toBe("Newer draft");
   });

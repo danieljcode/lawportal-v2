@@ -1,6 +1,11 @@
-// Hash routing for the app shell (LP-7, from App.tsx): which page is open, the
-// last form reopened on boot, back/forward, the page title, and going home.
-// #cases is the Case File, #cases/<id> one case in it (LP-101); #library the Law Library (LP-16).
+// Hash routing for the program shell (LP-103; from App.tsx in LP-7): which
+// program is open and where in it, the last place reopened on boot,
+// back/forward, the page title, and going home. Routes are prefixed by
+// program: #filings/<formId>, #cases/<caseId>, #cases/upcoming,
+// #clients/intake, #clients/conflicts, #library/penal-code,
+// #library/precedents, #jap, #control. The old flat hashes (#cases, #upcoming,
+// #intake, #conflicts, #library, #jap, #<formId>) still open the same place
+// and are rewritten to the new ones.
 
 import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
 import { getForm } from "@/data";
@@ -9,15 +14,18 @@ import { LAST_FORM_KEY } from "@/lib/formState";
 import { defaultKV } from "@/lib/storage";
 import type { FormDef } from "@/lib/types";
 
+export type ProgramId = "filings" | "cases" | "clients" | "library" | "jap" | "control";
+export type ClientsPage = "intake" | "conflicts";
+export type LibraryPage = "penal-code" | "precedents";
+
 export type Route =
-  | { kind: "home" }
-  | { kind: "form"; id: string }
-  | { kind: "jap" }
-  | { kind: "cases"; caseId: string | null }
-  | { kind: "upcoming" }
-  | { kind: "intake" }
-  | { kind: "conflicts" }
-  | { kind: "library" };
+  | { program: "home" }
+  | { program: "filings"; formId: string | null }
+  | { program: "cases"; caseId: string | null; upcoming?: boolean }
+  | { program: "clients"; page: ClientsPage }
+  | { program: "library"; page: LibraryPage }
+  | { program: "jap" }
+  | { program: "control" };
 
 /** The window title and the browser tab's suffix, from the firm's branding (LP-22). */
 export const APP_TITLE = appTitle();
@@ -27,82 +35,130 @@ export const UPCOMING_TITLE = "Upcoming";
 export const INTAKE_TITLE = "New client intake";
 export const CONFLICTS_TITLE = "Conflict check";
 export const LIBRARY_TITLE = "Law Library";
+export const CONTROL_TITLE = "Control Panel";
 
-/** The hash for a route ("#cases/<id>" for a case). */
+/** The one hash for a route: "#cases/<id>", "#filings/<formId>", "" for home. */
 export function hashFor(r: Route): string {
-  if (r.kind === "form") return "#" + r.id;
-  if (r.kind === "jap") return "#jap";
-  if (r.kind === "cases") return "#cases" + (r.caseId ? "/" + r.caseId : "");
-  if (r.kind === "upcoming") return "#upcoming";
-  if (r.kind === "intake") return "#intake";
-  if (r.kind === "conflicts") return "#conflicts";
-  if (r.kind === "library") return "#library";
-  return "";
+  switch (r.program) {
+    case "home":
+      return "";
+    case "filings":
+      return "#filings" + (r.formId ? "/" + r.formId : "");
+    case "cases":
+      return "#cases" + (r.upcoming ? "/upcoming" : r.caseId ? "/" + r.caseId : "");
+    case "clients":
+      return "#clients/" + r.page;
+    case "library":
+      return "#library/" + r.page;
+    default:
+      return "#" + r.program;
+  }
 }
 
-function parseRoute(): Route {
+const CASE_ID = /^[a-z0-9]{4,32}$/;
+
+/**
+ * The route for a hash (with or without "#"), new or old. Anything unknown is home; a
+ * program with an unknown page opens at its start.
+ */
+export function parseHash(hash: string): Route {
   let id = "";
   try {
-    id = decodeURIComponent(location.hash.slice(1));
+    id = decodeURIComponent(hash.replace(/^#/, ""));
   } catch {
     id = "";
   }
-  if (id === "jap") return { kind: "jap" };
-  if (id === "cases") return { kind: "cases", caseId: null };
-  if (id === "upcoming") return { kind: "upcoming" };
-  if (id === "intake") return { kind: "intake" };
-  if (id === "conflicts") return { kind: "conflicts" };
-  if (id === "library") return { kind: "library" };
-  const m = /^cases\/([a-z0-9]{4,32})$/.exec(id);
-  if (m) return { kind: "cases", caseId: m[1] };
-  if (id && getForm(id)) return { kind: "form", id };
-  return { kind: "home" };
+  const [head, rest = ""] = id.split(/\/(.*)/s);
+  switch (head) {
+    case "":
+      return { program: "home" };
+    case "filings":
+      return { program: "filings", formId: rest && getForm(rest) ? rest : null };
+    case "cases":
+      if (rest === "upcoming") return { program: "cases", caseId: null, upcoming: true };
+      return { program: "cases", caseId: CASE_ID.test(rest) ? rest : null };
+    case "clients":
+      return { program: "clients", page: rest === "conflicts" ? "conflicts" : "intake" };
+    case "library":
+      return { program: "library", page: rest === "precedents" ? "precedents" : "penal-code" };
+    case "jap":
+      return { program: "jap" };
+    case "control":
+      return { program: "control" };
+    // The flat hashes from before LP-103.
+    case "upcoming":
+      return { program: "cases", caseId: null, upcoming: true };
+    case "intake":
+      return { program: "clients", page: "intake" };
+    case "conflicts":
+      return { program: "clients", page: "conflicts" };
+  }
+  if (!rest && getForm(head)) return { program: "filings", formId: head };
+  return { program: "home" };
 }
 
-/** Same place: the browser fires popstate and hashchange for one navigation, and both parse alike. */
+/** The page's own name, for the browser tab ("Case File", a form's title…); null for home. */
+export function pageTitle(r: Route, form: FormDef | null): string | null {
+  switch (r.program) {
+    case "home":
+      return null;
+    case "filings":
+      return form ? form.title : "Court Filings";
+    case "cases":
+      return r.upcoming ? UPCOMING_TITLE : CASES_TITLE;
+    case "clients":
+      return r.page === "conflicts" ? CONFLICTS_TITLE : INTAKE_TITLE;
+    case "library":
+      return LIBRARY_TITLE;
+    case "jap":
+      return JAP_TITLE;
+    case "control":
+      return CONTROL_TITLE;
+  }
+}
+
 function sameRoute(a: Route, b: Route): boolean {
-  if (a.kind !== b.kind) return false;
-  if (a.kind === "cases") return a.caseId === (b as { caseId: string | null }).caseId;
-  return a.kind !== "form" || a.id === (b as { id: string }).id;
+  return hashFor(a) === hashFor(b);
 }
 
 /**
- * On boot with no hash, reopen the last form (or the J.A.P.), as the reference does. Pure (it runs
- * in render): the hook writes the restored hash into the URL in a layout effect.
+ * On boot with no hash, reopen the last place (saved as a hash without "#", or a form id or
+ * "jap"/"cases"/"upcoming" from before LP-103). Pure (it runs in render): the hook writes the
+ * hash into the URL in a layout effect.
  */
 function initialRoute(): Route {
   if (!location.hash) {
     const last = defaultKV().get(LAST_FORM_KEY);
-    if (last === "jap") return { kind: "jap" };
-    if (last === "cases") return { kind: "cases", caseId: null };
-    if (last === "upcoming") return { kind: "upcoming" };
-    if (last && getForm(last)) return { kind: "form", id: last };
+    if (last) return parseHash(last);
   }
-  return parseRoute();
+  return parseHash(location.hash);
 }
 
 export interface RouteState {
   route: Route;
-  /** The open form, or null (start page, J.A.P., or an unknown id). */
+  /** The open form (Court Filings), or null. */
   form: FormDef | null;
-  /** The brand and Start button: back to the start page. */
-  goHome(e: MouseEvent): void;
+  /** The brand and Exit: back to the start page. */
+  goHome(e?: MouseEvent): void;
 }
 
 export function useRoute(): RouteState {
   const [route, setRoute] = useState<Route>(initialRoute);
 
-  // A restored last form gets its hash before paint. Not during render: Next's router
-  // listens to history updates and would set state while App renders.
+  // The URL always shows the route's own hash: a restored last place gets its hash, and an
+  // old hash its new one, before paint. Not during render: Next's router listens to history
+  // updates and would set state while App renders.
   const bootRoute = useRef(route);
   useLayoutEffect(() => {
-    const r = bootRoute.current;
-    if (!location.hash && r.kind !== "home") history.replaceState(null, "", hashFor(r));
+    const want = hashFor(bootRoute.current);
+    if (want && location.hash !== want) history.replaceState(null, "", want);
   }, []);
 
   useEffect(() => {
     const onNav = () => {
-      const next = parseRoute();
+      const next = parseHash(location.hash);
+      const want = hashFor(next);
+      if (want && location.hash !== want) history.replaceState(null, "", want);
       setRoute((prev) => (sameRoute(prev, next) ? prev : next));
     };
     window.addEventListener("hashchange", onNav);
@@ -113,49 +169,27 @@ export function useRoute(): RouteState {
     };
   }, []);
 
-  const form = route.kind === "form" ? getForm(route.id) || null : null;
+  const form = route.program === "filings" && route.formId ? getForm(route.formId) || null : null;
 
   useEffect(() => {
-    if (route.kind === "home") {
-      // The start page forgets the last form, so a refresh stays here.
+    if (route.program === "home") {
+      // The start page forgets the last place, so a refresh stays here.
       defaultKV().remove(LAST_FORM_KEY);
       document.title = APP_TITLE;
-    } else if (route.kind === "jap") {
-      try {
-        defaultKV().set(LAST_FORM_KEY, "jap");
-      } catch {
-        // private mode
-      }
-      document.title = JAP_TITLE + " · " + APP_TITLE;
-    } else if (route.kind === "cases") {
-      try {
-        defaultKV().set(LAST_FORM_KEY, "cases");
-      } catch {
-        // private mode
-      }
-      document.title = CASES_TITLE + " · " + APP_TITLE;
-    } else if (route.kind === "upcoming") {
-      try {
-        defaultKV().set(LAST_FORM_KEY, "upcoming");
-      } catch {
-        // private mode
-      }
-      document.title = UPCOMING_TITLE + " · " + APP_TITLE;
-    } else if (route.kind === "intake") {
-      document.title = INTAKE_TITLE + " · " + APP_TITLE;
-    } else if (route.kind === "conflicts") {
-      document.title = CONFLICTS_TITLE + " · " + APP_TITLE;
-    } else if (route.kind === "library") {
-      document.title = LIBRARY_TITLE + " · " + APP_TITLE;
-    } else if (form) {
-      document.title = form.title + " · " + APP_TITLE;
+      return;
     }
+    try {
+      defaultKV().set(LAST_FORM_KEY, hashFor(route).slice(1));
+    } catch {
+      // private mode
+    }
+    document.title = pageTitle(route, form) + " · " + APP_TITLE;
   }, [route, form]);
 
-  const goHome = (e: MouseEvent) => {
-    e.preventDefault();
+  const goHome = (e?: MouseEvent) => {
+    e?.preventDefault();
     if (location.hash) history.pushState(null, "", location.pathname + location.search);
-    setRoute({ kind: "home" });
+    setRoute({ program: "home" });
   };
 
   return { route, form, goHome };

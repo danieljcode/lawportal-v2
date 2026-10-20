@@ -19,6 +19,24 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-21",
+    title: "Programs",
+    items: [
+      {
+        type: "new",
+        text: "Each part of the system is now its own program, in its own window with File, View and Help menus: Court Filings, Case File, Clients (intake and conflict check), Law Library, J.A.P. and Control Panel.",
+      },
+      {
+        type: "new",
+        text: "Open a program from the taskbar's Start button. The character you're filing as is now in the taskbar, so it's the same whichever program you're in.",
+      },
+      {
+        type: "update",
+        text: "Links now name the program, e.g. #filings/civil-complaint or #clients/intake. Your saved links and the form that reopens when you start still work.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-21",
     title: "Friedman & Associates",
     items: [
       {

@@ -192,7 +192,9 @@ describe("the Conflict check program and the intake (LP-10)", () => {
 
   it("checks names, shows the verdict and matches, and logs the check", () => {
     mount("#conflicts");
-    expect(must('#sidebar a[href="#conflicts"]').textContent).toBe("Conflict check");
+    // An old link opens the Clients program at the conflict check (LP-103).
+    expect(location.hash).toBe("#clients/conflicts");
+    expect(must("#clients-tab-conflicts").getAttribute("aria-current")).toBe("page");
     setValue("#conflict-names", "A. Lee\nZed Quinn");
     act(() => must("#conflict-form").dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })));
     expect(must("#conflict-verdict").textContent).toBe("Possible conflict: review before accepting");
