@@ -3438,6 +3438,175 @@ Bar No. X<&>"1 X2
 \`\`\`"
 `;
 
+exports[`toDiscord on every form > extra-ruling-on-motion > empty, code tables 1`] = `
+"**SAN ANDREAS COURT**
+COUNTY OF LOS SANTOS
+\`\`\`
+PLAINTIFF NAME,  )
+Plaintiff,
+
+v.               )  Case No. __________
+
+DEFENDANT NAME,  )
+Defendant.
+\`\`\`
+## **ORDER ON MOTION**
+The Court has considered the MOTION TITLE filed by THE MOVING PARTY on \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_, and the opposition filed by THE OPPOSING PARTY.
+The motion is **GRANTED / DENIED**.
+**__REASONS__**
+The Court's reasons for the ruling.
+**__ORDER__**
+It is hereby ORDERED:
+What the parties must do, one order per line.
+**IT IS SO ORDERED.**
+Dated: \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+SIGNATURE
+**\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_**
+Judge of the Superior Court
+SAN ANDREAS COURT"
+`;
+
+exports[`toDiscord on every form > extra-ruling-on-motion > empty, plain-line tables 1`] = `
+"**SAN ANDREAS COURT**
+COUNTY OF LOS SANTOS
+PLAINTIFF NAME,
+Plaintiff,
+v.
+Case No. \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+DEFENDANT NAME,
+Defendant.
+## **ORDER ON MOTION**
+The Court has considered the MOTION TITLE filed by THE MOVING PARTY on \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_, and the opposition filed by THE OPPOSING PARTY.
+The motion is **GRANTED / DENIED**.
+**__REASONS__**
+The Court's reasons for the ruling.
+**__ORDER__**
+It is hereby ORDERED:
+What the parties must do, one order per line.
+**IT IS SO ORDERED.**
+Dated: \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+SIGNATURE
+**\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_**
+Judge of the Superior Court
+SAN ANDREAS COURT"
+`;
+
+exports[`toDiscord on every form > extra-ruling-on-motion > filled, code tables 1`] = `
+"**X\\<&>"1 X2**
+COUNTY OF LOS SANTOS
+\`\`\`
+X<&>"1 X2,  )
+Plaintiff,
+
+v.          )  Case No. X<&>"1 X2
+
+X<&>"1 X2,  )
+Defendant.
+\`\`\`
+## **ORDER ON MOTION**
+The Court has considered the X\\<&>"1 X2 filed by X\\<&>"1 X2 on January 2, 2026, and the opposition filed by X\\<&>"1 X2.
+The motion is **GRANTED**.
+**__REASONS__**
+X\\<&>"1
+X2
+**__ORDER__**
+It is hereby ORDERED:
+- X\\<&>"1
+- X2
+**IT IS SO ORDERED.**
+Dated: January 2, 2026
+https://example.com/a.png
+**X\\<&>"1 X2**
+X\\<&>"1 X2
+X\\<&>"1 X2"
+`;
+
+exports[`toDiscord on every form > extra-sentencing-order > empty, code tables 1`] = `
+"**SAN ANDREAS COURT**
+COUNTY OF LOS SANTOS
+\`\`\`
+THE PEOPLE OF THE STATE OF SAN ANDREAS,  )
+Plaintiff,
+
+v.                                       )  Case No. __________
+
+DEFENDANT NAME,                          )
+Defendant.
+\`\`\`
+## **SENTENCING ORDER**
+The Defendant, DEFENDANT NAME, was convicted on \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ by verdict of:
+Each offence, one per line.
+IT IS ADJUDGED that the Defendant is sentenced as follows.
+**Custody:** \\_\\_ days in the county jail, with credit for 0 days already served.
+**Fine:** $\\_\\_\\_\\_, payable to the Court.
+The Defendant is remanded to custody to begin the sentence.
+**IT IS SO ORDERED.**
+Dated: \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+SIGNATURE
+**\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_**
+Judge of the Superior Court
+SAN ANDREAS COURT"
+`;
+
+exports[`toDiscord on every form > extra-sentencing-order > empty, plain-line tables 1`] = `
+"**SAN ANDREAS COURT**
+COUNTY OF LOS SANTOS
+THE PEOPLE OF THE STATE OF SAN ANDREAS,
+Plaintiff,
+v.
+Case No. \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+DEFENDANT NAME,
+Defendant.
+## **SENTENCING ORDER**
+The Defendant, DEFENDANT NAME, was convicted on \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ by verdict of:
+Each offence, one per line.
+IT IS ADJUDGED that the Defendant is sentenced as follows.
+**Custody:** \\_\\_ days in the county jail, with credit for 0 days already served.
+**Fine:** $\\_\\_\\_\\_, payable to the Court.
+The Defendant is remanded to custody to begin the sentence.
+**IT IS SO ORDERED.**
+Dated: \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+SIGNATURE
+**\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_**
+Judge of the Superior Court
+SAN ANDREAS COURT"
+`;
+
+exports[`toDiscord on every form > extra-sentencing-order > filled, code tables 1`] = `
+"**X\\<&>"1 X2**
+COUNTY OF LOS SANTOS
+\`\`\`
+X<&>"1 X2,  )
+Plaintiff,
+
+v.          )  Case No. X<&>"1 X2
+
+X<&>"1 X2,  )
+Defendant.
+\`\`\`
+## **SENTENCING ORDER**
+The Defendant, X\\<&>"1 X2, was convicted on January 2, 2026 by verdict of:
+- X\\<&>"1
+- X2
+IT IS ADJUDGED that the Defendant is sentenced as follows.
+**Custody:** X\\<&>"1 X2 in the county jail, with credit for X\\<&>"1 X2 already served.
+**Fine:** X\\<&>"1 X2, payable to the Court.
+**Restitution:** X\\<&>"1 X2 to X\\<&>"1 X2.
+**Community service:** X\\<&>"1 X2 hours, to be completed by January 2, 2026.
+**Probation:** X\\<&>"1 X2, on these conditions:
+- X\\<&>"1
+- X2
+X\\<&>"1
+
+X2
+**IT IS SO ORDERED.**
+Dated: January 2, 2026
+https://example.com/a.png
+**X\\<&>"1 X2**
+X\\<&>"1 X2
+X\\<&>"1 X2"
+`;
+
 exports[`toDiscord on every form > extra-service-contract > empty, code tables 1`] = `
 "## **SERVICES AGREEMENT**
 This Services Agreement (the "Agreement") is entered into as of \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ (the "Effective Date") by and between PROVIDER NAME, PROVIDER ADDRESS ("Provider"), and CLIENT NAME, CLIENT ADDRESS ("Client").
@@ -3630,6 +3799,72 @@ Dated: January 2, 2026
 Respectfully submitted,
 **X\\<&>"1 X2**
 Bar No. X\\<&>"1 X2
+X\\<&>"1 X2
+X\\<&>"1 X2"
+`;
+
+exports[`toDiscord on every form > extra-warrant-decision > empty, code tables 1`] = `
+"**SAN ANDREAS COURT**
+COUNTY OF LOS SANTOS
+## **SEARCH WARRANT**
+Warrant No. \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ · Case No. none yet
+Application by OFFICER NAME, BADGE NO. of AGENCY, received \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_.
+**Subject:** NAME OR PROPERTY
+**Location:** ADDRESS OR DESCRIPTION
+Having reviewed the application and the supporting affidavit, the Court finds that probable cause HAS / HAS NOT been shown. The application is **APPROVED / DENIED**.
+**Scope:**
+What may be searched or seized, or who may be arrested.
+**Valid until:** \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+The Court's reasons.
+**IT IS SO ORDERED.**
+Dated: \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+SIGNATURE
+**\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_**
+Judge of the Superior Court
+SAN ANDREAS COURT"
+`;
+
+exports[`toDiscord on every form > extra-warrant-decision > empty, plain-line tables 1`] = `
+"**SAN ANDREAS COURT**
+COUNTY OF LOS SANTOS
+## **SEARCH WARRANT**
+Warrant No. \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ · Case No. none yet
+Application by OFFICER NAME, BADGE NO. of AGENCY, received \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_.
+**Subject:** NAME OR PROPERTY
+**Location:** ADDRESS OR DESCRIPTION
+Having reviewed the application and the supporting affidavit, the Court finds that probable cause HAS / HAS NOT been shown. The application is **APPROVED / DENIED**.
+**Scope:**
+What may be searched or seized, or who may be arrested.
+**Valid until:** \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+The Court's reasons.
+**IT IS SO ORDERED.**
+Dated: \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
+SIGNATURE
+**\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_**
+Judge of the Superior Court
+SAN ANDREAS COURT"
+`;
+
+exports[`toDiscord on every form > extra-warrant-decision > filled, code tables 1`] = `
+"**X\\<&>"1 X2**
+COUNTY OF LOS SANTOS
+## **SEARCH WARRANT**
+Warrant No. X\\<&>"1 X2 · Case No. X\\<&>"1 X2
+Application by X\\<&>"1 X2 of X\\<&>"1 X2, received January 2, 2026.
+**Subject:** X\\<&>"1 X2
+**Location:** X\\<&>"1 X2
+Having reviewed the application and the supporting affidavit, the Court finds that probable cause HAS been shown. The application is **APPROVED**.
+**Scope:**
+X\\<&>"1
+X2
+**Valid until:** January 2, 2026
+X\\<&>"1
+
+X2
+**IT IS SO ORDERED.**
+Dated: January 2, 2026
+https://example.com/a.png
+**X\\<&>"1 X2**
 X\\<&>"1 X2
 X\\<&>"1 X2"
 `;
