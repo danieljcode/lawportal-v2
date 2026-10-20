@@ -1,8 +1,9 @@
-// The Law Library program (LP-16) at #library. Precedents: the firm's own
-// rulings, added and edited here, searched by keyword, case number, judge or
-// court (matches highlighted) and filtered by topic tag. PrecedentSearch is
-// also the Law Library dialog in a form, where Insert citation puts the
-// reference into the form field last clicked in.
+// The Law Library program at #library, with two tabs. Penal Code (LP-17): the
+// server's charges, searched and cited (PenalCodeSearch). Precedents (LP-16):
+// the firm's own rulings, added and edited here, searched by keyword, case
+// number, judge or court (matches highlighted) and filtered by topic tag. Both
+// searches are also the Law Library dialog in a form, where Insert citation
+// puts the reference into the form field last clicked in.
 
 import { useMemo, useState, type FormEvent } from "react";
 import { copyText } from "@/lib/clipboard";
@@ -13,16 +14,47 @@ import {
   citation,
   COURT_SUGGESTIONS,
   filterPrecedents,
-  highlightParts,
   precedentStore,
   searchTerms,
   type Precedent,
 } from "@/lib/precedents";
+import Marked from "./Marked";
+import PenalCodeSearch from "./PenalCodeSearch";
 import { usePrecedentVersion } from "./useStore";
 
-/** `text` with the search words marked. */
-function Marked({ text, terms }: { text: string; terms: readonly string[] }) {
-  return <>{highlightParts(text, terms).map((p, i) => (p.hit ? <mark key={i}>{p.text}</mark> : p.text))}</>;
+export type LibraryTab = "code" | "precedents";
+
+/** The Penal Code / Precedents switch. */
+export function LibraryTabs({
+  tab,
+  onTab,
+  idPrefix,
+}: {
+  tab: LibraryTab;
+  onTab(t: LibraryTab): void;
+  idPrefix: string;
+}) {
+  const tabs: Array<[LibraryTab, string]> = [
+    ["code", "Penal Code"],
+    ["precedents", "Precedents"],
+  ];
+  return (
+    <div className="row library-tabs" role="tablist" aria-label="Law Library">
+      {tabs.map(([t, label]) => (
+        <button
+          key={t}
+          type="button"
+          role="tab"
+          id={idPrefix + "-tab-" + t}
+          className={"btn" + (tab === t ? " primary" : "")}
+          aria-selected={tab === t}
+          onClick={() => onTab(t)}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 export interface PrecedentSearchProps {
@@ -329,6 +361,7 @@ function PrecedentForm({ editing, onDone }: { editing: Precedent | null; onDone(
 export default function LawLibraryView() {
   /** The ruling being edited, "new" for the add form, or null. */
   const [editing, setEditing] = useState<Precedent | "new" | null>(null);
+  const [tab, setTab] = useState<LibraryTab>("code");
 
   return (
     <section id="library" className="form-view library">
@@ -338,28 +371,36 @@ export default function LawLibraryView() {
           <h2 id="library-title">Law Library</h2>
         </div>
       </div>
-      <section aria-labelledby="precedents-title" className="precedents">
-        <div className="row precedents-head">
-          <h3 id="precedents-title">Precedents</h3>
-          {!editing && (
-            <button type="button" className="btn" id="precedent-new" onClick={() => setEditing("new")}>
-              Add ruling
-            </button>
+      <LibraryTabs tab={tab} onTab={setTab} idPrefix="library" />
+      {tab === "code" ? (
+        <section aria-labelledby="code-title" className="penal-code-section">
+          <h3 id="code-title">Penal Code</h3>
+          <PenalCodeSearch idPrefix="code" />
+        </section>
+      ) : (
+        <section aria-labelledby="precedents-title" className="precedents">
+          <div className="row precedents-head">
+            <h3 id="precedents-title">Precedents</h3>
+            {!editing && (
+              <button type="button" className="btn" id="precedent-new" onClick={() => setEditing("new")}>
+                Add ruling
+              </button>
+            )}
+          </div>
+          <p className="small muted">
+            Rulings the firm has been involved in. Search them here, or open the Law Library from a form to insert a
+            citation.
+          </p>
+          {editing && (
+            <PrecedentForm
+              key={editing === "new" ? "new" : editing.id}
+              editing={editing === "new" ? null : editing}
+              onDone={() => setEditing(null)}
+            />
           )}
-        </div>
-        <p className="small muted">
-          Rulings the firm has been involved in. Search them here, or open the Law Library from a form to insert a
-          citation.
-        </p>
-        {editing && (
-          <PrecedentForm
-            key={editing === "new" ? "new" : editing.id}
-            editing={editing === "new" ? null : editing}
-            onDone={() => setEditing(null)}
-          />
-        )}
-        <PrecedentSearch idPrefix="precedents" onEdit={(p) => setEditing(p)} />
-      </section>
+          <PrecedentSearch idPrefix="precedents" onEdit={(p) => setEditing(p)} />
+        </section>
+      )}
     </section>
   );
 }

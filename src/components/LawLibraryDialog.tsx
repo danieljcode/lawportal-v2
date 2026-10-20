@@ -1,9 +1,13 @@
-// The Law Library from inside a form (LP-16): search the firm's precedents and
-// Insert citation into the form field last clicked in.
+// The Law Library from inside a form: search the penal code (LP-17) or the
+// firm's precedents (LP-16) and Insert citation into the form field last
+// clicked in.
 
+import { useState } from "react";
 import Dialog from "./Dialog";
-import { PrecedentSearch } from "./LawLibraryView";
+import { LibraryTabs, PrecedentSearch, type LibraryTab } from "./LawLibraryView";
+import PenalCodeSearch from "./PenalCodeSearch";
 import type { FieldTarget } from "./fields/FormContext";
+import { chargeCitation } from "@/lib/penalCode";
 import { citation, type Precedent } from "@/lib/precedents";
 
 export interface LawLibraryDialogProps {
@@ -14,10 +18,12 @@ export interface LawLibraryDialogProps {
 }
 
 export default function LawLibraryDialog({ open, onClose, target }: LawLibraryDialogProps) {
-  const insert = (p: Precedent) => {
-    target?.insert(citation(p));
+  const [tab, setTab] = useState<LibraryTab>("code");
+  const insert = (text: string) => {
+    target?.insert(text);
     onClose();
   };
+  const insertOff = target ? undefined : "Click in a form field first";
   return (
     <Dialog
       open={open}
@@ -36,16 +42,25 @@ export default function LawLibraryDialog({ open, onClose, target }: LawLibraryDi
           "Click in a form field first, then open the Law Library to insert a citation there."
         )}
       </p>
-      <PrecedentSearch
-        idPrefix="library-dialog"
-        onInsert={insert}
-        insertOff={target ? undefined : "Click in a form field first"}
-      />
+      <LibraryTabs tab={tab} onTab={setTab} idPrefix="library-dialog" />
+      {tab === "code" ? (
+        <PenalCodeSearch
+          idPrefix="library-dialog-code"
+          onInsert={(c) => insert(chargeCitation(c))}
+          insertOff={insertOff}
+        />
+      ) : (
+        <PrecedentSearch
+          idPrefix="library-dialog"
+          onInsert={(p: Precedent) => insert(citation(p))}
+          insertOff={insertOff}
+        />
+      )}
       <p className="small muted">
         <a href="#library" onClick={onClose}>
           Open the Law Library
         </a>{" "}
-        to add or edit rulings.
+        to add or edit the firm&apos;s rulings.
       </p>
     </Dialog>
   );

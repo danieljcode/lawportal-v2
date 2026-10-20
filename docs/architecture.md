@@ -200,7 +200,17 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
   (`unionExhibits` → `unionCustody`). Copy for filing renders the list through the template engine
   (`custodyHtml`), so it's SafeHtml with every value escaped; Print renders a sheet only while the
   print dialog is open, shown alone by a `:has(#custody-sheet)` print stylesheet.
-- **Precedents** (`src/lib/precedents.ts`, `LawLibraryView.tsx`, LP-16): the Law Library at
+- **Penal code** (`src/lib/penalCode.ts`, `PenalCodeSearch.tsx`, LP-17): the Law Library's first tab.
+  The charges live in one data file, `src/data/penal-code.json` (title, a note such as "revised
+  draft", the source sheet, `updated` and the charges: section, chapter, title, class, default jail,
+  min/max range or judge's guidance, fine, description, extra penalties, status). Don't edit it by
+  hand: `npm run penal-code` (`scripts/import-penal-code.mjs`) downloads the sheet's Penal Code tab
+  as CSV, groups charges under the chapter rows, leaves out the review's notes and stamps today's
+  date, which the Law Library shows as "last updated". `searchCharges` puts an exact section
+  number first, then title matches, and hides retired charges unless asked or named;
+  `sentenceText` words the sentence; `chargeCitation` is "PC 1001 Assault". Insert citation works
+  as for precedents.
+- **Precedents** (`src/lib/precedents.ts`, `LawLibraryView.tsx`, LP-16): the Law Library's second tab, at
   `#library`. One list under `lawapp_precedents` (store base, v1, up to 1,000 rulings, newest ruling
   first): case name, number, court, in-game date, judge, summary, holding, an http(s)-only forum
   link (`safeLink`) and lower-case topic tags. Search (`filterPrecedents`) needs every word
