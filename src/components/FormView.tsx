@@ -12,6 +12,7 @@ import { hasDocket } from "@/lib/characters";
 import { caseStore, filterCases, isMember } from "@/lib/cases";
 import { addDeadlines, formatDay, formDates } from "@/lib/deadlines";
 import { docketStore } from "@/lib/dockets";
+import { exhibitRefs, refreshExhibitRefs, resolveExhibitRefs, type ExhibitRef } from "@/lib/exhibits";
 import { draftHistory, snapshotTime, SNAPSHOT_EVERY_MS, type Snapshot } from "@/lib/draftHistory";
 import { createDraftWriter, type DraftWriter } from "@/lib/draftWriter";
 import { filingStore, type FilingVia } from "@/lib/filings";
@@ -315,17 +316,40 @@ export default function FormView({
     [form.id, form.title],
   );
 
+  // Exhibits (LP-13): the firm case with this form's case number lends its evidence to the
+  // exhibit list and to references typed into the text. Stable between case changes, so the
+  // output memo doesn't churn.
+  const caseVersion = useCaseVersion();
+  const rawNumber = state.values["Case number"];
+  const exhibitCase = typeof rawNumber === "string" ? rawNumber.trim() : "";
+  const exhibits = useMemo<ExhibitRef[]>(() => {
+    const c = exhibitCase && caseVersion >= 0 ? caseStore().byNumber(exhibitCase) : null;
+    return c ? exhibitRefs(c.exhibits) : [];
+  }, [exhibitCase, caseVersion]);
+  // References in the editor follow the exhibits (a reorder's new letters, a renamed title),
+  // on opening and whenever they change. Adjusted during render, not an undo step: it only
+  // brings the reading text up to date, the ids don't change.
+  const [seenExhibits, setSeenExhibits] = useState<ExhibitRef[] | null>(null);
+  if (seenExhibits !== exhibits) {
+    setSeenExhibits(exhibits);
+    setUndoable((u) => {
+      const values = refreshExhibitRefs(u.state.values, exhibits);
+      return values === u.state.values ? u : { ...u, state: { ...u.state, values } };
+    });
+  }
+
   const output = useMemo<FormOutput | null>(() => {
     if (!tree) return null;
-    const finalHtml = render(tree, deferredValues, {});
+    const values = resolveExhibitRefs(deferredValues, exhibits);
+    const finalHtml = render(tree, values, { exhibits });
     return {
       finalHtml,
-      previewHtml: highlight ? render(tree, deferredValues, { highlight: true }) : finalHtml,
+      previewHtml: highlight ? render(tree, values, { highlight: true, exhibits }) : finalHtml,
       missing: missingRequired(entries, deferredValues, form.required),
       jumpTo,
       onFiled,
     };
-  }, [tree, entries, deferredValues, highlight, form.required, jumpTo, onFiled]);
+  }, [tree, entries, deferredValues, exhibits, highlight, form.required, jumpTo, onFiled]);
 
   // Leaving clears this form's output in App, so reopening it never shows the old instance's.
   // Declared before the publish effect: on a StrictMode re-run the setups run in order, publish last.
@@ -345,8 +369,8 @@ export default function FormView({
   const onState = useCallback((fn: (s: FormState) => FormState, key?: string) => setState(fn, key ?? null), [setState]);
   const required = useMemo(() => new Set(form.required), [form.required]);
   const ctx: FormCtx = useMemo(
-    () => ({ entries, character: activeCharacter, onState, now, required }),
-    [entries, activeCharacter, onState, now, required],
+    () => ({ entries, character: activeCharacter, onState, now, required, exhibits }),
+    [entries, activeCharacter, onState, now, required, exhibits],
   );
 
   const segs = useMemo(() => splitSegments(entries), [entries]);
@@ -394,7 +418,6 @@ export default function FormView({
 
   /* ---------- docket bar ---------- */
 
-  const caseVersion = useCaseVersion();
   const judge = hasDocket(activeCharacter) ? activeCharacter : null;
   const showDocket = !!(judge && tree && hasField(entries, state.values, "Case number"));
   // The firm's cases: this character's first, then everyone else's (LP-100).
