@@ -2703,3 +2703,35 @@ dialog.changelog {
 .precedent-form {
   margin: 6px 0 10px;
 }
+
+/* ---------- penal code (LP-17) ---------- */
+.library-tabs {
+  margin: 4px 0 8px;
+}
+.charge.retired {
+  opacity: 0.6;
+  border-left-color: var(--shadow);
+}
+.charge-class.felony,
+.charge-class.capital {
+  border-color: var(--bad);
+  color: var(--bad);
+}
+.charge-class.misdemeanor {
+  border-color: var(--missing);
+  color: var(--missing);
+}
+.charge-sentence {
+  margin: 2px 0 0;
+}
+.penal-code-source {
+  margin: 0 0 6px;
+}
+.precedent-filters {
+  flex-wrap: wrap;
+  align-items: center;
+}
+.precedent-filters select {
+  width: auto;
+  max-width: 100%;
+}
