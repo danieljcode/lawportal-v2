@@ -95,9 +95,11 @@ describe("the firm's name in the app (LP-22)", () => {
   });
 
   it("is in the window title, the toolbar and the browser tab", () => {
+    // The home screen is the Program Manager (LP-104); the tab keeps the system's name.
     expect(document.querySelector(".app-title .title-bar-text")!.textContent).toBe(
-      "Friedman & Associates: Court Filing System",
+      "Program Manager - Friedman & Associates",
     );
+    expect(document.title).toBe("Friedman & Associates: Court Filing System");
     expect(document.querySelector(".brand-name")!.textContent).toBe("Friedman & Associates");
     expect(document.querySelector(".brand-sub")!.textContent).toBe("Court Filing System");
     act(() => {

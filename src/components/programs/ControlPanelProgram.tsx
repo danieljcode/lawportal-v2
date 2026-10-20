@@ -2,11 +2,14 @@
 // system, gathered in one place. LP-109 gives each its own panel; for now it
 // opens the existing dialogs.
 
+import { useState } from "react";
 import { BRANDING } from "@/branding";
+import { bootEnabled, setBootEnabled } from "@/lib/boot";
 import { LABELS, type ThemeMode, MODES } from "@/lib/theme";
 import type { ProgramProps } from "./shell";
 
 export default function ControlPanelProgram({ shell }: ProgramProps) {
+  const [boot, setBoot] = useState(bootEnabled);
   return (
     <div className="layout no-nav">
       <main className="editor control-panel" id="editor">
@@ -37,6 +40,21 @@ export default function ControlPanelProgram({ shell }: ProgramProps) {
                   </option>
                 ))}
               </select>
+            </label>
+          </li>
+          <li>
+            {/* The startup screen (LP-21); it was on the start page until the Program Manager (LP-104). */}
+            <label className="check boot-setting">
+              <input
+                type="checkbox"
+                id="boot-setting"
+                checked={boot}
+                onChange={(e) => {
+                  setBootEnabled(e.target.checked);
+                  setBoot(e.target.checked);
+                }}
+              />
+              <span>Show the startup screen when the office system starts (once per browser session)</span>
             </label>
           </li>
           <li>

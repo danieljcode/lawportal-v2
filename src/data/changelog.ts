@@ -19,6 +19,24 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-21",
+    title: "Program Manager",
+    items: [
+      {
+        type: "new",
+        text: "The system now opens on a Program Manager: your programs as icons in two groups, Court Work and Main. Click one, or move with the arrow keys and press Enter.",
+      },
+      {
+        type: "update",
+        text: "Case File's icon shows a dot when something is due within 48 hours, and opens on Upcoming. The taskbar's Start button always brings you back here.",
+      },
+      {
+        type: "update",
+        text: "The how-to steps are now on Court Filings' first page, and the startup screen setting is in the Control Panel.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-21",
     title: "Programs",
     items: [
       {
