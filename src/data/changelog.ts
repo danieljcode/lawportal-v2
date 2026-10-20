@@ -19,6 +19,20 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-21",
+    title: "Startup screen",
+    items: [
+      {
+        type: "new",
+        text: "The Friedman & Associates Office System now boots like a 1990 computer: a memory test, drive checks and C:\\>. It shows once per browser session, for under 2 seconds, while the app loads.",
+      },
+      {
+        type: "new",
+        text: "Press any key or click to skip it. To turn it off, untick “Show the startup screen” on the start page.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-21",
     title: "Penal code",
     items: [
       {
