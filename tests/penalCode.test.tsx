@@ -236,12 +236,14 @@ describe("the Penal Code in the Law Library (LP-17)", () => {
     expect(copy).toHaveBeenCalledWith("PC 1001 Assault");
   });
 
-  it("is found from the sidebar search", () => {
+  it("opens from the Program Manager, not the forms list", () => {
     mount("#filings");
-    for (const q of ["library", "penal", "precedents"]) {
-      setValue("#form-search", q);
-      expect(document.querySelector('#form-list a[href="#library/penal-code"]'), q).not.toBeNull();
-    }
+    // Court Filings' list is court forms only (LP-105).
+    setValue("#form-search", "library");
+    expect(document.querySelector('#form-list a[href^="#library"]')).toBeNull();
+    expect(document.querySelector("#form-list")!.textContent).toContain("No forms match.");
+    act(() => document.querySelector<HTMLButtonElement>("#start-btn")!.click());
+    expect(document.querySelector("#pm-library")!.getAttribute("href")).toBe("#library/penal-code");
   });
 
   it("keeps the firm's precedents on their own tab", () => {

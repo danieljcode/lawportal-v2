@@ -19,6 +19,24 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-21",
+    title: "Court Filings",
+    items: [
+      {
+        type: "update",
+        text: "Court Filings' list now shows court forms only: the Case File, Clients, Law Library and J.A.P. open from the Program Manager.",
+      },
+      {
+        type: "new",
+        text: "A Form menu with the filing tools: pick a case, open the form's case in the Case File, the Law Library, Draft history and Filing history.",
+      },
+      {
+        type: "new",
+        text: "When a case is loaded into a form, Open in Case File takes you straight to it.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-21",
     title: "Program Manager",
     items: [
       {

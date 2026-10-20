@@ -26,7 +26,7 @@ import CharactersDialog from "./CharactersDialog";
 import DocketsDialog from "./DocketsDialog";
 import ErrorBoundary from "./ErrorBoundary";
 import FilingsDialog from "./FilingsDialog";
-import type { DraftRequest } from "./FormView";
+import type { DraftRequest, FormTools } from "./FormView";
 import MenuBar, { type Menu, type MenuItem } from "./MenuBar";
 import ProgramManager from "./ProgramManager";
 import { programFor } from "./programs/registry";
@@ -63,6 +63,8 @@ export default function App() {
   const [draftRequest, setDraftRequest] = useState<DraftRequest | null>(null);
   /** The open form shows its docket bar (it has a Case number and the active character keeps a docket). */
   const [docketBar, setDocketBar] = useState(false);
+  /** The open form's filing tools, for the Form menu (LP-105). */
+  const [formTools, setFormTools] = useState<FormTools | null>(null);
   const [theme, setThemeState] = useState<ThemeMode>(getTheme);
   const setTheme = (mode: ThemeMode) => {
     saveTheme(mode);
@@ -172,6 +174,7 @@ export default function App() {
     docketRequest,
     draftRequest,
     onDocketBar: setDocketBar,
+    onFormTools: setFormTools,
     openCharacters,
     openFilings,
     openFiling,
@@ -183,10 +186,9 @@ export default function App() {
 
   // Each program's own File items, then the shell's (LP-105 to LP-109 add more).
   const own: Partial<Record<string, MenuItem[]>> = {
-    filings: [
-      { label: "Filing history…", id: "menu-filing-history", onSelect: openFilings },
-      ...(hasDocket(active) ? [{ label: "Dockets…", id: "menu-dockets", onSelect: () => openDockets(activeId) }] : []),
-    ],
+    filings: hasDocket(active)
+      ? [{ label: "Dockets…", id: "menu-dockets", onSelect: () => openDockets(activeId) }]
+      : [],
     cases: [
       { label: "All cases", href: "#cases" },
       { label: "Upcoming", href: "#cases/upcoming" },
@@ -201,6 +203,29 @@ export default function App() {
     ],
   };
   const fileItems = (program && own[program.id]) || [];
+  // Court Filings' Form menu (LP-105): the open form's filing tools.
+  const tools = program?.id === "filings" && form ? formTools : null;
+  const formMenu: Menu = {
+    label: "Form",
+    items: [
+      { label: "Pick a case…", id: "menu-pick-case", disabled: !tools?.pickCase, onSelect: () => tools?.pickCase?.() },
+      {
+        label: "Open case in Case File",
+        id: "menu-open-case",
+        href: tools?.caseId ? "#cases/" + tools.caseId : undefined,
+        disabled: !tools?.caseId,
+      },
+      "-",
+      { label: "Law Library…", id: "menu-law-library", disabled: !tools, onSelect: () => tools?.openLibrary() },
+      {
+        label: "Draft history…",
+        id: "menu-draft-history",
+        disabled: !tools?.ready,
+        onSelect: () => tools?.openDraftHistory(),
+      },
+      { label: "Filing history…", id: "menu-filing-history", onSelect: openFilings },
+    ],
+  };
   const menus: Menu[] = [
     {
       label: "File",
@@ -212,6 +237,7 @@ export default function App() {
         ...(program ? (["-", { label: "Exit", id: "menu-exit", onSelect: () => goHome() }] as MenuItem[]) : []),
       ],
     },
+    ...(program?.id === "filings" ? [formMenu] : []),
     {
       label: "View",
       items: [

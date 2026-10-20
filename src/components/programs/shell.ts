@@ -6,7 +6,7 @@ import type { Filing } from "@/lib/filings";
 import type { SyncState } from "@/lib/sync";
 import type { ThemeMode } from "@/lib/theme";
 import type { Character, FormDef } from "@/lib/types";
-import type { DocketRequest, DraftRequest } from "../FormView";
+import type { DocketRequest, DraftRequest, FormTools } from "../FormView";
 import type { Route } from "../useRoute";
 
 export interface Shell {
@@ -28,6 +28,8 @@ export interface Shell {
   draftRequest: DraftRequest | null;
   /** The open form shows its docket bar. */
   onDocketBar(on: boolean): void;
+  /** The open form's filing tools, for Court Filings' Form menu (LP-105). */
+  onFormTools(tools: FormTools | null): void;
   openCharacters(startSync?: boolean): void;
   openFilings(): void;
   /** Open a filing as a new draft of its form. */

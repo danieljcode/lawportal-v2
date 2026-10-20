@@ -1,15 +1,10 @@
-// Court Filings' navigation pane: the searchable form list grouped by court (FR2, INV §a
-// Sidebar), as an Explorer-style tree. The firm's programs stay listed above the forms
-// until the Court Filings program becomes forms only (LP-105).
+// Court Filings' navigation pane: the searchable list of court forms grouped by court
+// and section (FR2, INV §a Sidebar), as an Explorer-style tree. Forms only (LP-105):
+// the firm's programs and the J.A.P. open from the Program Manager.
 
 import { useMemo, useState } from "react";
 import type { FormDef } from "@/lib/types";
 import { S_CREDIT, S_DISCLAIMER } from "@/lib/strings";
-
-const JAP_NAME = "Judicial Advancement Portfolio";
-const JAP_SEARCH = (JAP_NAME + " j.a.p. jap court commissioners").toLowerCase();
-const CASES_SEARCH =
-  "case file cases firm docket upcoming deadlines hearings new client intake conflict check law library penal code precedents citations";
 
 interface Group {
   court: string;
@@ -32,18 +27,14 @@ function group(forms: FormDef[], q: string): Group[] {
 
 export interface SidebarProps {
   forms: FormDef[];
-  /** Where the window is: the route's hash without "#" ("filings/<formId>", "cases"…). */
+  /** Where the window is: the route's hash without "#" ("filings/<formId>"). */
   current: string | null;
-  /** Show the Court Commissioners group. */
-  commissioner: boolean;
 }
 
-export default function Sidebar({ forms, current, commissioner }: SidebarProps) {
+export default function Sidebar({ forms, current }: SidebarProps) {
   const [query, setQuery] = useState("");
   const q = query.trim().toLowerCase();
   const groups = useMemo(() => group(forms, q), [forms, q]);
-  const showJap = commissioner && (!q || JAP_SEARCH.indexOf(q) >= 0);
-  const showCases = !q || CASES_SEARCH.indexOf(q) >= 0;
 
   const link = (href: string, text: string) => {
     const on = current === href.slice(1);
@@ -65,28 +56,7 @@ export default function Sidebar({ forms, current, commissioner }: SidebarProps) 
         onChange={(e) => setQuery(e.target.value)}
       />
       <div id="form-list" className="tree">
-        {showCases && (
-          <details open>
-            <summary>The firm</summary>
-            <ul>
-              <li>{link("#cases", "Case File")}</li>
-              <li>{link("#cases/upcoming", "Upcoming")}</li>
-              <li>{link("#clients/intake", "New client intake")}</li>
-              <li>{link("#clients/conflicts", "Conflict check")}</li>
-              <li>{link("#library/penal-code", "Law Library")}</li>
-            </ul>
-          </details>
-        )}
-        {showJap ? (
-          <details open>
-            <summary>Court Commissioners</summary>
-            <ul>
-              <li>{link("#jap", JAP_NAME + " (J.A.P.)")}</li>
-            </ul>
-          </details>
-        ) : (
-          !groups.length && !showCases && <p className="muted small">No forms match.</p>
-        )}
+        {!groups.length && <p className="muted small">No forms match.</p>}
         {groups.map((g) => (
           <details open key={g.court}>
             <summary>{g.court}</summary>

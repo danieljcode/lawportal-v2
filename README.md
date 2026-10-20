@@ -52,6 +52,9 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
   Letter, Retainer Agreement, Demand Letter and Letter of Representation, and **Judge** templates:
   Ruling on Motion, Sentencing Order and Warrant Decision. Search by title, court or
   section.
+- **Court Filings.** The court forms only, grouped by court, with search. Its **Form** menu has the
+  filing tools: pick a case, open the form's case in the Case File, the Law Library, Draft history
+  and Filing history.
 - **Form editor.** Inputs built from the form: collapsible sections with "x of y filled" counts,
   checkbox lists, repeatable items, optional sections, dates with Today/Auto. Case numbers show the
   pattern as a placeholder (in-game year, courthouse, division, number, e.g. `90SCCR00XXX`). Fill
