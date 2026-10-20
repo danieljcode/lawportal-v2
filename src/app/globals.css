@@ -2575,3 +2575,69 @@ dialog.changelog {
   width: auto;
   max-width: 100%;
 }
+
+/* ---------- chain of custody (LP-14) ---------- */
+.custody {
+  margin-top: 6px;
+  padding: 6px 8px;
+  border: 1px dashed var(--shadow);
+}
+.custody-list {
+  margin: 0 0 6px;
+  padding-left: 22px;
+}
+.custody-list li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  padding: 2px 0;
+}
+.custody-at {
+  font-variant-numeric: tabular-nums;
+}
+.custody-note {
+  flex-basis: 100%;
+  color: var(--muted);
+}
+.custody-form {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+}
+.custody-form .custody-note-input,
+.custody-form .row {
+  grid-column: 1 / -1;
+}
+@media (max-width: 700px) {
+  .custody-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media screen {
+  .custody-sheet {
+    display: none;
+  }
+}
+/* Print prints only the custody log being printed. */
+@media print {
+  html:has(#custody-sheet),
+  body:has(#custody-sheet) {
+    background: #fff;
+  }
+  body:has(#custody-sheet) * {
+    visibility: hidden;
+  }
+  body:has(#custody-sheet) #custody-sheet,
+  body:has(#custody-sheet) #custody-sheet * {
+    visibility: visible;
+  }
+  body:has(#custody-sheet) #custody-sheet {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    background: #fff;
+    color: #000;
+    font-size: 12pt;
+  }
+}

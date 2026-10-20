@@ -1,5 +1,7 @@
 // Shared types for the form engine, form data and the client stores.
 
+import type { CustodyEntry } from "./custody";
+
 /** A directory or extra form: forum HTML with {{tokens}}. */
 export interface FormDef {
   id: string;
@@ -158,6 +160,8 @@ export interface Exhibit {
   link?: string;
   /** In-game date obtained, YYYY-MM-DD. */
   obtained?: string;
+  /** Chain of custody (LP-14), oldest first; only ever added to. Absent when empty. */
+  custody?: CustodyEntry[];
 }
 
 /** A dated entry on a case (LP-18): an in-game date, a label and a note. */
