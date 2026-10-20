@@ -19,6 +19,24 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-20",
+    title: "Exhibits in filings",
+    items: [
+      {
+        type: "new",
+        text: "Insert exhibit: in a form whose case number matches a case in the Case File, pick one of the case's exhibits under a text box to add a reference such as “Exhibit C (Dashcam footage)”.",
+      },
+      {
+        type: "new",
+        text: "References follow the exhibit: move it up or down, or rename it, and the filing shows its new letter and title.",
+      },
+      {
+        type: "new",
+        text: "General Motion and General Petition can add an Exhibits list of the case's evidence, with links. Tick Exhibit list to include it.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-20",
     title: "Evidence",
     items: [
       {

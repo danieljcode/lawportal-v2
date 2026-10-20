@@ -57,7 +57,9 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
   one form, then **Open case** creates the case with the intake in its notes. Print it as a one-page
   client sheet.
 - **Evidence** on each case: exhibits with a title, description, link and date obtained, lettered
-  automatically (A, B, C…) and relettered when you reorder them.
+  automatically (A, B, C…) and relettered when you reorder them. **Insert exhibit** under a form's
+  text boxes adds a reference such as "Exhibit C (Dashcam footage)" that follows the exhibit when it's
+  moved, and General Motion and General Petition can list the case's exhibits.
 - **Deadlines and hearings** on each case, added by hand or from a form's dates (a case
   schedule fills in the whole timetable). **Upcoming** lists the next 14 days, overdue first, and
   the Case File button shows a dot when something is due within 48 hours.

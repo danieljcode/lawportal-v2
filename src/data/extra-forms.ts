@@ -52,6 +52,10 @@ function signature(role: string): string {
   );
 }
 
+/** An optional list of the loaded case's exhibits, filled from its evidence (LP-13). */
+const EXHIBIT_LIST =
+  "{{?Exhibit list|off}}" + heading("EXHIBITS") + "{{Exhibits@exhibits|<p>No exhibits.</p>}}\n" + "{{/Exhibit list}}";
+
 const generalPetition: FormDef = {
   id: "extra-general-petition",
   court: COURT,
@@ -75,6 +79,8 @@ const generalPetition: FormDef = {
     "{{#Allegations|2}}<p><strong>{{$index}}.</strong> {{Allegation:textarea|State the allegation.}}</p>\n{{/Allegations}}" +
     heading("PRAYER FOR RELIEF") +
     "{{Relief requested:paras|<p>WHEREFORE, Petitioner respectfully requests that this Court grant the relief sought herein.</p>}}\n" +
+    // The case's exhibits (LP-13), off unless ticked.
+    EXHIBIT_LIST +
     "{{-- Signature}}\n" +
     "<hr />\n" +
     signature("Petitioner"),
@@ -129,6 +135,8 @@ const generalMotion: FormDef = {
     "<p>{{Introduction:textarea|Movant respectfully moves this Honorable Court for an order granting the relief requested herein, and in support states as follows:}}</p>\n" +
     "{{Grounds:paras|<p>State the factual and legal basis for the motion here.</p>}}\n" +
     "{{Relief requested:paras|<p>WHEREFORE, Movant respectfully requests that this Court grant this Motion and award such further relief as it deems just and proper.</p>}}\n" +
+    // The case's exhibits (LP-13), off unless ticked.
+    EXHIBIT_LIST +
     "{{-- Signature}}\n" +
     "<hr />\n" +
     signature("Attorney for the Defendant") +

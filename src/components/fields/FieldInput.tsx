@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { FIELDS as CHARACTER_FIELDS } from "@/lib/characters";
+import { exhibitMarker } from "@/lib/exhibits";
 import { applyPrefills, autoDate, hasDependents, setValue, todayDate } from "@/lib/formState";
 import { plain } from "@/lib/template";
 import type { Field } from "@/lib/types";
@@ -17,6 +18,9 @@ const HELP: Partial<Record<Field["type"], string>> = {
 
 const MULTILINE = /^(textarea|list|spoiler|paras)$/;
 
+/** Fields that take an "Insert exhibit" reference (LP-13): the written boxes, not names, dates or links. */
+const TAKES_EXHIBITS = /^(textarea|list|paras)$/;
+
 function characterTag(key: string): string {
   return CHARACTER_FIELDS.find((c) => c.key === key)?.label || key;
 }
@@ -28,8 +32,9 @@ export default function FieldInput({
   prefix,
   inline,
 }: ScopeProps & { field: Field; inline?: boolean }) {
-  const { entries, onState, now, required } = useFormCtx();
+  const { entries, onState, now, required, exhibits } = useFormCtx();
   const inputRef = useRef<HTMLInputElement>(null);
+  const areaRef = useRef<HTMLTextAreaElement>(null);
   const id = slugId(prefix + f.label);
   const raw = scope[f.label];
   const value = typeof raw === "string" ? raw : "";
@@ -53,6 +58,35 @@ export default function FieldInput({
     if (i >= 0 && input.selectionStart === input.selectionEnd) input.setSelectionRange(i, i + 3);
   };
 
+  // The exhibit list (LP-13) comes from the case's evidence; nothing to type.
+  if (f.character === "exhibits") {
+    return (
+      <div className="field wide">
+        <label>{f.label}</label>
+        <p className="help" id={id}>
+          {exhibits.length
+            ? "From the case's evidence: " + exhibits.length + (exhibits.length === 1 ? " exhibit." : " exhibits.")
+            : "Filled from the evidence of the case with this case number. Add exhibits in the Case File."}
+        </p>
+      </div>
+    );
+  }
+
+  // Insert a reference at the cursor (or in place of the selection); it keeps the exhibit's id.
+  const insertExhibit = (exhibitId: string) => {
+    const ref = exhibits.find((e) => e.id === exhibitId);
+    if (!ref) return;
+    const el = areaRef.current;
+    const start = el?.selectionStart ?? value.length;
+    const end = el?.selectionEnd ?? start;
+    const marker = exhibitMarker(ref);
+    change(value.slice(0, start) + marker + value.slice(end));
+    setTimeout(() => {
+      el?.focus();
+      el?.setSelectionRange(start + marker.length, start + marker.length);
+    }, 0);
+  };
+
   let input: React.ReactElement;
   switch (f.type) {
     case "textarea":
@@ -61,6 +95,7 @@ export default function FieldInput({
     case "paras":
       input = (
         <textarea
+          ref={areaRef}
           id={id}
           rows={f.type === "textarea" || f.type === "paras" ? 5 : 3}
           placeholder={hint.slice(0, 160)}
@@ -154,6 +189,22 @@ export default function FieldInput({
     }
   }
   const help = HELP[f.type];
+  const picker =
+    exhibits.length > 0 && TAKES_EXHIBITS.test(f.type) ? (
+      <select
+        className="exhibit-insert"
+        aria-label={"Insert exhibit into " + f.label}
+        value=""
+        onChange={(e) => insertExhibit(e.target.value)}
+      >
+        <option value="">Insert exhibit…</option>
+        {exhibits.map((e) => (
+          <option key={e.id} value={e.id}>
+            {"Exhibit " + e.letter + " (" + e.title + ")"}
+          </option>
+        ))}
+      </select>
+    ) : null;
 
   return (
     <div className={"field" + (MULTILINE.test(f.type) ? " wide" : "") + (missing ? " missing" : "")}>
@@ -174,6 +225,7 @@ export default function FieldInput({
       ) : (
         input
       )}
+      {picker && <div className="row">{picker}</div>}
       {help && <p className="help">{help}</p>}
     </div>
   );
