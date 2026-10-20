@@ -1,4 +1,6 @@
-// Searchable form list grouped by court (FR2, INV §a Sidebar), as an Explorer-style tree.
+// Court Filings' navigation pane: the searchable form list grouped by court (FR2, INV §a
+// Sidebar), as an Explorer-style tree. The firm's programs stay listed above the forms
+// until the Court Filings program becomes forms only (LP-105).
 
 import { useMemo, useState } from "react";
 import type { FormDef } from "@/lib/types";
@@ -30,7 +32,7 @@ function group(forms: FormDef[], q: string): Group[] {
 
 export interface SidebarProps {
   forms: FormDef[];
-  /** The open form's id, "jap", or null on the start page. */
+  /** Where the window is: the route's hash without "#" ("filings/<formId>", "cases"…). */
   current: string | null;
   /** Show the Court Commissioners group. */
   commissioner: boolean;
@@ -43,11 +45,14 @@ export default function Sidebar({ forms, current, commissioner }: SidebarProps) 
   const showJap = commissioner && (!q || JAP_SEARCH.indexOf(q) >= 0);
   const showCases = !q || CASES_SEARCH.indexOf(q) >= 0;
 
-  const link = (href: string, text: string, on: boolean) => (
-    <a href={href} className={on ? "active" : undefined} aria-current={on ? "page" : undefined}>
-      {text}
-    </a>
-  );
+  const link = (href: string, text: string) => {
+    const on = current === href.slice(1);
+    return (
+      <a href={href} className={on ? "active" : undefined} aria-current={on ? "page" : undefined}>
+        {text}
+      </a>
+    );
+  };
 
   return (
     <nav className="sidebar" id="sidebar" aria-label="Forms">
@@ -64,11 +69,11 @@ export default function Sidebar({ forms, current, commissioner }: SidebarProps) 
           <details open>
             <summary>The firm</summary>
             <ul>
-              <li>{link("#cases", "Case File", current === "cases")}</li>
-              <li>{link("#upcoming", "Upcoming", current === "upcoming")}</li>
-              <li>{link("#intake", "New client intake", current === "intake")}</li>
-              <li>{link("#conflicts", "Conflict check", current === "conflicts")}</li>
-              <li>{link("#library", "Law Library", current === "library")}</li>
+              <li>{link("#cases", "Case File")}</li>
+              <li>{link("#cases/upcoming", "Upcoming")}</li>
+              <li>{link("#clients/intake", "New client intake")}</li>
+              <li>{link("#clients/conflicts", "Conflict check")}</li>
+              <li>{link("#library/penal-code", "Law Library")}</li>
             </ul>
           </details>
         )}
@@ -76,7 +81,7 @@ export default function Sidebar({ forms, current, commissioner }: SidebarProps) 
           <details open>
             <summary>Court Commissioners</summary>
             <ul>
-              <li>{link("#jap", JAP_NAME + " (J.A.P.)", current === "jap")}</li>
+              <li>{link("#jap", JAP_NAME + " (J.A.P.)")}</li>
             </ul>
           </details>
         ) : (
@@ -90,7 +95,7 @@ export default function Sidebar({ forms, current, commissioner }: SidebarProps) 
                 {run.section && <p className="section-label">{run.section}</p>}
                 <ul>
                   {run.forms.map((f) => (
-                    <li key={f.id}>{link("#" + f.id, f.title, current === f.id)}</li>
+                    <li key={f.id}>{link("#filings/" + f.id, f.title)}</li>
                   ))}
                 </ul>
               </div>

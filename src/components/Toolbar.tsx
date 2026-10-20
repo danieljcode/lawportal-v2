@@ -1,15 +1,13 @@
-// The main window's toolbar: every control of the reference topbar (FR6, INV §a Topbar).
+// The window's toolbar: the brand and the quick buttons of the reference topbar (FR6,
+// INV §a Topbar). The active character's picker is in the taskbar since LP-103, so
+// every program shows it; the theme is the shell's, shared with the View menu.
 
-import { useState, type MouseEvent } from "react";
+import type { MouseEvent } from "react";
 import { BRANDING } from "@/branding";
-import type { Character } from "@/lib/types";
 import { BADGES, type SyncStatus } from "@/lib/sync";
-import { cycle, getTheme, ICONS, themeLabel, type ThemeMode } from "@/lib/theme";
+import { ICONS, MODES, themeLabel, type ThemeMode } from "@/lib/theme";
 
 export interface ToolbarProps {
-  characters: Character[];
-  activeId: string | null;
-  onActive(id: string | null): void;
   /** Dockets button (the active character keeps a docket). */
   showDockets: boolean;
   /** J.A.P. link (the active character is a Court Commissioner). */
@@ -20,6 +18,10 @@ export interface ToolbarProps {
   syncStatus: SyncStatus | null;
   changelogUnread: boolean;
   navOpen: boolean;
+  /** The program has a navigation pane (the ☰ button at phone width). */
+  hasNav: boolean;
+  theme: ThemeMode;
+  onTheme(mode: ThemeMode): void;
   onHome(e: MouseEvent): void;
   onToggleNav(): void;
   onDockets(): void;
@@ -30,22 +32,24 @@ export interface ToolbarProps {
 }
 
 export default function Toolbar(p: ToolbarProps) {
-  const [theme, setThemeState] = useState<ThemeMode>(() => getTheme());
+  const theme = p.theme;
   const label = themeLabel(theme);
 
   return (
     <header className="toolbar">
-      <button
-        type="button"
-        className="btn icon-btn only-narrow"
-        id="toggle-nav"
-        aria-label="Show form list"
-        aria-expanded={p.navOpen}
-        aria-controls="sidebar"
-        onClick={p.onToggleNav}
-      >
-        ☰
-      </button>
+      {p.hasNav && (
+        <button
+          type="button"
+          className="btn icon-btn only-narrow"
+          id="toggle-nav"
+          aria-label="Show form list"
+          aria-expanded={p.navOpen}
+          aria-controls="sidebar"
+          onClick={p.onToggleNav}
+        >
+          ☰
+        </button>
+      )}
       <a className="brand" href="./" aria-label={BRANDING.productName + " home"} onClick={p.onHome}>
         <span className="brand-mark" aria-hidden="true">
           ⚖
@@ -57,22 +61,6 @@ export default function Toolbar(p: ToolbarProps) {
       </a>
       <div className="toolbar-sep" aria-hidden="true" />
       <div className="toolbar-actions">
-        <label className="char-picker">
-          <span className="muted">Filing as</span>
-          <select
-            id="active-character"
-            aria-label="Active character"
-            value={p.activeId || ""}
-            onChange={(e) => p.onActive(e.target.value || null)}
-          >
-            <option value="">— no character —</option>
-            {p.characters.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name + (c.title ? " (" + c.title + ")" : "")}
-              </option>
-            ))}
-          </select>
-        </label>
         {p.showDockets && (
           <button type="button" className="btn" id="open-dockets" onClick={p.onDockets}>
             Dockets
@@ -81,7 +69,7 @@ export default function Toolbar(p: ToolbarProps) {
         <a
           className="btn"
           id="open-cases"
-          href={p.casesDue ? "#upcoming" : "#cases"}
+          href={p.casesDue ? "#cases/upcoming" : "#cases"}
           title={p.casesDue ? p.casesDue + " due within 48 hours: see Upcoming" : "The firm's cases"}
         >
           Case File
@@ -137,7 +125,7 @@ export default function Toolbar(p: ToolbarProps) {
           id="theme-toggle"
           aria-label={label}
           title={label}
-          onClick={() => setThemeState(cycle(theme))}
+          onClick={() => p.onTheme(MODES[(MODES.indexOf(theme) + 1) % MODES.length])}
         >
           {ICONS[theme]}
         </button>
