@@ -9,6 +9,7 @@ import { FIELDS, STATUSES } from "@/lib/docketFields";
 import { filingsForCase, filingStore, type Filing } from "@/lib/filings";
 import type { Case, Character } from "@/lib/types";
 import CaseDeadlines from "./CaseDeadlines";
+import CaseEvidence from "./CaseEvidence";
 import { FilingList } from "./FilingsDialog";
 import { useCaseVersion, useFilingVersion } from "./useStore";
 
@@ -213,7 +214,7 @@ function detailsStamp(c: Case): string {
   return JSON.stringify(details);
 }
 
-/** A case's linked areas: its filings (LP-15), evidence (LP-12, to come) and deadlines (LP-18). */
+/** A case's linked areas: its deadlines (LP-18), filings (LP-15) and evidence (LP-12). */
 function CaseLinks({ c, filings, onUseFiling }: { c: Case; filings: Filing[]; onUseFiling(f: Filing): void }) {
   const [filingStatus, setFilingStatus] = useState<{ text: string; bad: boolean } | null>(null);
   return (
@@ -244,7 +245,7 @@ function CaseLinks({ c, filings, onUseFiling }: { c: Case; filings: Filing[]; on
       </section>
       <section className="case-empty" id="case-evidence" aria-labelledby="case-evidence-title">
         <h4 id="case-evidence-title">Evidence</h4>
-        <p className="small muted">No evidence yet. Exhibits for this case will be kept here.</p>
+        <CaseEvidence c={c} />
       </section>
     </div>
   );

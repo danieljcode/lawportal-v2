@@ -56,6 +56,8 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
 - **New client intake** (sidebar, or the Case File): take a new client's details and the matter in
   one form, then **Open case** creates the case with the intake in its notes. Print it as a one-page
   client sheet.
+- **Evidence** on each case: exhibits with a title, description, link and date obtained, lettered
+  automatically (A, B, C…) and relettered when you reorder them.
 - **Deadlines and hearings** on each case, added by hand or from a form's dates (a case
   schedule fills in the whole timetable). **Upcoming** lists the next 14 days, overdue first, and
   the Case File button shows a dot when something is due within 48 hours.
