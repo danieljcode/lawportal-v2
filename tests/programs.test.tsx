@@ -172,7 +172,7 @@ describe("the program shell (LP-103)", () => {
 
     go("#library/precedents");
     expect(title()).toBe("Law Library - Friedman & Associates");
-    expect(must("#library-tab-precedents").getAttribute("aria-selected")).toBe("true");
+    expect(must('#library-nav [aria-current="page"]').textContent).toBe("Precedents");
 
     go("#control");
     expect(title()).toBe("Control Panel - Friedman & Associates");
@@ -264,7 +264,7 @@ describe("the program shell (LP-103)", () => {
     // The Case File has its own pane (LP-106).
     expect(must("#toggle-nav").getAttribute("aria-controls")).toBe("case-nav");
     expect(must("#toggle-nav").getAttribute("aria-label")).toBe("Show Case File pages");
-    go("#library/penal-code");
+    go("#control");
     expect(document.querySelector("#toggle-nav")).toBeNull();
   });
 });

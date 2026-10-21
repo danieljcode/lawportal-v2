@@ -7,6 +7,8 @@ import { copyText } from "@/lib/clipboard";
 import {
   chapters,
   CHARGE_CLASSES,
+  sortCharges,
+  type ChargeSort,
   chargeCitation,
   fineText,
   PENAL_CODE,
@@ -48,20 +50,35 @@ export interface PenalCodeSearchProps {
   idPrefix: string;
   /** The code to show (tests); the app's data file by default. */
   code?: PenalCode;
+  /** The chapter shown, when the Law Library program's route holds it (LP-108); "" for all. */
+  chapter?: string;
+  /** Pick a chapter (the program changes its address); without it the chapter list is local. */
+  onChapter?(chapter: string): void;
 }
 
-export default function PenalCodeSearch({ onInsert, insertOff, idPrefix, code = PENAL_CODE }: PenalCodeSearchProps) {
+export default function PenalCodeSearch({
+  onInsert,
+  insertOff,
+  idPrefix,
+  code = PENAL_CODE,
+  chapter: routeChapter,
+  onChapter,
+}: PenalCodeSearchProps) {
   const [q, setQ] = useState("");
-  const [chapter, setChapter] = useState("");
+  const [localChapter, setLocalChapter] = useState("");
+  const chapter = onChapter ? routeChapter || "" : localChapter;
+  const setChapter = onChapter || setLocalChapter;
+  const [sort, setSort] = useState<ChargeSort>("section");
   const [cls, setCls] = useState("");
   const [retired, setRetired] = useState(false);
   const [limit, setLimit] = useState(PAGE);
   const [status, setStatus] = useState<{ text: string; bad: boolean } | null>(null);
   const terms = useMemo(() => searchTerms(q).filter((t) => t !== "pc"), [q]);
-  const shown = useMemo(
-    () => searchCharges(code.charges, { q, chapter, class: cls, retired }),
-    [code, q, chapter, cls, retired],
-  );
+  // A search ranks its matches; browsing follows the chosen order (LP-108).
+  const shown = useMemo(() => {
+    const found = searchCharges(code.charges, { q, chapter, class: cls, retired });
+    return q.trim() ? found : sortCharges(found, sort);
+  }, [code, q, chapter, cls, retired, sort]);
   const chapterList = useMemo(() => chapters(code), [code]);
 
   // A new search starts from the top of the results.
@@ -119,6 +136,17 @@ export default function PenalCodeSearch({ onInsert, insertOff, idPrefix, code = 
               {c}
             </option>
           ))}
+        </select>
+        <select
+          id={idPrefix + "-sort"}
+          aria-label="Order"
+          value={sort}
+          disabled={!!q.trim()}
+          title={q.trim() ? "Search results are in order of how well they match" : undefined}
+          onChange={(e) => filter(setSort)(e.target.value as ChargeSort)}
+        >
+          <option value="section">Section order</option>
+          <option value="title">Title, A to Z</option>
         </select>
         <label className="check">
           <input

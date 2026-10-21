@@ -3031,3 +3031,12 @@ dialog.changelog {
   border-radius: 50%;
   background: var(--notify);
 }
+
+/* ---------- Law Library program (LP-108): long sections stay readable ---------- */
+.charge p {
+  max-width: 75ch;
+  line-height: 1.45;
+}
+.library-nav a {
+  white-space: normal;
+}
