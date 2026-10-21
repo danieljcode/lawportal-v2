@@ -27,7 +27,7 @@ browser.
   time and clicks pass through (`pointer-events: none`), so it never holds anything up; any key or
   click ends it, and it ends by itself after 1.8 s (0.7 s on the finished screen with reduced motion).
   It's `aria-hidden`: decoration only.
-- **Program Manager** (`ProgramManager.tsx`, LP-104): the home screen (an empty hash). The registry's
+- **Program Manager** (`ProgramManager.tsx`, LP-104): the Classic layout's home screen (an empty hash). The registry's
   programs as icons in their `group` (Court Work, Main), only those the active character can see,
   plus What's new (a dialog, not a program). Click or Enter opens one; the arrow keys move between
   icons (left and right along the row, up and down to the nearest icon in the next row). Case File's
@@ -42,13 +42,17 @@ browser.
   program; a bottom bar at phone width) and a top bar (the program or page name, the `MenuBar`, the
   active character, Characters with the sync dot, What's new, About and the theme). The page never
   scrolls (`.m-app` is fixed to the viewport); only the program's panes do. **Classic**: the Windows
-  3.x window, toolbar, taskbar and boot screen described below. Home is the Program Manager in both
-  for now (LP-127 gives the modern shell its own).
+  3.x window, toolbar, taskbar and boot screen described below. Home is the Program Manager in
+  Classic and `ModernHome.tsx` in Modern (LP-127): a tile per visible program (linking back to where
+  it was left), then "Needs attention": the character's deadlines due within 48 hours or overdue
+  (`upcoming(…, SOON_DAYS)`, each linking to its case), the latest 5 filings (opened again through
+  App's `openFiling`) and the 5 cases updated most recently, each with an empty state. With no
+  character it shows the whole firm's.
 - **Programs keep their place** (LP-126). Every program opened stays mounted inside React's
   `<Activity>`, hidden while another shows (App remembers each one's last route in `visited`), so
   coming back finds the same form, scroll position, searches and half-typed intake. A hidden
   program's effects are cleaned up (so it does no background work) and come back when it shows;
-  only the showing program has `#editor` (`Shell.visible`). The rail and the Program Manager link
+  only the showing program has `#editor` (`Shell.visible`). The rail and the home screen link
   back to where each was left. Changing the active character drops the hidden programs, so none
   shows the last character's work, and a new page within a program scrolls to the top.
 - **Programs** (LP-103). `App.tsx` is the shell: one program at a time, full-screen, in a window
@@ -82,7 +86,7 @@ browser.
 - **Hash routing** (`useRoute.ts`). Routes are prefixed by program: `#filings` and
   `#filings/<formId>`, `#cases`, `#cases/<id>` and `#cases/upcoming`, `#clients/intake` and
   `#clients/conflicts`, `#library/penal-code` and `#library/precedents`, `#jap`, `#control`; an
-  empty hash is the Program Manager. `parseHash` also reads the old flat hashes (`#cases`, `#upcoming`,
+  empty hash is home. `parseHash` also reads the old flat hashes (`#cases`, `#upcoming`,
   `#intake`, `#conflicts`, `#library`, `#jap`, `#<formId>`), and the hook rewrites them to the
   new ones with `replaceState`. The last place is remembered under `lawapp_last_form` as a hash
   without "#" (a bare form id or `jap`/`cases`/`upcoming` from before still reopens).

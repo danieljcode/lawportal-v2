@@ -2,11 +2,11 @@
 // and phone widths (playwright.config.ts). Each test starts from empty storage.
 import { expect, test, type Page } from "@playwright/test";
 
-/** Open a form the way a user does: Court Filings from the Program Manager, then the sidebar (behind ☰ on a phone). */
+/** Open a form the way a user does: Court Filings from the home screen, then the sidebar (behind ☰ on a phone). */
 async function openForm(page: Page, id: string): Promise<void> {
   await page.goto("/");
-  // The app renders in the browser after a brief "Loading…": wait for the Program Manager (LP-104).
-  await page.locator("#pm-filings").click();
+  // The app renders in the browser after a brief "Loading…": wait for the home screen (LP-127).
+  await page.locator("#tile-filings").click();
   await expect(page.locator(".m-app, .app-window").first()).toBeVisible();
   const toggle = page.locator("#toggle-nav");
   if (await toggle.isVisible()) await toggle.click();

@@ -54,7 +54,7 @@ describe("changelog", () => {
   const added: ChangelogEntry[] = [{ date: "2026-12-01", items: [{ type: "fix", text: "A fix." }] }, ...CHANGELOG];
 
   it("stamps the newest entry and the entry count", () => {
-    expect(stamp()).toBe("2026-10-21|Programs keep their place|2|40");
+    expect(stamp()).toBe("2026-10-21|A home screen that shows what's next|2|41");
     expect(stamp([])).toBe("");
   });
 
