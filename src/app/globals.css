@@ -3040,3 +3040,149 @@ dialog.changelog {
 .library-nav a {
   white-space: normal;
 }
+
+/* ---------- modern shell (LP-125): app rail, top bar, only panes scroll ----------
+   Plain styles on the current colour tokens; LP-110 gives it the modern design. */
+body:has(.m-app) {
+  overflow: hidden;
+}
+.m-app {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  background: var(--face);
+  color: var(--text);
+  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+}
+.m-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 84px;
+  padding: 8px 6px;
+  overflow-y: auto;
+  border-right: 1px solid var(--shadow);
+}
+.m-rail-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 2px;
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+}
+.m-rail-item:hover {
+  background: var(--light);
+  color: #000;
+}
+.m-rail-item[aria-current="page"] {
+  background: var(--select-bg);
+  color: var(--select-text);
+}
+.m-rail-item:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+.m-rail-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+.m-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--field);
+}
+.m-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--shadow);
+  background: var(--face);
+}
+.m-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+.m-topbar .menu-bar {
+  padding: 0;
+}
+.m-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+.m-char {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.m-char select {
+  max-width: 240px;
+}
+.m-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: 6px;
+}
+
+/* Phone width: the rail is a bottom bar, and the navigation pane a drawer above it. */
+@media (max-width: 760px) {
+  .m-app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .m-rail {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    flex-direction: row;
+    width: auto;
+    height: 62px;
+    padding: 4px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-top: 1px solid var(--shadow);
+    border-right: 0;
+    background: var(--face);
+  }
+  .m-rail-item {
+    flex: 1 0 64px;
+    padding: 4px 2px;
+    font-size: 11px;
+  }
+  .m-main {
+    padding-bottom: 62px;
+  }
+  .m-app .sidebar {
+    bottom: 62px;
+  }
+  .m-char .muted {
+    display: none;
+  }
+  .m-char select {
+    max-width: 160px;
+  }
+  /* The File, View and Help menus have these on a phone; the top bar keeps who's filing and sync. */
+  .m-actions #open-dockets,
+  .m-actions #open-changelog,
+  .m-actions #open-about,
+  .m-actions #theme-toggle {
+    display: none;
+  }
+}

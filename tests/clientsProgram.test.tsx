@@ -118,7 +118,7 @@ describe("the Clients program (LP-107)", () => {
     // The intake moves to the case with a hash change, which jsdom fires a moment later.
     await act(async () => new Promise((r) => setTimeout(r, 0)));
     expect(location.hash).toMatch(/^#cases\/[a-z0-9]+$/);
-    expect(must(".app-title .title-bar-text").textContent).toBe("Case File - Friedman & Associates");
+    expect(must("#m-title").textContent).toBe("Case File");
     expect(must("#case-nav-open").textContent).toBe(
       caseStore()
         .list()

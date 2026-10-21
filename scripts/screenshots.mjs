@@ -44,7 +44,7 @@ try {
       // "/#form" on one page would only be a same-document hash change).
       const page = await context.newPage();
       await page.goto(base + "/" + shot.hash, { waitUntil: "networkidle" });
-      await page.waitForSelector(".app-window");
+      await page.waitForSelector(".m-app, .app-window");
       if (shot.hash) {
         // No input is entered: the preview must hold the rendered template as soon as the form is there.
         const first = await page

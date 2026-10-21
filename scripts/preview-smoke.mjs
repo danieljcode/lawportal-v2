@@ -355,7 +355,7 @@ async function phaseSidebar(browser, theme, mode, ctx) {
   const context = await newContext(browser, theme, mode);
   const page = await newPage(context, errors);
   await page.goto(base + "/#filings", { waitUntil: "networkidle" });
-  await page.waitForSelector(".app-window");
+  await page.waitForSelector(".m-app, .app-window");
   const appliedTheme = await page.evaluate(() => document.documentElement.dataset.theme || "");
 
   for (const id of ids) {

@@ -14,6 +14,7 @@ import { caseStore } from "@/lib/cases";
 import { characterStore } from "@/lib/characters";
 import { LAST_FORM_KEY } from "@/lib/formState";
 import { defaultKV } from "@/lib/storage";
+import { setShell } from "@/lib/shell";
 import * as sync from "@/lib/sync";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -141,6 +142,8 @@ describe("the program shell (LP-103)", () => {
     localStorage.clear();
     sessionStorage.clear();
     markBooted();
+    // LP-103 and LP-104 built these in the Classic layout (LP-125).
+    setShell("classic");
     vi.stubGlobal("requestAnimationFrame", () => 0);
     vi.stubGlobal("cancelAnimationFrame", () => {});
     vi.spyOn(sync, "init").mockResolvedValue(undefined);
@@ -274,6 +277,8 @@ describe("the Program Manager (LP-104)", () => {
     localStorage.clear();
     sessionStorage.clear();
     markBooted();
+    // LP-103 and LP-104 built these in the Classic layout (LP-125).
+    setShell("classic");
     vi.stubGlobal("requestAnimationFrame", () => 0);
     vi.stubGlobal("cancelAnimationFrame", () => {});
     vi.spyOn(sync, "init").mockResolvedValue(undefined);
