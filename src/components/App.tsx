@@ -33,6 +33,7 @@ import FilingsDialog from "./FilingsDialog";
 import type { DraftRequest, FormTools } from "./FormView";
 import MenuBar, { type Menu, type MenuItem } from "./MenuBar";
 import ModernFrame from "./ModernFrame";
+import ModernHome from "./ModernHome";
 import ProgramManager from "./ProgramManager";
 import { PROGRAMS, programFor } from "./programs/registry";
 import type { Shell } from "./programs/shell";
@@ -167,7 +168,7 @@ export default function App() {
 
   const commissioner = isCommissioner(active);
   const syncOn = !!sync.code();
-  /** The open program; null at home, where the Program Manager is. */
+  /** The open program; null at home (the modern home screen, or Classic's Program Manager). */
   const program = programFor(route);
   // Deadlines (LP-18): Case File's badge in the Program Manager when the active character has something due within 48 hours.
   const caseVersion = useCaseVersion();
@@ -328,7 +329,17 @@ export default function App() {
   );
   const content = (
     <>
-      {!program && (
+      {!program && layout === "modern" && (
+        <ErrorBoundary where="the home screen" resetKey="home">
+          <ModernHome
+            programs={PROGRAMS.filter((p) => p.visible({ commissioner }))}
+            hrefFor={hrefFor}
+            active={active}
+            onOpenFiling={openFiling}
+          />
+        </ErrorBoundary>
+      )}
+      {!program && layout === "classic" && (
         <ErrorBoundary where="the Program Manager" resetKey="home">
           <ProgramManager
             commissioner={commissioner}

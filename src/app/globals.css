@@ -3186,3 +3186,107 @@ body:has(.m-app) {
     display: none;
   }
 }
+
+/* ---------- modern home screen (LP-127): program tiles and what needs attention ---------- */
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+}
+.home-heading {
+  margin: 0;
+  font-size: 15px;
+}
+.home-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.home-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 6px;
+  border: 1px solid var(--shadow);
+  background: var(--field);
+  color: var(--text);
+  text-align: center;
+  text-decoration: none;
+}
+.home-tile:hover {
+  background: var(--light);
+}
+.home-tile:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+.home-tile-icon {
+  position: relative;
+  font-size: 26px;
+  line-height: 1;
+}
+.home-attention {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 8px;
+}
+.home-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--shadow);
+  background: var(--field);
+  color: var(--text);
+}
+.home-card h3 {
+  margin: 0;
+  font-size: 13px;
+}
+.home-card p {
+  margin: 0;
+}
+.home-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.home-list a,
+.home-link {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+  padding: 5px 6px;
+  border: 0;
+  border-left: 3px solid transparent;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.home-list a:hover,
+.home-link:hover {
+  background: var(--light);
+}
+.home-list .overdue a {
+  border-left-color: var(--bad);
+}
+.home-list .soon a {
+  border-left-color: var(--dot-conflict);
+}
+@media (max-width: 760px) {
+  .home-tiles {
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  }
+}
