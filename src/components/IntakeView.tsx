@@ -18,21 +18,19 @@ import {
   type ClientSide,
   type Intake,
 } from "@/lib/intake";
-import { runConflictCheck, type ConflictRun } from "@/lib/services/conflicts";
 import type { Character } from "@/lib/types";
-import { ConflictResult } from "./ConflictCheckView";
 
 export interface IntakeViewProps {
   characters: Character[];
   /** Defaults the lead to the character filing. */
   active: Character | null;
+  /** Run conflict check: check these names on the Conflict check page (LP-107). */
+  onRunConflicts?(names: string[]): void;
 }
 
-export default function IntakeView({ characters, active }: IntakeViewProps) {
+export default function IntakeView({ characters, active, onRunConflicts }: IntakeViewProps) {
   const [intake, setIntake] = useState<Intake>(() => emptyIntake(active ? active.id : ""));
   const [error, setError] = useState("");
-  /** The conflict check run from here (LP-10), for the names it checked. */
-  const [conflicts, setConflicts] = useState<ConflictRun | null>(null);
   const today = gameToday();
   const leadName = characters.find((c) => c.id === intake.lead)?.name;
 
@@ -199,14 +197,14 @@ export default function IntakeView({ characters, active }: IntakeViewProps) {
           <p className="error" id="intake-error" role="alert">
             {error}
           </p>
-          {conflicts && <ConflictResult run={conflicts} characters={characters} runBy={active} />}
           <div className="row">
             <button
               type="button"
               className="btn"
               id="intake-conflicts"
-              disabled={!intake.clientName.trim()}
-              onClick={() => setConflicts(runConflictCheck([intake.clientName, intake.opposingParty], active))}
+              disabled={!intake.clientName.trim() || !onRunConflicts}
+              title="Check the client and the other side on the Conflict check page"
+              onClick={() => onRunConflicts?.([intake.clientName, intake.opposingParty].filter((n) => n.trim()))}
             >
               Run conflict check
             </button>
