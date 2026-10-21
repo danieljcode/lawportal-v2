@@ -63,6 +63,7 @@ export const PROGRAMS: readonly ProgramDef[] = [
     group: "court",
     start: "#clients/intake",
     visible: everyone,
+    nav: { id: "clients-nav", label: "Clients pages" },
     View: ClientsProgram,
   },
   {
