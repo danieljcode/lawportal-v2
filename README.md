@@ -101,6 +101,8 @@ in, your searches and where you'd scrolled to are still there when you come back
   citation ("PC 1001 Assault") or insert it into a form.
 - **J.A.P.** The Judicial Advancement Portfolio for Court Commissioners I and II: task lists,
   progress and the finished BBCode. Only Court Commissioners see it.
+- **Home.** A tile for each program, and what needs your attention: deadlines due in the next 48
+  hours or overdue, your latest filings to open again, and the cases you worked on most recently.
 - **Control Panel.** Characters, sync and backups, the theme (automatic, light or dark), the startup
   screen, What's new and About.
 

@@ -83,7 +83,8 @@ describe("the modern shell (LP-125)", () => {
     expect(must(".m-app")).toBeTruthy();
     expect(document.querySelector(".app-window, .taskbar, #boot-screen")).toBeNull();
     expect(title()).toBe("Home");
-    expect(must("#program-manager")).toBeTruthy();
+    expect(must("#home")).toBeTruthy();
+    expect(document.querySelector("#program-manager")).toBeNull();
     expect(railNames()).toEqual(["Home", "Court Filings", "Case File", "Clients", "Law Library", "Control Panel"]);
     expect(must("#rail-home").getAttribute("aria-current")).toBe("page");
   });

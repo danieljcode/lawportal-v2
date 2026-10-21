@@ -111,10 +111,11 @@ for (const layout of ["modern", "classic"] as ShellMode[]) {
       mount("#library/penal-code/offenses-involving-theft");
       go("#cases/case0001");
       go(location.pathname);
-      // The home screen's icons (and, in the modern layout, the rail).
-      expect(must("#pm-library").getAttribute("href")).toBe("#library/penal-code/offenses-involving-theft");
-      expect(must("#pm-cases").getAttribute("href")).toBe("#cases/case0001");
-      expect(must("#pm-clients").getAttribute("href")).toBe("#clients/intake");
+      // The home screen's tiles or icons (and, in the modern layout, the rail).
+      const pm = layout === "modern" ? "#tile-" : "#pm-";
+      expect(must(pm + "library").getAttribute("href")).toBe("#library/penal-code/offenses-involving-theft");
+      expect(must(pm + "cases").getAttribute("href")).toBe("#cases/case0001");
+      expect(must(pm + "clients").getAttribute("href")).toBe("#clients/intake");
       if (layout === "modern") {
         expect(must("#rail-library").getAttribute("href")).toBe("#library/penal-code/offenses-involving-theft");
       }
