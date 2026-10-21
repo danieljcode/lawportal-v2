@@ -69,6 +69,7 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
   toolbar button): every firm case, with its lead and the other characters on
   it. Search by case number or party, filter by status or character, and open a case to edit its
   details and who's working it.
+- **Clients** (a program): **New client intake** and the **Conflict check** in its side pane.
 - **Conflict check** (in **Clients**): check a new client's name (and the other side's) against every firm
   case, with a clear verdict, the matches, and a memo to copy or print. Every check is logged.
 - **Law Library** (a program): the FreestyleRP **penal code**, searchable by section number, keyword

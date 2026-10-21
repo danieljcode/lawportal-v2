@@ -194,7 +194,7 @@ describe("the Conflict check program and the intake (LP-10)", () => {
     mount("#conflicts");
     // An old link opens the Clients program at the conflict check (LP-103).
     expect(location.hash).toBe("#clients/conflicts");
-    expect(must("#clients-tab-conflicts").getAttribute("aria-current")).toBe("page");
+    expect(must("#clients-nav-conflicts").getAttribute("aria-current")).toBe("page");
     setValue("#conflict-names", "A. Lee\nZed Quinn");
     act(() => must("#conflict-form").dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })));
     expect(must("#conflict-verdict").textContent).toBe("Possible conflict: review before accepting");

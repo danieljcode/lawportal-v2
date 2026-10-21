@@ -78,14 +78,29 @@ export function ConflictResult({ run, characters, runBy, memoActions }: Conflict
   );
 }
 
+/** A check started elsewhere (intake's Run conflict check, LP-107): its names and result; each new `seq` once. */
+export interface ConflictRequest {
+  names: string[];
+  run: ConflictRun;
+  seq: number;
+}
+
 export interface ConflictCheckViewProps {
   characters: Character[];
   active: Character | null;
+  request?: ConflictRequest | null;
 }
 
-export default function ConflictCheckView({ characters, active }: ConflictCheckViewProps) {
-  const [text, setText] = useState("");
-  const [run, setRun] = useState<ConflictRun | null>(null);
+export default function ConflictCheckView({ characters, active, request = null }: ConflictCheckViewProps) {
+  const [text, setText] = useState(() => (request ? request.names.join("\n") : ""));
+  const [run, setRun] = useState<ConflictRun | null>(() => (request ? request.run : null));
+  // A new check from intake fills in its names and shows its result (adjusted while rendering).
+  const [seenSeq, setSeenSeq] = useState(request ? request.seq : 0);
+  if (request && request.seq !== seenSeq) {
+    setSeenSeq(request.seq);
+    setText(request.names.join("\n"));
+    setRun(request.run);
+  }
   const [error, setError] = useState("");
   const version = useConflictLogVersion();
   const log = useMemo(() => (version >= 0 ? conflictLog().list().slice(0, 20) : []), [version]);
