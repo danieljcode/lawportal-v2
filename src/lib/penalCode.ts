@@ -48,6 +48,29 @@ export function chapters(code: PenalCode = PENAL_CODE): string[] {
   return [...new Set(code.charges.map((c) => c.chapter))];
 }
 
+/** A chapter's address part: "Offenses Involving Theft" → "offenses-involving-theft" (LP-108). */
+export function chapterSlug(chapter: string): string {
+  return chapter
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+/** The chapter with this slug, or "" for none or an unknown one. */
+export function chapterFromSlug(slug: string | undefined, code: PenalCode = PENAL_CODE): string {
+  if (!slug) return "";
+  return chapters(code).find((c) => chapterSlug(c) === slug) || "";
+}
+
+export type ChargeSort = "section" | "title";
+
+/** Charges in section order (as the code lists them) or by title, A to Z. */
+export function sortCharges(charges: readonly Charge[], by: ChargeSort): Charge[] {
+  if (by === "section") return [...charges];
+  return [...charges].sort((a, b) => a.title.localeCompare(b.title, "en-GB") || a.section.localeCompare(b.section));
+}
+
 /** "PC 1001 Assault". */
 export function chargeCitation(c: Charge): string {
   return c.section + " " + c.title;

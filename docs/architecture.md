@@ -56,8 +56,13 @@ browser.
   trip to the check. Intake's Run conflict check runs the check (`runConflictCheck`) and hands it
   to the Conflict check page as a request (names, result, `seq`), which fills in the names and
   shows the result; `navigate()` in `useRoute` moves there at once. The Rolodex (LP-30) will be one
-  more entry in its pane. The other programs are single-pane for now (LP-108, LP-109 give each its
-  own layout and menus).
+  more entry in its pane. The Law Library (`LibraryProgram.tsx`, LP-108) has a pane with Penal Code (All charges, then
+  each chapter with its count) and Precedents; a chapter has its own address
+  (`#library/penal-code/<chapter slug>`, `chapterSlug`/`chapterFromSlug` in `penalCode.ts`), and
+  picking one in the chapter list changes it. `PenalCodeSearch` takes the chapter from the program
+  (or keeps its own in the Insert citation dialog, which still shows both as tabs) and can browse
+  in section order or by title (`sortCharges`; a search ranks its matches instead). The J.A.P. and
+  Control Panel are single-pane for now (LP-109).
 - **Hash routing** (`useRoute.ts`). Routes are prefixed by program: `#filings` and
   `#filings/<formId>`, `#cases`, `#cases/<id>` and `#cases/upcoming`, `#clients/intake` and
   `#clients/conflicts`, `#library/penal-code` and `#library/precedents`, `#jap`, `#control`; an

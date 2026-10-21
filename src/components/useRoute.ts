@@ -23,7 +23,7 @@ export type Route =
   | { program: "filings"; formId: string | null }
   | { program: "cases"; caseId: string | null; upcoming?: boolean }
   | { program: "clients"; page: ClientsPage }
-  | { program: "library"; page: LibraryPage }
+  | { program: "library"; page: LibraryPage; chapter?: string }
   | { program: "jap" }
   | { program: "control" };
 
@@ -58,7 +58,7 @@ export function hashFor(r: Route): string {
     case "clients":
       return "#clients/" + r.page;
     case "library":
-      return "#library/" + r.page;
+      return "#library/" + r.page + (r.page === "penal-code" && r.chapter ? "/" + r.chapter : "");
     default:
       return "#" + r.program;
   }
@@ -88,8 +88,14 @@ export function parseHash(hash: string): Route {
       return { program: "cases", caseId: CASE_ID.test(rest) ? rest : null };
     case "clients":
       return { program: "clients", page: rest === "conflicts" ? "conflicts" : "intake" };
-    case "library":
-      return { program: "library", page: rest === "precedents" ? "precedents" : "penal-code" };
+    case "library": {
+      // A penal code chapter (LP-108): #library/penal-code/<chapter slug>.
+      const [page, chapter] = rest.split("/");
+      if (page === "precedents") return { program: "library", page: "precedents" };
+      return /^[a-z0-9-]{1,80}$/.test(chapter || "")
+        ? { program: "library", page: "penal-code", chapter }
+        : { program: "library", page: "penal-code" };
+    }
     case "jap":
       return { program: "jap" };
     case "control":
