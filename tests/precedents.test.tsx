@@ -211,8 +211,7 @@ describe("the Law Library (LP-16)", () => {
 
   it("adds a ruling, then searches, highlights and filters by topic", () => {
     precedentStore().save(LEE);
-    mount("#library");
-    click(must("#library-tab-precedents"));
+    mount("#library/precedents");
     expect(document.title).toContain("Law Library");
     click(must("#precedent-new"));
     act(() => must("#precedent-form").dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })));
@@ -248,8 +247,7 @@ describe("the Law Library (LP-16)", () => {
 
   it("edits and deletes a ruling, and shows typed text as text", () => {
     precedentStore().save({ ...LEE, caseName: '<img src=x onerror="alert(1)">' });
-    mount("#library");
-    click(must("#library-tab-precedents"));
+    mount("#library/precedents");
     expect(document.querySelector("#precedents-list img")).toBeNull();
     click(button(must(".precedent"), "Edit"));
     setValue("#precedent-name", "People v. Lee");
@@ -264,8 +262,7 @@ describe("the Law Library (LP-16)", () => {
   it("copies a citation", async () => {
     const copy = vi.spyOn(clipboard, "copyText").mockResolvedValue(true);
     precedentStore().save(SMITH);
-    mount("#library");
-    click(must("#library-tab-precedents"));
+    mount("#library/precedents");
     await act(async () => button(must(".precedent"), "Copy citation").click());
     expect(copy).toHaveBeenCalledWith("Smith v. Jones, 90SCCV00123 (San Andreas Civil Court 1990)");
   });

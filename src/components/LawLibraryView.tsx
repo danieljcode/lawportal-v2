@@ -1,9 +1,10 @@
-// The Law Library program at #library, with two tabs. Penal Code (LP-17): the
-// server's charges, searched and cited (PenalCodeSearch). Precedents (LP-16):
-// the firm's own rulings, added and edited here, searched by keyword, case
-// number, judge or court (matches highlighted) and filtered by topic tag. Both
-// searches are also the Law Library dialog in a form, where Insert citation
-// puts the reference into the form field last clicked in.
+// The Law Library's page. Penal Code (LP-17): the server's charges, browsed by
+// chapter or searched, and cited (PenalCodeSearch). Precedents (LP-16): the
+// firm's own rulings, added and edited here, searched by keyword, case number,
+// judge or court (matches highlighted) and filtered by topic tag. The program's
+// navigation pane picks the section (LP-108); the Law Library dialog in a form
+// shows both as tabs (LibraryTabs), where Insert citation puts the reference
+// into the form field last clicked in.
 
 import { useMemo, useState, type FormEvent } from "react";
 import { copyText } from "@/lib/clipboard";
@@ -358,52 +359,47 @@ function PrecedentForm({ editing, onDone }: { editing: Precedent | null; onDone(
   );
 }
 
-const TAB_HASH: Record<LibraryTab, string> = { code: "#library/penal-code", precedents: "#library/precedents" };
-
-/** The Law Library program's page; `tab` comes from the route (#library/penal-code, #library/precedents). */
-export default function LawLibraryView({ tab: routeTab = "code" }: { tab?: LibraryTab }) {
+/**
+ * The Law Library program's page (LP-108): the section its navigation pane picked, Penal Code
+ * (optionally one chapter) or Precedents. The program changes the address for a chapter.
+ */
+export default function LawLibraryView({
+  tab = "code",
+  chapter = "",
+  onChapter,
+}: {
+  tab?: LibraryTab;
+  chapter?: string;
+  onChapter?(chapter: string): void;
+}) {
   /** The ruling being edited, "new" for the add form, or null. */
   const [editing, setEditing] = useState<Precedent | "new" | null>(null);
-  // The tab switches at once, and the URL follows (back and forward come in through the route).
-  const [tab, setTab] = useState<LibraryTab>(routeTab);
-  const [seenTab, setSeenTab] = useState(routeTab);
-  if (routeTab !== seenTab) {
-    setSeenTab(routeTab);
-    setTab(routeTab);
-  }
-  const pickTab = (t: LibraryTab) => {
-    setTab(t);
-    if (location.hash !== TAB_HASH[t]) location.hash = TAB_HASH[t];
-  };
 
   return (
     <section id="library" className="form-view library">
       <div className="form-head">
         <div>
-          <p className="crumb muted">The firm</p>
-          <h2 id="library-title">Law Library</h2>
+          <p className="crumb muted">Law Library</p>
+          <h2 id="library-title">{tab === "code" ? chapter || "Penal Code" : "Precedents"}</h2>
         </div>
       </div>
-      <LibraryTabs tab={tab} onTab={pickTab} idPrefix="library" />
       {tab === "code" ? (
-        <section aria-labelledby="code-title" className="penal-code-section">
-          <h3 id="code-title">Penal Code</h3>
-          <PenalCodeSearch idPrefix="code" />
+        <section aria-labelledby="library-title" className="penal-code-section" id="code-section">
+          <PenalCodeSearch idPrefix="code" chapter={chapter} onChapter={onChapter || (() => {})} />
         </section>
       ) : (
-        <section aria-labelledby="precedents-title" className="precedents">
+        <section aria-labelledby="library-title" className="precedents" id="precedents-section">
           <div className="row precedents-head">
-            <h3 id="precedents-title">Precedents</h3>
+            <p className="small muted">
+              Rulings the firm has been involved in. Search them here, or open the Law Library from a form to insert a
+              citation.
+            </p>
             {!editing && (
               <button type="button" className="btn" id="precedent-new" onClick={() => setEditing("new")}>
                 Add ruling
               </button>
             )}
           </div>
-          <p className="small muted">
-            Rulings the firm has been involved in. Search them here, or open the Law Library from a form to insert a
-            citation.
-          </p>
           {editing && (
             <PrecedentForm
               key={editing === "new" ? "new" : editing.id}

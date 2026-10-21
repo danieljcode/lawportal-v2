@@ -204,7 +204,7 @@ describe("the Penal Code in the Law Library (LP-17)", () => {
 
   it("opens on the code, says when it was updated, and searches with highlights", () => {
     mount("#library");
-    expect(must("#library-tab-code").getAttribute("aria-selected")).toBe("true");
+    expect(must('#library-nav [aria-current="page"]').textContent).toBe("All charges");
     expect(must("#code-source").textContent).toMatch(/last updated \d{1,2} [A-Z][a-z]{2} \d{4}/);
     // A page of results, then Show more.
     expect(document.querySelectorAll("#code-list .charge")).toHaveLength(40);
@@ -246,9 +246,8 @@ describe("the Penal Code in the Law Library (LP-17)", () => {
     expect(document.querySelector("#pm-library")!.getAttribute("href")).toBe("#library/penal-code");
   });
 
-  it("keeps the firm's precedents on their own tab", () => {
-    mount("#library");
-    click(must("#library-tab-precedents"));
+  it("keeps the firm's precedents in their own section", () => {
+    mount("#library/precedents");
     expect(must("#precedents-empty").textContent).toContain("No rulings");
     expect(document.querySelector("#code-q")).toBeNull();
   });
