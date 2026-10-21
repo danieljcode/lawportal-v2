@@ -19,6 +19,20 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-21",
+    title: "Clients",
+    items: [
+      {
+        type: "new",
+        text: "The Clients program has a side pane with New client intake and Conflict check.",
+      },
+      {
+        type: "update",
+        text: "Run conflict check on the intake now opens the Conflict check with the client and the other side filled in, and what you typed in the intake is still there when you go back.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-21",
     title: "Case File",
     items: [
       {

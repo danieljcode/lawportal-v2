@@ -37,6 +37,15 @@ export const CONFLICTS_TITLE = "Conflict check";
 export const LIBRARY_TITLE = "Law Library";
 export const CONTROL_TITLE = "Control Panel";
 
+/**
+ * Go to a hash now: a history entry (so Back returns) and the route updates in the same task,
+ * without waiting for the browser's own hashchange event.
+ */
+export function navigate(hash: string): void {
+  history.pushState(null, "", hash);
+  window.dispatchEvent(new HashChangeEvent("hashchange"));
+}
+
 /** The one hash for a route: "#cases/<id>", "#filings/<formId>", "" for home. */
 export function hashFor(r: Route): string {
   switch (r.program) {

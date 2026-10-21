@@ -51,8 +51,13 @@ browser.
   The Case File (`CaseFileProgram.tsx`, LP-106) has a navigation pane too: All cases, Upcoming
   (with how many are due soon) and the open case, and links across to Clients (New case from
   intake, Run conflict check). A registry entry's `nav` is its pane's id and label, which the
-  toolbar's ☰ controls at phone width. The other programs are single-pane for now (LP-107 to
-  LP-109 give each its own layout and menus).
+  toolbar's ☰ controls at phone width. Clients (`ClientsProgram.tsx`, LP-107) has a pane too, with
+  New client intake and Conflict check, both kept mounted with the other page hidden, so a half-typed intake survives a
+  trip to the check. Intake's Run conflict check runs the check (`runConflictCheck`) and hands it
+  to the Conflict check page as a request (names, result, `seq`), which fills in the names and
+  shows the result; `navigate()` in `useRoute` moves there at once. The Rolodex (LP-30) will be one
+  more entry in its pane. The other programs are single-pane for now (LP-108, LP-109 give each its
+  own layout and menus).
 - **Hash routing** (`useRoute.ts`). Routes are prefixed by program: `#filings` and
   `#filings/<formId>`, `#cases`, `#cases/<id>` and `#cases/upcoming`, `#clients/intake` and
   `#clients/conflicts`, `#library/penal-code` and `#library/precedents`, `#jap`, `#control`; an
