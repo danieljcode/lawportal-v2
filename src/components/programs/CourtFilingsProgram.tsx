@@ -42,7 +42,7 @@ export default function CourtFilingsProgram({ shell }: ProgramProps) {
     // "with-output" adds the third grid column (the form's preview).
     <div className={"layout" + (showOutput ? " with-output" : "")}>
       <Sidebar forms={ALL_FORMS} current={hashFor(shell.route).slice(1)} />
-      <main className="editor" id="editor">
+      <main className="editor" id={shell.visible ? "editor" : undefined}>
         {form ? (
           <ErrorBoundary
             where="this form"

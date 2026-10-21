@@ -42,6 +42,8 @@ export interface Shell {
   /** The frame round the programs (LP-125): modern or Classic, until the Classic theme (LP-112). */
   layout: ShellMode;
   setLayout(mode: ShellMode): void;
+  /** This program is the one showing; false while it's kept, hidden, for coming back to (LP-126). */
+  visible: boolean;
 }
 
 export interface ProgramProps {
