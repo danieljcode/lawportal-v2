@@ -68,9 +68,10 @@ request.
 
 ## What's in it
 
-The app is a set of **programs**, opened from the home screen (the **Program Manager**) and shown one
-at a time, each with its own **File**, **View** and **Help** menus. The character you're filing as
-is in the taskbar, the same in every program.
+The app is a set of **programs**, shown one at a time. An app rail down the side (a bar along the
+bottom on a phone) switches between them, and the top bar shows the program, its **File**, **View**
+and **Help** menus, and the character you're filing as, the same in every program. Only the panes
+scroll, never the whole page.
 
 - **Court Filings.** 39 FreestyleRP court forms grouped by court (Criminal, Civil, Traffic, Small
   Claims, Appellate, Supreme, general), plus 13 of the firm's own templates: General Petition,
@@ -102,8 +103,9 @@ is in the taskbar, the same in every program.
 - **Control Panel.** Characters, sync and backups, the theme (automatic, light or dark), the startup
   screen, What's new and About.
 
-The look is a 1990s Windows desktop for now, with a DOS-style startup screen once per session (any
-key skips it). That's changing: see [Roadmap](#roadmap).
+Prefer the 1990 look? **Classic layout** (Control Panel, or View in the menus) puts the programs in a
+Windows 3.x window with a taskbar, a Program Manager and a DOS-style startup screen once per session.
+The programs are the same in both.
 
 ## Your data and sync
 

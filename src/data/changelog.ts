@@ -19,6 +19,24 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-21",
+    title: "A modern layout",
+    items: [
+      {
+        type: "new",
+        text: "A cleaner, modern layout: an app rail down the side switches programs (a bar along the bottom on a phone), and the top bar shows the program, its menus and who you're filing as.",
+      },
+      {
+        type: "update",
+        text: "Only the panes scroll now, never the whole page, so the menus and the character picker stay in view.",
+      },
+      {
+        type: "new",
+        text: "Prefer the 1990 look? Choose Classic layout in the Control Panel (or View in the menus) for the Windows 3.x window, taskbar and startup screen.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-21",
     title: "Law Library",
     items: [
       {

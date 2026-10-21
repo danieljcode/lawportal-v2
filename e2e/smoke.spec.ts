@@ -7,7 +7,7 @@ async function openForm(page: Page, id: string): Promise<void> {
   await page.goto("/");
   // The app renders in the browser after a brief "Loading…": wait for the Program Manager (LP-104).
   await page.locator("#pm-filings").click();
-  await expect(page.locator(".app-window")).toBeVisible();
+  await expect(page.locator(".m-app, .app-window").first()).toBeVisible();
   const toggle = page.locator("#toggle-nav");
   if (await toggle.isVisible()) await toggle.click();
   await page.locator(`#sidebar a[href="#filings/${id}"]`).click();
@@ -83,7 +83,13 @@ test("add a character, and it becomes the one filing", async ({ page }) => {
 test("add a case to a judge's docket", async ({ page }) => {
   await seedJudge(page);
   await page.goto("/");
-  await page.locator("#open-dockets").click();
+  // A phone's top bar keeps Dockets in the File menu (LP-125).
+  const dockets = page.locator("#open-dockets");
+  if (await dockets.isVisible()) await dockets.click();
+  else {
+    await page.locator("#menu-file").click();
+    await page.locator("#menu-dockets").click();
+  }
   await expect(page.locator("#dockets-title")).toContainText("Judy Bench");
   await page.locator("#new-docket").click();
   await page.locator("#docket-caseNumber").fill("90SCCR00147");

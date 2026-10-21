@@ -35,6 +35,15 @@ browser.
   dot while unread. The taskbar's **Start** returns here. Court Filings with no form open
   (`#filings`) shows the three steps that used to be the start page; the startup screen setting is
   in the Control Panel.
+- **Two layouts round the programs** (LP-125). `App.tsx` builds the program, its menus, the set-aside
+  notice and the dialogs once, then draws one of two frames, picked by `lawapp_shell`
+  (`src/lib/shell.ts`; a temporary setting in the Control Panel and the View menu until the Classic
+  theme, LP-112). **Modern** (the default, `ModernFrame.tsx`): an app rail (Home and each visible
+  program; a bottom bar at phone width) and a top bar (the program or page name, the `MenuBar`, the
+  active character, Characters with the sync dot, What's new, About and the theme). The page never
+  scrolls (`.m-app` is fixed to the viewport); only the program's panes do. **Classic**: the Windows
+  3.x window, toolbar, taskbar and boot screen described below. Home is the Program Manager in both
+  for now (LP-127 gives the modern shell its own).
 - **Programs** (LP-103). `App.tsx` is the shell: one program at a time, full-screen, in a window
   with its title bar ("Case File - Friedman & Associates"; at home, "Program Manager - Friedman &
   Associates", while the browser tab keeps the LP-22 title), a menu bar (`MenuBar.tsx`: File, View,

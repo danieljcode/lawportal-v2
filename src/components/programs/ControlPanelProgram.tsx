@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { BRANDING } from "@/branding";
 import { bootEnabled, setBootEnabled } from "@/lib/boot";
+import type { ShellMode } from "@/lib/shell";
 import { LABELS, type ThemeMode, MODES } from "@/lib/theme";
 import type { ProgramProps } from "./shell";
 
@@ -39,6 +40,20 @@ export default function ControlPanelProgram({ shell }: ProgramProps) {
                     {LABELS[m][0].toUpperCase() + LABELS[m].slice(1)}
                   </option>
                 ))}
+              </select>
+            </label>
+          </li>
+          <li>
+            {/* Modern or Classic layout (LP-125), until the Classic theme (LP-112) replaces this. */}
+            <label className="control-theme">
+              <span>Layout</span>
+              <select
+                id="control-shell"
+                value={shell.layout}
+                onChange={(e) => shell.setLayout(e.target.value as ShellMode)}
+              >
+                <option value="modern">Modern</option>
+                <option value="classic">Classic (1990): window, taskbar and startup screen</option>
               </select>
             </label>
           </li>

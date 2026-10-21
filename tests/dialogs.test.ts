@@ -241,7 +241,7 @@ describe("Characters dialog", () => {
     expect(c.name).toBe("Jane Roe");
     expect(characterStore().activeId()).toBe(c.id); // the first character becomes active
     expect(must("#char-list").textContent).toContain("active");
-    expect($("#open-jap")).not.toBeNull();
+    expect($("#rail-jap")).not.toBeNull();
     expect($("#open-dockets")).not.toBeNull();
   });
 });

@@ -132,8 +132,8 @@ describe("Upcoming and the toolbar dot (LP-18)", () => {
     expect(must("#pm-cases #due-dot")).toBeTruthy();
     expect(must("#pm-cases").getAttribute("href")).toBe("#cases/upcoming");
     expect(must("#pm-cases").getAttribute("aria-label")).toBe("Case File (1 due soon)");
-    // The toolbar's Case File button no longer carries the dot (LP-104).
-    expect(must("#open-cases").getAttribute("href")).toBe("#cases");
+    // The app rail's Case File carries no dot (LP-104 moved it to the Program Manager).
+    expect(must("#rail-cases").getAttribute("href")).toBe("#cases");
     // The Case File program's File menu leads there too (LP-103).
     act(() => {
       history.pushState(null, "", "#cases");
