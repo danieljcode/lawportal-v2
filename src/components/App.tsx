@@ -286,7 +286,7 @@ export default function App() {
           syncStatus={syncOn ? syncState.status : null}
           changelogUnread={changelogUnread}
           navOpen={navOpen}
-          hasNav={!!program?.nav}
+          nav={program?.nav}
           theme={theme}
           onTheme={setTheme}
           onHome={goHome}

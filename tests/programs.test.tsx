@@ -254,12 +254,17 @@ describe("the program shell (LP-103)", () => {
     expect(characterStore().activeId()).toBe("carl0001");
   });
 
-  it("has the forms list as Court Filings' drawer at phone width, and no ☰ elsewhere", () => {
+  it("has each program's navigation pane as a drawer at phone width, and no ☰ without one", () => {
     mount("#filings");
+    expect(must("#toggle-nav").getAttribute("aria-controls")).toBe("sidebar");
     click("#toggle-nav");
     expect(must(".app-window").className).toContain("nav-open");
     go("#cases");
     expect(must(".app-window").className).not.toContain("nav-open");
+    // The Case File has its own pane (LP-106).
+    expect(must("#toggle-nav").getAttribute("aria-controls")).toBe("case-nav");
+    expect(must("#toggle-nav").getAttribute("aria-label")).toBe("Show Case File pages");
+    go("#library/penal-code");
     expect(document.querySelector("#toggle-nav")).toBeNull();
   });
 });
