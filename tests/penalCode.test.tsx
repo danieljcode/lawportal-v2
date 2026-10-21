@@ -242,7 +242,7 @@ describe("the Penal Code in the Law Library (LP-17)", () => {
     setValue("#form-search", "library");
     expect(document.querySelector('#form-list a[href^="#library"]')).toBeNull();
     expect(document.querySelector("#form-list")!.textContent).toContain("No forms match.");
-    act(() => document.querySelector<HTMLButtonElement>("#start-btn")!.click());
+    act(() => document.querySelector<HTMLAnchorElement>("#rail-home")!.click());
     expect(document.querySelector("#pm-library")!.getAttribute("href")).toBe("#library/penal-code");
   });
 

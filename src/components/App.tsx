@@ -1,9 +1,11 @@
 "use client";
 
-// The program shell (LP-103; design §UI components): the Program Manager at
-// home (LP-104), or one program at a time, full-screen, in a Windows 3.x-style
-// window with its own title bar and menu bar; the taskbar with Start (back to
-// the Program Manager) and the active character; and the dialogs. The
+// The program shell (LP-103; design §UI components): one program at a time,
+// full-screen, around which App draws one of two frames (LP-125): the modern
+// shell (ModernFrame: app rail and top bar; the default) or Classic, the
+// Windows 3.x window with its title bar and menu bar, the taskbar with Start
+// (back to the Program Manager) and the boot screen. Home is the Program
+// Manager in both for now (LP-127 gives the modern shell its own). The
 // programs are in programs/registry.ts; routing is useRoute.ts and the dialogs
 // useDialogs.ts (LP-7).
 
@@ -18,6 +20,7 @@ import { readDraft, writeDraft } from "@/lib/formState";
 import { defaultKV } from "@/lib/storage";
 import { isCommissioner } from "@/lib/portfolio";
 import * as sync from "@/lib/sync";
+import { getShell, setShell, type ShellMode } from "@/lib/shell";
 import { getTheme, LABELS, MODES, setTheme as saveTheme, type ThemeMode } from "@/lib/theme";
 import AboutDialog from "./AboutDialog";
 import BootScreen from "./BootScreen";
@@ -28,8 +31,9 @@ import ErrorBoundary from "./ErrorBoundary";
 import FilingsDialog from "./FilingsDialog";
 import type { DraftRequest, FormTools } from "./FormView";
 import MenuBar, { type Menu, type MenuItem } from "./MenuBar";
+import ModernFrame from "./ModernFrame";
 import ProgramManager from "./ProgramManager";
-import { programFor } from "./programs/registry";
+import { PROGRAMS, programFor } from "./programs/registry";
 import type { Shell } from "./programs/shell";
 import Taskbar from "./Taskbar";
 import Toolbar from "./Toolbar";
@@ -69,6 +73,12 @@ export default function App() {
   const setTheme = (mode: ThemeMode) => {
     saveTheme(mode);
     setThemeState(mode);
+  };
+  /** The frame round the programs (LP-125): modern unless Classic was chosen. */
+  const [layout, setLayoutState] = useState<ShellMode>(getShell);
+  const setLayout = (mode: ShellMode) => {
+    setShell(mode);
+    setLayoutState(mode);
   };
 
   /**
@@ -182,13 +192,12 @@ export default function App() {
     openAbout,
     theme,
     setTheme,
+    layout,
+    setLayout,
   };
 
   // Each program's own File items, then the shell's (LP-105 to LP-109 add more).
   const own: Partial<Record<string, MenuItem[]>> = {
-    filings: hasDocket(active)
-      ? [{ label: "Dockets…", id: "menu-dockets", onSelect: () => openDockets(activeId) }]
-      : [],
     cases: [
       { label: "All cases", href: "#cases" },
       { label: "Upcoming", href: "#cases/upcoming" },
@@ -233,6 +242,10 @@ export default function App() {
         ...fileItems,
         ...(fileItems.length ? (["-"] as MenuItem[]) : []),
         { label: "Characters…", id: "menu-characters", onSelect: () => openCharacters() },
+        // In every program, so a phone (where the top bar drops its Dockets button) still has it.
+        ...(hasDocket(active)
+          ? [{ label: "Dockets…", id: "menu-dockets", onSelect: () => openDockets(activeId) }]
+          : []),
         // Exit closes the program, back to the Program Manager.
         ...(program ? (["-", { label: "Exit", id: "menu-exit", onSelect: () => goHome() }] as MenuItem[]) : []),
       ],
@@ -248,6 +261,12 @@ export default function App() {
           onSelect: () => setTheme(m),
         })),
         "-",
+        {
+          label: "Classic (1990) layout",
+          id: "menu-classic",
+          checked: layout === "classic",
+          onSelect: () => setLayout(layout === "classic" ? "modern" : "classic"),
+        },
         { label: "Control Panel", href: "#control" },
       ],
     },
@@ -265,73 +284,102 @@ export default function App() {
   const icon = program ? program.icon : "▦";
   const View = program?.View;
 
+  const notice = setAsideCount > setAsideSeen && (
+    <div className="set-aside-notice" id="set-aside-notice" role="alert">
+      <strong>{S_SET_ASIDE}</strong> {S_SET_ASIDE_HINT}
+      <button type="button" className="mini" id="set-aside-dismiss" onClick={() => setSetAsideSeen(setAsideCount)}>
+        Dismiss
+      </button>
+    </div>
+  );
+  const content = (
+    <ErrorBoundary where={program ? program.title : "the Program Manager"} resetKey={program ? program.id : "home"}>
+      {View ? (
+        <View shell={shell} />
+      ) : (
+        <ProgramManager
+          commissioner={commissioner}
+          casesDue={casesDue}
+          changelogUnread={changelogUnread}
+          openChangelog={openChangelog}
+        />
+      )}
+    </ErrorBoundary>
+  );
+
   return (
     <>
-      <div className={"app-window program-" + (program ? program.id : "home") + (navOpen ? " nav-open" : "")}>
-        <div className="title-bar app-title">
-          <span className="title-bar-icon" aria-hidden="true">
-            {icon}
-          </span>
-          <span className="title-bar-text">{windowTitle}</span>
-          <span className="title-bar-controls" aria-hidden="true">
-            <span>_</span>
-            <span>□</span>
-            <span>✕</span>
-          </span>
-        </div>
-        <MenuBar menus={menus} />
-        <Toolbar
-          showDockets={hasDocket(active)}
-          showJap={commissioner}
+      {layout === "modern" ? (
+        <ModernFrame
+          programs={PROGRAMS.filter((p) => p.visible({ commissioner }))}
+          program={program}
+          title={program ? task : "Home"}
+          menus={menus}
+          navOpen={navOpen}
+          onToggleNav={() => setNavOpen((o) => !o)}
+          characters={characters}
+          activeId={active ? active.id : null}
+          onActive={(id) => characterStore().setActive(id)}
           syncStatus={syncOn ? syncState.status : null}
           changelogUnread={changelogUnread}
-          navOpen={navOpen}
-          nav={program?.nav}
-          theme={theme}
-          onTheme={setTheme}
-          onHome={goHome}
-          onToggleNav={() => setNavOpen((o) => !o)}
+          showDockets={hasDocket(active)}
           onDockets={() => openDockets(activeId)}
           onCharacters={() => openCharacters()}
           onChangelog={openChangelog}
           onAbout={openAbout}
-        />
-        {setAsideCount > setAsideSeen && (
-          <div className="set-aside-notice" id="set-aside-notice" role="alert">
-            <strong>{S_SET_ASIDE}</strong> {S_SET_ASIDE_HINT}
-            <button
-              type="button"
-              className="mini"
-              id="set-aside-dismiss"
-              onClick={() => setSetAsideSeen(setAsideCount)}
-            >
-              Dismiss
-            </button>
-          </div>
-        )}
-        <ErrorBoundary where={program ? program.title : "the Program Manager"} resetKey={program ? program.id : "home"}>
-          {View ? (
-            <View shell={shell} />
-          ) : (
-            <ProgramManager
-              commissioner={commissioner}
-              casesDue={casesDue}
+          theme={theme}
+          onTheme={setTheme}
+          onHome={goHome}
+          notice={notice}
+        >
+          {content}
+        </ModernFrame>
+      ) : (
+        <>
+          <div className={"app-window program-" + (program ? program.id : "home") + (navOpen ? " nav-open" : "")}>
+            <div className="title-bar app-title">
+              <span className="title-bar-icon" aria-hidden="true">
+                {icon}
+              </span>
+              <span className="title-bar-text">{windowTitle}</span>
+              <span className="title-bar-controls" aria-hidden="true">
+                <span>_</span>
+                <span>□</span>
+                <span>✕</span>
+              </span>
+            </div>
+            <MenuBar menus={menus} />
+            <Toolbar
+              showDockets={hasDocket(active)}
+              showJap={commissioner}
+              syncStatus={syncOn ? syncState.status : null}
               changelogUnread={changelogUnread}
-              openChangelog={openChangelog}
+              navOpen={navOpen}
+              nav={program?.nav}
+              theme={theme}
+              onTheme={setTheme}
+              onHome={goHome}
+              onToggleNav={() => setNavOpen((o) => !o)}
+              onDockets={() => openDockets(activeId)}
+              onCharacters={() => openCharacters()}
+              onChangelog={openChangelog}
+              onAbout={openAbout}
             />
-          )}
-        </ErrorBoundary>
-      </div>
-      <Taskbar
-        icon={icon}
-        task={task}
-        characters={characters}
-        activeId={active ? active.id : null}
-        onActive={(id) => characterStore().setActive(id)}
-        onHome={goHome}
-      />
-      {/* The DOS-style boot screen (LP-21), over the app once per session. */}
-      <BootScreen />
+            {notice}
+            {content}
+          </div>
+          <Taskbar
+            icon={icon}
+            task={task}
+            characters={characters}
+            activeId={active ? active.id : null}
+            onActive={(id) => characterStore().setActive(id)}
+            onHome={goHome}
+          />
+          {/* The DOS-style boot screen (LP-21), over the app once per session: part of Classic. */}
+          <BootScreen />
+        </>
+      )}
       <datalist id="character-names">
         {characters.map((c) => (
           <option key={c.id} value={c.name} />

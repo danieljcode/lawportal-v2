@@ -19,6 +19,7 @@ import {
   shouldBoot,
   STILL_MS,
 } from "@/lib/boot";
+import { setShell } from "@/lib/shell";
 import * as sync from "@/lib/sync";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -95,6 +96,8 @@ describe("the boot screen in the App (LP-21)", () => {
   beforeEach(() => {
     localStorage.clear();
     sessionStorage.clear();
+    // The boot screen is part of the Classic layout (LP-125).
+    setShell("classic");
     vi.useFakeTimers();
     vi.stubGlobal("requestAnimationFrame", () => 0);
     vi.stubGlobal("cancelAnimationFrame", () => {});
