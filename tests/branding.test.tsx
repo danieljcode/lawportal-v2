@@ -13,6 +13,7 @@ import { toDiscord } from "@/lib/discord";
 import { fromHtml } from "@/lib/bbcode";
 import { compile, fields, render } from "@/lib/template";
 import { APP_VERSION } from "@/lib/version";
+import { setShell } from "@/lib/shell";
 import * as sync from "@/lib/sync";
 import { fixture } from "./fixtures";
 
@@ -75,6 +76,8 @@ describe("the firm's name in the app (LP-22)", () => {
     localStorage.clear();
     sessionStorage.clear();
     markBooted();
+    // The window title and toolbar checked here are the Classic layout's (LP-125).
+    setShell("classic");
     vi.stubGlobal("requestAnimationFrame", () => 0);
     vi.stubGlobal("cancelAnimationFrame", () => {});
     vi.spyOn(sync, "init").mockResolvedValue(undefined);

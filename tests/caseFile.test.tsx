@@ -87,9 +87,9 @@ afterEach(() => {
 });
 
 describe("the Case File (LP-101)", () => {
-  it("opens from the toolbar, and lists every firm case with who's on it", () => {
+  it("opens from the app rail, and lists every firm case with who's on it", () => {
     mount("#civil-complaint");
-    expect(must<HTMLAnchorElement>("#open-cases").getAttribute("href")).toBe("#cases");
+    expect(must<HTMLAnchorElement>("#rail-cases").getAttribute("href")).toBe("#cases");
     // The forms list is court forms only (LP-105): the Case File opens from the Program Manager.
     expect(document.querySelector('#sidebar a[href="#cases"]')).toBeNull();
     go("#cases");
