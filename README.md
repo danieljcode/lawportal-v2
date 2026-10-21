@@ -1,21 +1,20 @@
-# Court Filing Generator
+# Court Filing System
 
 [![CI](https://github.com/danieljcode/lawportal-v2/actions/workflows/ci.yml/badge.svg)](https://github.com/danieljcode/lawportal-v2/actions/workflows/ci.yml)
 
-A personal, local web app for writing San Andreas court filings on the **FreestyleRP** roleplay
-server. Pick a form, fill in the fields, and copy the finished filing straight into a forum editor (as
-formatted HTML or as BBCode), into Discord, or download it as a Word `.docx`.
+A web app for writing San Andreas court filings on the **FreestyleRP** roleplay server, growing into
+the office system of the in-game law firm **Friedman & Associates**. Pick a court form, fill it in,
+and copy the finished filing straight into the forum editor (as formatted text or BBCode), into
+Discord, or download it as a Word `.docx`. Alongside the forms are the firm's own tools: a Case File
+with evidence and deadlines, client intake and conflict checks, and a Law Library with the penal
+code and the firm's precedents.
 
-It's set up as **Friedman & Associates: Court Filing System**, the firm's in-house system. The firm's
-name, logo and colours live in one file, `src/branding.ts`. Filings posted to the forum carry no
-firm branding.
+It's for Daniel, his friends and the firm's members, run on your own computer (it may be hosted
+later). The firm's name and colours come from one file, `src/branding.ts`; **court forms never carry
+firm branding**, so anything posted to the forum looks official. FreestyleRP is set in 1990, so every
+date the app fills in is 36 years before today's real date.
 
-It carries 39 court forms plus six of our own templates (petitions, a motion, discovery and a
-contract), all in FreestyleRP's court names, and it looks like a 1990s Windows desktop. FreestyleRP
-is set in 1990, so every date the app fills in is 36 years back from today's real date.
-
-> Personal tool. These are roleplay court forms, not legal documents. Always check a filing before
-> posting.
+> These are roleplay court forms, not legal documents. Always check a filing before posting it.
 
 ![A civil complaint being filled in, with the live forum preview beside it](docs/screenshots/form-light.png)
 
@@ -23,108 +22,156 @@ is set in 1990, so every date the app fills in is 36 years back from today's rea
 
 ## Running it
 
-You need Node.js 22.6 or newer.
+You need **Node.js 22.6 or newer** (CI uses Node 22; Node 24 works too).
 
 ```bash
 npm install
 npm run dev
 ```
 
-Then open http://localhost:3000. Only this computer can reach it. To use it from other devices on
-your network, run `npm run build && npm run start:lan` instead (only on a network you trust).
-[Development](docs/development.md) has the details.
+Then open http://localhost:3000. Only this computer can reach it.
 
-## Features
+To use it from other devices on your network (only a network you trust):
 
-- **Programs.** Each part of the office system is its own program, opened full-screen in a Windows
-  3.x-style window with its own title bar and **File**, **View** and **Help** menus: **Court
-  Filings**, **Case File**, **Clients**, **Law Library**, **J.A.P.** (Court Commissioners) and
-  **Control Panel**. The home screen is a Windows 3.x **Program Manager**: groups of program icons
-  (Case File's shows a dot when something is due within 48 hours), and **Start** always comes back
-  to it. The character you're filing as is in the taskbar, so it's the same in every program. Links are by program (`#filings/<form>`,
-  `#cases/<case>`, `#clients/intake`, `#library/penal-code`…); older links still work.
-- **Startup screen.** Once per browser session, the Friedman & Associates Office System boots
-  DOS-style (memory test, drive checks, `C:\>`) for under 2 seconds while the app loads. Any key or
-  click skips it, and the Control Panel has a setting to turn it off.
-- **Forms.** 39 court forms grouped by court (Criminal, Civil, Traffic, Small Claims, Appellate,
-  Supreme, general), plus **Additional Templates**: General Petition, Petition for Name Change,
-  General Motion, Interrogatories, Subpoena and Service Agreement, and **Firm Letters**: Engagement
-  Letter, Retainer Agreement, Demand Letter and Letter of Representation, and **Judge** templates:
-  Ruling on Motion, Sentencing Order and Warrant Decision. Search by title, court or
-  section.
-- **Court Filings.** The court forms only, grouped by court, with search. Its **Form** menu has the
-  filing tools: pick a case, open the form's case in the Case File, the Law Library, Draft history
-  and Filing history.
-- **Form editor.** Inputs built from the form: collapsible sections with "x of y filled" counts,
-  checkbox lists, repeatable items, optional sections, dates with Today/Auto. Case numbers show the
-  pattern as a placeholder (in-game year, courthouse, division, number, e.g. `90SCCR00XXX`). Fill
-  from character, Clear form; drafts save automatically and the last form reopens.
-- **Output.** A live forum preview with Highlight unfilled; **Copy for forum** (keeps tables),
-  **Copy BBCode**, **Download .docx** (opens in Word, LibreOffice, Pages and Google Docs).
-- **Discord.** The filing as Discord markdown, split into messages of up to 2,000 characters (4,000
-  with Nitro), each with a preview, a character count and its own Copy button.
-- **Characters.** Name, title, contact details, bar number, signature and notes, used to fill forms.
-  Export and import them (with dockets and J.A.P.) as `lawapp-characters.json`.
-- **Case File** (a program, with All cases, Upcoming and the open case in its side pane; also the
-  toolbar button): every firm case, with its lead and the other characters on
-  it. Search by case number or party, filter by status or character, and open a case to edit its
-  details and who's working it.
-- **Clients** (a program): **New client intake** and the **Conflict check** in its side pane.
-- **Conflict check** (in **Clients**): check a new client's name (and the other side's) against every firm
-  case, with a clear verdict, the matches, and a memo to copy or print. Every check is logged.
-- **Law Library** (a program, with Penal Code, its chapters and Precedents in its side pane): the FreestyleRP **penal code**, searchable by section number, keyword
-  or title, with each charge's class, sentence, fine and description; and the firm's
-  **precedents**: add rulings with the case, court, date, judge, key holding, summary, forum link
-  and topics, then search them or filter by topic. Matches are highlighted. In a form, **Law
-  Library** inserts a citation ("PC 1001 Assault", or a ruling) into the field you last clicked in.
-- **New client intake** (in **Clients**, or from the Case File): take a new client's details and the matter in
-  one form, then **Open case** creates the case with the intake in its notes. Print it as a one-page
-  client sheet.
-- **Evidence** on each case: exhibits with a title, description, link and date obtained, lettered
-  automatically (A, B, C…) and relettered when you reorder them. **Insert exhibit** under a form's
-  text boxes adds a reference such as "Exhibit C (Dashcam footage)" that follows the exhibit when it's
-  moved, and General Motion and General Petition can list the case's exhibits. Each exhibit keeps a
-  **chain of custody** (who received, reviewed, copied, filed or returned it, and when), which you
-  can copy into a filing or print.
-- **Deadlines and hearings** on each case, added by hand or from a form's dates (a case
-  schedule fills in the whole timetable). **Upcoming** lists the next 14 days, overdue first, and
-  the Case File button shows a dot when something is due within 48 hours.
-- **Dockets** for judges and lawyers: the cases each character works. Any form with a case number
-  can load a firm case (yours listed first) or save its case to the Case File. Cases belong to the firm, so characters
-  with the same case number share it, and deleting a character keeps its cases.
-- **Judicial Advancement Portfolio (J.A.P.)** for Court Commissioners I and II: task lists, progress,
-  and the finished BBCode ready to copy.
-- **Sync** across browsers and devices through this app's own server, with a private sync code.
-- **What's new**, with the app's version. **Themes:** automatic, light and dark.
+```bash
+npm run dev:lan                     # development, on 0.0.0.0
+npm run build && npm run start:lan  # or the production build, on 0.0.0.0
+```
 
-## Your data
+Both set **`LAWAPP_ALLOW_LAN=1`**, which lets the app's server answer requests from other machines,
+not only `localhost`. Without it, sync and the `.docx` download only work on the computer running the
+app. [Development](docs/development.md) has the details and the other settings.
 
-- Everything is saved in **this browser's local storage**. Nothing leaves the computer unless you
+### npm scripts
+
+| Script                  | What it does                                                                                  |
+| ----------------------- | --------------------------------------------------------------------------------------------- |
+| `npm run dev`           | Development server on `127.0.0.1:3000`, with hot reload.                                      |
+| `npm run dev:lan`       | The same on `0.0.0.0`, open to your network.                                                  |
+| `npm run build`         | Type-checks the app and the tests, and makes a production build.                              |
+| `npm start`             | Serves the production build on `127.0.0.1:3000`.                                              |
+| `npm run start:lan`     | The same on `0.0.0.0`, open to your network.                                                  |
+| `npm test`              | Runs every test suite once (Vitest).                                                          |
+| `npm run test:e2e`      | Browser smoke tests at desktop and phone sizes (Playwright; run `npm run build` first).       |
+| `npm run lint`          | ESLint; fails on any error or warning.                                                        |
+| `npm run format`        | Formats every file with Prettier.                                                             |
+| `npm run format:check`  | Checks formatting without changing anything.                                                  |
+| `npm run port-forms`    | Regenerates `src/data/forms.json` from the reference data (needs access to its private repo). |
+| `npm run penal-code`    | Updates `src/data/penal-code.json` from the FreestyleRP penal code sheet.                     |
+| `npm run screenshots`   | Takes screenshots of the running app into `.agents/screenshots/`.                             |
+| `npm run smoke:preview` | Checks every form's preview in a browser against the running app.                             |
+| `npm run release-notes` | Prints the release notes for the version in `package.json`.                                   |
+| `npm run prepare`       | Runs on `npm install`: turns on the commit-message check in `.githooks/`.                     |
+
+CI runs the tests, lint, the format check, the build and the smoke tests on every push and pull
+request.
+
+## What's in it
+
+The app is a set of **programs**, opened from the home screen (the **Program Manager**) and shown one
+at a time, each with its own **File**, **View** and **Help** menus. The character you're filing as
+is in the taskbar, the same in every program.
+
+- **Court Filings.** 39 FreestyleRP court forms grouped by court (Criminal, Civil, Traffic, Small
+  Claims, Appellate, Supreme, general), plus 13 of the firm's own templates: General Petition,
+  Petition for Name Change, General Motion, Interrogatories, Subpoena, Service Agreement, four firm
+  letters (Engagement, Retainer, Demand, Representation) and three for judges (Ruling on Motion,
+  Sentencing Order, Warrant Decision).
+  - **Editing:** sections with "x of y filled" counts, required fields, repeatable items, dates on
+    the 1990 calendar, Fill from character, Undo and Redo, and Draft history. Drafts save as you
+    type.
+  - **Output:** a live forum preview with Highlight unfilled; **Copy for forum**, **Copy BBCode**,
+    **Download .docx**, and Discord messages split to fit (2,000 characters, or 4,000 with Nitro).
+  - **The Form menu:** pick a firm case to fill the form from, open the form's case, insert a
+    citation from the Law Library, Draft history and Filing history. Under a text box, **Insert
+    exhibit** adds "Exhibit C (Dashcam footage)", which follows the exhibit if it's moved.
+- **Case File.** Every firm case with its lead and the characters working it, searchable and
+  filterable. Each case has its details, **deadlines and hearings**, the **filings** made for it,
+  and its **evidence**: lettered exhibits (A, B, C…) with links and dates, each with a **chain of
+  custody** you can copy into a filing or print. **Upcoming** lists the next 14 days, overdue first,
+  and the Case File's icon shows a dot when something is due within 48 hours.
+- **Clients.** **New client intake** opens a case from one form and prints a client sheet; the
+  **Conflict check** looks for a name on either side of every firm case, gives a clear verdict and a
+  memo, and keeps a log.
+- **Law Library.** The FreestyleRP **penal code**, browsed by chapter or by title and searched by
+  section number, keyword or title, with each charge's class, sentence and fine. The firm's
+  **precedents**: rulings with the court, judge, key holding, summary, forum link and topics. Copy a
+  citation ("PC 1001 Assault") or insert it into a form.
+- **J.A.P.** The Judicial Advancement Portfolio for Court Commissioners I and II: task lists,
+  progress and the finished BBCode. Only Court Commissioners see it.
+- **Control Panel.** Characters, sync and backups, the theme (automatic, light or dark), the startup
+  screen, What's new and About.
+
+The look is a 1990s Windows desktop for now, with a DOS-style startup screen once per session (any
+key skips it). That's changing: see [Roadmap](#roadmap).
+
+## Your data and sync
+
+- **Everything is saved in this browser's local storage.** Nothing leaves the computer unless you
   turn on sync.
-- **Back up everything** (Characters dialog) saves one file with your characters, cases, J.A.P.,
-  form drafts and settings; **Restore backup** puts it all back after showing what will change. If
-  sync is off, the dialog reminds you when there's been no backup for 30 days.
-- **Sync** stores your characters, cases and J.A.P. on the computer running the app, under a
-  private code. Anyone with the code who can reach that computer can read or change them, so keep it
-  private. If two devices change the same character, the newer change wins and the other is kept so
-  you can restore it. The sync server limits how many codes can be made (5 an hour) and how many
-  wrong codes one device can try, so others on your network can't fill it up.
-- **Filing history** keeps every filing you copy or download (the newest 150), with search and
-  filters. Reopen one as a new draft or copy it again; a case's filings also show in the Case File.
-- **Undo and Redo** (or Ctrl+Z and Ctrl+Y) step back through your edits in a form, and **Draft
-  history** keeps earlier versions of each form's draft (every few minutes, and before Clear form)
-  that you can preview and restore.
-- If saved data is ever damaged, it's **set aside rather than deleted**, and the Characters dialog
-  offers **Download damaged data**.
+- **Back up everything** (in Characters) saves one file with your characters, cases, filings,
+  drafts and settings, and **Restore backup** puts it back after showing what will change. Damaged
+  data is set aside, never deleted, and can be downloaded.
+- **Sync** shares your characters (with their J.A.P.), cases, filings, precedents and conflict checks between browsers
+  and devices through the app's own server. Turning it on gives you a **sync code**; enter the same
+  code on another device to join it. Anyone with the code who can reach the computer running the
+  app can read and change that data, so keep it private.
+- **Sync files** are kept on the computer running the app, one JSON file per code in `data/sync/`
+  (or the folder in `LAWAPP_SYNC_DIR`), named by a hash of the code. `data/` is ignored by Git:
+  **never commit sync files**, or anything else with players' data in it.
 
-[Sync, storage and recovery](docs/sync.md) explains how all of this works.
+[Sync, storage and recovery](docs/sync.md) explains how merging and recovery work.
+
+## Project layout
+
+| Folder            | What's in it                                                                                                                                                                                |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/app/`        | The Next.js page, layout and styles, and the server's API routes (`api/account`, `api/data` for sync, `api/docx`).                                                                          |
+| `src/components/` | The interface: the shell (`App.tsx`), `programs/` (one per program, and the registry), `fields/` (form inputs), dialogs and views.                                                          |
+| `src/lib/`        | Everything that isn't interface: the stores (characters, cases, filings…), the template engine (`template/`), form state, Discord and `.docx` output, sync, and `server/` code for the API. |
+| `src/data/`       | The court forms (`forms.json`), the firm's templates (`extra-forms.ts`), the penal code and What's new.                                                                                     |
+| `src/branding.ts` | The firm's name, short name, logo and colours.                                                                                                                                              |
+| `tests/`, `e2e/`  | Vitest suites, and the Playwright smoke tests.                                                                                                                                              |
+| `scripts/`        | The npm scripts' code: form porting, the penal code import, smoke checks, release notes, hooks.                                                                                             |
+| `docs/`           | Developer documentation.                                                                                                                                                                    |
+
+## Contributing
+
+Work is planned in Jira, project **LP**: [freestylelawportal.atlassian.net](https://freestylelawportal.atlassian.net/jira/software/projects/LP/boards/1).
+
+- **One issue at a time,** from the top of the board, on its own branch named after it:
+  `LP-64-merge-sync-conflicts`.
+- **Commits and PR titles** follow `<type>(<area>): <summary> [LP-<n>]`, for example
+  `fix(sync): merge conflicts per character [LP-64]`. A hook installed by `npm install` checks this.
+- **Never push or merge to `main`.** Open a pull request; Daniel reviews and merges. GitHub doesn't
+  enforce this on this plan, so it's up to you.
+- **Definition of Done** for every issue: its acceptance criteria met; tests added or updated, all
+  passing and CI green; a What's new entry if users will notice; the README and docs updated if setup
+  or behaviour changed; and the branch, commits and PR named after the issue, with the PR linking it.
+
+[Contributing](docs/contributing.md) has the full conventions, and [Releasing](docs/releasing.md) the
+release steps.
+
+## Roadmap
+
+Releases are tracked in [Jira](https://freestylelawportal.atlassian.net/projects/LP?selectedItem=com.atlassian.jira.jira-projects-plugin%3Arelease-page).
+
+- **v0.2, Stable & FreestyleRP** (released 19 Oct 2026): tested, FreestyleRP only, nothing lost.
+- **v0.3, Firm tools** (in progress): the Case File, deadlines, intake, conflict checks, evidence,
+  the Law Library and the firm's branding, and the app split into programs.
+- **v0.4, Office tools:** a Rolodex, Help, Find, the Ledger, and sturdier storage and export.
+- **v1.0, Hosted firm:** Discord sign-in, firm workspaces and roles, shared cases, an audit trail
+  and Discord reminders.
+
+The direction from v0.3 on is **modern first**: a clean, easy-to-read app, with the 1990 look
+becoming an optional **Classic** theme alongside light and dark.
 
 ## Documentation
 
 Developer documentation is in [`docs/`](docs/README.md): [development](docs/development.md),
 [architecture](docs/architecture.md), [templates and forms](docs/templates-and-forms.md),
-[sync](docs/sync.md), [testing](docs/testing.md), [contributing](docs/contributing.md) and
-[releasing](docs/releasing.md).
+[sync](docs/sync.md), [testing](docs/testing.md), [dependencies](docs/dependencies.md),
+[contributing](docs/contributing.md) and [releasing](docs/releasing.md).
 
 ## Credits
 
