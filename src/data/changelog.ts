@@ -19,6 +19,20 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-21",
+    title: "Law Library",
+    items: [
+      {
+        type: "new",
+        text: "The Law Library has a side pane: Penal Code, with each chapter listed under it, and Precedents. Every chapter has its own link.",
+      },
+      {
+        type: "new",
+        text: "Browse the penal code a chapter at a time, in section order or by title A to Z, as well as searching it.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-21",
     title: "Clients",
     items: [
       {

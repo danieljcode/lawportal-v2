@@ -73,6 +73,7 @@ export const PROGRAMS: readonly ProgramDef[] = [
     group: "court",
     start: "#library/penal-code",
     visible: everyone,
+    nav: { id: "library-nav", label: "Law Library sections" },
     View: LibraryProgram,
   },
   {

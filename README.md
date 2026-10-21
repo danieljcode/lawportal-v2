@@ -72,7 +72,7 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
 - **Clients** (a program): **New client intake** and the **Conflict check** in its side pane.
 - **Conflict check** (in **Clients**): check a new client's name (and the other side's) against every firm
   case, with a clear verdict, the matches, and a memo to copy or print. Every check is logged.
-- **Law Library** (a program): the FreestyleRP **penal code**, searchable by section number, keyword
+- **Law Library** (a program, with Penal Code, its chapters and Precedents in its side pane): the FreestyleRP **penal code**, searchable by section number, keyword
   or title, with each charge's class, sentence, fine and description; and the firm's
   **precedents**: add rulings with the case, court, date, judge, key holding, summary, forum link
   and topics, then search them or filter by topic. Matches are highlighted. In a form, **Law
