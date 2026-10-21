@@ -19,6 +19,20 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-21",
+    title: "A home screen that shows what's next",
+    items: [
+      {
+        type: "new",
+        text: "Home now shows what needs your attention: deadlines due in the next 48 hours or overdue, your latest filings to open again, and the cases you worked on most recently, each one click away.",
+      },
+      {
+        type: "update",
+        text: "Programs are tiles on the home screen. The Classic layout keeps the Program Manager.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-21",
     title: "Programs keep their place",
     items: [
       {

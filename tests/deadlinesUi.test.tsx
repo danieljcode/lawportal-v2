@@ -122,17 +122,16 @@ describe("Upcoming and the toolbar dot (LP-18)", () => {
     expect(document.querySelectorAll(".upcoming-item")).toHaveLength(1);
   });
 
-  it("shows a dot on Case File in the Program Manager when something is due within 48 hours, leading to Upcoming", () => {
+  it("marks Case File on the home screen when something is due within 48 hours, and lists it", () => {
     mount("");
-    expect(document.querySelector("#due-dot")).toBeNull();
-    expect(must("#pm-cases").getAttribute("href")).toBe("#cases");
+    expect(document.querySelector("#tile-cases .pm-badge")).toBeNull();
     act(() => {
       withDeadlines([{ date: "1990-10-20", label: "Hearing" }]);
     });
-    expect(must("#pm-cases #due-dot")).toBeTruthy();
-    expect(must("#pm-cases").getAttribute("href")).toBe("#cases/upcoming");
-    expect(must("#pm-cases").getAttribute("aria-label")).toBe("Case File (1 due soon)");
-    // The app rail's Case File carries no dot (LP-104 moved it to the Program Manager).
+    expect(must("#tile-cases .pm-badge")).toBeTruthy();
+    expect(must("#tile-cases").getAttribute("aria-label")).toBe("Case File (1 due soon)");
+    expect(must("#home-due").textContent).toContain("Hearing");
+    // The app rail's Case File carries no dot.
     expect(must("#rail-cases").getAttribute("href")).toBe("#cases");
     // The Case File program's File menu leads there too (LP-103).
     act(() => {
