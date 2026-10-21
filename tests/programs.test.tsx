@@ -171,7 +171,7 @@ describe("the program shell (LP-103)", () => {
     expect(title()).toBe("Case File - Friedman & Associates");
     expect(document.title).toBe("Upcoming · Friedman & Associates: Court Filing System");
     // One program at a time: the forms list belongs to Court Filings.
-    expect(document.querySelector("#sidebar")).toBeNull();
+    expect(document.querySelector("#sidebar")!.closest('[style*="display: none"]')).not.toBeNull();
 
     go("#library/precedents");
     expect(title()).toBe("Law Library - Friedman & Associates");

@@ -59,7 +59,7 @@ export default function LibraryProgram({ shell }: ProgramProps) {
           </details>
         </div>
       </nav>
-      <main className="editor" id="editor">
+      <main className="editor" id={shell.visible ? "editor" : undefined}>
         <ErrorBoundary where="the Law Library" resetKey={page}>
           <LawLibraryView
             tab={page === "precedents" ? "precedents" : "code"}

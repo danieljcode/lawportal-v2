@@ -269,7 +269,7 @@ async function phaseNav(browser, theme, mode, ctx) {
 
   // Home (the Program Manager, LP-104), Court Filings, then a search result.
   await page.click("a.brand");
-  await page.waitForSelector("#form-view", { state: "detached" });
+  await page.waitForSelector("#form-view", { state: "hidden" });
   await page.click("#pm-filings");
   await page.fill("#form-search", "arraign");
   await resetProbe(page);
@@ -326,7 +326,7 @@ async function phaseSeeded(browser, theme, mode, ctx) {
 
   // Home, switch, reopen the same form: the first read shows B, never A's old output.
   await page.click("a.brand");
-  await page.waitForSelector("#form-view", { state: "detached" });
+  await page.waitForSelector("#form-view", { state: "hidden" });
   await page.selectOption("#active-character", CHAR_B.id);
   await page.click("#pm-filings");
   await sidebar(page, "civil-complaint");
