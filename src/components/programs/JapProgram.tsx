@@ -11,7 +11,7 @@ export default function JapProgram({ shell }: ProgramProps) {
   const showOutput = commissioner && !!active;
   return (
     <div className={"layout no-nav" + (showOutput ? " with-output" : "")}>
-      <main className="editor" id="editor">
+      <main className="editor" id={shell.visible ? "editor" : undefined}>
         <ErrorBoundary where="the J.A.P." resetKey="jap">
           <JapView
             commissioner={commissioner ? active : null}

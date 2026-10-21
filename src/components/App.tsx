@@ -9,7 +9,8 @@
 // programs are in programs/registry.ts; routing is useRoute.ts and the dialogs
 // useDialogs.ts (LP-7).
 
-import { useEffect, useMemo, useState } from "react";
+import { Activity, useEffect, useMemo, useRef, useState } from "react";
+import { getForm } from "@/data";
 import { BRANDING } from "@/branding";
 import { characterStore, hasDocket } from "@/lib/characters";
 import { caseStore } from "@/lib/cases";
@@ -39,11 +40,12 @@ import Taskbar from "./Taskbar";
 import Toolbar from "./Toolbar";
 import { S_SET_ASIDE, S_SET_ASIDE_HINT } from "@/lib/strings";
 import { useDialogs } from "./useDialogs";
-import { pageTitle, useRoute } from "./useRoute";
+import { hashFor, navigate, pageTitle, useRoute } from "./useRoute";
 import { useCaseVersion, useCharacterVersion, useSetAsideVersion, useSyncState } from "./useStore";
 
 export type { DialogName } from "./useDialogs";
 export type { Route } from "./useRoute";
+import type { Route } from "./useRoute";
 
 export default function App() {
   const { route, form, goHome } = useRoute();
@@ -100,7 +102,7 @@ export default function App() {
       draftHistory().add(f.formId, existing);
     }
     writeDraft(kv, f.formId, f.state);
-    location.hash = "#filings/" + f.formId;
+    navigate("#filings/" + f.formId);
   };
   const setAsideCount = useSetAsideVersion();
   /** The set-aside count when the notice was last dismissed; a new one shows it again. */
@@ -141,7 +143,12 @@ export default function App() {
     setNavRoute(route);
     setNavOpen(false);
   }
+  // A new page in the same program starts at the top; coming back to a program keeps its place (LP-126).
+  const lastProgram = useRef(route.program);
   useEffect(() => {
+    const same = lastProgram.current === route.program;
+    lastProgram.current = route.program;
+    if (!same) return;
     const editor = document.getElementById("editor");
     if (editor) editor.scrollTop = 0;
   }, [route, form]);
@@ -194,7 +201,36 @@ export default function App() {
     setTheme,
     layout,
     setLayout,
+    visible: true,
   };
+
+  // Each program opened stays mounted, hidden while another is showing, so coming back finds it as
+  // it was (LP-126). React's Activity keeps a hidden program's state and DOM but stops its effects,
+  // so it does no work in the background; it only re-renders, at low priority, if its data changes.
+  const [visited, setVisited] = useState<Partial<Record<string, Route>>>({});
+  // Filing as someone else starts every other program afresh, so none shows the last character's work.
+  const [visitedFor, setVisitedFor] = useState(activeId);
+  if (visitedFor !== activeId) {
+    setVisitedFor(activeId);
+    setVisited(program ? { [program.id]: route } : {});
+  } else if (program && visited[program.id] !== route) {
+    setVisited((v) => ({ ...v, [program.id]: route }));
+  }
+  // The rail and the Program Manager take you back to where each program was left.
+  const hrefFor = (p: { id: string; start: string }) => {
+    const r = visited[p.id];
+    return r ? hashFor(r) || p.start : p.start;
+  };
+  const shellFor = (id: string, r: Route): Shell =>
+    program?.id === id
+      ? shell
+      : {
+          ...shell,
+          route: r,
+          form: r.program === "filings" && r.formId ? getForm(r.formId) || null : null,
+          navOpen: false,
+          visible: false,
+        };
 
   // Each program's own File items, then the shell's (LP-105 to LP-109 add more).
   const own: Partial<Record<string, MenuItem[]>> = {
@@ -282,8 +318,6 @@ export default function App() {
   const windowTitle = (program ? program.title : "Program Manager") + " - " + BRANDING.firmName;
   const task = program ? pageTitle(route, form) || program.title : "Program Manager";
   const icon = program ? program.icon : "▦";
-  const View = program?.View;
-
   const notice = setAsideCount > setAsideSeen && (
     <div className="set-aside-notice" id="set-aside-notice" role="alert">
       <strong>{S_SET_ASIDE}</strong> {S_SET_ASIDE_HINT}
@@ -293,18 +327,31 @@ export default function App() {
     </div>
   );
   const content = (
-    <ErrorBoundary where={program ? program.title : "the Program Manager"} resetKey={program ? program.id : "home"}>
-      {View ? (
-        <View shell={shell} />
-      ) : (
-        <ProgramManager
-          commissioner={commissioner}
-          casesDue={casesDue}
-          changelogUnread={changelogUnread}
-          openChangelog={openChangelog}
-        />
+    <>
+      {!program && (
+        <ErrorBoundary where="the Program Manager" resetKey="home">
+          <ProgramManager
+            commissioner={commissioner}
+            casesDue={casesDue}
+            changelogUnread={changelogUnread}
+            openChangelog={openChangelog}
+            hrefFor={hrefFor}
+          />
+        </ErrorBoundary>
       )}
-    </ErrorBoundary>
+      {PROGRAMS.map((p) => {
+        const r = program?.id === p.id ? route : visited[p.id];
+        if (!r) return null;
+        const View = p.View;
+        return (
+          <Activity key={p.id} mode={program?.id === p.id ? "visible" : "hidden"}>
+            <ErrorBoundary where={p.title} resetKey={p.id}>
+              <View shell={shellFor(p.id, r)} />
+            </ErrorBoundary>
+          </Activity>
+        );
+      })}
+    </>
   );
 
   return (
@@ -312,6 +359,7 @@ export default function App() {
       {layout === "modern" ? (
         <ModernFrame
           programs={PROGRAMS.filter((p) => p.visible({ commissioner }))}
+          hrefFor={hrefFor}
           program={program}
           title={program ? task : "Home"}
           menus={menus}

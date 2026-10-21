@@ -52,7 +52,7 @@ export default function ClientsProgram({ shell }: ProgramProps) {
           </details>
         </div>
       </nav>
-      <main className="editor" id="editor">
+      <main className="editor" id={shell.visible ? "editor" : undefined}>
         <div hidden={page !== "intake"}>
           <ErrorBoundary where="the intake" resetKey="intake">
             <IntakeView characters={shell.characters} active={shell.active} onRunConflicts={checkFromIntake} />

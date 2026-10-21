@@ -6,7 +6,7 @@
 // come later (LP-28).
 
 import type { KeyboardEvent, ReactNode } from "react";
-import { GROUPS, PROGRAMS, type ProgramGroup } from "./programs/registry";
+import { GROUPS, PROGRAMS, type ProgramDef, type ProgramGroup } from "./programs/registry";
 
 export interface ProgramManagerProps {
   commissioner: boolean;
@@ -14,6 +14,8 @@ export interface ProgramManagerProps {
   casesDue: number;
   changelogUnread: boolean;
   openChangelog(): void;
+  /** Where each program's icon goes: back to where it was left (LP-126), or its start. */
+  hrefFor?(program: ProgramDef): string;
 }
 
 /** The next icon for an arrow key: along the row for left and right, the nearest in the next row for up and down. */
@@ -45,6 +47,7 @@ export default function ProgramManager({
   casesDue,
   changelogUnread,
   openChangelog,
+  hrefFor = (p) => p.start,
 }: ProgramManagerProps) {
   const onKey = (e: KeyboardEvent<HTMLElement>) => {
     if (!["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) return;
@@ -76,7 +79,7 @@ export default function ProgramManager({
             className="pm-icon"
             id={"pm-" + p.id}
             // Something due: Case File opens on Upcoming.
-            href={due ? "#cases/upcoming" : p.start}
+            href={due ? "#cases/upcoming" : hrefFor(p)}
             title={due ? casesDue + " due within 48 hours: see Upcoming" : undefined}
             aria-label={due ? p.title + " (" + casesDue + " due soon)" : undefined}
           >

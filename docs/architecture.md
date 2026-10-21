@@ -44,6 +44,13 @@ browser.
   scrolls (`.m-app` is fixed to the viewport); only the program's panes do. **Classic**: the Windows
   3.x window, toolbar, taskbar and boot screen described below. Home is the Program Manager in both
   for now (LP-127 gives the modern shell its own).
+- **Programs keep their place** (LP-126). Every program opened stays mounted inside React's
+  `<Activity>`, hidden while another shows (App remembers each one's last route in `visited`), so
+  coming back finds the same form, scroll position, searches and half-typed intake. A hidden
+  program's effects are cleaned up (so it does no background work) and come back when it shows;
+  only the showing program has `#editor` (`Shell.visible`). The rail and the Program Manager link
+  back to where each was left. Changing the active character drops the hidden programs, so none
+  shows the last character's work, and a new page within a program scrolls to the top.
 - **Programs** (LP-103). `App.tsx` is the shell: one program at a time, full-screen, in a window
   with its title bar ("Case File - Friedman & Associates"; at home, "Program Manager - Friedman &
   Associates", while the browser tab keeps the LP-22 title), a menu bar (`MenuBar.tsx`: File, View,

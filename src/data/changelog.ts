@@ -19,6 +19,20 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-21",
+    title: "Programs keep their place",
+    items: [
+      {
+        type: "new",
+        text: "Switching programs keeps each one's place: the form you were filling in and where you'd scrolled to, your searches, the Law Library chapter and a half-typed intake are all still there when you come back.",
+      },
+      {
+        type: "update",
+        text: "The app rail and the home screen take you back to where you left each program. Filing as someone else starts the other programs afresh.",
+      },
+    ],
+  },
+  {
+    date: "2026-10-21",
     title: "A modern layout",
     items: [
       {

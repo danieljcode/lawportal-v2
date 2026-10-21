@@ -15,6 +15,8 @@ import type { ProgramDef } from "./programs/registry";
 
 export interface ModernFrameProps {
   programs: readonly ProgramDef[];
+  /** Where each program's link goes: back to where it was left (LP-126), or its start. */
+  hrefFor(program: ProgramDef): string;
   /** The open program; null at home. */
   program: ProgramDef | null;
   /** The top bar's heading: the program, or the page inside it. */
@@ -65,7 +67,7 @@ export default function ModernFrame(p: ModernFrameProps) {
             key={prog.id}
             className="m-rail-item"
             id={"rail-" + prog.id}
-            href={prog.start}
+            href={p.hrefFor(prog)}
             aria-current={p.program?.id === prog.id ? "page" : undefined}
           >
             <span className="m-rail-icon" aria-hidden="true">
