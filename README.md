@@ -71,7 +71,8 @@ request.
 The app is a set of **programs**, shown one at a time. An app rail down the side (a bar along the
 bottom on a phone) switches between them, and the top bar shows the program, its **File**, **View**
 and **Help** menus, and the character you're filing as, the same in every program. Only the panes
-scroll, never the whole page.
+scroll, never the whole page. Switching programs keeps each one's place: the form you were filling
+in, your searches and where you'd scrolled to are still there when you come back.
 
 - **Court Filings.** 39 FreestyleRP court forms grouped by court (Criminal, Civil, Traffic, Small
   Claims, Appellate, Supreme, general), plus 13 of the firm's own templates: General Petition,

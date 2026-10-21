@@ -13,7 +13,7 @@ export default function ControlPanelProgram({ shell }: ProgramProps) {
   const [boot, setBoot] = useState(bootEnabled);
   return (
     <div className="layout no-nav">
-      <main className="editor control-panel" id="editor">
+      <main className="editor control-panel" id={shell.visible ? "editor" : undefined}>
         <div className="form-head">
           <div>
             <p className="crumb muted">{BRANDING.firmName}</p>

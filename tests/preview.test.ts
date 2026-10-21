@@ -280,8 +280,11 @@ describe("forum preview with no frames and no input", () => {
     mount();
     expectRendered("Dan Tester");
     traverse(""); // home
-    expect(document.querySelector("#preview")).toBeNull();
+    // Court Filings is kept, hidden, for coming back to (LP-126) ...
+    expect(document.querySelector("#preview")!.closest('[style*="display: none"]')).not.toBeNull();
     choose("#active-character", b);
+    // ... until the character changes: then it opens afresh.
+    expect(document.querySelector("#preview")).toBeNull();
     // Every node the reopen inserts or removes, so even an intermediate commit with the old
     // instance's output (replaced before paint) is caught.
     const seen: string[] = [];

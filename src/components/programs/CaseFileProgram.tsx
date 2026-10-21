@@ -69,7 +69,7 @@ export default function CaseFileProgram({ shell }: ProgramProps) {
           </details>
         </div>
       </nav>
-      <main className="editor" id="editor">
+      <main className="editor" id={shell.visible ? "editor" : undefined}>
         {upcoming ? (
           <ErrorBoundary where="Upcoming" resetKey="upcoming">
             <UpcomingView character={shell.active} />
