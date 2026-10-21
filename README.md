@@ -65,7 +65,8 @@ your network, run `npm run build && npm run start:lan` instead (only on a networ
   with Nitro), each with a preview, a character count and its own Copy button.
 - **Characters.** Name, title, contact details, bar number, signature and notes, used to fill forms.
   Export and import them (with dockets and J.A.P.) as `lawapp-characters.json`.
-- **Case File** (a program; also the toolbar button): every firm case, with its lead and the other characters on
+- **Case File** (a program, with All cases, Upcoming and the open case in its side pane; also the
+  toolbar button): every firm case, with its lead and the other characters on
   it. Search by case number or party, filter by status or character, and open a case to edit its
   details and who's working it.
 - **Conflict check** (in **Clients**): check a new client's name (and the other side's) against every firm

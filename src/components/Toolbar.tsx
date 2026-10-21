@@ -16,8 +16,8 @@ export interface ToolbarProps {
   syncStatus: SyncStatus | null;
   changelogUnread: boolean;
   navOpen: boolean;
-  /** The program has a navigation pane (the ☰ button at phone width). */
-  hasNav: boolean;
+  /** The program's navigation pane, for the ☰ button at phone width; absent when it has none. */
+  nav?: { id: string; label: string };
   theme: ThemeMode;
   onTheme(mode: ThemeMode): void;
   onHome(e: MouseEvent): void;
@@ -35,14 +35,14 @@ export default function Toolbar(p: ToolbarProps) {
 
   return (
     <header className="toolbar">
-      {p.hasNav && (
+      {p.nav && (
         <button
           type="button"
           className="btn icon-btn only-narrow"
           id="toggle-nav"
-          aria-label="Show form list"
+          aria-label={"Show " + p.nav.label}
           aria-expanded={p.navOpen}
-          aria-controls="sidebar"
+          aria-controls={p.nav.id}
           onClick={p.onToggleNav}
         >
           ☰
