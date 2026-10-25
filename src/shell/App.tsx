@@ -4,8 +4,8 @@
 // full-screen, around which App draws one of two frames (LP-125): the modern
 // shell (ModernFrame: app rail and top bar; the default) or Classic, the
 // Windows 3.x window with its title bar and menu bar, the taskbar with Start
-// (back to the Program Manager) and the boot screen. Home is the Program
-// Manager in both for now (LP-127 gives the modern shell its own). The
+// (back to the Program Manager) and the boot screen. Home is the modern home
+// screen (ModernHome.tsx, LP-127), or the Program Manager in Classic. The
 // programs are in registry.ts; routing is useRoute.ts and the dialogs
 // useDialogs.ts (LP-7). Ctrl+K or "/" opens the jump box (JumpBox.tsx, LP-128).
 
