@@ -7,16 +7,17 @@
 // (back to the Program Manager) and the boot screen. Home is the Program
 // Manager in both for now (LP-127 gives the modern shell its own). The
 // programs are in programs/registry.ts; routing is useRoute.ts and the dialogs
-// useDialogs.ts (LP-7).
+// useDialogs.ts (LP-7). Ctrl+K or "/" opens the jump box (JumpBox.tsx, LP-128).
 
 import { Activity, useEffect, useMemo, useRef, useState } from "react";
-import { getForm } from "@/data";
+import { ALL_FORMS, getForm } from "@/data";
 import { BRANDING } from "@/branding";
 import { characterStore, hasDocket } from "@/lib/characters";
 import { caseStore } from "@/lib/cases";
 import { dueSoonCount, gameToday } from "@/lib/deadlines";
 import { draftHistory, hasContent } from "@/lib/draftHistory";
 import type { Filing } from "@/lib/filings";
+import type { JumpEntry } from "@/lib/jump";
 import { readDraft, writeDraft } from "@/lib/formState";
 import { defaultKV } from "@/lib/storage";
 import { isCommissioner } from "@/lib/portfolio";
@@ -30,6 +31,7 @@ import CharactersDialog from "./CharactersDialog";
 import DocketsDialog from "./DocketsDialog";
 import ErrorBoundary from "./ErrorBoundary";
 import FilingsDialog from "./FilingsDialog";
+import JumpBox, { isJumpKey, jumpShortcut } from "./JumpBox";
 import type { DraftRequest, FormTools } from "./FormView";
 import MenuBar, { type Menu, type MenuItem } from "./MenuBar";
 import ModernFrame from "./ModernFrame";
@@ -61,6 +63,7 @@ export default function App() {
     openChangelog,
     openAbout,
     openFilings,
+    openJump,
     closeDialog,
     autoSyncDone,
     loadDocketInForm,
@@ -164,6 +167,17 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [navOpen]);
 
+  // Ctrl+K (Cmd+K) anywhere, or "/" outside a field, opens the jump box (LP-128).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || !isJumpKey(e)) return;
+      e.preventDefault();
+      openJump();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [openJump]);
+
   /* ---------- the program and its window ---------- */
 
   const commissioner = isCommissioner(active);
@@ -233,22 +247,37 @@ export default function App() {
           visible: false,
         };
 
-  // Each program's own File items, then the shell's (LP-105 to LP-109 add more).
-  const own: Partial<Record<string, MenuItem[]>> = {
-    cases: [
-      { label: "All cases", href: "#cases" },
-      { label: "Upcoming", href: "#cases/upcoming" },
-    ],
-    clients: [
-      { label: "New client intake", href: "#clients/intake" },
-      { label: "Conflict check", href: "#clients/conflicts" },
-    ],
-    library: [
-      { label: "Penal Code", href: "#library/penal-code" },
-      { label: "Precedents", href: "#library/precedents" },
-    ],
-  };
-  const fileItems = (program && own[program.id]) || [];
+  // The jump box's entries (LP-128): the programs the character can see (back to where each was
+  // left), their sections, then every court form.
+  const visiblePrograms = PROGRAMS.filter((p) => p.visible({ commissioner }));
+  const jumpEntries: JumpEntry[] = [
+    ...visiblePrograms.map((p): JumpEntry => ({
+      id: "program-" + p.id,
+      kind: "program",
+      label: p.title,
+      detail: "",
+      href: hrefFor(p),
+    })),
+    ...visiblePrograms.flatMap((p) =>
+      (p.sections || []).map((s, i): JumpEntry => ({
+        id: "section-" + p.id + "-" + i,
+        kind: "section",
+        label: s.label,
+        detail: p.title,
+        href: s.href,
+      })),
+    ),
+    ...ALL_FORMS.map((f): JumpEntry => ({
+      id: "form-" + f.id,
+      kind: "form",
+      label: f.title,
+      detail: [f.court, f.section].filter(Boolean).join(" · "),
+      href: "#filings/" + f.id,
+    })),
+  ];
+
+  // Each program's own File items (its sections), then the shell's.
+  const fileItems: MenuItem[] = (program?.sections || []).map((s) => ({ label: s.label, href: s.href }));
   // Court Filings' Form menu (LP-105): the open form's filing tools.
   const tools = program?.id === "filings" && form ? formTools : null;
   const formMenu: Menu = {
@@ -305,6 +334,8 @@ export default function App() {
           onSelect: () => setLayout(layout === "classic" ? "modern" : "classic"),
         },
         { label: "Control Panel", href: "#control" },
+        "-",
+        { label: "Jump to… (" + jumpShortcut() + ")", id: "menu-jump", onSelect: openJump },
       ],
     },
     {
@@ -331,12 +362,7 @@ export default function App() {
     <>
       {!program && layout === "modern" && (
         <ErrorBoundary where="the home screen" resetKey="home">
-          <ModernHome
-            programs={PROGRAMS.filter((p) => p.visible({ commissioner }))}
-            hrefFor={hrefFor}
-            active={active}
-            onOpenFiling={openFiling}
-          />
+          <ModernHome programs={visiblePrograms} hrefFor={hrefFor} active={active} onOpenFiling={openFiling} />
         </ErrorBoundary>
       )}
       {!program && layout === "classic" && (
@@ -369,7 +395,7 @@ export default function App() {
     <>
       {layout === "modern" ? (
         <ModernFrame
-          programs={PROGRAMS.filter((p) => p.visible({ commissioner }))}
+          programs={visiblePrograms}
           hrefFor={hrefFor}
           program={program}
           title={program ? task : "Home"}
@@ -469,6 +495,14 @@ export default function App() {
       </ErrorBoundary>
       <ErrorBoundary where="About" variant="dialog" resetKey={dialog} onDismiss={closeDialog}>
         <AboutDialog open={dialog === "about"} onClose={closeDialog} />
+      </ErrorBoundary>
+      <ErrorBoundary where="the jump box" variant="dialog" resetKey={dialog} onDismiss={closeDialog}>
+        <JumpBox
+          open={dialog === "jump"}
+          onClose={closeDialog}
+          entries={jumpEntries}
+          onPick={(e) => navigate(e.href)}
+        />
       </ErrorBoundary>
       <ErrorBoundary where="Filing history" variant="dialog" resetKey={dialog} onDismiss={closeDialog}>
         <FilingsDialog open={dialog === "filings"} onClose={closeDialog} characters={characters} onUse={openFiling} />

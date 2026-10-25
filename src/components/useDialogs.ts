@@ -1,13 +1,13 @@
 // The app shell's dialogs (LP-7, from App.tsx): which one is open (one at a
 // time), whose docket it shows, the J.A.P. "Turn on sync" start, the Dockets
-// "Use in form" request, and the What's new unread dot.
+// "Use in form" request, the What's new unread dot and the jump box (LP-128).
 
 import { useCallback, useState } from "react";
 import { isUnread, markSeen } from "@/lib/changelog";
 import type { DocketRequest } from "./FormView";
 
 /** Which dialog is open (one at a time). */
-export type DialogName = "characters" | "dockets" | "changelog" | "filings" | "about" | null;
+export type DialogName = "characters" | "dockets" | "changelog" | "filings" | "about" | "jump" | null;
 
 export interface Dialogs {
   dialog: DialogName;
@@ -26,6 +26,8 @@ export interface Dialogs {
   openFilings(): void;
   /** Help → About (LP-22). */
   openAbout(): void;
+  /** The jump box (LP-128). */
+  openJump(): void;
   closeDialog(): void;
   autoSyncDone(): void;
   /** Close the Dockets dialog and ask the open form to load this docket. */
@@ -51,6 +53,7 @@ export function useDialogs(): Dialogs {
   };
 
   const closeDialog = useCallback(() => setDialog(null), []);
+  const openJump = useCallback(() => setDialog("jump"), []);
   const autoSyncDone = useCallback(() => setAutoSync(false), []);
 
   const loadDocketInForm = (docketId: string) => {
@@ -78,6 +81,7 @@ export function useDialogs(): Dialogs {
     openChangelog,
     openFilings,
     openAbout,
+    openJump,
     closeDialog,
     autoSyncDone,
     loadDocketInForm,
