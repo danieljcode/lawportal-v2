@@ -1,19 +1,13 @@
 // Prefills: today and date rules, values computed from other fields, and case-number patterns.
 
+import { addDays } from "../deadlines";
+import { gameTime } from "../freestyle";
 import type { Field } from "../types";
 
 /* ---------------------------------------------------------------- prefill */
 
-export function todayUTC(now?: Date): string {
-  return (now || new Date()).toISOString().slice(0, 10);
-}
-
-export function addDays(iso: string, n: number): string {
-  const d = new Date(iso + "T00:00:00Z");
-  if (Number.isNaN(d.getTime())) return "";
-  d.setUTCDate(d.getUTCDate() + n);
-  return d.toISOString().slice(0, 10);
-}
+/** The 2-digit game year of the real instant `now` ("90" in 2026). */
+const gameYY = (now: Date) => gameTime(now).date.slice(2, 4);
 
 /** `"today+21"` → `{base:"today", days:21}`; `"Filing date - 7"` → `{base:"Filing date", days:-7}`. */
 export function dateRule(expr: string): { base: string; days: number } {
@@ -26,9 +20,10 @@ export type Lookup = (label: string) => string | undefined;
 
 /**
  * The value a field starts with ("" when none).
- * Text: a leading `YY` becomes the 2-digit UTC year; `<Label?A=x;B=y>` becomes the
+ * `now` is the real instant; dates and years come out on the game calendar (gameTime).
+ * Text: a leading `YY` becomes the 2-digit game year; `<Label?A=x;B=y>` becomes the
  * code for another field's current value, and if that has no match the whole prefill is "".
- * Date: `today`, `today±N` or `<Label>±N` days, in UTC.
+ * Date: `today`, `today±N` or `<Label>±N` days, where today is the game date.
  */
 export function prefillValue(f: Field, now?: Date, lookup?: Lookup): string {
   if (!f.prefill) return "";
@@ -36,7 +31,7 @@ export function prefillValue(f: Field, now?: Date, lookup?: Lookup): string {
   if (f.type !== "date") {
     let missing = false;
     const out = f.prefill
-      .replace(/^YY/, String(when.getUTCFullYear()).slice(-2))
+      .replace(/^YY/, gameYY(when))
       .replace(/<([^?>]+)\?([^>]*)>/g, (_m, label: string, map: string) => {
         const current = lookup ? lookup(label.trim()) : undefined;
         const hit = map
@@ -52,7 +47,7 @@ export function prefillValue(f: Field, now?: Date, lookup?: Lookup): string {
     return missing ? "" : out;
   }
   const rule = dateRule(f.prefill);
-  const base = rule.base === "today" ? todayUTC(when) : lookup ? lookup(rule.base) : undefined;
+  const base = rule.base === "today" ? gameTime(when).date : lookup ? lookup(rule.base) : undefined;
   return base ? addDays(base, rule.days) : "";
 }
 
@@ -60,8 +55,8 @@ export function prefillValue(f: Field, now?: Date, lookup?: Lookup): string {
  * The display pattern for a case-number field: 2-digit year + courthouse +
  * division + number (src/lib/courts.ts; port-forms writes the courthouse into
  * each form's prefill, e.g. `YYSCCR00XXX`). The `prefill` is expanded the same way
- * `prefillValue` does (`^YY` → 2-digit year of `now`, which callers pass as the
- * server date; `<Label?A=x;B=y>` → the code for another field's current value)
+ * `prefillValue` does (`^YY` → 2-digit game year of the real instant `now`;
+ * `<Label?A=x;B=y>` → the code for another field's current value)
  * but, unlike `prefillValue`, when the `<Division?…>` lookup misses it falls
  * back to the FIRST code listed in the token so the placeholder is never empty
  * (an un-chosen Division still shows a concrete `90SCCR00XXX`-style pattern).
@@ -69,9 +64,8 @@ export function prefillValue(f: Field, now?: Date, lookup?: Lookup): string {
  */
 export function caseNumberPattern(f: Field, now: Date | undefined, lookup?: Lookup): string {
   if (!f.prefill) return "";
-  const when = now || new Date();
   return f.prefill
-    .replace(/^YY/, String(when.getUTCFullYear()).slice(-2))
+    .replace(/^YY/, gameYY(now || new Date()))
     .replace(/<([^?>]+)\?([^>]*)>/g, (_m, label: string, map: string) => {
       const pairs = map
         .split(";")

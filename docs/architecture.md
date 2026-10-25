@@ -198,20 +198,26 @@ flowchart LR
    - **Word:** the browser posts the HTML to `/api/docx`, and `src/lib/docx/htmlToDocx.ts` builds
      the file on the server. Images become `[Image: <url>]` links; the server never fetches them.
 
-**Dates are in-game.** FreestyleRP is set 36 years back. `src/lib/freestyle.ts` (`gameDate()`) gives
-`FormView` its `now`, which feeds Today, Auto, date prefills and the case-number year. Courthouses,
+**Dates are in-game.** FreestyleRP is set 36 years back. `gameTime()` in `src/lib/freestyle.ts`
+gives every date and time the app shows or fills in. `FormView` passes the real `new Date()` as
+its `now`; Today, Auto, date prefills and the case-number year turn it into game time. Courthouses,
 court names and the case-number shape live in `src/lib/courts.ts`.
 
-- **Today:** forms read the date in UTC (`todayUTC` in `src/lib/template/prefill.ts`), while the
-  Case File, deadlines, intake, the conflict memo, custody times and draft history read the
-  computer's local time (`gameToday`, `gameNow`, `snapshotTime`). Near midnight the two can differ
-  by a day. Weekdays are the ones the date had in 1990.
 - **The rule from LP-135** (Dan, 25 Oct 2026): game time is **New York time**
   (`America/New_York`) on every computer. The game date is today's New York date with the year
   minus 36; the day and month stay the same, and the **weekday is the real one** (Sunday 25 Oct
   2026 is "Sun 25 Oct 1990"), even where 1990's calendar had another. Times of day are New York
-  time too. One function in `freestyle.ts` will give every date and time; until LP-135 is merged,
-  the previous point still describes the code.
+  time too.
+- **How:** `gameTime(now)` reads New York wall-clock time with `Intl.DateTimeFormat` and returns
+  the game date (`YYYY-MM-DD`) and time (`HH:MM`). `gameToday`, `gameNow`, `snapshotTime`, the
+  prefills (`prefillValue`, `caseNumberPattern`, `todayDate`) and the Classic taskbar clock all
+  call it. `formatDay` takes the weekday from the real date the game date maps to. A real Feb 29
+  needs no special case: 36 is a multiple of 4. Nothing reads the computer's own time zone, and
+  `tests/gameTimeZones.test.ts` runs the rule under London and Tokyo time to keep it that way.
+- **Before LP-135:** forms read the date in UTC (`todayUTC` in `src/lib/template/prefill.ts`),
+  while the Case File, deadlines, intake, the conflict memo, custody times and draft history read
+  the computer's local time (`gameToday`, `gameNow`, `snapshotTime`). Near midnight the two could
+  differ by a day. Weekdays were the ones the date had in 1990.
 
 ## Client data: the stores
 
@@ -351,8 +357,8 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
 - **Deadlines and hearing dates** (`src/lib/deadlines.ts`, LP-18) live on each case
   (`deadlines`: an in-game date, a label, a note, done), so they sync and back up with it; merging
   two copies of a case keeps both copies' deadlines. Dates are on the 1990 calendar: "today" is
-  `gameToday()`, from `gameDate()`. Until LP-135, that can differ from a form's Today: see "Dates
-  are in-game" under [From form to filing](#from-form-to-filing).
+  `gameToday()`, from `gameTime()`, the same date a form's Today gives (LP-135): see "Dates are
+  in-game" under [From form to filing](#from-form-to-filing).
   - **On a case** (`CaseDeadlines.tsx`): add, tick off and remove, each saved straight away. The
     case details form above only reloads when the case's details change, so unsaved edits there
     survive a deadline change.

@@ -10,6 +10,7 @@ import FormView, { type FormOutput, type FormViewProps } from "@/programs/filing
 import Sidebar from "@/programs/filings/Sidebar";
 import { ALL_FORMS, getForm } from "@/data";
 import { characterStore } from "@/lib/characters";
+import { gameToday } from "@/lib/deadlines";
 import { runMigrations } from "@/lib/migrations";
 import * as sync from "@/lib/sync";
 
@@ -71,7 +72,7 @@ afterEach(() => {
 });
 
 // The in-game year: 36 years back (2026 → 1990).
-const gameYear = () => String(new Date().getUTCFullYear() - 36);
+const gameYear = () => gameToday().slice(0, 4);
 const gameYY = () => gameYear().slice(-2);
 
 /* ---------- Sidebar ---------- */

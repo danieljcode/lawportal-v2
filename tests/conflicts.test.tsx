@@ -93,7 +93,7 @@ describe("checking the firm's cases", () => {
   it("writes a short memo with the verdict and matches", () => {
     const m = checkConflicts(["A. Lee"], cases);
     const memo = conflictMemo(["A. Lee"], m, "1990-10-19", "Alice", (id) => (id === "bob00001" ? "Bob" : "Alice"));
-    expect(memo).toContain("Conflict check\nDate: Fri 19 Oct 1990\nRun by: Alice\nNames checked: A. Lee");
+    expect(memo).toContain("Conflict check\nDate: Mon 19 Oct 1990\nRun by: Alice\nNames checked: A. Lee");
     expect(memo).toContain("Result: Possible conflict: review before accepting");
     expect(memo).toContain(
       '90SCCRe0002 · Plaintiff / petitioner · Open · Lead: Bob · "A. Lee" matched "Ann Lee" (partial)',
@@ -165,7 +165,7 @@ describe("the Conflict check program and the intake (LP-10)", () => {
   beforeEach(() => {
     localStorage.clear();
     vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date(2026, 9, 19, 12, 0));
+    vi.setSystemTime(new Date("2026-10-19T16:00:00Z"));
     vi.stubGlobal("requestAnimationFrame", () => 0);
     vi.stubGlobal("cancelAnimationFrame", () => {});
     vi.spyOn(sync, "init").mockResolvedValue(undefined);

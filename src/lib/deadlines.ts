@@ -1,13 +1,13 @@
 // Deadlines and hearing dates on cases (LP-18). Each case holds dated entries
 // ("Response due", "Hearing") with a note. Dates are in-game (the 1990
-// calendar, as forms fill them): "today" is gameDate() of the real date.
+// calendar, as forms fill them): "today" is gameTime().date (LP-135).
 //
 // Upcoming lists what's due in the next 14 days across the active character's
 // cases, with overdue entries first; the toolbar shows a dot when something is
 // due within 48 hours (or overdue). Pure: no storage.
 
 import type { Entry, Values } from "./types";
-import { gameDate } from "./freestyle";
+import { gameTime, YEAR_OFFSET } from "./freestyle";
 import { isId, ISO_DATE_RE, newId } from "./storage";
 import type { Case, Deadline } from "./types";
 
@@ -60,26 +60,26 @@ export function unionDeadlines(first: Deadline[], second: Deadline[]): Deadline[
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-/** Today in the game (1990), as YYYY-MM-DD in local time. */
+/** Today in the game (1990), as YYYY-MM-DD, New York time. */
 export function gameToday(now: Date = new Date()): string {
-  const d = gameDate(now);
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  return gameTime(now).date;
 }
 
-/** YYYY-MM-DD plus `n` days. */
+/** YYYY-MM-DD plus `n` days; "" when `iso` isn't a date. */
 export function addDays(iso: string, n: number): string {
   const [y, m, d] = iso.split("-").map(Number);
   const t = new Date(Date.UTC(y, m - 1, d + n));
+  if (Number.isNaN(t.getTime())) return "";
   return `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}`;
 }
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-/** "Fri 19 Oct 1990" for 1990-10-19 (that year's own weekday). */
+/** "Sun 25 Oct 1990" for 1990-10-25: the weekday of the real date it maps to (2026-10-25). */
 export function formatDay(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
-  const t = new Date(Date.UTC(y, m - 1, d));
+  const t = new Date(Date.UTC(y - YEAR_OFFSET, m - 1, d));
   return `${DAYS[t.getUTCDay()]} ${d} ${MONTHS[m - 1]} ${y}`;
 }
 
