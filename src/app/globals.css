@@ -494,7 +494,7 @@ summary:focus-visible {
 }
 
 /* sync status: a dot and its word, linking to Settings (LP-109) */
-.sync-link {
+.sync-status {
   display: inline-flex;
   align-items: center;
   gap: 6px;
