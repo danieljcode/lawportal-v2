@@ -32,7 +32,7 @@
 }
 .dc-count {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: var(--text-sm);
   margin-right: auto;
 }
 .code-area.dc-raw {

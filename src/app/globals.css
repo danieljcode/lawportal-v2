@@ -33,6 +33,9 @@
   --dot-offline: #808080;
   --dot-error: #c00000;
   --notify: #c00000;
+  --task-bg: var(--light);
+  --task-text: #000;
+  --disabled-emboss: 1px 1px var(--hilite);
   --sidebar: 280px;
   --check-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.2 3.8l1.9 1.9L6.8 2' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E");
   --select-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='16' height='16' fill='%23000'/%3E%3Crect width='15' height='15' fill='%23dfdfdf'/%3E%3Crect x='1' y='1' width='14' height='14' fill='%23808080'/%3E%3Crect x='1' y='1' width='13' height='13' fill='%23fff'/%3E%3Crect x='2' y='2' width='12' height='12' fill='%23c0c0c0'/%3E%3Cpath d='M4.5 6h7L8 9.5z' fill='%23000'/%3E%3C/svg%3E");
@@ -70,6 +73,9 @@
   --dot-offline: #c0c0c0;
   --dot-error: #ff4040;
   --notify: #ffff00;
+  --task-bg: #000;
+  --task-text: #fff;
+  --disabled-emboss: none;
   --check-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.2 3.8l1.9 1.9L6.8 2' fill='none' stroke='%23fff' stroke-width='1.5'/%3E%3C/svg%3E");
   --select-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='16' height='16' fill='%23fff'/%3E%3Crect width='15' height='15' fill='%23c0c0c0'/%3E%3Crect x='1' y='1' width='14' height='14' fill='%23808080'/%3E%3Crect x='1' y='1' width='13' height='13' fill='%23fff'/%3E%3Crect x='2' y='2' width='12' height='12' fill='%23000'/%3E%3Cpath d='M4.5 6h7L8 9.5z' fill='%23fff'/%3E%3C/svg%3E");
   color-scheme: dark;
@@ -103,10 +109,81 @@
     --dot-offline: #c0c0c0;
     --dot-error: #ff4040;
     --notify: #ffff00;
+    --task-bg: #000;
+    --task-text: #fff;
+    --disabled-emboss: none;
     --check-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.2 3.8l1.9 1.9L6.8 2' fill='none' stroke='%23fff' stroke-width='1.5'/%3E%3C/svg%3E");
     --select-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='16' height='16' fill='%23fff'/%3E%3Crect width='15' height='15' fill='%23c0c0c0'/%3E%3Crect x='1' y='1' width='14' height='14' fill='%23808080'/%3E%3Crect x='1' y='1' width='13' height='13' fill='%23fff'/%3E%3Crect x='2' y='2' width='12' height='12' fill='%23000'/%3E%3Cpath d='M4.5 6h7L8 9.5z' fill='%23fff'/%3E%3C/svg%3E");
     color-scheme: dark;
   }
+}
+
+/* ---------- look tokens (LP-110) ---------- */
+/* What changes between looks besides the colours above: bevels, type, radii and control sizes.
+   These are the 1990 look's values, which the Classic theme keeps (LP-112). The bevels are set on
+   .post too, so the forum preview's own fixed colours feed them. */
+:root,
+.post {
+  --bevel-raised:
+    inset -1px -1px var(--dkshadow), inset 1px 1px var(--hilite), inset -2px -2px var(--shadow),
+    inset 2px 2px var(--light);
+  --bevel-window:
+    inset -1px -1px var(--dkshadow), inset 1px 1px var(--light), inset -2px -2px var(--shadow),
+    inset 2px 2px var(--hilite);
+  --bevel-sunken:
+    inset -1px -1px var(--hilite), inset 1px 1px var(--shadow), inset -2px -2px var(--light),
+    inset 2px 2px var(--dkshadow);
+  --bevel-pressed:
+    inset -1px -1px var(--hilite), inset 1px 1px var(--dkshadow), inset -2px -2px var(--light),
+    inset 2px 2px var(--shadow);
+  /* the default button's extra black frame */
+  --bevel-default:
+    inset 0 0 0 1px var(--dkshadow), inset -2px -2px var(--dkshadow), inset 2px 2px var(--hilite),
+    inset -3px -3px var(--shadow), inset 3px 3px var(--light);
+  --bevel-thin: inset -1px -1px var(--hilite), inset 1px 1px var(--shadow);
+  --bevel-groove: 1px 1px var(--hilite), inset 1px 1px var(--hilite);
+  --bevel-tab:
+    inset 1px 1px var(--hilite), inset 2px 2px var(--light), inset -1px 0 var(--dkshadow), inset -2px 0 var(--shadow);
+  --bevel-taskbar: inset 0 1px var(--light), inset 0 2px var(--hilite);
+  --bevel-rule: 0 1px var(--hilite);
+  --bevel-rule-inset: inset 0 1px var(--hilite);
+}
+:root {
+  --shadow-menu: 2px 2px 0 rgba(0, 0, 0, 0.35);
+  --backdrop: rgba(0, 0, 0, 0.4);
+  /* the modern frame's font, until the modern look sets --ui-font (LP-110 part 3) */
+  --frame-font: system-ui, "Segoe UI", Roboto, sans-serif;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 13px;
+  --text-md: 14px;
+  --text-lg: 15px;
+  --text-xl: 16px;
+  --text-2xl: 18px;
+  --text-3xl: 20px;
+  --text-4xl: 22px;
+  --text-5xl: 26px;
+  --text-6xl: 28px;
+  --radius: 0;
+  --radius-tab: 3px 3px 0 0;
+  --radius-rail: 6px;
+  /* buttons and fields; a pressed button's label moves by --press */
+  --control-height: 23px;
+  --btn-pad-y: 3px;
+  --btn-pad-x: 12px;
+  --mini-height: 21px;
+  --mini-pad-y: 1px;
+  --mini-pad-x: 8px;
+  --icon-pad-y: 2px;
+  --icon-pad-x: 6px;
+  --press: 1px;
+  --field-pad: 3px 5px;
+  /* text on the desktop colour, the error icon, the About mark's ring, a hovered rail item */
+  --desktop-text: #fff;
+  --alert-bg: #c00000;
+  --alert-text: #fff;
+  --ring: #c0c0c0;
+  --hover-text: #000;
 }
 
 /* ---------- base ---------- */
@@ -125,7 +202,7 @@ body {
   background: var(--desktop);
   color: var(--text);
   font-family: var(--ui-font);
-  font-size: 13px;
+  font-size: var(--text-base);
   line-height: 1.4;
   scrollbar-color: var(--face) var(--light);
 }
@@ -133,7 +210,7 @@ body {
   color: var(--muted);
 }
 .small {
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 ::selection {
   background: var(--select-bg);
@@ -146,8 +223,8 @@ body {
   inset: 0;
   display: grid;
   place-items: center;
-  color: #fff;
-  font-size: 14px;
+  color: var(--desktop-text);
+  font-size: var(--text-md);
 }
 
 /* Classic scrollbars (WebKit; Firefox and new Chromium use scrollbar-color above). */
@@ -160,11 +237,7 @@ body {
 }
 ::-webkit-scrollbar-thumb {
   background: var(--face);
-  box-shadow:
-    inset -1px -1px var(--dkshadow),
-    inset 1px 1px var(--hilite),
-    inset -2px -2px var(--shadow),
-    inset 2px 2px var(--light);
+  box-shadow: var(--bevel-raised);
 }
 ::-webkit-scrollbar-corner {
   background: var(--face);
@@ -182,22 +255,14 @@ body {
   background: var(--face);
   color: var(--text);
   border: 0;
-  box-shadow:
-    inset -1px -1px var(--dkshadow),
-    inset 1px 1px var(--hilite),
-    inset -2px -2px var(--shadow),
-    inset 2px 2px var(--light);
+  box-shadow: var(--bevel-raised);
 }
 .app-window,
 .window,
 dialog {
   background: var(--face);
   color: var(--text);
-  box-shadow:
-    inset -1px -1px var(--dkshadow),
-    inset 1px 1px var(--light),
-    inset -2px -2px var(--shadow),
-    inset 2px 2px var(--hilite);
+  box-shadow: var(--bevel-window);
 }
 /* sunken: fields, the sidebar tree, the preview frame, the clock tray */
 .sidebar,
@@ -216,18 +281,12 @@ dialog {
     select,
     textarea
   ) {
-  box-shadow:
-    inset -1px -1px var(--hilite),
-    inset 1px 1px var(--shadow),
-    inset -2px -2px var(--light),
-    inset 2px 2px var(--dkshadow);
+  box-shadow: var(--bevel-sunken);
 }
 /* thin sunken: status bars and the task button */
 .status-bar,
 .task-btn {
-  box-shadow:
-    inset -1px -1px var(--hilite),
-    inset 1px 1px var(--shadow);
+  box-shadow: var(--bevel-thin);
 }
 
 /* ---------- buttons ---------- */
@@ -237,28 +296,23 @@ dialog {
   align-items: center;
   justify-content: center;
   gap: 5px;
-  min-height: 23px;
-  padding: 3px 12px;
+  min-height: var(--control-height);
+  padding: var(--btn-pad-y) var(--btn-pad-x);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--text-base);
   white-space: nowrap;
   cursor: pointer;
   text-decoration: none;
   position: relative;
 }
 .mini {
-  min-height: 21px;
-  padding: 1px 8px;
-  font-size: 12px;
+  min-height: var(--mini-height);
+  padding: var(--mini-pad-y) var(--mini-pad-x);
+  font-size: var(--text-sm);
 }
 .btn.primary {
   /* the default button's extra black frame */
-  box-shadow:
-    inset 0 0 0 1px var(--dkshadow),
-    inset -2px -2px var(--dkshadow),
-    inset 2px 2px var(--hilite),
-    inset -3px -3px var(--shadow),
-    inset 3px 3px var(--light);
+  box-shadow: var(--bevel-default);
   font-weight: 700;
 }
 .btn:active:not(:disabled),
@@ -266,45 +320,33 @@ dialog {
 .start-btn:active,
 .btn[aria-pressed="true"],
 .start-btn[aria-pressed="true"] {
-  box-shadow:
-    inset -1px -1px var(--hilite),
-    inset 1px 1px var(--dkshadow),
-    inset -2px -2px var(--light),
-    inset 2px 2px var(--shadow);
-  padding-top: 4px;
-  padding-left: 13px;
-  padding-bottom: 2px;
-  padding-right: 11px;
+  box-shadow: var(--bevel-pressed);
+  padding-top: calc(var(--btn-pad-y) + var(--press));
+  padding-left: calc(var(--btn-pad-x) + var(--press));
+  padding-bottom: calc(var(--btn-pad-y) - var(--press));
+  padding-right: calc(var(--btn-pad-x) - var(--press));
 }
 .mini:active:not(:disabled) {
-  padding: 2px 7px 0 9px;
+  padding: calc(var(--mini-pad-y) + var(--press)) calc(var(--mini-pad-x) - var(--press))
+    calc(var(--mini-pad-y) - var(--press)) calc(var(--mini-pad-x) + var(--press));
 }
 .btn.icon-btn:active:not(:disabled) {
-  padding: 3px 5px 1px 7px;
+  padding: calc(var(--icon-pad-y) + var(--press)) calc(var(--icon-pad-x) - var(--press))
+    calc(var(--icon-pad-y) - var(--press)) calc(var(--icon-pad-x) + var(--press));
 }
 .btn:disabled,
 .mini:disabled {
   color: var(--shadow);
-  text-shadow: 1px 1px var(--hilite);
+  text-shadow: var(--disabled-emboss);
   cursor: default;
-}
-:root[data-theme="dark"] .btn:disabled,
-:root[data-theme="dark"] .mini:disabled {
-  text-shadow: none;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .btn:disabled,
-  :root:not([data-theme="light"]) .mini:disabled {
-    text-shadow: none;
-  }
 }
 .danger-quiet {
   color: var(--bad);
 }
 .btn.icon-btn {
   min-width: 28px;
-  padding: 2px 6px;
-  font-size: 15px;
+  padding: var(--icon-pad-y) var(--icon-pad-x);
+  font-size: var(--text-lg);
   line-height: 1;
 }
 .btn.add {
@@ -354,13 +396,13 @@ summary:focus-visible {
 .dc-settings select,
 .code-area {
   width: 100%;
-  min-height: 23px;
-  padding: 3px 5px;
+  min-height: var(--control-height);
+  padding: var(--field-pad);
   border: 0;
-  border-radius: 0;
+  border-radius: var(--radius);
   background: var(--field);
   color: var(--text);
-  font-size: 13px;
+  font-size: var(--text-base);
 }
 :where(.classic-bar, .sidebar, .editor, .taskbar, dialog) select:not([multiple]),
 .dc-settings select {
@@ -392,11 +434,7 @@ summary:focus-visible {
   height: 13px;
   margin: 2px 0 0;
   background: var(--field) no-repeat center / 9px 9px;
-  box-shadow:
-    inset -1px -1px var(--hilite),
-    inset 1px 1px var(--shadow),
-    inset -2px -2px var(--light),
-    inset 2px 2px var(--dkshadow);
+  box-shadow: var(--bevel-sunken);
   cursor: pointer;
 }
 :where(.classic-bar, .sidebar, .editor, .taskbar, dialog) input[type="checkbox"]:checked,
@@ -423,10 +461,10 @@ summary:focus-visible {
   background: linear-gradient(90deg, var(--title-from), var(--title-to));
   color: var(--title-text);
   font-weight: 700;
-  font-size: 13px;
+  font-size: var(--text-base);
 }
 .title-bar-icon {
-  font-size: 13px;
+  font-size: var(--text-base);
   line-height: 1;
 }
 .title-bar-text {
@@ -445,7 +483,7 @@ summary:focus-visible {
   place-items: center;
   width: 16px;
   height: 14px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   line-height: 1;
   font-weight: 700;
 }
@@ -603,7 +641,7 @@ summary:focus-visible {
 }
 .section-label {
   margin: 6px 0 1px 12px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
   color: var(--muted);
 }
@@ -612,7 +650,7 @@ summary:focus-visible {
 }
 .sidebar-foot {
   margin: 14px 4px 0;
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 :where(.classic-bar, .sidebar, .editor, .taskbar, dialog) a {
   color: var(--link);
@@ -627,7 +665,7 @@ summary:focus-visible {
 }
 :where(.editor) h2 {
   margin: 0;
-  font-size: 18px;
+  font-size: var(--text-2xl);
   font-weight: 700;
   line-height: 1.25;
 }
@@ -642,17 +680,17 @@ summary:focus-visible {
 }
 .eyebrow {
   margin: 0 0 4px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
   color: var(--muted);
 }
 .empty h2 {
   margin-bottom: 6px;
-  font-size: 22px;
+  font-size: var(--text-4xl);
 }
 .lede {
   margin: 0 0 14px;
-  font-size: 14px;
+  font-size: var(--text-md);
 }
 :where(.editor) .steps {
   list-style: none;
@@ -667,9 +705,7 @@ summary:focus-visible {
   align-items: flex-start;
   padding: 10px 12px;
   border: 1px solid var(--shadow);
-  box-shadow:
-    1px 1px var(--hilite),
-    inset 1px 1px var(--hilite);
+  box-shadow: var(--bevel-groove);
 }
 .steps p {
   margin: 2px 0 0;
@@ -693,11 +729,11 @@ summary:focus-visible {
   margin-bottom: 10px;
   padding-bottom: 8px;
   border-bottom: 1px solid var(--shadow);
-  box-shadow: 0 1px var(--hilite);
+  box-shadow: var(--bevel-rule);
 }
 .crumb {
   margin: 0 0 2px;
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 .form-head-actions {
   display: flex;
@@ -714,9 +750,7 @@ summary:focus-visible {
   padding: 6px 8px;
   margin-bottom: 10px;
   border: 1px solid var(--shadow);
-  box-shadow:
-    1px 1px var(--hilite),
-    inset 1px 1px var(--hilite);
+  box-shadow: var(--bevel-groove);
 }
 .docket-bar label {
   font-weight: 700;
@@ -736,9 +770,7 @@ summary:focus-visible {
 /* sections as group boxes */
 .section {
   border: 1px solid var(--shadow);
-  box-shadow:
-    1px 1px var(--hilite),
-    inset 1px 1px var(--hilite);
+  box-shadow: var(--bevel-groove);
   padding: 0;
 }
 .section > summary {
@@ -760,7 +792,7 @@ summary:focus-visible {
   place-items: center;
   width: 13px;
   height: 13px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   line-height: 1;
   border: 1px solid var(--shadow);
   background: var(--field);
@@ -774,7 +806,7 @@ summary:focus-visible {
 }
 .section-meta {
   margin-left: auto;
-  font-size: 12px;
+  font-size: var(--text-sm);
   color: var(--muted);
   white-space: nowrap;
 }
@@ -818,7 +850,7 @@ summary:focus-visible {
 }
 .help {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .inline {
@@ -830,7 +862,7 @@ summary:focus-visible {
   flex: none;
 }
 .tag {
-  font-size: 12px;
+  font-size: var(--text-sm);
   padding: 0 4px;
   border: 1px solid var(--shadow);
   background: var(--field);
@@ -894,9 +926,7 @@ summary:focus-visible {
   margin: 0;
   padding: 6px 10px 10px;
   border: 1px solid var(--shadow);
-  box-shadow:
-    1px 1px var(--hilite),
-    inset 1px 1px var(--hilite);
+  box-shadow: var(--bevel-groove);
   min-width: 0;
 }
 .block > legend {
@@ -907,9 +937,7 @@ summary:focus-visible {
   margin-top: 8px;
   padding: 6px 8px 8px;
   border: 1px solid var(--shadow);
-  box-shadow:
-    1px 1px var(--hilite),
-    inset 1px 1px var(--hilite);
+  box-shadow: var(--bevel-groove);
 }
 .item:first-of-type {
   margin-top: 2px;
@@ -967,14 +995,14 @@ summary:focus-visible {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: #c00000;
-  color: #fff;
+  background: var(--alert-bg);
+  color: var(--alert-text);
   font-weight: 700;
   outline: 1px solid var(--dkshadow);
 }
 
 .disclaimer {
-  font-size: 12px;
+  font-size: var(--text-sm);
   color: var(--muted);
   padding: 4px 6px;
   margin: 12px 0 0;
@@ -991,7 +1019,7 @@ summary:focus-visible {
   flex: none;
   min-height: 22px;
   padding: 2px 6px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   background: var(--face);
   color: var(--text);
 }
@@ -1042,12 +1070,8 @@ summary:focus-visible {
   margin-right: -1px;
   font: inherit;
   cursor: pointer;
-  box-shadow:
-    inset 1px 1px var(--hilite),
-    inset 2px 2px var(--light),
-    inset -1px 0 var(--dkshadow),
-    inset -2px 0 var(--shadow);
-  border-radius: 3px 3px 0 0;
+  box-shadow: var(--bevel-tab);
+  border-radius: var(--radius-tab);
   margin-top: 2px;
 }
 .tab[aria-selected="true"] {
@@ -1068,11 +1092,7 @@ summary:focus-visible {
 .tab-panel {
   flex: 1;
   padding: 8px;
-  box-shadow:
-    inset -1px -1px var(--dkshadow),
-    inset 1px 1px var(--hilite),
-    inset -2px -2px var(--shadow),
-    inset 2px 2px var(--light);
+  box-shadow: var(--bevel-raised);
 }
 .copy-row {
   display: flex;
@@ -1082,14 +1102,14 @@ summary:focus-visible {
   margin: 0 0 8px;
 }
 .note {
-  font-size: 12px;
+  font-size: var(--text-sm);
   color: var(--muted);
   margin: 0 0 6px;
 }
 .code-area {
   min-height: 55vh;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 .post-frame {
   background: #fff;
@@ -1205,9 +1225,7 @@ summary:focus-visible {
   padding: 3px 3px 2px;
   background: var(--face);
   color: var(--text);
-  box-shadow:
-    inset 0 1px var(--light),
-    inset 0 2px var(--hilite);
+  box-shadow: var(--bevel-taskbar);
 }
 .start-btn {
   display: inline-flex;
@@ -1260,18 +1278,8 @@ summary:focus-visible {
   height: 23px;
   padding: 2px 8px;
   font-weight: 700;
-  background: var(--light);
-  color: #000;
-}
-:root[data-theme="dark"] .task-btn {
-  background: #000;
-  color: #fff;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .task-btn {
-    background: #000;
-    color: #fff;
-  }
+  background: var(--task-bg);
+  color: var(--task-text);
 }
 .task-title {
   overflow: hidden;
@@ -1286,7 +1294,7 @@ summary:focus-visible {
   padding: 0 10px;
 }
 .clock {
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 
 /* ---------- dialogs ---------- */
@@ -1298,7 +1306,7 @@ dialog {
   overflow: auto;
 }
 dialog::backdrop {
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--backdrop);
 }
 .dialog-head {
   display: flex;
@@ -1315,7 +1323,7 @@ dialog::backdrop {
 .dialog-head h2 {
   margin: 0;
   flex: 1;
-  font-size: 13px;
+  font-size: var(--text-base);
   font-weight: 700;
 }
 .dialog-head [data-close] {
@@ -1325,7 +1333,7 @@ dialog::backdrop {
   height: 16px;
   padding: 0;
   font: inherit;
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
@@ -1343,12 +1351,12 @@ dialog::backdrop {
   color: var(--bad);
   margin: 0;
   min-height: 1em;
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
 }
 :where(dialog) h3 {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--text-base);
   font-weight: 700;
 }
 :where(dialog) p {
@@ -1363,9 +1371,7 @@ dialog::backdrop {
 .char-list li,
 .jap-note {
   border: 1px solid var(--shadow);
-  box-shadow:
-    1px 1px var(--hilite),
-    inset 1px 1px var(--hilite);
+  box-shadow: var(--bevel-groove);
 }
 
 /* Jump box (LP-128) */
@@ -1381,7 +1387,7 @@ dialog.jump-box {
 .jump-input {
   width: 100%;
   box-sizing: border-box;
-  font-size: 14px;
+  font-size: var(--text-md);
 }
 .jump-results {
   list-style: none;
@@ -1406,7 +1412,7 @@ dialog.jump-box {
   color: var(--select-text);
 }
 .jump-where {
-  font-size: 12px;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .jump-result.current .jump-where {
@@ -1448,7 +1454,7 @@ dialog.jump-box {
   margin-bottom: 6px;
 }
 .sync-badge {
-  font-size: 12px;
+  font-size: var(--text-sm);
   padding: 0 6px;
   border: 1px solid var(--shadow);
   background: var(--field);
@@ -1479,13 +1485,11 @@ dialog.jump-box {
 }
 .sync-code {
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: var(--text-base);
   padding: 2px 6px;
   background: var(--field);
   color: var(--text);
-  box-shadow:
-    inset -1px -1px var(--hilite),
-    inset 1px 1px var(--shadow);
+  box-shadow: var(--bevel-thin);
   word-break: break-all;
 }
 .sync-message {
@@ -1618,16 +1622,16 @@ dialog.changelog {
 }
 .log-entry time {
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--text-md);
 }
 .log-title {
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
   text-transform: uppercase;
   color: var(--muted);
 }
 .log-version {
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
   padding: 0 4px;
   border: 1px solid var(--muted);
@@ -1639,7 +1643,7 @@ dialog.changelog {
   display: inline-block;
   margin: 0 0 2px;
   padding: 0 6px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
   border: 1px solid var(--shadow);
   background: var(--field);
@@ -1662,7 +1666,7 @@ dialog.changelog {
 }
 .log-entry + .log-entry {
   border-top: 1px solid var(--shadow);
-  box-shadow: inset 0 1px var(--hilite);
+  box-shadow: var(--bevel-rule-inset);
   padding-top: 10px;
 }
 
@@ -1710,7 +1714,7 @@ dialog.changelog {
   font-weight: 700;
 }
 .jap-count {
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 400;
   color: var(--muted);
 }
@@ -1737,13 +1741,11 @@ dialog.changelog {
 }
 .jap-topic code {
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: var(--text-base);
   padding: 2px 6px;
   background: var(--field);
   color: var(--text);
-  box-shadow:
-    inset -1px -1px var(--hilite),
-    inset 1px 1px var(--shadow);
+  box-shadow: var(--bevel-thin);
 }
 
 /* ---------- responsive (ported reference rules) ---------- */
@@ -1813,7 +1815,7 @@ dialog.changelog {
     margin-top: 12px;
   }
   .empty h2 {
-    font-size: 20px;
+    font-size: var(--text-3xl);
   }
   .section-body,
   .item-body,
@@ -1845,7 +1847,7 @@ dialog.changelog {
   inset: 0;
   z-index: 100;
   padding: 16px;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--backdrop);
   overflow: auto;
 }
 .crash {
@@ -1874,7 +1876,7 @@ dialog.changelog {
   background: var(--bad);
   color: var(--face);
   font-weight: 700;
-  font-size: 18px;
+  font-size: var(--text-2xl);
 }
 .crash-actions {
   justify-content: flex-end;
@@ -2110,8 +2112,8 @@ dialog.changelog {
 .about-mark {
   display: grid;
   place-items: center;
-  border: 2px solid #c0c0c0;
-  font-size: 28px;
+  border: 2px solid var(--ring);
+  font-size: var(--text-6xl);
 }
 .about-credits {
   margin: 0;
@@ -2163,7 +2165,7 @@ dialog.changelog {
   background: var(--face);
   color: var(--text);
   border: 1px solid var(--text);
-  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow-menu);
   z-index: 50;
 }
 .menu-list {
@@ -2292,7 +2294,7 @@ dialog.changelog {
 }
 .pm-group-title {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--text-base);
 }
 .pm-icons {
   display: grid;
@@ -2325,12 +2327,12 @@ dialog.changelog {
   height: 40px;
   border: 2px solid var(--shadow);
   background: var(--face);
-  font-size: 22px;
+  font-size: var(--text-4xl);
   line-height: 1;
 }
 .pm-label {
   padding: 0 3px;
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 .pm-icon:hover .pm-label,
 .pm-icon:focus-visible .pm-label {
@@ -2364,7 +2366,7 @@ body:has(.m-app) {
   grid-template-columns: auto minmax(0, 1fr);
   background: var(--face);
   color: var(--text);
-  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--frame-font);
 }
 .m-rail {
   display: flex;
@@ -2382,16 +2384,16 @@ body:has(.m-app) {
   align-items: center;
   gap: 2px;
   padding: 8px 2px;
-  border-radius: 6px;
+  border-radius: var(--radius-rail);
   color: var(--text);
-  font-size: 12px;
+  font-size: var(--text-sm);
   line-height: 1.2;
   text-align: center;
   text-decoration: none;
 }
 .m-rail-item:hover {
   background: var(--light);
-  color: #000;
+  color: var(--hover-text);
 }
 .m-rail-item[aria-current="page"] {
   background: var(--select-bg);
@@ -2402,7 +2404,7 @@ body:has(.m-app) {
   outline-offset: 1px;
 }
 .m-rail-icon {
-  font-size: 20px;
+  font-size: var(--text-3xl);
   line-height: 1;
 }
 .m-main {
@@ -2423,7 +2425,7 @@ body:has(.m-app) {
 }
 .m-title {
   margin: 0;
-  font-size: 16px;
+  font-size: var(--text-xl);
   font-weight: 600;
 }
 .m-topbar .menu-bar {
@@ -2476,7 +2478,7 @@ body:has(.m-app) {
   .m-rail-item {
     flex: 1 0 64px;
     padding: 4px 2px;
-    font-size: 11px;
+    font-size: var(--text-xs);
   }
   .m-main {
     padding-bottom: 62px;
@@ -2508,7 +2510,7 @@ body:has(.m-app) {
 }
 .home-heading {
   margin: 0;
-  font-size: 15px;
+  font-size: var(--text-lg);
 }
 .home-tiles {
   display: grid;
@@ -2539,7 +2541,7 @@ body:has(.m-app) {
 }
 .home-tile-icon {
   position: relative;
-  font-size: 26px;
+  font-size: var(--text-5xl);
   line-height: 1;
 }
 .home-attention {
@@ -2558,7 +2560,7 @@ body:has(.m-app) {
 }
 .home-card h3 {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--text-base);
 }
 .home-card p {
   margin: 0;

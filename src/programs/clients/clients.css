@@ -22,7 +22,7 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   font-family: var(--ui-font);
-  font-size: 13px;
+  font-size: var(--text-base);
 }
 @media (max-width: 800px) {
   .intake-layout {
@@ -82,7 +82,7 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   font-family: var(--ui-font);
-  font-size: 13px;
+  font-size: var(--text-base);
 }
 .conflict-log h3 {
   margin: 16px 0 6px;

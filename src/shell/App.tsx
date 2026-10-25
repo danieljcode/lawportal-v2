@@ -22,7 +22,7 @@ import { readDraft, writeDraft } from "@/lib/formState";
 import { defaultKV } from "@/lib/storage";
 import { isCommissioner } from "@/lib/portfolio";
 import * as sync from "@/lib/sync";
-import { getShell, setShell, type ShellMode } from "@/lib/shell";
+import { applyLook, getShell, setShell, type ShellMode } from "@/lib/shell";
 import { getTheme, LABELS, MODES, setTheme as saveTheme, type ThemeMode } from "@/lib/theme";
 import AboutDialog from "./AboutDialog";
 import BootScreen from "./BootScreen";
@@ -92,6 +92,7 @@ export default function App() {
     setShell(mode);
     setLayoutState(mode);
   };
+  useEffect(() => applyLook(layout), [layout]);
 
   /**
    * Open a filing as a new draft of its form (LP-15). The open form takes it as an undo step;
