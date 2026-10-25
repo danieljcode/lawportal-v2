@@ -105,6 +105,9 @@ in, your searches and where you'd scrolled to are still there when you come back
   hours or overdue, your latest filings to open again, and the cases you worked on most recently.
 - **Control Panel.** Characters, sync and backups, the theme (automatic, light or dark), the startup
   screen, What's new and About.
+- **Jump to anything.** Press **Ctrl+K** (**Cmd+K** on a Mac) or **/**, or choose View → Jump to, and
+  type a few letters to go straight to a program, a section such as Upcoming or Precedents, or any
+  court form.
 
 Prefer the 1990 look? **Classic layout** (Control Panel, or View in the menus) puts the programs in a
 Windows 3.x window with a taskbar, a Program Manager and a DOS-style startup screen once per session.
