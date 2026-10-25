@@ -133,6 +133,20 @@ scripts/          port-forms, FreestyleRP wording, template safety, release note
 tests/            vitest suites, snapshots, the reference-data oracle
 ```
 
+### Code layout (LP-121)
+
+Lint (`eslint.config.mjs`, tested by `tests/import-rules.test.ts`) keeps the folders apart:
+
+- **A program is reached only through its `index.ts`** (`@/programs/cases`, never
+  `@/programs/cases/CaseFileView`). The index exports the program's component for the registry
+  and anything another part of the app genuinely needs, such as the filing types `Shell` carries
+  or the Law Library searches that Court Filings' Law Library dialog embeds.
+- **Inside a program, relative imports never climb out of it.** Shared code is imported as
+  `@/ui/…`, `@/lib/…` or `@/shell/…`; programs talk through the registry, routes and shared stores.
+- **`src/lib` and `src/ui` never import the shell or a program**, so the shared layers stay shared.
+- Something two programs need moves to `src/ui/` (a component or hook) or `src/lib/` (logic, a
+  store). Tests stay in `tests/`, and styles in `globals.css` until LP-110.
+
 ## From form to filing
 
 Every output starts from one HTML string, so the forum preview, BBCode, Discord and Word all say
