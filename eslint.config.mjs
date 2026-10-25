@@ -37,6 +37,8 @@ const config = [
       "tests/__snapshots__/",
       "test-results/",
       "playwright-report/",
+      // Git worktrees for other branches: each has its own checks (LP-134).
+      ".worktrees/",
     ],
   },
   ...nextVitals,
