@@ -206,7 +206,7 @@ dialog {
 .code-area,
 .checklist,
 .dc-settings select,
-:where(.toolbar, .sidebar, .editor, .taskbar, dialog)
+:where(.classic-bar, .sidebar, .editor, .taskbar, dialog)
   :is(
     input[type="text"],
     input[type="url"],
@@ -322,12 +322,12 @@ summary:focus-visible {
   outline: 1px dotted var(--focus);
   outline-offset: -4px;
 }
-:where(.toolbar, .sidebar, .editor, .taskbar, dialog) a:focus-visible,
+:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) a:focus-visible,
 .post-frame a:focus-visible {
   outline: 1px dotted var(--focus);
   outline-offset: 1px;
 }
-:where(.toolbar, .sidebar, .editor, .taskbar, dialog) :is(input, select, textarea):focus,
+:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) :is(input, select, textarea):focus,
 .dc-settings select:focus,
 .code-area:focus,
 .win-check:focus-visible {
@@ -336,12 +336,12 @@ summary:focus-visible {
 }
 
 /* ---------- fields ---------- */
-:where(.toolbar, .sidebar, .editor, .taskbar, dialog) :is(button, input, select, textarea),
+:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) :is(button, input, select, textarea),
 .dc-settings select {
   font: inherit;
   color: inherit;
 }
-:where(.toolbar, .sidebar, .editor, .taskbar, dialog)
+:where(.classic-bar, .sidebar, .editor, .taskbar, dialog)
   :is(
     input[type="text"],
     input[type="url"],
@@ -362,29 +362,29 @@ summary:focus-visible {
   color: var(--text);
   font-size: 13px;
 }
-:where(.toolbar, .sidebar, .editor, .taskbar, dialog) select:not([multiple]),
+:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) select:not([multiple]),
 .dc-settings select {
   appearance: none;
   padding-right: 22px;
   background: var(--field) var(--select-img) no-repeat right 2px center;
   cursor: pointer;
 }
-:where(.toolbar, .sidebar, .editor, .taskbar, dialog) textarea,
+:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) textarea,
 .code-area {
   resize: vertical;
   line-height: 1.35;
   min-height: 60px;
 }
-:where(.toolbar, .sidebar, .editor, .taskbar, dialog) :is(input, textarea)::placeholder {
+:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) :is(input, textarea)::placeholder {
   color: var(--muted);
   opacity: 1;
 }
-:where(.toolbar, .sidebar, .editor, .taskbar, dialog) :is(input, select, textarea):disabled {
+:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) :is(input, select, textarea):disabled {
   background-color: var(--face);
   color: var(--shadow);
 }
 
-:where(.toolbar, .sidebar, .editor, .taskbar, dialog) input[type="checkbox"],
+:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) input[type="checkbox"],
 .win-check {
   appearance: none;
   flex: none;
@@ -399,7 +399,7 @@ summary:focus-visible {
     inset 2px 2px var(--dkshadow);
   cursor: pointer;
 }
-:where(.toolbar, .sidebar, .editor, .taskbar, dialog) input[type="checkbox"]:checked,
+:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) input[type="checkbox"]:checked,
 .win-check:checked {
   background-image: var(--check-img);
 }
@@ -453,19 +453,15 @@ summary:focus-visible {
   margin-left: 2px;
 }
 
-/* ---------- toolbar (the reference topbar) ---------- */
-.toolbar {
+/* ---------- Classic: the menu bar row, with ☰ at phone width (LP-109) ---------- */
+.classic-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 4px;
   flex: none;
-  padding: 4px 4px 5px;
-  border-bottom: 1px solid var(--shadow);
-  box-shadow: 0 1px var(--hilite);
-  margin-bottom: 3px;
-  position: relative;
-  z-index: 20;
+}
+.classic-bar .menu-bar {
+  flex: 1;
 }
 .brand {
   display: flex;
@@ -476,41 +472,6 @@ summary:focus-visible {
   min-width: 0;
   padding: 1px 4px;
 }
-.brand-mark {
-  font-size: 22px;
-  line-height: 1;
-}
-.brand-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.15;
-  min-width: 0;
-}
-.brand-name {
-  font-weight: 700;
-  font-size: 14px;
-  white-space: nowrap;
-}
-.brand-sub {
-  font-size: 12px;
-  color: var(--muted);
-  white-space: nowrap;
-}
-.toolbar-sep {
-  width: 2px;
-  align-self: stretch;
-  margin: 2px 2px;
-  border-left: 1px solid var(--shadow);
-  border-right: 1px solid var(--hilite);
-}
-.toolbar-actions {
-  margin-left: auto;
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
 .char-picker {
   display: flex;
   align-items: center;
@@ -518,15 +479,6 @@ summary:focus-visible {
 }
 .char-picker .muted {
   white-space: nowrap;
-}
-.toolbar select {
-  max-width: 240px;
-  width: auto;
-  min-width: 160px;
-}
-.changelog-btn svg {
-  width: 16px;
-  height: 16px;
 }
 .changelog-dot {
   position: absolute;
@@ -537,14 +489,16 @@ summary:focus-visible {
   background: var(--notify);
   outline: 1px solid var(--dkshadow);
 }
-.theme-btn {
-  font-size: 15px;
-}
 .only-narrow {
   display: none !important;
 }
 
-/* sync status dot (each has a title too, so colour is not the only signal) */
+/* sync status: a dot and its word, linking to Settings (LP-109) */
+.sync-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
 .sync-dot {
   display: inline-block;
   width: 8px;
@@ -660,10 +614,10 @@ summary:focus-visible {
   margin: 14px 4px 0;
   font-size: 12px;
 }
-:where(.toolbar, .sidebar, .editor, .taskbar, dialog) a {
+:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) a {
   color: var(--link);
 }
-:where(.toolbar, .sidebar, .editor, .taskbar, dialog) a.btn {
+:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) a.btn {
   color: var(--text);
 }
 
@@ -1973,26 +1927,11 @@ dialog.changelog {
   .app-window {
     inset: 0 0 30px 0;
   }
-  .toolbar {
-    gap: 6px;
-  }
-  .brand-sub,
-  .toolbar-sep {
-    display: none;
-  }
-  .toolbar-actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
   .char-picker {
     flex: 1 1 100%;
   }
   .char-picker .muted {
     display: none;
-  }
-  .toolbar select {
-    max-width: none;
-    flex: 1;
   }
   .layout,
   .layout.with-output {
@@ -2844,9 +2783,6 @@ dialog.changelog {
 }
 
 /* ---------- About (LP-22) ---------- */
-.help-btn {
-  font-weight: 700;
-}
 .about-head {
   display: flex;
   align-items: center;
@@ -2977,7 +2913,15 @@ dialog.changelog {
   padding-bottom: 0;
 }
 
-/* The Control Panel, for now a list of the system's settings. */
+/* Settings (the Control Panel in Classic): one section per area (LP-109). */
+.settings-section {
+  margin: 0 0 24px;
+}
+.settings-section > h3 {
+  margin: 0 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--shadow);
+}
 .control-items {
   display: flex;
   flex-direction: column;
@@ -3130,6 +3074,7 @@ body:has(.m-app) {
   border-right: 1px solid var(--shadow);
 }
 .m-rail-item {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;

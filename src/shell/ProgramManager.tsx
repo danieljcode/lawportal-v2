@@ -6,7 +6,7 @@
 // come later (LP-28).
 
 import type { KeyboardEvent, ReactNode } from "react";
-import { GROUPS, PROGRAMS, type ProgramDef, type ProgramGroup } from "./registry";
+import { GROUPS, PROGRAMS, titleIn, type ProgramDef, type ProgramGroup } from "./registry";
 
 export interface ProgramManagerProps {
   commissioner: boolean;
@@ -81,9 +81,9 @@ export default function ProgramManager({
             // Something due: Case File opens on Upcoming.
             href={due ? "#cases/upcoming" : hrefFor(p)}
             title={due ? casesDue + " due within 48 hours: see Upcoming" : undefined}
-            aria-label={due ? p.title + " (" + casesDue + " due soon)" : undefined}
+            aria-label={due ? titleIn(p, "classic") + " (" + casesDue + " due soon)" : undefined}
           >
-            {icon(p.icon, p.title, due && <span className="pm-badge due-dot" id="due-dot" />)}
+            {icon(p.icon, titleIn(p, "classic"), due && <span className="pm-badge due-dot" id="due-dot" />)}
           </a>
         </li>
       );

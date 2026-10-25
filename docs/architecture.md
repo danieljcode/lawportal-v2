@@ -13,9 +13,9 @@ browser.
 - **Branding** (`src/branding.ts`, LP-22). One config holds the firm's name ("Friedman &
   Associates"), short name ("F&A"), the product name ("Court Filing System"), logo, colours and
   wallpaper, so another firm could be set up when it's hosted. The app's chrome reads it: the window
-  title and browser tab (`appTitle()`, also `APP_TITLE` in `useRoute`), the toolbar, the favicon
+  title and browser tab (`appTitle()`, also `APP_TITLE` in `useRoute`), the app rail, the favicon
   (`iconHref()`: the logo, or scales in the firm's colours), the boot screen, the crash report and
-  Help → About (`AboutDialog.tsx`, the toolbar's **?**). Court forms, the forum preview and
+  Help → About (`AboutDialog.tsx`, also the About section of Settings). Court forms, the forum preview and
   everything posted stay unbranded; `tests/branding.test.tsx` renders every form to check.
   Changing the firm means editing that file only (the backup format's `BACKUP_APP` id stays).
   The starting tab title is set by a head script (`titleScript()`), not
@@ -34,15 +34,18 @@ browser.
   icon carries the LP-18 due dot and opens on Upcoming while something is due; What's new shows a
   dot while unread. The taskbar's **Start** returns here. Court Filings with no form open
   (`#filings`) shows the three steps that used to be the start page; the startup screen setting is
-  in the Control Panel.
+  in Settings (the Control Panel in Classic).
 - **Two layouts round the programs** (LP-125). `App.tsx` builds the program, its menus, the set-aside
   notice and the dialogs once, then draws one of two frames, picked by `lawapp_shell`
-  (`src/lib/shell.ts`; a temporary setting in the Control Panel and the View menu until the Classic
+  (`src/lib/shell.ts`; a temporary setting in Settings and the View menu until the Classic
   theme, LP-112). **Modern** (the default, `ModernFrame.tsx`): an app rail (Home and each visible
-  program; a bottom bar at phone width) and a top bar (the program or page name, the `MenuBar`, the
-  active character, Characters with the sync dot, What's new, About and the theme). The page never
+  program; a bottom bar at phone width) and a top bar (the program or page name, the `MenuBar`, Dockets for a character who keeps one, the
+  active character and the sync status, `SyncDot.tsx`, which links to Settings; LP-109). Characters,
+  the theme, What's new and About are in the menus and Settings, and What's new's unread dot is on
+  the Settings rail item. The page never
   scrolls (`.m-app` is fixed to the viewport); only the program's panes do. **Classic**: the Windows
-  3.x window, toolbar, taskbar and boot screen described below. Home is the Program Manager in
+  3.x window, menu bar, taskbar and boot screen described below. Since LP-109 it has no toolbar of
+  its own: the menu bar holds the shell's actions, with ☰ beside it at phone width. Home is the Program Manager in
   Classic and `ModernHome.tsx` in Modern (LP-127): a tile per visible program (linking back to where
   it was left), then "Needs attention": the character's deadlines due within 48 hours or overdue
   (`upcoming(…, SOON_DAYS)`, each linking to its case), the latest 5 filings (opened again through
@@ -77,9 +80,9 @@ browser.
 - **Programs** (LP-103). `App.tsx` is the shell: one program at a time, full-screen, in a window
   with its title bar ("Case File - Friedman & Associates"; at home, "Program Manager - Friedman &
   Associates", while the browser tab keeps the LP-22 title), a menu bar (`MenuBar.tsx`: File, View,
-  Help, plus each program's own File items), the toolbar, and the taskbar (`Taskbar.tsx`: Start
-  returns to the Program Manager, the open program's icon and name, and the tray with the active
-  character, the same in every program). The programs are one registry,
+  Help, plus each program's own File items), and the taskbar (`Taskbar.tsx`: Start returns to the
+  Program Manager, the open program's icon and name, and the tray with the active character and
+  the sync status, the same in every program). The programs are one registry,
   `src/shell/registry.ts` (id, title, icon, where it opens, who can see it, whether it has a
   navigation pane, its component); each gets the shell's state and actions as `Shell`
   (`src/shell/program.ts`). Court Filings has the court forms (only, since LP-105) as its navigation
@@ -90,7 +93,7 @@ browser.
   The Case File (`CaseFileProgram.tsx`, LP-106) has a navigation pane too: All cases, Upcoming
   (with how many are due soon) and the open case, and links across to Clients (New case from
   intake, Run conflict check). A registry entry's `nav` is its pane's id and label, which the
-  toolbar's ☰ controls at phone width. Clients (`ClientsProgram.tsx`, LP-107) has a pane too, with
+  top bar's ☰ (the menu bar's, in Classic) controls at phone width. Clients (`ClientsProgram.tsx`, LP-107) has a pane too, with
   New client intake and Conflict check, both kept mounted with the other page hidden, so a half-typed intake survives a
   trip to the check. Intake's Run conflict check runs the check (`runConflictCheck`) and hands it
   to the Conflict check page as a request (names, result, `seq`), which fills in the names and
@@ -100,8 +103,13 @@ browser.
   (`#library/penal-code/<chapter slug>`, `chapterSlug`/`chapterFromSlug` in `penalCode.ts`), and
   picking one in the chapter list changes it. `PenalCodeSearch` takes the chapter from the program
   (or keeps its own in the Insert citation dialog, which still shows both as tabs) and can browse
-  in section order or by title (`sortCharges`; a search ranks its matches instead). The J.A.P. and
-  Control Panel are single-pane for now (LP-109).
+  in section order or by title (`sortCharges`; a search ranks its matches instead). The J.A.P. is
+  single-pane. **Settings** (`ControlPanelProgram.tsx`, LP-109; titled "Control Panel" in Classic,
+  the registry's `classicTitle`) is one page of sections: Characters and Sync (the Characters
+  dialog's body, `CharactersBody`, and `SyncPanel`), Appearance (theme, layout, startup screen),
+  What's new (`ChangelogList`) and About (`AboutContent`). Seeing it marks What's new read. Its
+  dialog-backed sections are drawn only while it shows, so a dialog another program opens never
+  doubles their ids, and in Settings the File and Help menu items scroll to the section instead.
 - **Hash routing** (`useRoute.ts`). Routes are prefixed by program: `#filings` and
   `#filings/<formId>`, `#cases`, `#cases/<id>` and `#cases/upcoming`, `#clients/intake` and
   `#clients/conflicts`, `#library/penal-code` and `#library/precedents`, `#jap`, `#control`; an

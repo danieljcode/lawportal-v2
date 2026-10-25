@@ -1,5 +1,6 @@
 // "What's new" (FR15, INV §a #changelog-dialog, §e.5). Opening it is handled
-// by App, which marks the entries seen and hides the toolbar dot.
+// by App, which marks the entries seen and hides the unread dot. Settings
+// (LP-109) shows the same list as a section.
 
 import { CHANGELOG } from "@/data/changelog";
 import { friendlyDate, LOG_TYPES } from "@/lib/changelog";
@@ -16,6 +17,14 @@ export default function ChangelogDialog({ open, onClose }: { open: boolean; onCl
       titleId="changelog-title"
       title="What's new"
     >
+      <ChangelogList />
+    </Dialog>
+  );
+}
+
+export function ChangelogList() {
+  return (
+    <>
       <p className="muted small" id="app-version">
         Version {APP_VERSION}
       </p>
@@ -44,6 +53,6 @@ export default function ChangelogDialog({ open, onClose }: { open: boolean; onCl
           </article>
         ))}
       </div>
-    </Dialog>
+    </>
   );
 }

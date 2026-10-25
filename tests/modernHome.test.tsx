@@ -73,13 +73,7 @@ afterEach(() => {
 describe("the modern home screen (LP-127)", () => {
   it("has a tile for each program the character can see, the J.A.P. only for a Court Commissioner", () => {
     mount();
-    expect(texts(".home-tile-label")).toEqual([
-      "Court Filings",
-      "Case File",
-      "Clients",
-      "Law Library",
-      "Control Panel",
-    ]);
+    expect(texts(".home-tile-label")).toEqual(["Court Filings", "Case File", "Clients", "Law Library", "Settings"]);
     expect(must("#tile-filings").getAttribute("href")).toBe("#filings");
     act(() => characterStore().setActive("carl0001"));
     expect(texts(".home-tile-label")).toContain("J.A.P.");

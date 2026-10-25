@@ -36,13 +36,12 @@ import MenuBar, { type Menu, type MenuItem } from "./MenuBar";
 import ModernFrame from "./ModernFrame";
 import ModernHome from "./ModernHome";
 import ProgramManager from "./ProgramManager";
-import { PROGRAMS, programFor } from "./registry";
+import { PROGRAMS, programFor, titleIn } from "./registry";
 import type { Shell } from "./program";
 import Taskbar from "./Taskbar";
-import Toolbar from "./Toolbar";
 import { S_SET_ASIDE, S_SET_ASIDE_HINT } from "@/lib/strings";
 import { useDialogs } from "./useDialogs";
-import { hashFor, navigate, pageTitle, useRoute } from "./useRoute";
+import { CONTROL_TITLE, hashFor, navigate, pageTitle, SETTINGS_TITLE, useRoute } from "./useRoute";
 import { useCaseVersion, useCharacterVersion, useSetAsideVersion, useSyncState } from "@/ui/useStore";
 
 export type { DialogName } from "./useDialogs";
@@ -64,6 +63,7 @@ export default function App() {
     openDockets,
     openCharacters,
     openChangelog,
+    markChangelogSeen,
     openAbout,
     openFilings,
     openJump,
@@ -200,6 +200,15 @@ export default function App() {
   // "Use in form" only for the active character's own docket, into a form that shows the docket bar.
   const canUseDocket = route.program === "filings" && docketBar && !!active && docketsFor === active.id;
 
+  // In Settings (LP-109), Characters, What's new and About are sections of the page: the menus
+  // scroll to them rather than opening the same content again in a dialog.
+  const inSettings = program?.id === "control";
+  const toSection = (id: string) => document.getElementById(id)?.scrollIntoView?.({ block: "start" });
+  const showCharacters = (startSync = false) =>
+    inSettings && !startSync ? toSection("settings-characters") : openCharacters(startSync);
+  const showChangelog = () => (inSettings ? toSection("settings-changelog") : openChangelog());
+  const showAbout = () => (inSettings ? toSection("settings-about") : openAbout());
+
   const shell: Shell = {
     route,
     form,
@@ -213,11 +222,13 @@ export default function App() {
     draftRequest,
     onDocketBar: setDocketBar,
     onFormTools: setFormTools,
-    openCharacters,
+    openCharacters: showCharacters,
     openFilings,
     openFiling,
-    openChangelog,
-    openAbout,
+    openChangelog: showChangelog,
+    openAbout: showAbout,
+    openDockets: (charId) => openDockets(charId),
+    markChangelogSeen,
     theme,
     setTheme,
     layout,
@@ -271,7 +282,7 @@ export default function App() {
     ...visiblePrograms.map((p): JumpEntry => ({
       id: "program-" + p.id,
       kind: "program",
-      label: p.title,
+      label: titleIn(p, layout),
       detail: "",
       href: hrefFor(p),
     })),
@@ -280,7 +291,7 @@ export default function App() {
         id: "section-" + p.id + "-" + i,
         kind: "section",
         label: s.label,
-        detail: p.title,
+        detail: titleIn(p, layout),
         href: s.href,
       })),
     ),
@@ -324,7 +335,7 @@ export default function App() {
       items: [
         ...fileItems,
         ...(fileItems.length ? (["-"] as MenuItem[]) : []),
-        { label: "Characters…", id: "menu-characters", onSelect: () => openCharacters() },
+        { label: "Characters…", id: "menu-characters", onSelect: () => showCharacters() },
         // In every program, so a phone (where the top bar drops its Dockets button) still has it.
         ...(hasDocket(active)
           ? [{ label: "Dockets…", id: "menu-dockets", onSelect: () => openDockets(activeId) }]
@@ -350,7 +361,7 @@ export default function App() {
           checked: layout === "classic",
           onSelect: () => setLayout(layout === "classic" ? "modern" : "classic"),
         },
-        { label: "Control Panel", href: "#control" },
+        { label: layout === "classic" ? CONTROL_TITLE : SETTINGS_TITLE, href: "#control" },
         "-",
         { label: "Jump to… (" + jumpShortcut() + ")", id: "menu-jump", onSelect: openJump },
       ],
@@ -358,14 +369,14 @@ export default function App() {
     {
       label: "Help",
       items: [
-        { label: "What's new", id: "menu-changelog", onSelect: openChangelog },
-        { label: "About " + BRANDING.productName, id: "menu-about", onSelect: openAbout },
+        { label: "What's new", id: "menu-changelog", onSelect: showChangelog },
+        { label: "About " + BRANDING.productName, id: "menu-about", onSelect: showAbout },
       ],
     },
   ];
 
-  const windowTitle = (program ? program.title : "Program Manager") + " - " + BRANDING.firmName;
-  const task = program ? pageTitle(route, form) || program.title : "Program Manager";
+  const windowTitle = (program ? titleIn(program, layout) : "Program Manager") + " - " + BRANDING.firmName;
+  const task = program ? pageTitle(route, form) || titleIn(program, layout) : "Program Manager";
   const icon = program ? program.icon : "▦";
   const notice = setAsideCount > setAsideSeen && (
     <div className="set-aside-notice" id="set-aside-notice" role="alert">
@@ -399,7 +410,7 @@ export default function App() {
         const View = p.View;
         return (
           <Activity key={p.id} mode={program?.id === p.id ? "visible" : "hidden"}>
-            <ErrorBoundary where={p.title} resetKey={p.id} onHome={() => goHome()}>
+            <ErrorBoundary where={titleIn(p, layout)} resetKey={p.id} onHome={() => goHome()}>
               <Suspense fallback={<p className="booting">Loading…</p>}>
                 <View shell={shellFor(p.id, r)} />
               </Suspense>
@@ -428,11 +439,6 @@ export default function App() {
           changelogUnread={changelogUnread}
           showDockets={hasDocket(active)}
           onDockets={() => openDockets(activeId)}
-          onCharacters={() => openCharacters()}
-          onChangelog={openChangelog}
-          onAbout={openAbout}
-          theme={theme}
-          onTheme={setTheme}
           onHome={goHome}
           notice={notice}
         >
@@ -452,23 +458,23 @@ export default function App() {
                 <span>✕</span>
               </span>
             </div>
-            <MenuBar menus={menus} />
-            <Toolbar
-              showDockets={hasDocket(active)}
-              showJap={commissioner}
-              syncStatus={syncOn ? syncState.status : null}
-              changelogUnread={changelogUnread}
-              navOpen={navOpen}
-              nav={program?.nav}
-              theme={theme}
-              onTheme={setTheme}
-              onHome={goHome}
-              onToggleNav={() => setNavOpen((o) => !o)}
-              onDockets={() => openDockets(activeId)}
-              onCharacters={() => openCharacters()}
-              onChangelog={openChangelog}
-              onAbout={openAbout}
-            />
+            {/* The menu bar holds the shell's actions (LP-109); ☰ opens the navigation pane on a phone. */}
+            <div className="classic-bar">
+              {program?.nav && (
+                <button
+                  type="button"
+                  className="btn icon-btn only-narrow"
+                  id="toggle-nav"
+                  aria-label={"Show " + program.nav.label}
+                  aria-expanded={navOpen}
+                  aria-controls={program.nav.id}
+                  onClick={() => setNavOpen((o) => !o)}
+                >
+                  ☰
+                </button>
+              )}
+              <MenuBar menus={menus} />
+            </div>
             {notice}
             {content}
           </div>
@@ -478,6 +484,7 @@ export default function App() {
             characters={characters}
             activeId={active ? active.id : null}
             onActive={(id) => characterStore().setActive(id)}
+            syncStatus={syncOn ? syncState.status : null}
             onHome={goHome}
           />
           {/* The DOS-style boot screen (LP-21), over the app once per session: part of Classic. */}

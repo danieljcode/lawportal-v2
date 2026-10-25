@@ -1,17 +1,18 @@
 // The modern shell (LP-125): a slim app rail (Home and each program the active
 // character can see), and a top bar with the program's name, its menus, the
-// active character, sync status and the shell's quick buttons. The program's
+// active character and sync status (LP-109: characters, theme, What's new and
+// About live in Settings and the menus; Dockets stays for now). The program's
 // own panes fill the rest; the page never scrolls, only the panes do. At phone
 // width the rail is a bottom bar and the navigation pane a drawer (☰). Classic
 // keeps the Windows 3.x window instead (App.tsx).
 
 import type { MouseEvent, ReactNode } from "react";
 import { BRANDING } from "@/branding";
-import { BADGES, type SyncStatus } from "@/lib/sync";
-import { ICONS, MODES, themeLabel, type ThemeMode } from "@/lib/theme";
+import type { SyncStatus } from "@/lib/sync";
 import type { Character } from "@/lib/types";
 import MenuBar, { type Menu } from "./MenuBar";
 import type { ProgramDef } from "./registry";
+import SyncDot from "./SyncDot";
 
 export interface ModernFrameProps {
   programs: readonly ProgramDef[];
@@ -29,14 +30,10 @@ export interface ModernFrameProps {
   onActive(id: string | null): void;
   /** Sync status for the dot; null while sync is off on this device. */
   syncStatus: SyncStatus | null;
+  /** What's new has entries not seen yet: a dot on Settings. */
   changelogUnread: boolean;
   showDockets: boolean;
   onDockets(): void;
-  onCharacters(): void;
-  onChangelog(): void;
-  onAbout(): void;
-  theme: ThemeMode;
-  onTheme(mode: ThemeMode): void;
   onHome(e: MouseEvent): void;
   /** Shown above the program (the set-aside notice). */
   notice?: ReactNode;
@@ -45,7 +42,6 @@ export interface ModernFrameProps {
 
 export default function ModernFrame(p: ModernFrameProps) {
   const home = !p.program;
-  const themeText = themeLabel(p.theme);
   return (
     <div className={"m-app program-" + (p.program ? p.program.id : "home") + (p.navOpen ? " nav-open" : "")}>
       <nav className="m-rail" aria-label="Programs">
@@ -69,11 +65,17 @@ export default function ModernFrame(p: ModernFrameProps) {
             id={"rail-" + prog.id}
             href={p.hrefFor(prog)}
             aria-current={p.program?.id === prog.id ? "page" : undefined}
+            aria-label={
+              prog.id === "control" && p.changelogUnread ? prog.title + " (What's new has new entries)" : undefined
+            }
           >
             <span className="m-rail-icon" aria-hidden="true">
               {prog.icon}
             </span>
             <span className="m-rail-label">{prog.title}</span>
+            {prog.id === "control" && p.changelogUnread && (
+              <span className="changelog-dot" id="changelog-dot" aria-hidden="true" />
+            )}
           </a>
         ))}
       </nav>
@@ -118,48 +120,7 @@ export default function ModernFrame(p: ModernFrameProps) {
                 ))}
               </select>
             </label>
-            <button type="button" className="btn" id="open-characters" onClick={p.onCharacters}>
-              Characters
-              {p.syncStatus && (
-                <span
-                  className={"sync-dot " + p.syncStatus}
-                  id="sync-dot"
-                  title={"Sync: " + (BADGES[p.syncStatus] || "on")}
-                  role="img"
-                  aria-label={"Sync: " + (BADGES[p.syncStatus] || "on")}
-                />
-              )}
-            </button>
-            <button
-              type="button"
-              className="btn icon-btn changelog-btn"
-              id="open-changelog"
-              aria-label={p.changelogUnread ? "What's new (unread)" : "What's new"}
-              title="What's new"
-              onClick={p.onChangelog}
-            >
-              ✎{p.changelogUnread && <span className="changelog-dot" id="changelog-dot" aria-hidden="true" />}
-            </button>
-            <button
-              type="button"
-              className="btn icon-btn help-btn"
-              id="open-about"
-              aria-label="Help: About"
-              title="Help: About"
-              onClick={p.onAbout}
-            >
-              ?
-            </button>
-            <button
-              type="button"
-              className="btn icon-btn theme-btn"
-              id="theme-toggle"
-              aria-label={themeText}
-              title={themeText}
-              onClick={() => p.onTheme(MODES[(MODES.indexOf(p.theme) + 1) % MODES.length])}
-            >
-              {ICONS[p.theme]}
-            </button>
+            <SyncDot status={p.syncStatus} />
           </div>
         </header>
         {p.notice}

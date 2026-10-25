@@ -1,10 +1,12 @@
 // The taskbar (design D8; LP-103, LP-104): Start returns to the Program
 // Manager, the open program's icon and name, and the tray with the active
-// character (the same in every program) and a clock.
+// character (the same in every program), sync status (LP-109) and a clock.
 
 import { useEffect, useState, type MouseEvent } from "react";
 import { gameTime } from "@/lib/freestyle";
+import type { SyncStatus } from "@/lib/sync";
 import type { Character } from "@/lib/types";
+import SyncDot from "./SyncDot";
 
 /** New York time of day (LP-135). */
 const clock = () => gameTime().time;
@@ -16,6 +18,8 @@ export interface TaskbarProps {
   characters: Character[];
   activeId: string | null;
   onActive(id: string | null): void;
+  /** Sync status; null while sync is off on this device. */
+  syncStatus: SyncStatus | null;
   onHome(e: MouseEvent): void;
 }
 
@@ -62,6 +66,7 @@ export default function Taskbar(p: TaskbarProps) {
             ))}
           </select>
         </label>
+        <SyncDot status={p.syncStatus} />
         <time className="clock" aria-label={"Time " + time}>
           {time}
         </time>

@@ -46,7 +46,7 @@ describe("lazy programs (LP-122)", () => {
     expect(document.querySelector("#control-title")).toBeNull();
     expect(document.querySelector(".booting")?.textContent).toBe("Loading…");
     await act(() => PROGRAMS.find((p) => p.id === "control")!.load());
-    expect(document.querySelector("#control-title")?.textContent).toBe("Control Panel");
+    expect(document.querySelector("#control-title")?.textContent).toBe("Settings");
     expect(document.querySelector(".booting")).toBeNull();
   });
 
