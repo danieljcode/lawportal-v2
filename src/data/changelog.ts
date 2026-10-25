@@ -42,6 +42,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         text: "Filing history's preview, Copy again and a case's filings now show a blank case number as it was copied (such as 90SCCR00XXX), not the template's raw YYSCCR#####.",
       },
       {
+        type: "fix",
+        text: "In the Case File, adding, editing, moving or deleting an exhibit, or logging its custody, no longer throws away changes you've typed in the case's details and not saved yet.",
+      },
+      {
         type: "update",
         text: "If a program breaks, its error box now has Go home, so you can carry on in the rest of the app, and Copy error details says which page you were on.",
       },
