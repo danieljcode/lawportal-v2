@@ -18,6 +18,7 @@
 // re-exports them, so imports from "@/lib/template" keep working.
 
 export * from "./template/escape";
+export * from "./template/form";
 export * from "./template/parse";
 export * from "./template/plain";
 export * from "./template/prefill";

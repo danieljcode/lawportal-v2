@@ -38,6 +38,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         text: "Game dates and times now follow New York time on every computer, with the year 36 back, so a filing, the Case File and Upcoming always agree on today's date, even late at night. Days show the real weekday: Sunday 25 October is Sun 25 Oct 1990.",
       },
       {
+        type: "fix",
+        text: "Filing history's preview, Copy again and a case's filings now show a blank case number as it was copied (such as 90SCCR00XXX), not the template's raw YYSCCR#####.",
+      },
+      {
         type: "update",
         text: "If a program breaks, its error box now has Go home, so you can carry on in the rest of the app, and Copy error details says which page you were on.",
       },

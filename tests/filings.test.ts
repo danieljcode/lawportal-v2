@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+﻿// @vitest-environment jsdom
 // Filing history (LP-15): what a filing keeps, duplicates, the cap and a full
 // store, search and filters, a case's filings, sync and backup.
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -17,6 +17,7 @@ import {
 import { EMPTY_STATE } from "@/lib/formState";
 import { memoryKV, type KV } from "@/lib/storage";
 import * as sync from "@/lib/sync";
+import { renderFiling } from "@/ui/FilingsDialog";
 
 const T1 = "2026-10-01T10:00:00.000Z";
 const T2 = "2026-10-02T10:00:00.000Z";
@@ -155,5 +156,23 @@ describe("sync and backup", () => {
     const kv = memoryKV();
     createFilingStore(kv).add(filing());
     expect(Object.keys(makeBackup(kv).data)).toContain(FILINGS_KEY);
+  });
+});
+
+describe("a past filing re-rendered (LP-136)", () => {
+  const past = (at: string): Filing =>
+    ({ ...filing({ caseNumber: "", caseId: undefined, state: EMPTY_STATE }), id: "fil00001", at }) as Filing;
+
+  it("shows a blank Case number as the pattern, as the original copy did", () => {
+    const html = String(renderFiling(past(T1)));
+    expect(html).toMatch(/90SC[A-Z]{2}00XXX/);
+    // The template's raw fallback was "Court File: YYSCCC#####".
+    expect(html).not.toMatch(/YYSC|#####/);
+  });
+
+  it("takes the case-number year from when it was filed, in New York", () => {
+    // 10 pm on New York's New Year's Eve is still 1990; the next June is 1991.
+    expect(String(renderFiling(past("2027-01-01T03:00:00.000Z")))).toMatch(/90SC[A-Z]{2}00XXX/);
+    expect(String(renderFiling(past("2027-06-01T12:00:00.000Z")))).toMatch(/91SC[A-Z]{2}00XXX/);
   });
 });

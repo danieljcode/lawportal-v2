@@ -10,20 +10,25 @@ import { caseStore } from "@/lib/cases";
 import { snapshotTime } from "@/lib/draftHistory";
 import { exhibitRefs, resolveExhibitRefs } from "@/lib/exhibits";
 import { filterFilings, filingStore, VIA_LABELS, type Filing } from "@/lib/filings";
-import { compile, render } from "@/lib/template";
+import { compileForm, render } from "@/lib/template";
 import type { Character } from "@/lib/types";
 import Dialog from "./Dialog";
 import { useFilingVersion } from "./useStore";
 
-/** A filing rendered with today's template (SafeHtml), or null when its form is gone. */
+/**
+ * A filing rendered with today's template (SafeHtml), or null when its form is gone. Compiled as
+ * the form view compiles it (LP-136), so a blank Case number shows the pattern for the year filed.
+ */
 export function renderFiling(f: Filing) {
   const form = getForm(f.formId);
   if (!form) return null;
   try {
+    const { tree } = compileForm(form, new Date(f.at));
+    if (!tree) return null;
     // Exhibit references and the exhibit list follow the case as it is now (LP-13).
     const c = (f.caseId && caseStore().get(f.caseId)) || (f.caseNumber ? caseStore().byNumber(f.caseNumber) : null);
     const exhibits = c ? exhibitRefs(c.exhibits) : [];
-    return render(compile(form.html), resolveExhibitRefs(f.state.values, exhibits), { exhibits });
+    return render(tree, resolveExhibitRefs(f.state.values, exhibits), { exhibits });
   } catch {
     return null;
   }
