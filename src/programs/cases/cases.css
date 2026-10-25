@@ -1,0 +1,302 @@
+/* cases program styles (LP-110): only this program uses these; the shared components are in
+   src/app/globals.css. Loaded with the program's code. */
+
+/* ---------- Case File (LP-101) ---------- */
+.case-layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 2fr) minmax(0, 3fr);
+  gap: 12px;
+  align-items: start;
+}
+.case-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.case-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  border: 1px solid var(--shadow);
+  border-left: 3px solid var(--shadow);
+  background: var(--field);
+  color: var(--text);
+  text-decoration: none;
+}
+.case-row:hover,
+.case-row:focus-visible {
+  border-left-color: var(--select-bg);
+}
+.case-row.current {
+  border-left: 5px solid var(--select-bg);
+}
+.case-row-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.case-status {
+  font-size: 12px;
+  color: var(--muted);
+}
+.case-parties {
+  overflow-wrap: anywhere;
+}
+.case-detail {
+  min-width: 0;
+}
+.case-back {
+  display: none;
+  margin-bottom: 8px;
+}
+.case-placeholder {
+  margin: 8px 0;
+}
+.case-flag {
+  margin: 0;
+  padding: 4px 8px;
+  border: 1px solid var(--missing);
+  color: var(--missing);
+}
+.case-assigned {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+.case-links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 4px;
+}
+.case-empty {
+  padding: 6px 8px;
+  border: 1px dashed var(--shadow);
+}
+.case-empty h4 {
+  margin: 0 0 4px;
+}
+.case-empty p {
+  margin: 0;
+}
+@media (max-width: 800px) {
+  .case-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* On a phone the open case replaces the list, with a link back. */
+  .case-file.has-detail .case-list-pane {
+    display: none;
+  }
+  .case-file:not(.has-detail) .case-detail {
+    display: none;
+  }
+  .case-back {
+    display: inline-block;
+  }
+}
+
+/* ---------- deadlines (LP-18) ---------- */
+.case-links #case-deadlines {
+  grid-column: 1 / -1;
+}
+.deadline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 6px;
+  border: 1px solid var(--shadow);
+  border-left: 3px solid var(--shadow);
+  background: var(--field);
+}
+.deadline > label > span,
+.upcoming-what {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.deadline.done strong {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+.deadline.overdue,
+.upcoming-item.overdue {
+  border-left: 5px solid var(--bad);
+}
+.upcoming-item.soon {
+  border-left: 5px solid var(--missing);
+}
+.deadline-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.deadline-add input[type="text"] {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+.upcoming-item {
+  display: grid;
+  grid-template-columns: minmax(130px, auto) minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  align-items: start;
+  padding: 6px 8px;
+  border: 1px solid var(--shadow);
+  border-left: 3px solid var(--shadow);
+  background: var(--field);
+  color: var(--text);
+}
+.upcoming-when {
+  display: flex;
+  flex-direction: column;
+}
+.upcoming-item.overdue .upcoming-when .small {
+  color: var(--bad);
+  font-weight: 700;
+}
+@media (max-width: 700px) {
+  .upcoming-item {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .upcoming-what {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+/* ---------- evidence (LP-12) ---------- */
+.case-links #case-evidence {
+  grid-column: 1 / -1;
+}
+.exhibit-list {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.exhibit-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+.exhibit-title {
+  flex: 1 1 140px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.exhibit-actions {
+  display: flex;
+  gap: 4px;
+}
+.exhibit-description {
+  white-space: pre-wrap;
+}
+.exhibit-form {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 1fr);
+  gap: 6px;
+  margin: 6px 0;
+}
+.exhibit-form textarea,
+.exhibit-form .row {
+  grid-column: 1 / -1;
+}
+@media (max-width: 700px) {
+  .exhibit-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- chain of custody (LP-14) ---------- */
+.custody {
+  margin-top: 6px;
+  padding: 6px 8px;
+  border: 1px dashed var(--shadow);
+}
+.custody-list {
+  margin: 0 0 6px;
+  padding-left: 22px;
+}
+.custody-list li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  padding: 2px 0;
+}
+.custody-at {
+  font-variant-numeric: tabular-nums;
+}
+.custody-note {
+  flex-basis: 100%;
+  color: var(--muted);
+}
+.custody-form {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+}
+.custody-form .custody-note-input,
+.custody-form .row {
+  grid-column: 1 / -1;
+}
+@media (max-width: 700px) {
+  .custody-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media screen {
+  .custody-sheet {
+    display: none;
+  }
+}
+
+/* ---------- evidence (LP-12) ---------- */
+.exhibit {
+  padding: 4px 8px;
+  border: 1px solid var(--shadow);
+  border-left: 3px solid var(--select-bg);
+  background: var(--field);
+  color: var(--text);
+}
+.exhibit p {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+
+/* Print prints only the custody log being printed. */
+@media print {
+  html:has(#custody-sheet),
+  body:has(#custody-sheet) {
+    background: #fff;
+  }
+  body:has(#custody-sheet) * {
+    visibility: hidden;
+  }
+  body:has(#custody-sheet) #custody-sheet,
+  body:has(#custody-sheet) #custody-sheet * {
+    visibility: visible;
+  }
+  body:has(#custody-sheet) #custody-sheet {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    background: #fff;
+    color: #000;
+    font-size: 12pt;
+  }
+}
