@@ -33,6 +33,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "fix",
         text: "Ctrl+K no longer closes a dialog you're typing in (such as a new character) to open the jump box, so what you've typed stays.",
       },
+      {
+        type: "update",
+        text: "If a program breaks, its error box now has Go home, so you can carry on in the rest of the app, and Copy error details says which page you were on.",
+      },
     ],
   },
   {

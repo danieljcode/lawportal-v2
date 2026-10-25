@@ -7,11 +7,24 @@ import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import App from "@/shell/App";
 import ErrorBoundary from "@/ui/ErrorBoundary";
-import { EMPTY_STATE, writeDraft } from "@/lib/formState";
+import { EMPTY_STATE, readDraft, writeDraft } from "@/lib/formState";
 // The form crashes by making something only FormView uses while rendering throw: its draft writer.
 import * as draftWriter from "@/lib/draftWriter";
 import { defaultKV } from "@/lib/storage";
 import * as sync from "@/lib/sync";
+
+// A whole program crashes by swapping the Law Library's component for one that throws (LP-123).
+const library = vi.hoisted(() => ({ breaks: false }));
+vi.mock("@/programs/library", async (importOriginal) => {
+  const real = await importOriginal<typeof import("@/programs/library")>();
+  return {
+    ...real,
+    default: (props: Parameters<typeof real.default>[0]) => {
+      if (library.breaks) throw new Error("library broke");
+      return real.default(props);
+    },
+  };
+});
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -77,6 +90,8 @@ describe("a crash in one panel (LP-88)", () => {
     expect(document.querySelector("#form-view")).toBeNull();
     expect(document.querySelector("#output")).toBeNull();
     expect(must("#sidebar")).toBeTruthy();
+    // Inside a program, a panel's box has no Go home: the program itself still works.
+    expect(document.querySelector("#crash-home")).toBeNull();
     // The rest of the app still works: another dialog opens fine.
     click("#open-characters");
     expect(must("#characters-dialog").hasAttribute("open")).toBe(true);
@@ -135,6 +150,40 @@ describe("a crash in one panel (LP-88)", () => {
     expect(JSON.parse(text).data).toEqual({ lawapp_chars: '[{"id":"abcd1234","name":"Ann Lee"}]' });
     expect(text).not.toContain(CODE);
     expect(must(".crash-status").textContent).toContain("Backup downloaded");
+  });
+});
+
+describe("a crash in a whole program (LP-123)", () => {
+  afterEach(() => {
+    library.breaks = false;
+  });
+
+  it("shows the box with Go home; home, other programs and drafts keep working", async () => {
+    library.breaks = true;
+    writeDraft(defaultKV(), "civil-complaint", { ...EMPTY_STATE, values: { "Plaintiff name": "Ann Lee" } });
+    history.replaceState(null, "", "#library/precedents");
+    render(createElement(App));
+    expect(must("#crash-text").textContent).toContain("Something went wrong in Law Library.");
+    expect(must("#crash-retry")).toBeTruthy();
+
+    await act(async () => {
+      must("#crash-copy").click();
+      await Promise.resolve();
+    });
+    const details = writeText.mock.calls[0][0] as string;
+    expect(details).toContain("Where: Law Library");
+    expect(details).toContain("Route: #library/precedents");
+    expect(details).toContain("Error: Error: library broke");
+
+    click("#crash-home");
+    expect(location.hash).toBe("");
+    expect(must("#home")).toBeTruthy();
+    act(() => {
+      history.pushState(null, "", "#cases");
+      window.dispatchEvent(new HashChangeEvent("hashchange"));
+    });
+    expect(must("#case-file-title").textContent).toBe("Case File");
+    expect(readDraft(defaultKV(), "civil-complaint")?.values["Plaintiff name"]).toBe("Ann Lee");
   });
 });
 

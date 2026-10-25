@@ -29,12 +29,15 @@ describe("errorDetails", () => {
     error,
     componentStack: "\n    at FormView (app.js:1:1)\n    at ErrorBoundary (app.js:2:2)",
     where: "this form",
+    route: "#filings/civil-complaint",
     userAgent: "TestBrowser/1.0",
     now: new Date("2026-10-19T12:00:00Z"),
   });
 
   it("says where and when it broke, the browser and the error", () => {
     expect(text).toContain("Where: this form");
+    expect(text).toContain("Route: #filings/civil-complaint");
+    expect(errorDetails({ error: "x", where: "the app" })).toContain("Route: home");
     expect(text).toContain("When: 2026-10-19T12:00:00.000Z");
     expect(text).toContain("Browser: TestBrowser/1.0");
     expect(text).toContain('Error: TypeError: Unexpected "…" near [sync code]');
