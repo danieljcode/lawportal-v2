@@ -79,9 +79,11 @@ checks every commit message and the PR title against the commit format (LP-84). 
 ## End-to-end smoke tests (LP-6)
 
 ```bash
-npm run build
-npm run test:e2e        # starts the built app on port 3210, runs, and stops it
+npm run test:e2e        # builds, starts the app on port 3210, runs, and stops it
 ```
+
+Locally the command runs `npm run build` first, so the tests always run the current code (LP-134).
+In CI the build is its own step, so `test:e2e` only starts the app.
 
 `e2e/smoke.spec.ts` uses Playwright's test runner (`playwright.config.ts`) to walk the key journeys in
 a real Chromium, at **desktop** (1440×900) and **phone** (Pixel 7) sizes, each from empty storage:
@@ -96,7 +98,7 @@ a real Chromium, at **desktop** (1440×900) and **phone** (Pixel 7) sizes, each 
 The suite takes a few seconds. It needs Chromium once: `npx playwright install chromium`. The
 server gets a throwaway sync directory (`test-results/sync`). A failing test keeps a screenshot and
 a trace in `test-results/`; open a trace with `npx playwright show-trace <path>/trace.zip`. Locally,
-an app already running on port 3210 is reused.
+an app already running on port 3210 is reused, without building, so stop it first if it's out of date.
 
 ## Playwright scripts
 

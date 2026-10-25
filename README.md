@@ -52,7 +52,7 @@ app. [Development](docs/development.md) has the details and the other settings.
 | `npm start`             | Serves the production build on `127.0.0.1:3000`.                                              |
 | `npm run start:lan`     | The same on `0.0.0.0`, open to your network.                                                  |
 | `npm test`              | Runs every test suite once (Vitest).                                                          |
-| `npm run test:e2e`      | Browser smoke tests at desktop and phone sizes (Playwright; run `npm run build` first).       |
+| `npm run test:e2e`      | Browser smoke tests at desktop and phone sizes (Playwright; builds the app first).            |
 | `npm run lint`          | ESLint; fails on any error or warning.                                                        |
 | `npm run format`        | Formats every file with Prettier.                                                             |
 | `npm run format:check`  | Checks formatting without changing anything.                                                  |

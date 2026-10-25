@@ -83,24 +83,24 @@ npm run build && npm run start:lan
 
 ## Scripts
 
-| Command                 | What it does                                                                                                                                    |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run dev`           | Development server on `127.0.0.1:3000`, with hot reload.                                                                                        |
-| `npm run dev:lan`       | The same on `0.0.0.0`, API open to the network.                                                                                                 |
-| `npm run build`         | Type-checks the app and tests, and makes a production build.                                                                                    |
-| `npm start`             | Serves the production build on `127.0.0.1:3000`.                                                                                                |
-| `npm run start:lan`     | The same on `0.0.0.0`, API open to the network.                                                                                                 |
-| `npm test`              | Runs every test suite once (Vitest). See [Testing](testing.md).                                                                                 |
-| `npm run test:e2e`      | End-to-end smoke tests in a real browser, desktop and phone (run `npm run build` first). See [Testing](testing.md#end-to-end-smoke-tests-lp-6). |
-| `npm run lint`          | ESLint (Next.js, React and TypeScript rules); fails on any error or warning.                                                                    |
-| `npm run format`        | Formats every file with Prettier.                                                                                                               |
-| `npm run format:check`  | Checks formatting without changing anything (what CI runs).                                                                                     |
-| `npm run port-forms`    | Regenerates `src/data/forms.json` from the reference data. See [Templates and forms](templates-and-forms.md#regenerating-the-court-forms).      |
-| `npm run penal-code`    | Updates `src/data/penal-code.json` from the FreestyleRP penal code sheet (or `-- file.csv`). See [Architecture](architecture.md).               |
-| `npm run screenshots`   | Screenshots of the running app into `.agents/screenshots/` (Playwright).                                                                        |
-| `npm run smoke:preview` | Browser smoke test of every form against the running app (Playwright).                                                                          |
-| `npm run release-notes` | Prints the GitHub Release notes for the version in `package.json`. See [Releasing](releasing.md).                                               |
-| `npm run prepare`       | Runs on `npm install`: turns on the commit-message hook in `.githooks/`.                                                                        |
+| Command                 | What it does                                                                                                                               |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `npm run dev`           | Development server on `127.0.0.1:3000`, with hot reload.                                                                                   |
+| `npm run dev:lan`       | The same on `0.0.0.0`, API open to the network.                                                                                            |
+| `npm run build`         | Type-checks the app and tests, and makes a production build.                                                                               |
+| `npm start`             | Serves the production build on `127.0.0.1:3000`.                                                                                           |
+| `npm run start:lan`     | The same on `0.0.0.0`, API open to the network.                                                                                            |
+| `npm test`              | Runs every test suite once (Vitest). See [Testing](testing.md).                                                                            |
+| `npm run test:e2e`      | End-to-end smoke tests in a real browser, desktop and phone (builds the app first). See [Testing](testing.md#end-to-end-smoke-tests-lp-6). |
+| `npm run lint`          | ESLint (Next.js, React and TypeScript rules); fails on any error or warning.                                                               |
+| `npm run format`        | Formats every file with Prettier.                                                                                                          |
+| `npm run format:check`  | Checks formatting without changing anything (what CI runs).                                                                                |
+| `npm run port-forms`    | Regenerates `src/data/forms.json` from the reference data. See [Templates and forms](templates-and-forms.md#regenerating-the-court-forms). |
+| `npm run penal-code`    | Updates `src/data/penal-code.json` from the FreestyleRP penal code sheet (or `-- file.csv`). See [Architecture](architecture.md).          |
+| `npm run screenshots`   | Screenshots of the running app into `.agents/screenshots/` (Playwright).                                                                   |
+| `npm run smoke:preview` | Browser smoke test of every form against the running app (Playwright).                                                                     |
+| `npm run release-notes` | Prints the GitHub Release notes for the version in `package.json`. See [Releasing](releasing.md).                                          |
+| `npm run prepare`       | Runs on `npm install`: turns on the commit-message hook in `.githooks/`.                                                                   |
 
 ## Environment variables
 
