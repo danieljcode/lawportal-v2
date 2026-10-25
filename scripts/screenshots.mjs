@@ -2,8 +2,8 @@
 //
 // Needs the app running (`npm start` or `npm run dev`) and a Playwright browser
 // (`npx playwright install chromium`, or set PLAYWRIGHT_CHANNEL=msedge to use an
-// installed Edge). Writes home, form, dialog and Discord-tab shots in light and dark to
-// .agents/screenshots/{home,form,dialog,discord}-{light,dark}.png.
+// installed Edge). Writes home, form, settings and Discord-tab shots in light and dark to
+// .agents/screenshots/{home,form,settings,discord}-{light,dark}.png.
 //
 // Usage: node scripts/screenshots.mjs [baseUrl]   (default http://127.0.0.1:3000)
 import { mkdir } from "node:fs/promises";
@@ -18,9 +18,9 @@ const channel = process.env.PLAYWRIGHT_CHANNEL || undefined;
 
 const SHOTS = [
   { name: "home", hash: "" },
-  { name: "form", hash: "#civil-complaint" },
+  { name: "form", hash: "#civil-complaint", form: true },
   { name: "settings", hash: "#control" },
-  { name: "discord", hash: "#civil-complaint", click: "#tab-discord" },
+  { name: "discord", hash: "#civil-complaint", form: true, click: "#tab-discord" },
 ];
 
 await mkdir(outDir, { recursive: true });
@@ -45,7 +45,7 @@ try {
       const page = await context.newPage();
       await page.goto(base + "/" + shot.hash, { waitUntil: "networkidle" });
       await page.waitForSelector(".m-app, .app-window");
-      if (shot.hash) {
+      if (shot.form) {
         // No input is entered: the preview must hold the rendered template as soon as the form is there.
         const first = await page
           .waitForFunction(
