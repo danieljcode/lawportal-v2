@@ -76,7 +76,8 @@ export default function CaseFileView({
     );
   } else if (selected) {
     // Re-keyed when the case's details change (saved here, or synced in), so the form shows
-    // what's stored. Not on a deadline change: that would throw away unsaved edits above.
+    // what's stored. Not on a deadline, exhibit or custody change: that would throw away unsaved
+    // edits above. Save spreads the latest `initial`, so those are kept.
     detail = (
       <>
         <CaseEditor
@@ -225,9 +226,9 @@ export default function CaseFileView({
   );
 }
 
-/** The case's details and who's on it, but not its deadlines or when it was saved. */
+/** The case's details and who's on it, but not its deadlines, evidence or save times (LP-148). */
 function detailsStamp(c: Case): string {
-  const { deadlines: _deadlines, updated: _updated, ...details } = c;
+  const { deadlines: _deadlines, exhibits: _exhibits, updated: _updated, created: _created, ...details } = c;
   return JSON.stringify(details);
 }
 
