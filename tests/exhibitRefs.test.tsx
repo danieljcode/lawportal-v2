@@ -5,8 +5,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import App from "@/components/App";
-import { renderFiling } from "@/components/FilingsDialog";
+import App from "@/shell/App";
+import { renderFiling } from "@/ui/FilingsDialog";
 import { fromHtml } from "@/lib/bbcode";
 import { caseStore } from "@/lib/cases";
 import { characterStore } from "@/lib/characters";

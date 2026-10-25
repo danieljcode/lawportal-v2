@@ -5,7 +5,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import App from "@/components/App";
+import App from "@/shell/App";
 import { CHANGELOG } from "@/data/changelog";
 import { LOG_TYPES } from "@/lib/changelog";
 import { APP_VERSION } from "@/lib/version";
