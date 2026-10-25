@@ -6,9 +6,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import App from "@/components/App";
-import { PROGRAMS, programFor } from "@/components/programs/registry";
-import { hashFor, parseHash, type Route } from "@/components/useRoute";
+import App from "@/shell/App";
+import { PROGRAMS, programFor } from "@/shell/registry";
+import { hashFor, parseHash, type Route } from "@/shell/useRoute";
 import { markBooted } from "@/lib/boot";
 import { caseStore } from "@/lib/cases";
 import { characterStore } from "@/lib/characters";

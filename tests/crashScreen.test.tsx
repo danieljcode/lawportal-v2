@@ -5,8 +5,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import App from "@/components/App";
-import ErrorBoundary from "@/components/ErrorBoundary";
+import App from "@/shell/App";
+import ErrorBoundary from "@/ui/ErrorBoundary";
 import { EMPTY_STATE, writeDraft } from "@/lib/formState";
 // The form crashes by making something only FormView uses while rendering throw: its draft writer.
 import * as draftWriter from "@/lib/draftWriter";

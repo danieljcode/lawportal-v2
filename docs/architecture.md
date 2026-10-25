@@ -71,9 +71,9 @@ browser.
   Help, plus each program's own File items), the toolbar, and the taskbar (`Taskbar.tsx`: Start
   returns to the Program Manager, the open program's icon and name, and the tray with the active
   character, the same in every program). The programs are one registry,
-  `src/components/programs/registry.ts` (id, title, icon, where it opens, who can see it, whether
-  it has a navigation pane, its component); each gets the shell's state and actions as `Shell`
-  (`programs/shell.ts`). Court Filings has the court forms (only, since LP-105) as its navigation
+  `src/shell/registry.ts` (id, title, icon, where it opens, who can see it, whether it has a
+  navigation pane, its component); each gets the shell's state and actions as `Shell`
+  (`src/shell/program.ts`). Court Filings has the court forms (only, since LP-105) as its navigation
   pane (a drawer at phone width) and owns the open form's output. Its **Form** menu (LP-105) holds
   the open form's filing tools: FormView reports them up through `onTools` (`FormTools`: Draft
   history, the Law Library dialog, focus the docket bar's case picker, and the firm case its case
@@ -116,8 +116,12 @@ browser.
 ```
 src/
   app/            page.tsx (client-only entry), layout.tsx, globals.css, api/{account,data,docx}
-  components/     App shell (useRoute, useDialogs hooks), FormView, dialogs, output panes;
-                  fields/ for the form editor inputs
+  shell/          App, registry, program.ts (what every program gets), useRoute, useDialogs, both
+                  frames, the home screens, the jump box and the shell's dialogs
+  programs/<id>/  one folder per program (filings, cases, clients, library, jap, control); the
+                  rest of the app imports it only through its index.ts. filings/fields/ holds the
+                  form editor inputs
+  ui/             shared by the shell and programs: Dialog, ErrorBoundary, useStore, Filing history
   data/           forms.json (39 court forms, generated), extra-forms.ts (13 templates), changelog.ts
   lib/            the logic: template engine, converters, stores, sync, settings (see below)
   lib/template/   the template engine: parse, prefill, render, escape, plain (template.ts re-exports)
@@ -128,6 +132,20 @@ src/
 scripts/          port-forms, FreestyleRP wording, template safety, release notes, Playwright scripts
 tests/            vitest suites, snapshots, the reference-data oracle
 ```
+
+### Code layout (LP-121)
+
+Lint (`eslint.config.mjs`, tested by `tests/import-rules.test.ts`) keeps the folders apart:
+
+- **A program is reached only through its `index.ts`** (`@/programs/cases`, never
+  `@/programs/cases/CaseFileView`). The index exports the program's component for the registry
+  and anything another part of the app genuinely needs, such as the filing types `Shell` carries
+  or the Law Library searches that Court Filings' Law Library dialog embeds.
+- **Inside a program, relative imports never climb out of it.** Shared code is imported as
+  `@/ui/…`, `@/lib/…` or `@/shell/…`; programs talk through the registry, routes and shared stores.
+- **`src/lib` and `src/ui` never import the shell or a program**, so the shared layers stay shared.
+- Something two programs need moves to `src/ui/` (a component or hook) or `src/lib/` (logic, a
+  store). Tests stay in `tests/`, and styles in `globals.css` until LP-110.
 
 ## From form to filing
 
@@ -150,7 +168,7 @@ flowchart LR
 1. **Template.** Each form (`src/data/forms.json`, `src/data/extra-forms.ts`) is the forum post's
    own HTML with `{{tokens}}` for the fields. See [Templates and forms](templates-and-forms.md).
 2. **Compile and fields** (`src/lib/template/`, re-exported by `template.ts`). `compile()` parses the template into a tree;
-   `fields()` lists the inputs. `FormView` turns those into the editor (`src/components/fields/`).
+   `fields()` lists the inputs. `FormView` turns those into the editor (`src/programs/filings/fields/`).
 3. **Form state** (`src/lib/formState/`, re-exported by `formState.ts`). Values, prefills (dates, case numbers), filling from
    the active character and dockets, repeatable blocks. Drafts save per form under
    `lawapp_draft_<form id>`.
@@ -192,7 +210,7 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
   back to memory. `readJson` sets aside values it can't parse instead of deleting them (see
   [Sync, storage and recovery](sync.md#damaged-data)).
 - **Change channels and React.** Each store has a change channel with a version counter. The hooks
-  in `src/components/useStore.ts` subscribe with `useSyncExternalStore`, so components re-read a
+  in `src/ui/useStore.ts` subscribe with `useSyncExternalStore`, so components re-read a
   store when its version moves.
 - **Clean on the way in.** Every store runs input through a `clean()` function (trimmed strings,
   known fields only, valid ids), so imports, synced copies and old data can't put odd shapes into
