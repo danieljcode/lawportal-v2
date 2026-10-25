@@ -219,6 +219,38 @@ describe("the Evidence area on a case (LP-12)", () => {
     expect(letters()).toEqual(["Exhibit A Second"]);
   });
 
+  it("keeps unsaved edits to the case while exhibits and custody change, and Save keeps both (LP-148)", () => {
+    const notes = () => must<HTMLTextAreaElement>("#case-notes").value;
+    setValue("#case-notes", "Not saved yet");
+    add("First");
+    add("Second");
+    expect(notes()).toBe("Not saved yet");
+    click(button(document.querySelectorAll(".exhibit")[1], "Move Exhibit B up"));
+    click(button(must(".exhibit"), "Edit"));
+    setValue("#exhibit-title", "Second, edited");
+    submit();
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    click(button(document.querySelectorAll(".exhibit")[1], "Delete"));
+    expect(notes()).toBe("Not saved yet");
+    click([...must(".exhibit").querySelectorAll("button")].find((b) => b.textContent!.startsWith("Custody"))!);
+    setValue(".custody-note-input", "Sealed in bag 14");
+    act(() => must(".custody-form").dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })));
+    expect(caseStore().get("case0001")!.exhibits[0].custody).toHaveLength(1);
+    expect(notes()).toBe("Not saved yet");
+
+    act(() => must("#case-form").dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })));
+    const saved = caseStore().get("case0001")!;
+    expect(saved.notes).toBe("Not saved yet");
+    expect(saved.exhibits.map((e) => [e.title, e.custody?.length])).toEqual([["Second, edited", 1]]);
+  });
+
+  it("still reloads the case form when the details change elsewhere (a sync)", () => {
+    act(() => {
+      caseStore().save({ ...caseStore().get("case0001")!, notes: "From another device" });
+    });
+    expect(must<HTMLTextAreaElement>("#case-notes").value).toBe("From another device");
+  });
+
   it("shows typed text as text, never markup", () => {
     add('<img src=x onerror="alert(1)">');
     expect(document.querySelector(".exhibit img")).toBeNull();
