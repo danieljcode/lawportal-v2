@@ -33,4 +33,11 @@ describe("import rules (LP-121)", { timeout: 30_000 }, () => {
     expect(await blocked("src/ui/x.ts", 'import "@/programs/cases";')).toBe(true);
     expect(await blocked("src/ui/x.ts", 'import "@/lib/cases";')).toBe(false);
   });
+
+  it("keeps the court form templates out of the shell (LP-133)", async () => {
+    expect(await blocked("src/shell/x.ts", 'import "@/data";')).toBe(true);
+    expect(await blocked("src/shell/x.ts", 'import "@/data/form-index";')).toBe(false);
+    expect(await blocked("src/shell/x.ts", 'import "@/programs/cases/CaseFileView";')).toBe(true);
+    expect(await blocked("src/programs/filings/x.ts", 'import "@/data";')).toBe(false);
+  });
 });

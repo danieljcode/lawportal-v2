@@ -19,6 +19,12 @@ const UP = {
   message: "src/lib and src/ui are shared: they can't depend on the shell or a program (LP-121).",
 };
 const restrict = (...patterns) => ({ "no-restricted-imports": ["error", { patterns }] });
+// The shell is in the first load, so it lists forms from their index and leaves the templates to
+// Court Filings and Filing history (LP-133).
+const FORMS = {
+  name: "@/data",
+  message: "The shell uses `@/data/form-index`; the templates load with Court Filings (LP-133).",
+};
 
 const config = [
   {
@@ -42,6 +48,10 @@ const config = [
     },
   },
   { files: ["src/**/*.{ts,tsx}"], rules: restrict(DEEP) },
+  {
+    files: ["src/shell/**/*.{ts,tsx}"],
+    rules: { "no-restricted-imports": ["error", { patterns: [DEEP], paths: [FORMS] }] },
+  },
   { files: ["src/programs/*/*.{ts,tsx}"], rules: restrict(DEEP, OUT("../")) },
   { files: ["src/programs/*/*/*.{ts,tsx}"], rules: restrict(DEEP, OUT("../../")) },
   { files: ["src/lib/**/*.{ts,tsx}", "src/ui/**/*.{ts,tsx}"], rules: restrict(UP) },

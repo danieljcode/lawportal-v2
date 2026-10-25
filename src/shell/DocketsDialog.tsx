@@ -2,7 +2,7 @@
 // status filter, the case list with its actions, and the New/Edit form.
 
 import { useState, type FormEvent } from "react";
-import { COURTS } from "@/data";
+import { COURTS } from "@/data/form-index";
 import { characterStore } from "@/lib/characters";
 import { docketStore, FIELDS, STATUSES } from "@/lib/dockets";
 import { formatDate } from "@/lib/template";
