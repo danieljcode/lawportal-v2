@@ -103,13 +103,15 @@ browser.
   `useDialogs` owns the open dialog.
 - **Three small API routes** on the same server, all behind a host check (see [Server](#server)):
   sync (`/api/account`, `/api/data`) and the `.docx` export (`/api/docx`).
-- **Error boundaries** (`ErrorBoundary.tsx`, LP-88). One wraps the whole app in `AppLoader`; inside
-  `App`, the form, the forum preview, the J.A.P. and its output, and each dialog have their own. A
-  render error shows an "Application Error" box in that panel's place while the rest keeps working,
-  with **Try again** (or **Close** for a dialog), **Reload**, **Download a backup of my data** (the
-  LP-1 backup) and **Copy error details**. When the form breaks, its preview is hidden so nothing
+- **Error boundaries** (`src/ui/ErrorBoundary.tsx`, LP-88). One wraps the whole app in `AppLoader`
+  (Reload only); inside `App`, each program has one (LP-123), and so do the form, the forum
+  preview, the J.A.P. and its output, and each dialog. A render error shows an "Application Error"
+  box in that panel's place while the rest keeps working, with **Try again** (or **Close** for a
+  dialog), **Go home** for a whole program, **Reload**, **Download a backup of my data** (the LP-1
+  backup) and **Copy error details**. When the form breaks, its preview is hidden so nothing
   half-made can be copied. The details (`src/lib/crash.ts`) hold the version, where it broke, the
-  browser, the error's name and message with quoted text and sync codes blanked out, and code
+  route (the page's hash), the browser, the error's name and message with quoted text and sync
+  codes blanked out, and code
   locations only, so never a sync code or anything typed into a form. Add a boundary round any new
   major panel.
 

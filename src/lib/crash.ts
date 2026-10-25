@@ -53,12 +53,14 @@ export interface CrashInfo {
   componentStack?: string | null;
   /** Which part broke ("the form", "the whole app"). */
   where: string;
+  /** The page's hash ("#cases/<id>"), "" at home (LP-123). */
+  route?: string;
   userAgent?: string;
   now?: Date;
 }
 
 /** The text "Copy error details" puts on the clipboard. */
-export function errorDetails({ error, componentStack, where, userAgent, now = new Date() }: CrashInfo): string {
+export function errorDetails({ error, componentStack, where, route, userAgent, now = new Date() }: CrashInfo): string {
   const err = error instanceof Error ? error : null;
   const name = err ? err.name || "Error" : typeof error;
   let message = redact(err ? err.message : String(error));
@@ -66,6 +68,7 @@ export function errorDetails({ error, componentStack, where, userAgent, now = ne
   const lines = [
     BRANDING.productName + " " + APP_VERSION + ": error report",
     "Where: " + where,
+    "Route: " + (route ? redact(route) : "home"),
     "When: " + now.toISOString(),
     "Browser: " + (userAgent || "unknown"),
     "Error: " + name + ": " + message,
