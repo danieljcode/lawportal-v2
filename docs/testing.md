@@ -13,7 +13,9 @@ Run `npm test` and `npm run build` before calling any change done.
 
 All suites are in `tests/` and use [Vitest](https://vitest.dev). Most run in Node; files that need a
 DOM start with `// @vitest-environment jsdom`. UI tests render the real `App` (or one component)
-with React and drive it through the DOM.
+with React and drive it through the DOM. Programs load lazily (LP-122), so `tests/setup.ts` loads all
+of them before each DOM suite, as the app's idle preload does; `lazyPrograms.test.tsx` covers the lazy
+path itself.
 
 | Area             | Suites                                                                                                             |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------ |

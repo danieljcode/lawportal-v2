@@ -13,6 +13,7 @@ export default defineConfig({
     environment: "node",
     include: ["tests/**/*.test.ts", "tests/**/*.test.tsx"],
     globalSetup: ["tests/reference-check.ts"],
+    setupFiles: ["tests/setup.ts"],
     // The same value next.config.mjs inlines for src/lib/version.ts.
     env: { APP_VERSION: version },
   },
