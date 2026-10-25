@@ -62,8 +62,11 @@ browser.
   (`lazyProgram` in `registry.ts`); App shows "Loading…" in a `Suspense` inside the program's error
   boundary until it arrives, and once the browser is idle it loads every program the character can
   open, so switching is instant (a loaded program renders without suspending). The penal code comes
-  with the Law Library (and the form's Law Library dialog in Court Filings). The court forms are
-  still in the shell, because routing, the jump box, Filing history and Dockets read them.
+  with the Law Library (and the form's Law Library dialog in Court Filings). The court forms'
+  templates (`@/data`) come with Court Filings, or when Filing history first opens (LP-133): the
+  shell routes, titles the page, fills the jump box and the Dockets court list from
+  `@/data/form-index` (id, court, section and title), and `Shell.form` is that index entry. A lint
+  rule keeps `@/data` out of `src/shell`.
 - **Programs keep their place** (LP-126). Every program opened stays mounted inside React's
   `<Activity>`, hidden while another shows (App remembers each one's last route in `visited`), so
   coming back finds the same form, scroll position, searches and half-typed intake. A hidden
@@ -130,7 +133,8 @@ src/
                   rest of the app imports it only through its index.ts. filings/fields/ holds the
                   form editor inputs
   ui/             shared by the shell and programs: Dialog, ErrorBoundary, useStore, Filing history
-  data/           forms.json (39 court forms, generated), extra-forms.ts (13 templates), changelog.ts
+  data/           forms.json (39 court forms, generated), extra-forms.ts (13 templates), form-index.json
+                  (their ids and titles, for the shell), changelog.ts
   lib/            the logic: template engine, converters, stores, sync, settings (see below)
   lib/template/   the template engine: parse, prefill, render, escape, plain (template.ts re-exports)
   lib/discord/    HTML → Discord markdown: model, escape, serialize, dom, builder, tables, convert

@@ -144,8 +144,8 @@ test("Ctrl+K jumps to a form, and Esc closes the box and gives the focus back", 
   await expect(page.locator("#form-view")).toBeVisible();
 });
 
-/** The first-load JavaScript budget for the home screen, uncompressed (README, "First-load budget"; LP-122). */
-const FIRST_LOAD_BUDGET_KIB = 950;
+/** The first-load JavaScript budget for the home screen, uncompressed (README, "First-load budget"; LP-122, LP-133). */
+const FIRST_LOAD_BUDGET_KIB = 650;
 
 test("the home screen's first load stays within the JavaScript budget", async ({ page }) => {
   // First load only: the idle preload of the programs never fires.
