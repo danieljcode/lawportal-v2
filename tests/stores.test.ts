@@ -26,8 +26,10 @@ import {
 import {
   __resetSetAsideForTests,
   CORRUPT_PREFIX,
+  isId,
   listSetAside,
   memoryKV,
+  newId,
   readJson,
   setAsideVersion,
   writeJson,
@@ -55,6 +57,14 @@ function stores(kv: KV = spyKV()) {
 }
 
 describe("storage helpers", () => {
+  it("never repeats an id made in the same millisecond (LP-157)", () => {
+    const now = vi.spyOn(Date, "now").mockReturnValue(Date.UTC(2026, 9, 25, 12));
+    const ids = Array.from({ length: 100_000 }, newId);
+    now.mockRestore();
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(ids.every(isId)).toBe(true);
+  });
+
   it("sets corrupt JSON aside before removing it, and raises the notice (LP-65)", () => {
     const kv = memoryKV({ lawapp_chars: '[{"id":"abcd1234","name":"Ha' });
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
