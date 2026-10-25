@@ -25,6 +25,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "new",
         text: "Press Ctrl+K (Cmd+K on a Mac) or / and type a few letters to jump straight to a program, a section such as Upcoming or Precedents, or any court form. The arrow keys and Enter pick one, and Esc closes it. It's also in the View menu.",
       },
+      {
+        type: "fix",
+        text: "Sync no longer loses an edit made while it's saving, or a change to a ruling in the Law Library that another device changed too: yours is kept, and Restore my version brings it back.",
+      },
     ],
   },
   {

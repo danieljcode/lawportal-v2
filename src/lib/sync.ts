@@ -68,6 +68,8 @@ export interface SyncState {
   lost: number;
   /** The same for cases (LP-4). */
   lostCases: number;
+  /** The same for precedents (LP-132). */
+  lostPrecedents: number;
 }
 
 /** The sync document: the export shape, with the J.A.P. inside each character, and the firm's cases (LP-4). */
@@ -100,6 +102,7 @@ const INITIAL: SyncState = Object.freeze({
   applied: 0,
   lost: 0,
   lostCases: 0,
+  lostPrecedents: 0,
 });
 
 let state: SyncState = INITIAL;
@@ -161,8 +164,8 @@ function set(status: SyncStatus, message = "", updated?: string): void {
   notify();
 }
 
-function setLost(lost: number, lostCases: number): void {
-  state = Object.freeze({ ...state, lost, lostCases });
+function setLost(lost: number, lostCases: number, lostPrecedents: number): void {
+  state = Object.freeze({ ...state, lost, lostCases, lostPrecedents });
   notify();
 }
 
@@ -376,6 +379,8 @@ export interface Resolved {
   lost: Doc[];
   /** The same for cases (LP-4). */
   lostCases: Case[];
+  /** The same for precedents (LP-132). */
+  lostPrecedents: Precedent[];
   /** True when the result holds anything of this browser's, so it must be pushed. */
   keptLocal: boolean;
 }
@@ -456,6 +461,7 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
     },
     lost,
     lostCases: cases.lost,
+    lostPrecedents: precedents.lost,
     keptLocal: keptLocal || cases.keptLocal || filings.keptLocal || checks.keptLocal || precedents.keptLocal,
   };
 }
@@ -530,6 +536,14 @@ function readLostCases(): Case[] {
   }
 }
 
+function readLostPrecedents(): Precedent[] {
+  try {
+    return precedentsOf(JSON.parse(lsGet(LOST_KEY) || "null")) || [];
+  } catch {
+    return [];
+  }
+}
+
 /**
  * Put this browser's versions back after a merge chose another device's: each
  * is saved with a fresh updatedAt (so it wins the next merge) and pushed.
@@ -559,6 +573,14 @@ export function restoreLost(): number {
       console.warn("[sync] couldn't restore a case", err);
     }
   }
+  for (const p of readLostPrecedents()) {
+    try {
+      precedentStore().save(p); // a fresh `updated` too
+      restored++;
+    } catch (err) {
+      console.warn("[sync] couldn't restore a precedent", err);
+    }
+  }
   discardLost();
   return restored;
 }
@@ -566,7 +588,7 @@ export function restoreLost(): number {
 /** Forget the kept-aside versions. */
 export function discardLost(): void {
   lsSet(LOST_KEY, null);
-  setLost(0, 0);
+  setLost(0, 0, 0);
 }
 
 /** Set `status` after applying a server copy, unless some characters failed to store. */
@@ -591,24 +613,33 @@ function takeServer(b: ApiBody, dirty: boolean): boolean {
     setAfterApply(failed, "synced", "Updated from the server.", b.updated);
     return false;
   }
-  const { doc, lost, lostCases, keptLocal } = resolve(b.data);
+  const { doc, lost, lostCases, lostPrecedents, keptLocal } = resolve(b.data);
   saveBase(b.data);
-  const anyLost = lost.length + lostCases.length > 0;
+  const anyLost = lost.length + lostCases.length + lostPrecedents.length > 0;
   if (anyLost) {
-    // Add to anything not yet restored; a newer copy of the same character or case replaces the older one.
+    // Add to anything not yet restored; a newer copy of the same item replaces the older one.
     const ids = new Set(lost.map((c) => c.id));
     const all = [...readLost().filter((c) => !ids.has(c.id)), ...lost];
     const caseIds = new Set(lostCases.map((c) => c.id));
     const allCases = [...readLostCases().filter((c) => !caseIds.has(c.id)), ...lostCases];
-    lsSet(LOST_KEY, JSON.stringify({ at: new Date().toISOString(), characters: all, cases: allCases }));
-    setLost(all.length, allCases.length);
+    const precedentIds = new Set(lostPrecedents.map((p) => p.id));
+    const allPrecedents = [...readLostPrecedents().filter((p) => !precedentIds.has(p.id)), ...lostPrecedents];
+    lsSet(
+      LOST_KEY,
+      JSON.stringify({ at: new Date().toISOString(), characters: all, cases: allCases, precedents: allPrecedents }),
+    );
+    setLost(all.length, allCases.length, allPrecedents.length);
   }
   const failed = apply(doc);
   lsSet(DIRTY_KEY, keptLocal ? "1" : null);
   setAfterApply(
     failed,
     anyLost ? "conflict" : "synced",
-    anyLost ? S_SYNC_LOST(lost.length, lostCases.length) : keptLocal ? S_SYNC_MERGED : "Updated from the server.",
+    anyLost
+      ? S_SYNC_LOST(lost.length, lostCases.length, lostPrecedents.length)
+      : keptLocal
+        ? S_SYNC_MERGED
+        : "Updated from the server.",
     b.updated,
   );
   return keptLocal;
@@ -802,7 +833,8 @@ export function init(): Promise<void> {
   ];
   const lost = readLost().length;
   const lostCases = readLostCases().length;
-  if (lost || lostCases) setLost(lost, lostCases);
+  const lostPrecedents = readLostPrecedents().length;
+  if (lost || lostCases || lostPrecedents) setLost(lost, lostCases, lostPrecedents);
   initPromise = (async () => {
     if (code()) {
       set("loading", "Loading from the server…");
