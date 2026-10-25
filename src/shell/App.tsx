@@ -9,7 +9,7 @@
 // programs are in registry.ts; routing is useRoute.ts and the dialogs
 // useDialogs.ts (LP-7). Ctrl+K or "/" opens the jump box (JumpBox.tsx, LP-128).
 
-import { Activity, useEffect, useMemo, useRef, useState } from "react";
+import { Activity, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { ALL_FORMS, getForm } from "@/data";
 import { BRANDING } from "@/branding";
 import { characterStore, hasDocket } from "@/lib/characters";
@@ -250,6 +250,17 @@ export default function App() {
   // The jump box's entries (LP-128): the programs the character can see (back to where each was
   // left), their sections, then every court form.
   const visiblePrograms = PROGRAMS.filter((p) => p.visible({ commissioner }));
+
+  // Once the browser is idle, fetch the code of every program this character can open, so opening
+  // one is instant (LP-122). A failed fetch is retried when the program is opened.
+  useEffect(() => {
+    const idle = window.requestIdleCallback ?? ((f: () => void) => window.setTimeout(f, 200));
+    const id = idle(() => {
+      for (const p of PROGRAMS) if (p.visible({ commissioner })) p.load().catch(() => {});
+    });
+    return () => (window.cancelIdleCallback ?? window.clearTimeout)(id);
+  }, [commissioner]);
+
   const jumpEntries: JumpEntry[] = [
     ...visiblePrograms.map((p): JumpEntry => ({
       id: "program-" + p.id,
@@ -383,7 +394,9 @@ export default function App() {
         return (
           <Activity key={p.id} mode={program?.id === p.id ? "visible" : "hidden"}>
             <ErrorBoundary where={p.title} resetKey={p.id} onHome={() => goHome()}>
-              <View shell={shellFor(p.id, r)} />
+              <Suspense fallback={<p className="booting">Loading…</p>}>
+                <View shell={shellFor(p.id, r)} />
+              </Suspense>
             </ErrorBoundary>
           </Activity>
         );

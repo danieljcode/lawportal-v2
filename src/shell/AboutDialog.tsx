@@ -2,7 +2,6 @@
 // and the credits. Everything named comes from src/branding.ts.
 
 import { appTitle, BRANDING } from "@/branding";
-import { PENAL_CODE } from "@/lib/penalCode";
 import { S_CREDIT } from "@/lib/strings";
 import { APP_VERSION } from "@/lib/version";
 import Dialog from "@/ui/Dialog";
@@ -53,7 +52,8 @@ export default function AboutDialog({ open, onClose }: { open: boolean; onClose(
       <ul className="small about-credits" id="about-credits">
         <li>{S_CREDIT} All rights reserved.</li>
         <li>Court forms: adapted from third-party templates (see LICENSE).</li>
-        <li>{PENAL_CODE.title + ": FreestyleRP."}</li>
+        {/* Not read from the penal code, so its 115 KB loads with the Law Library only (LP-122). */}
+        <li>State of San Andreas Penal Code: FreestyleRP.</li>
       </ul>
       <div className="row">
         <button type="button" className="btn primary" onClick={onClose}>

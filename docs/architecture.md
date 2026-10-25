@@ -58,6 +58,12 @@ browser.
   section or program containing it, then the letters in order; ties go programs, sections, forms.
   The input is an ARIA combobox over a listbox (`aria-activedescendant`), with the result count in a
   live region; Esc or ✕ gives the focus back to where it was.
+- **Programs load when opened** (LP-122). Each registry entry's `load` imports the program's folder
+  (`lazyProgram` in `registry.ts`); App shows "Loading…" in a `Suspense` inside the program's error
+  boundary until it arrives, and once the browser is idle it loads every program the character can
+  open, so switching is instant (a loaded program renders without suspending). The penal code comes
+  with the Law Library (and the form's Law Library dialog in Court Filings). The court forms are
+  still in the shell, because routing, the jump box, Filing history and Dockets read them.
 - **Programs keep their place** (LP-126). Every program opened stays mounted inside React's
   `<Activity>`, hidden while another shows (App remembers each one's last route in `visited`), so
   coming back finds the same form, scroll position, searches and half-typed intake. A hidden
