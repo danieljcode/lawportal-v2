@@ -180,6 +180,13 @@ Lint (`eslint.config.mjs`, tested by `tests/import-rules.test.ts`) keeps the fol
   `tests/stylesheets.test.ts` fails on a hard-coded colour, font, font size, radius or bevel there,
   and on any variable that isn't defined. The forum preview, the Discord message, the boot screen and
   the print sheets keep fixed looks on purpose.
+- **The two looks** (LP-110). The 1990 values are on `:root` and stay the Classic look. The modern look
+  (slate and brass, Dan's pick) overrides the same variables under `:root[data-look="modern"]`, with
+  its own dark values for `data-theme="dark"` and for automatic with a dark system theme. It is
+  flat: hairlines (`inset 0 0 0 1px`) where 1990 had bevels, a soft shadow on dialogs and menus,
+  6px corners, a 14px system font and 32px controls. `--accent` (brass in modern, navy in Classic)
+  marks cards and lists, and `--primary-bg`/`--primary-text` colour the default button. No rule
+  changes between looks, only values, so the layout is the same in both.
 
 ## From form to filing
 

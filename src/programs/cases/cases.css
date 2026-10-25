@@ -29,10 +29,10 @@
 }
 .case-row:hover,
 .case-row:focus-visible {
-  border-left-color: var(--select-bg);
+  border-left-color: var(--accent);
 }
 .case-row.current {
-  border-left: 5px solid var(--select-bg);
+  border-left: 5px solid var(--accent);
 }
 .case-row-head {
   display: flex;
@@ -269,7 +269,7 @@
 .exhibit {
   padding: 4px 8px;
   border: 1px solid var(--shadow);
-  border-left: 3px solid var(--select-bg);
+  border-left: 3px solid var(--accent);
   background: var(--field);
   color: var(--text);
 }

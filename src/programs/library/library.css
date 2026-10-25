@@ -21,7 +21,7 @@
 .precedent {
   padding: 4px 8px;
   border: 1px solid var(--shadow);
-  border-left: 3px solid var(--select-bg);
+  border-left: 3px solid var(--accent);
   background: var(--field);
   color: var(--text);
 }
