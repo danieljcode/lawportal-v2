@@ -5,10 +5,14 @@
 // text and the raw code never reaches the filesystem or the logs. Every file
 // operation on a code runs under a per-hash promise lock, and writes go through
 // a temp file plus an atomic rename (retried while Windows holds the target).
+//
+// When Upstash Redis is configured (syncRedis.ts), create/read/write/remove use
+// it instead, for hosts without a lasting file system.
 import { createHash, randomBytes } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { generateCode } from "./code";
+import { redisConfigured, redisCreate, redisRead, redisRemove, redisWrite } from "./syncRedis";
 
 export interface SyncRecord {
   rev: number;
@@ -135,6 +139,7 @@ export async function sweepUnused(now = Date.now()): Promise<number> {
 
 /** A new sync code with an empty record, or "full" when the directory holds MAX_FILES records. */
 export async function create(): Promise<{ code: string } | "full"> {
+  if (redisConfigured()) return createRedis();
   const dir = syncDir();
   await fs.mkdir(dir, { recursive: true });
   const existing = await sweepUnused();
@@ -152,12 +157,25 @@ export async function create(): Promise<{ code: string } | "full"> {
   }
 }
 
+async function createRedis(): Promise<{ code: string } | "full"> {
+  const record: SyncRecord = { rev: 0, updated: new Date().toISOString(), data: { characters: [] } };
+  for (let attempt = 1; ; attempt++) {
+    const code = generateCode();
+    const result = await redisCreate(codeHash(code), record, MAX_FILES, UNUSED_TTL_MS);
+    if (result === "full") return "full";
+    if (result === "ok") return { code };
+    if (attempt >= 3) throw Object.assign(new Error("Sync code collision"), { code: "EEXIST" });
+  }
+}
+
 export function read(code: string): Promise<SyncRecord | null> {
+  if (redisConfigured()) return redisRead(codeHash(code));
   return withLock(codeHash(code), () => readFile(fileFor(code)));
 }
 
 /** Optimistic write: only succeeds when the stored rev equals `expectedRev`. */
 export function write(code: string, expectedRev: number, data: SyncRecord["data"]): Promise<WriteResult> {
+  if (redisConfigured()) return redisWrite(codeHash(code), expectedRev, data);
   return withLock(codeHash(code), async () => {
     const file = fileFor(code);
     const current = await readFile(file);
@@ -177,6 +195,7 @@ export function write(code: string, expectedRev: number, data: SyncRecord["data"
 }
 
 export function remove(code: string): Promise<"ok" | "missing"> {
+  if (redisConfigured()) return redisRemove(codeHash(code));
   return withLock(codeHash(code), async () => {
     try {
       await fs.unlink(fileFor(code));
