@@ -140,7 +140,7 @@ src/
   lib/discord/    HTML → Discord markdown: model, escape, serialize, dom, builder, tables, convert
   lib/formState/  per-form state: state, update, rules, dockets, layout, drafts
   lib/services/   work spanning several stores (characters.ts: delete, duplicate, export, import)
-  lib/server/     server-only: host guard, capped body reader, sync codes, file store
+  lib/server/     server-only: host guard, capped body reader, sync codes, rate limits, file and Redis stores
 scripts/          port-forms, FreestyleRP wording, template safety, release notes, Playwright scripts
 tests/            vitest suites, snapshots, the reference-data oracle
 ```
@@ -201,6 +201,17 @@ flowchart LR
 **Dates are in-game.** FreestyleRP is set 36 years back. `src/lib/freestyle.ts` (`gameDate()`) gives
 `FormView` its `now`, which feeds Today, Auto, date prefills and the case-number year. Courthouses,
 court names and the case-number shape live in `src/lib/courts.ts`.
+
+- **Today:** forms read the date in UTC (`todayUTC` in `src/lib/template/prefill.ts`), while the
+  Case File, deadlines, intake, the conflict memo, custody times and draft history read the
+  computer's local time (`gameToday`, `gameNow`, `snapshotTime`). Near midnight the two can differ
+  by a day. Weekdays are the ones the date had in 1990.
+- **The rule from LP-135** (Dan, 25 Oct 2026): game time is **New York time**
+  (`America/New_York`) on every computer. The game date is today's New York date with the year
+  minus 36; the day and month stay the same, and the **weekday is the real one** (Sunday 25 Oct
+  2026 is "Sun 25 Oct 1990"), even where 1990's calendar had another. Times of day are New York
+  time too. One function in `freestyle.ts` will give every date and time; until LP-135 is merged,
+  the previous point still describes the code.
 
 ## Client data: the stores
 
@@ -339,8 +350,9 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
   the field as it is then. Citations are plain text, so they're escaped like any other value.
 - **Deadlines and hearing dates** (`src/lib/deadlines.ts`, LP-18) live on each case
   (`deadlines`: an in-game date, a label, a note, done), so they sync and back up with it; merging
-  two copies of a case keeps both copies' deadlines. Dates are on the 1990 calendar, as forms fill
-  them: "today" is `gameToday()`, from `gameDate()`.
+  two copies of a case keeps both copies' deadlines. Dates are on the 1990 calendar: "today" is
+  `gameToday()`, from `gameDate()` (see "Dates are in-game" under [From form to filing](#from-form-to-filing) for how it differs from a
+  form's Today until LP-135).
   - **On a case** (`CaseDeadlines.tsx`): add, tick off and remove, each saved straight away. The
     case details form above only reloads when the case's details change, so unsaved edits there
     survive a deadline change.
@@ -385,14 +397,16 @@ The only server code is three route handlers and `src/lib/server/`:
 | `/api/data`    | `GET` the copy; `PUT` replaces it (optimistic, by revision) | Sync data     |
 | `/api/docx`    | `POST` HTML, returns a `.docx`                              | Word export   |
 
-- **Host check** (`guard.ts`). Unless the app was started with `dev:lan` / `start:lan` (which set
-  `LAWAPP_ALLOW_LAN=1`), every API route answers `421` to requests not addressed to `localhost` or
-  `127.0.0.1`. That also stops DNS-rebinding pages reaching the local API.
+- **Host check** (`guard.ts`). Unless `LAWAPP_ALLOW_LAN=1` is set (by `dev:lan` / `start:lan`, or
+  in the hosted app's environment), every API route answers `421` to requests not addressed to
+  `localhost` or `127.0.0.1`. That also stops DNS-rebinding pages reaching the local API.
 - **Capped bodies** (`body.ts`). Route handlers have no built-in body limit, so they read through
   `readCapped`: 1 MB for sync data, 2 MB for `.docx`.
 - **Rate limits** (`rateLimit.ts`). The sync routes answer `429` when an IP (or the server overall)
   makes too many codes, or an IP sends too many bad codes: see [Sync](sync.md#server-storage).
-- **Sync storage** is one JSON file per sync code: see [Sync, storage and recovery](sync.md).
+- **Sync storage** is Upstash Redis on the hosted app (`syncRedis.ts`, used when its environment
+  variables are set), or one JSON file per sync code when the app runs on its own: see
+  [Sync, storage and recovery](sync.md).
 
 ## Related
 
