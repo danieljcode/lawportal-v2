@@ -4,7 +4,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import App from "@/components/App";
+import App from "@/shell/App";
 import { COLLAPSED_KEY, EMPTY_STATE, writeDraft } from "@/lib/formState";
 import { defaultKV } from "@/lib/storage";
 import * as sync from "@/lib/sync";

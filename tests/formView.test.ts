@@ -8,7 +8,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import FormView, { type FormViewProps } from "@/components/FormView";
+import FormView, { type FormViewProps } from "@/programs/filings/FormView";
 import { getForm } from "@/data";
 import { draftKey } from "@/lib/formState";
 

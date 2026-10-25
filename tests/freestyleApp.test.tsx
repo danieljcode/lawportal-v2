@@ -5,9 +5,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import App from "@/components/App";
-import FormView, { type FormOutput, type FormViewProps } from "@/components/FormView";
-import Sidebar from "@/components/Sidebar";
+import App from "@/shell/App";
+import FormView, { type FormOutput, type FormViewProps } from "@/programs/filings/FormView";
+import Sidebar from "@/programs/filings/Sidebar";
 import { ALL_FORMS, getForm } from "@/data";
 import { characterStore } from "@/lib/characters";
 import { runMigrations } from "@/lib/migrations";
