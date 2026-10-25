@@ -95,7 +95,8 @@ describe("the jump box (LP-128)", () => {
 
   it("doesn't open with Ctrl+K over another dialog, so what's typed there stays (LP-131)", () => {
     mount("#cases");
-    act(() => must("#open-characters").click());
+    act(() => must("#menu-file").click());
+    act(() => must("#menu-characters").click());
     act(() => must("#new-character").click());
     const name = must<HTMLInputElement>("#char-name");
     act(() => {
@@ -136,7 +137,7 @@ describe("the jump box (LP-128)", () => {
       "Case File",
       "Clients",
       "Law Library",
-      "Control Panel",
+      "Settings",
       "All cases",
       "Upcoming",
       "New client intake",

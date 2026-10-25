@@ -81,7 +81,8 @@ afterEach(() => {
 
 describe("Characters dialog", () => {
   it("opens as a dialog with the sync panel and the storage note, and closes from the title bar", () => {
-    click("#open-characters");
+    click("#menu-file");
+    click("#menu-characters");
     const dialog = must<HTMLDialogElement>("#characters-dialog");
     expect(dialog.hasAttribute("open")).toBe(true);
     expect(dialog.getAttribute("aria-labelledby")).toBe("characters-title");
@@ -102,7 +103,8 @@ describe("Characters dialog", () => {
     );
     root = createRoot(container);
     act(() => root.render(createElement(App)));
-    click("#open-characters");
+    click("#menu-file");
+    click("#menu-characters");
     expect(must("#sync-lost").textContent).toContain("Your version of 1 character was replaced");
     click("#sync-restore");
     expect($("#sync-lost")).toBeNull();
@@ -125,7 +127,8 @@ describe("Characters dialog", () => {
     ) {
       filename = this.download;
     });
-    click("#open-characters");
+    click("#menu-file");
+    click("#menu-characters");
     expect(must("#backup-note").textContent).toContain("No full backup made in this browser yet.");
     expect(must("#backup-note").className).toContain("warn"); // sync is off and there's a character
     click("#backup-all");
@@ -166,7 +169,8 @@ describe("Characters dialog", () => {
 
   it("restoring an older characters-only file imports its characters instead (LP-1)", async () => {
     const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
-    click("#open-characters");
+    click("#menu-file");
+    click("#menu-characters");
     const input = must<HTMLInputElement>("#restore-file");
     const old = JSON.stringify({ characters: [{ id: "oldone01", name: "Old Export", server: "gtaw" }] });
     Object.defineProperty(input, "files", { configurable: true, value: [new File([old], "lawapp-characters.json")] });
@@ -196,7 +200,8 @@ describe("Characters dialog", () => {
     });
     Object.assign(URL, { createObjectURL: createUrl, revokeObjectURL: () => {} });
     const anchorClick = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
-    click("#open-characters");
+    click("#menu-file");
+    click("#menu-characters");
     click("#download-damaged");
     expect(anchorClick).toHaveBeenCalled();
     const file = JSON.parse(await blob!.text()) as { setAside: Array<{ key: string; raw: string }> };
@@ -208,7 +213,8 @@ describe("Characters dialog", () => {
   });
 
   it("has the 12 fields, needs a name, and the docket box follows the title", () => {
-    click("#open-characters");
+    click("#menu-file");
+    click("#menu-characters");
     click("#new-character");
     const ids = [...document.querySelectorAll("#char-fields :is(input, textarea, select)")].map((e) => e.id);
     expect(ids).toEqual([
@@ -342,7 +348,8 @@ describe("Dockets dialog", () => {
 describe("What's new", () => {
   it("lists our entries and hides the unread dot once opened", () => {
     expect($("#changelog-dot")).not.toBeNull();
-    click("#open-changelog");
+    click("#menu-help");
+    click("#menu-changelog");
     expect($("#changelog-dot")).toBeNull();
     expect(must("#app-version").textContent).toBe("Version " + APP_VERSION);
     expect(document.querySelectorAll("#changelog-list article.log-entry")).toHaveLength(CHANGELOG.length);

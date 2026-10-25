@@ -1,6 +1,7 @@
 // The Characters dialog (FR9, INV §a #characters-dialog): the sync panel, the
 // storage note, the character list with its row actions, the New/Edit form,
-// Export / Import, and the full backup and restore (LP-1).
+// Export / Import, and the full backup and restore (LP-1). Settings (LP-109)
+// shows the same body as a section, with Sync as a section of its own.
 
 import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import {
@@ -80,7 +81,19 @@ function startEdit(c: Character | null): Editing {
   return { id: c ? c.id : null, values, followTitle: !c || c.docket === undefined, error: "" };
 }
 
-function CharactersBody({ characters, activeId, onDockets, autoSync, onAutoSyncDone }: CharactersDialogProps) {
+export type CharactersBodyProps = Omit<CharactersDialogProps, "open" | "onClose"> & {
+  /** Show the sync panel at the top (the dialog does; Settings has a Sync section). */
+  withSync?: boolean;
+};
+
+export function CharactersBody({
+  characters,
+  activeId,
+  onDockets,
+  autoSync,
+  onAutoSyncDone,
+  withSync = true,
+}: CharactersBodyProps) {
   const [editing, setEditing] = useState<Editing | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   useDocketVersion(); // the "Dockets (n)" counts follow docket changes
@@ -208,7 +221,7 @@ function CharactersBody({ characters, activeId, onDockets, autoSync, onAutoSyncD
 
   return (
     <>
-      <SyncPanel autoEnable={autoSync} onAutoEnableDone={onAutoSyncDone} />
+      {withSync && <SyncPanel autoEnable={autoSync} onAutoEnableDone={onAutoSyncDone} />}
       <p className="muted small" id="storage-note">
         {storageNote}
       </p>

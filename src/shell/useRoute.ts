@@ -11,6 +11,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "r
 import { formInfo } from "@/data/form-index";
 import { appTitle } from "@/branding";
 import { LAST_FORM_KEY } from "@/lib/formState";
+import { getShell } from "@/lib/shell";
 import { defaultKV } from "@/lib/storage";
 import type { FormInfo } from "@/lib/types";
 
@@ -35,6 +36,8 @@ export const UPCOMING_TITLE = "Upcoming";
 export const INTAKE_TITLE = "New client intake";
 export const CONFLICTS_TITLE = "Conflict check";
 export const LIBRARY_TITLE = "Law Library";
+/** Settings (LP-109) is the Control Panel in the Classic layout. */
+export const SETTINGS_TITLE = "Settings";
 export const CONTROL_TITLE = "Control Panel";
 
 /**
@@ -128,7 +131,8 @@ export function pageTitle(r: Route, form: FormInfo | null): string | null {
     case "jap":
       return JAP_TITLE;
     case "control":
-      return CONTROL_TITLE;
+      // shortcut: reads the saved layout, so the tab keeps the old name until the next page after a switch.
+      return getShell() === "classic" ? CONTROL_TITLE : SETTINGS_TITLE;
   }
 }
 

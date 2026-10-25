@@ -37,6 +37,10 @@ export interface Shell {
   openFiling(f: Filing): void;
   openChangelog(): void;
   openAbout(): void;
+  /** The Dockets dialog for a character (Settings' character list, LP-109). */
+  openDockets(charId: string): void;
+  /** Settings showed What's new: clear its unread dot. */
+  markChangelogSeen(): void;
   theme: ThemeMode;
   setTheme(mode: ThemeMode): void;
   /** The frame round the programs (LP-125): modern or Classic, until the Classic theme (LP-112). */

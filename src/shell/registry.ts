@@ -4,7 +4,8 @@
 // ones as icons, in their group.
 
 import { createElement, lazy, type ComponentType } from "react";
-import type { ProgramId, Route } from "./useRoute";
+import type { ShellMode } from "@/lib/shell";
+import { CONTROL_TITLE, SETTINGS_TITLE, type ProgramId, type Route } from "./useRoute";
 import type { ProgramProps } from "./program";
 
 type Module = { default: ComponentType<ProgramProps> };
@@ -27,6 +28,8 @@ export type ProgramGroup = keyof typeof GROUPS;
 export interface ProgramDef {
   id: ProgramId;
   title: string;
+  /** Its name in the Classic layout, when that differs ("Control Panel" for Settings, LP-109). */
+  classicTitle?: string;
   /** A one-character icon for the title bar, the Program Manager and the taskbar. */
   icon: string;
   /** The Program Manager group it's in. */
@@ -110,7 +113,8 @@ export const PROGRAMS: readonly ProgramDef[] = [
   },
   {
     id: "control",
-    title: "Control Panel",
+    title: SETTINGS_TITLE,
+    classicTitle: CONTROL_TITLE,
     icon: "⚙",
     group: "main",
     start: "#control",
@@ -118,6 +122,11 @@ export const PROGRAMS: readonly ProgramDef[] = [
     ...lazyProgram(() => import("@/programs/control")),
   },
 ];
+
+/** A program's name in this layout. */
+export function titleIn(p: Pick<ProgramDef, "title" | "classicTitle">, layout: ShellMode): string {
+  return (layout === "classic" && p.classicTitle) || p.title;
+}
 
 /** The program a route belongs to; null for home (the Program Manager). */
 export function programFor(route: Route): ProgramDef | null {
