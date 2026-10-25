@@ -87,6 +87,8 @@ given, says which form.
    - `tests/extra-forms.test.ts`: add a `SPEC` entry (section, title, the `{{-- …}}` section names in order, and
      headings), in the same order as `EXTRA_FORMS`. Update the counts in "adds thirteen forms…" (`52` = 39 + the
      number of templates) and in its title.
+   - Rewrite the forms' index with `npx vitest run -u tests/form-index.test.ts` (also after changing a form's id,
+     title, court or section): the shell lists forms from `src/data/form-index.json`.
    - Update the template count in `README.md`, `docs/architecture.md` and `docs/templates-and-forms.md` (each says
      13 / Thirteen today), and add the form to the README's and the doc's lists if it's a new kind.
 

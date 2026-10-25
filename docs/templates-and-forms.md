@@ -172,6 +172,10 @@ So `forms.json` holds exactly what gets posted; the app does no translation at r
 `npm test` afterwards: a test fails if `forms.json` isn't exactly what `port-forms` would write now
 (for example after changing `courts.ts` without re-running it).
 
+The shell lists and routes forms from `src/data/form-index.json` (each form's id, court, section and
+title; LP-133), so the templates can load with Court Filings. After adding a form or changing one of
+those four, rewrite it with `npx vitest run -u tests/form-index.test.ts`; that test fails until you do.
+
 ## Reference data
 
 `port-forms` and the parity tests use three files from the
