@@ -27,7 +27,7 @@ import {
 } from "@/lib/formState";
 import { divisionFor } from "@/lib/dockets";
 import { memoryKV } from "@/lib/storage";
-import { compile, fields, todayUTC } from "@/lib/template";
+import { compile, fields } from "@/lib/template";
 import type { Character, Docket, Entry, Values } from "@/lib/types";
 
 const NOW = new Date("2026-03-10T12:00:00Z");
@@ -146,14 +146,14 @@ describe("Division and the case code (R2)", () => {
 
   it("leaves a derived number for applyPrefills", () => {
     const s = deepFreeze(
-      state({ Division: "CRIMINAL DIVISION", "Case number": "26SCCR00XXX" }, {}, { "Case number": "26SCCR00XXX" }),
+      state({ Division: "CRIMINAL DIVISION", "Case number": "90SCCR00XXX" }, {}, { "Case number": "90SCCR00XXX" }),
     );
     const next = setValue(s, [], "Division", "CIVIL DIVISION");
-    expect(next.values["Case number"]).toBe("26SCCR00XXX");
+    expect(next.values["Case number"]).toBe("90SCCR00XXX");
     expect(hasDependents(entries, next.values, "Division")).toBe(true);
     const after = applyPrefills(entries, next, NOW);
-    expect(after.values["Case number"]).toBe("26SCCC00XXX");
-    expect(after.derived["Case number"]).toBe("26SCCC00XXX");
+    expect(after.values["Case number"]).toBe("90SCCC00XXX");
+    expect(after.derived["Case number"]).toBe("90SCCC00XXX");
   });
 
   it("swaps a hand-typed number", () => {
@@ -179,20 +179,20 @@ describe("prefills", () => {
 
   it("settles chained dates", () => {
     const s = applyPrefills(entries, state(), NOW);
-    expect(s.values["Filing date"]).toBe("2026-03-10");
-    expect(s.values.Judgement).toBe("2026-03-31");
-    expect(s.values["Pre-trial motions start"]).toBe("2026-03-10");
-    expect(s.values["Closing arguments end"]).toBe("2026-03-29");
-    expect(s.values["Case number"]).toBe("26SCCR00XXX");
+    expect(s.values["Filing date"]).toBe("1990-03-10");
+    expect(s.values.Judgement).toBe("1990-03-31");
+    expect(s.values["Pre-trial motions start"]).toBe("1990-03-10");
+    expect(s.values["Closing arguments end"]).toBe("1990-03-29");
+    expect(s.values["Case number"]).toBe("90SCCR00XXX");
 
     // Moving the judgement reflows its dependents but not a hand-typed one.
-    let next = setValue(s, [], "Witness examinations end", "2026-01-01");
-    next = setValue(next, [], "Judgement", "2026-04-30");
+    let next = setValue(s, [], "Witness examinations end", "1990-01-01");
+    next = setValue(next, [], "Judgement", "1990-04-30");
     expect(hasDependents(entries, next.values, "Judgement")).toBe(true);
     next = applyPrefills(entries, next, NOW);
-    expect(next.values["Pre-trial motions start"]).toBe("2026-04-09");
-    expect(next.values["Witness examinations end"]).toBe("2026-01-01");
-    expect(next.values.Judgement).toBe("2026-04-30");
+    expect(next.values["Pre-trial motions start"]).toBe("1990-04-09");
+    expect(next.values["Witness examinations end"]).toBe("1990-01-01");
+    expect(next.values.Judgement).toBe("1990-04-30");
   });
 
   it("returns the same state when nothing changes", () => {
@@ -205,17 +205,17 @@ describe("prefills", () => {
     const typed = setValue(s, [], "Filing date", "2020-01-01");
     expect(typed.values["Filing date"]).toBe("2020-01-01");
     const auto = autoDate(entries, typed, [], "Filing date", NOW);
-    expect(auto.values["Filing date"]).toBe(todayUTC(NOW));
+    expect(auto.values["Filing date"]).toBe("1990-03-10");
   });
 
-  it("Today sets UTC today and reflows only when there are dependents (R3)", () => {
+  it("Today sets the game date and reflows only when there are dependents (R3)", () => {
     const s = applyPrefills(entries, state(), NOW);
-    const later = new Date("2026-05-01T00:30:00Z");
+    const later = new Date("2026-05-01T04:30:00Z");
     const j = todayDate(entries, s, [], "Judgement", later);
-    expect(j.values.Judgement).toBe("2026-05-01");
-    expect(j.values["Pre-trial motions start"]).toBe("2026-04-10");
+    expect(j.values.Judgement).toBe("1990-05-01");
+    expect(j.values["Pre-trial motions start"]).toBe("1990-04-10");
     const f = todayDate(entries, s, [], "Filing date", later);
-    expect(f.values["Filing date"]).toBe("2026-05-01");
+    expect(f.values["Filing date"]).toBe("1990-05-01");
     expect(f.values["Case number"]).toBe(s.values["Case number"]);
   });
 });
@@ -258,8 +258,8 @@ describe("opening and adding (R1, R6)", () => {
     expect(s.values["Defendant name"]).toBe("Cy");
     expect(items(s.values, "Exhibits")).toHaveLength(1); // the draft's array is kept
     expect(items(s.values, "Defendants")).toHaveLength(2);
-    expect(s.values["Case number"]).toBe("26SCCC00XXX");
-    expect(s.derived["Case number"]).toBe("26SCCC00XXX");
+    expect(s.values["Case number"]).toBe("90SCCC00XXX");
+    expect(s.derived["Case number"]).toBe("90SCCC00XXX");
     expect(s.values["Plaintiff name"]).toBe("Ann Lee");
     expect(s.autofilled["Plaintiff name"]).toBe("Ann Lee");
     // A stored hand-typed number is kept.
@@ -350,7 +350,7 @@ describe("dockets ↔ form", () => {
     const s = applyPrefills(se, state({ "Case number": "90SCCR00147", "Plaintiff name": "People" }), NOW);
     const p = formToDocketPatch(sched, se, s.values);
     expect(p).toMatchObject({
-      patch: { plaintiff: "People", nextEvent: "Judgement", nextDate: "2026-03-31", filed: "2026-03-10" },
+      patch: { plaintiff: "People", nextEvent: "Judgement", nextDate: "1990-03-31", filed: "1990-03-10" },
     });
     expect("patch" in p && p.patch.status).toBeFalsy();
   });

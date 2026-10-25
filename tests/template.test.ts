@@ -2,7 +2,6 @@
 import { describe, expect, it } from "vitest";
 import { ALL_FORMS, getForm } from "@/data";
 import {
-  addDays,
   caseNumberPattern,
   compile,
   dateRule,
@@ -14,9 +13,7 @@ import {
   prefillDeps,
   prefillValue,
   render,
-  todayUTC,
 } from "@/lib/template";
-import { gameDate } from "@/lib/freestyle";
 import type { BlockEntry, CondEntry, Entry, Field } from "@/lib/types";
 
 /** The first field token of a one-token template. */
@@ -78,22 +75,23 @@ describe("formatDate", () => {
   });
 });
 
+// Prefills take the real instant and fill in game dates (LP-135): 2026-03-10 is 1990-03-10.
 describe("prefill", () => {
-  it("YY becomes the two-digit UTC year", () => {
-    expect(prefillValue(field("{{Case number=YYSCCR00XXX}}"), NOW)).toBe("26SCCR00XXX");
+  it("YY becomes the two-digit game year", () => {
+    expect(prefillValue(field("{{Case number=YYSCCR00XXX}}"), NOW)).toBe("90SCCR00XXX");
   });
 
   it("<Label?A=x> takes the code for another field's value", () => {
     const f = field("{{Case number=YYSC<Division?CRIMINAL DIVISION=CR;CIVIL DIVISION=CC>00XXX}}");
-    expect(prefillValue(f, NOW, (l) => (l === "Division" ? "CIVIL DIVISION" : undefined))).toBe("26SCCC00XXX");
+    expect(prefillValue(f, NOW, (l) => (l === "Division" ? "CIVIL DIVISION" : undefined))).toBe("90SCCC00XXX");
     expect(prefillValue(f, NOW, () => "TRAFFIC DIVISION")).toBe("");
     expect(prefillValue(f, NOW)).toBe("");
     expect(prefillDeps(f)).toEqual(["Division"]);
   });
 
   it("dates: today, today+21 and Label-2", () => {
-    expect(prefillValue(field("{{Filed=today:date}}"), NOW)).toBe("2026-03-10");
-    expect(prefillValue(field("{{Due=today+21:date}}"), NOW)).toBe("2026-03-31");
+    expect(prefillValue(field("{{Filed=today:date}}"), NOW)).toBe("1990-03-10");
+    expect(prefillValue(field("{{Due=today+21:date}}"), NOW)).toBe("1990-03-31");
     const chained = field("{{Notice=Hearing date-2:date}}");
     expect(prefillValue(chained, NOW, (l) => (l === "Hearing date" ? "2026-03-01" : undefined))).toBe("2026-02-27");
     expect(prefillValue(chained, NOW, () => undefined)).toBe("");
@@ -105,9 +103,6 @@ describe("prefill", () => {
     expect(dateRule("today + 7")).toEqual({ base: "today", days: 7 });
     expect(dateRule("Filing date-3")).toEqual({ base: "Filing date", days: -3 });
     expect(dateRule("today")).toEqual({ base: "today", days: 0 });
-    expect(addDays("2026-12-30", 3)).toBe("2027-01-02");
-    expect(addDays("not a date", 3)).toBe("");
-    expect(todayUTC(NOW)).toBe("2026-03-10");
   });
 
   it("no prefill gives an empty string", () => {
@@ -116,19 +111,15 @@ describe("prefill", () => {
 });
 
 describe("caseNumberPattern", () => {
-  // Callers (FormView) pass the in-game `now` (gameDate), so the
-  // 2-digit year comes from that date.
-  const fsNow = (d: Date) => gameDate(d);
-
+  // Callers (FormView) pass the real `now`; the 2-digit year is the game year (LP-135).
   it("builds year + courthouse + division + number from the prefill (LP-68, LP-69)", () => {
     const f = field("{{Case number=YYSCCR00XXX}}");
-    expect(caseNumberPattern(f, fsNow(NOW))).toBe("90SCCR00XXX");
-    expect(caseNumberPattern(f, NOW)).toBe("26SCCR00XXX");
+    expect(caseNumberPattern(f, NOW)).toBe("90SCCR00XXX");
   });
 
   it("leaves patterns for other courts alone except for the year", () => {
-    expect(caseNumberPattern(field("{{Case number=YYSCWC00XXX}}"), fsNow(NOW))).toBe("90SCWC00XXX");
-    expect(caseNumberPattern(field("{{Case number=YYAPCR#####}}"), fsNow(NOW))).toBe("90APCR#####");
+    expect(caseNumberPattern(field("{{Case number=YYSCWC00XXX}}"), NOW)).toBe("90SCWC00XXX");
+    expect(caseNumberPattern(field("{{Case number=YYAPCR#####}}"), NOW)).toBe("90APCR#####");
   });
 
   it("uses the first <Division?…> code when no Division is chosen", () => {
@@ -136,24 +127,25 @@ describe("caseNumberPattern", () => {
       "{{Case number=YYSC<Division?CRIMINAL DIVISION=CR;CIVIL DIVISION=CC;TRAFFIC DIVISION=TC;SMALL CLAIMS DIVISION=SM>00XXX}}",
     );
     // No lookup → first code (CR), so the placeholder is never empty.
-    expect(caseNumberPattern(f, fsNow(NOW))).toBe("90SCCR00XXX");
+    expect(caseNumberPattern(f, NOW)).toBe("90SCCR00XXX");
     // A chosen Division wins over the first code.
     const civil = (l: string) => (l === "Division" ? "CIVIL DIVISION" : undefined);
-    expect(caseNumberPattern(f, fsNow(NOW), civil)).toBe("90SCCC00XXX");
+    expect(caseNumberPattern(f, NOW, civil)).toBe("90SCCC00XXX");
     const traffic = () => "TRAFFIC DIVISION";
-    expect(caseNumberPattern(f, fsNow(NOW), traffic)).toBe("90SCTC00XXX");
+    expect(caseNumberPattern(f, NOW, traffic)).toBe("90SCTC00XXX");
   });
 
   it("sources the pattern from the prefill, not the (noisy) fallback", () => {
     // Fallback letters/placeholders differ from the prefill; the pattern follows the prefill.
     const f = field("{{Case number=YYSCCR00XXX|##SCCR#####}}");
-    expect(caseNumberPattern(f, fsNow(NOW))).toBe("90SCCR00XXX");
+    expect(caseNumberPattern(f, NOW)).toBe("90SCCR00XXX");
   });
 
-  it("tracks the year across the New-Year rollover (freestyle = year − 36)", () => {
+  it("tracks the year across the New York New Year (freestyle = year − 36)", () => {
     const f = field("{{Case number=YYSCCR00XXX}}");
-    expect(caseNumberPattern(f, fsNow(new Date("2026-12-31T23:00:00Z")))).toBe("90SCCR00XXX");
-    expect(caseNumberPattern(f, fsNow(new Date("2027-01-01T01:00:00Z")))).toBe("91SCCR00XXX");
+    // 10 pm on 31 Dec in New York is already 1 Jan in UTC.
+    expect(caseNumberPattern(f, new Date("2027-01-01T03:00:00Z"))).toBe("90SCCR00XXX");
+    expect(caseNumberPattern(f, new Date("2027-01-01T05:00:00Z"))).toBe("91SCCR00XXX");
   });
 
   it("returns '' for a field with no prefill", () => {

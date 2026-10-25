@@ -38,8 +38,8 @@ const entry = (id: string, at: string, action: CustodyEntry["action"] = "receive
 
 describe("custody times", () => {
   it("are in-game (1990) local time, to the minute", () => {
-    expect(gameNow(new Date(2026, 9, 20, 14, 5, 59))).toBe("1990-10-20T14:05");
-    expect(formatAt("1990-10-20T14:05")).toBe("Sat 20 Oct 1990, 14:05");
+    expect(gameNow(new Date("2026-10-20T18:05:59Z"))).toBe("1990-10-20T14:05");
+    expect(formatAt("1990-10-20T14:05")).toBe("Tue 20 Oct 1990, 14:05");
   });
 
   it("must be a real date and time", () => {
@@ -121,8 +121,8 @@ describe("custody logs", () => {
     ];
     expect(custodyText("C", "Dashcam", log)).toBe(
       "Chain of custody: Exhibit C (Dashcam)\n" +
-        "1. Sat 20 Oct 1990, 14:05: Received by Alice Lawyer. Sealed in bag 14\n" +
-        '2. Sun 21 Oct 1990, 09:30: Reviewed by <b>Bo</b>. Line one\n<img src=x onerror="alert(1)">',
+        "1. Tue 20 Oct 1990, 14:05: Received by Alice Lawyer. Sealed in bag 14\n" +
+        '2. Wed 21 Oct 1990, 09:30: Reviewed by <b>Bo</b>. Line one\n<img src=x onerror="alert(1)">',
     );
     const html = custodyHtml("C", "<i>Dashcam</i>", log);
     const doc = new DOMParser().parseFromString(html, "text/html");
@@ -130,7 +130,7 @@ describe("custody logs", () => {
     expect(doc.querySelectorAll("ol li")).toHaveLength(2);
     expect(doc.querySelector("strong")!.textContent).toBe("Chain of custody: Exhibit C (<i>Dashcam</i>)");
     expect(doc.querySelectorAll("ol li")[1].textContent).toBe(
-      'Sun 21 Oct 1990, 09:30: Reviewed by <b>Bo</b>. Line one <img src=x onerror="alert(1)">',
+      'Wed 21 Oct 1990, 09:30: Reviewed by <b>Bo</b>. Line one <img src=x onerror="alert(1)">',
     );
   });
 
@@ -181,7 +181,7 @@ describe("the custody log on a case (LP-14)", () => {
   beforeEach(() => {
     localStorage.clear();
     vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date(2026, 9, 20, 14, 5)); // in-game Sat 20 Oct 1990, 14:05
+    vi.setSystemTime(new Date("2026-10-20T18:05:00Z")); // in-game Tue 20 Oct 1990, 14:05
     vi.stubGlobal("requestAnimationFrame", () => 0);
     vi.stubGlobal("cancelAnimationFrame", () => {});
     vi.spyOn(sync, "init").mockResolvedValue(undefined);
@@ -218,7 +218,7 @@ describe("the custody log on a case (LP-14)", () => {
     expect(must<HTMLSelectElement>(".custody-who-input").value).toBe("alice001");
     setValue(".custody-note-input", "Sealed in bag 14");
     submit(".custody-form");
-    expect(lines()).toEqual(["Sat 20 Oct 1990, 14:05Receivedby Alice LawyerSealed in bag 14"]);
+    expect(lines()).toEqual(["Tue 20 Oct 1990, 14:05Receivedby Alice LawyerSealed in bag 14"]);
     expect(saved()).toMatchObject([
       { at: "1990-10-20T14:05", action: "received", by: "Alice Lawyer", byId: "alice001", note: "Sealed in bag 14" },
     ]);
@@ -263,7 +263,7 @@ describe("the custody log on a case (LP-14)", () => {
     const copy = vi.spyOn(clipboard, "copyRich").mockResolvedValue(true);
     submit(".custody-form");
     await act(async () => must(".custody-copy").click());
-    expect(copy.mock.calls[0][0]).toContain("<li>Sat 20 Oct 1990, 14:05: Received by Alice Lawyer.</li>");
+    expect(copy.mock.calls[0][0]).toContain("<li>Tue 20 Oct 1990, 14:05: Received by Alice Lawyer.</li>");
     expect(copy.mock.calls[0][1]).toContain("Chain of custody: Exhibit A (Dashcam footage)");
     expect(document.querySelector('.custody [role="status"]')!.textContent).toContain("Copied the chain of custody");
 

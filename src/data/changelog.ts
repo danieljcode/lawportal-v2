@@ -34,6 +34,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         text: "Ctrl+K no longer closes a dialog you're typing in (such as a new character) to open the jump box, so what you've typed stays.",
       },
       {
+        type: "fix",
+        text: "Game dates and times now follow New York time on every computer, with the year 36 back, so a filing, the Case File and Upcoming always agree on today's date, even late at night. Days show the real weekday: Sunday 25 October is Sun 25 Oct 1990.",
+      },
+      {
         type: "update",
         text: "If a program breaks, its error box now has Go home, so you can carry on in the rest of the app, and Copy error details says which page you were on.",
       },

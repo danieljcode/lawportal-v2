@@ -1,7 +1,8 @@
 // Prefills, filling from the character, case-code swaps, Today/Auto, and opening a form.
 
 import { DIVISION_CODES } from "../dockets";
-import { prefillValue, todayUTC } from "../template";
+import { gameToday } from "../deadlines";
+import { prefillValue } from "../template";
 import type { Character, Entry, Values } from "../types";
 import { cloneValues, eachField, type FormState, type ScopePath, str } from "./state";
 import { hasDependents, materializeBlocks, setValue } from "./update";
@@ -85,7 +86,7 @@ export function autoDate(entries: Entry[], s: FormState, path: ScopePath, label:
 
 /** R3: the date "Today" button (UTC). Prefills are re-applied only when other fields depend on this one. */
 export function todayDate(entries: Entry[], s: FormState, path: ScopePath, label: string, now?: Date): FormState {
-  const next = setValue(s, path, label, todayUTC(now));
+  const next = setValue(s, path, label, gameToday(now));
   return hasDependents(entries, next.values, label) ? applyPrefills(entries, next, now) : next;
 }
 

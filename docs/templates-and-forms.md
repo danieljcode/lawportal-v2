@@ -42,6 +42,11 @@ A template is the forum post's own HTML with `{{tokens}}` (engine: `src/lib/temp
 | `{{$roman after Items}}`                                        | The numeral after a block's last item.                                                                                                                                   |
 | `{{-- Section name}}`                                           | Starts a collapsible section in the editor. Renders nothing.                                                                                                             |
 
+Prefill dates are in-game (LP-135): `today` is today's **New York** date with the year minus 36,
+whatever computer runs the app, and `YY` is that date's 2-digit year (`90` in 2026, even at 10 pm
+on New York's New Year's Eve). The weekday a date shows with is the real one. See "Dates are
+in-game" in [architecture.md](architecture.md#from-form-to-filing).
+
 Exhibit references (LP-13): when the case number is a firm case with exhibits, the multi-line
 boxes (textarea, list and paras fields) get **Insert exhibit**, which stores `[Exhibit C: Title #<id>]` in the value.
 Output shows it as "Exhibit C (Title)" with the exhibit's letter and title at the time, found by id,

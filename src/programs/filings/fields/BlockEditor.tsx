@@ -66,7 +66,7 @@ export default function BlockEditor({ entry, scope, path, prefix }: ScopeProps &
         type="button"
         className="btn add"
         // R6: materialise the new item's nested blocks, prefill, then the non-force character fill.
-        // `now` is the server-offset date so a new item's date prefills land on the active server's year.
+        // `now` is the form's real time; the prefills turn it into game time.
         onClick={() => onState((s) => afterAddItem(entries, addItem(s, path, name), character, now))}
       >
         {"+ Add " + one.toLowerCase()}

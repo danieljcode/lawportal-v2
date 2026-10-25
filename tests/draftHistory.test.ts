@@ -136,10 +136,9 @@ describe("snapshots", () => {
 });
 
 describe("snapshot details", () => {
-  it("shows times on the 1990 calendar", () => {
-    // 19 Oct 2026 is a Monday; 19 Oct 1990 was a Friday.
-    const local = new Date(2026, 9, 19, 14, 5);
-    expect(snapshotTime(local.toISOString())).toBe("Fri 19 Oct 1990, 14:05");
+  it("shows times on the 1990 calendar, New York time, with the real weekday (LP-135)", () => {
+    // 19 Oct 2026 is a Monday (19 Oct 1990 was a Friday); 18:05 UTC is 14:05 in New York.
+    expect(snapshotTime("2026-10-19T18:05:00.000Z")).toBe("Mon 19 Oct 1990, 14:05");
   });
 
   it("counts filled fields, in blocks too, and tells an empty form", () => {

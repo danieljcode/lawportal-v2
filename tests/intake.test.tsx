@@ -56,7 +56,7 @@ describe("building the case from an intake", () => {
   it("writes the intake into the notes, with the in-game date", () => {
     expect(intakeNotes(intake(), "1990-10-19", "Alice Lawyer")).toBe(
       [
-        "Client intake, Fri 19 Oct 1990",
+        "Client intake, Mon 19 Oct 1990",
         "Client: Cy Ng",
         "Phone: 555-0101",
         "Address: 1 Grove St",
@@ -106,7 +106,7 @@ describe("the intake program (LP-19)", () => {
   beforeEach(() => {
     localStorage.clear();
     vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date(2026, 9, 19, 12, 0));
+    vi.setSystemTime(new Date("2026-10-19T16:00:00Z"));
     vi.stubGlobal("requestAnimationFrame", () => 0);
     vi.stubGlobal("cancelAnimationFrame", () => {});
     vi.spyOn(sync, "init").mockResolvedValue(undefined);
@@ -146,7 +146,7 @@ describe("the intake program (LP-19)", () => {
     setValue("#intake-clientName", "Cy Ng");
     setValue("#intake-summary", "Arrested for jaywalking.");
     expect(must("#intake-sheet").textContent).toContain("Client: Cy Ng");
-    expect(must("#intake-sheet").textContent).toContain("Client intake, Fri 19 Oct 1990");
+    expect(must("#intake-sheet").textContent).toContain("Client intake, Mon 19 Oct 1990");
     expect(must("#intake-sheet").textContent).toContain("Arrested for jaywalking.");
   });
 
