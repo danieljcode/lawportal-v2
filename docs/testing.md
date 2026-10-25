@@ -13,7 +13,9 @@ Run `npm test` and `npm run build` before calling any change done.
 
 All suites are in `tests/` and use [Vitest](https://vitest.dev). Most run in Node; files that need a
 DOM start with `// @vitest-environment jsdom`. UI tests render the real `App` (or one component)
-with React and drive it through the DOM.
+with React and drive it through the DOM. Programs load lazily (LP-122), so `tests/setup.ts` loads all
+of them before each DOM suite, as the app's idle preload does; `lazyPrograms.test.tsx` covers the lazy
+path itself.
 
 | Area             | Suites                                                                                                             |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------ |
@@ -88,7 +90,8 @@ a real Chromium, at **desktop** (1440×900) and **phone** (Pixel 7) sizes, each 
 - **Copy for forum**: the clipboard holds the filing as HTML;
 - **Download .docx**: a real Word file (a zip) downloads;
 - add a character, and it appears in "Filing as";
-- add a case to a judge's docket.
+- add a case to a judge's docket;
+- the home screen's first load stays within the JavaScript budget (README, "First-load budget").
 
 The suite takes a few seconds. It needs Chromium once: `npx playwright install chromium`. The
 server gets a throwaway sync directory (`test-results/sync`). A failing test keeps a screenshot and

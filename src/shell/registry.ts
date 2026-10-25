@@ -3,15 +3,22 @@
 // File, View and Help menus; the Program Manager (LP-104) shows the visible
 // ones as icons, in their group.
 
-import type { ComponentType } from "react";
+import { createElement, lazy, type ComponentType } from "react";
 import type { ProgramId, Route } from "./useRoute";
-import CaseFileProgram from "@/programs/cases";
-import ClientsProgram from "@/programs/clients";
-import ControlPanelProgram from "@/programs/control";
-import CourtFilingsProgram from "@/programs/filings";
-import JapProgram from "@/programs/jap";
-import LibraryProgram from "@/programs/library";
 import type { ProgramProps } from "./program";
+
+type Module = { default: ComponentType<ProgramProps> };
+
+/**
+ * A program's code, loaded the first time it's opened or preloaded (LP-122). Until it's loaded the
+ * view suspends (App shows Loading…); after that it renders at once, with no Loading… flash.
+ */
+function lazyProgram(load: () => Promise<Module>): Pick<ProgramDef, "load" | "View"> {
+  let loaded: Module["default"] | null = null;
+  const preload = () => load().then((m) => ((loaded = m.default), m));
+  const Lazy = lazy(preload);
+  return { load: preload, View: (props) => createElement(loaded ?? Lazy, props) };
+}
 
 /** The Program Manager's groups, in order. */
 export const GROUPS = { court: "Court Work", main: "Main" } as const;
@@ -32,6 +39,8 @@ export interface ProgramDef {
   nav?: { id: string; label: string };
   /** Its pages, for the File menu and the jump box (LP-128). */
   sections?: readonly { label: string; href: string }[];
+  /** Fetch its code now (App does when idle, so opening it later is instant). */
+  load(): Promise<unknown>;
   View: ComponentType<ProgramProps>;
 }
 
@@ -46,7 +55,7 @@ export const PROGRAMS: readonly ProgramDef[] = [
     start: "#filings",
     visible: everyone,
     nav: { id: "sidebar", label: "form list" },
-    View: CourtFilingsProgram,
+    ...lazyProgram(() => import("@/programs/filings")),
   },
   {
     id: "cases",
@@ -60,7 +69,7 @@ export const PROGRAMS: readonly ProgramDef[] = [
       { label: "All cases", href: "#cases" },
       { label: "Upcoming", href: "#cases/upcoming" },
     ],
-    View: CaseFileProgram,
+    ...lazyProgram(() => import("@/programs/cases")),
   },
   {
     id: "clients",
@@ -74,7 +83,7 @@ export const PROGRAMS: readonly ProgramDef[] = [
       { label: "New client intake", href: "#clients/intake" },
       { label: "Conflict check", href: "#clients/conflicts" },
     ],
-    View: ClientsProgram,
+    ...lazyProgram(() => import("@/programs/clients")),
   },
   {
     id: "library",
@@ -88,7 +97,7 @@ export const PROGRAMS: readonly ProgramDef[] = [
       { label: "Penal Code", href: "#library/penal-code" },
       { label: "Precedents", href: "#library/precedents" },
     ],
-    View: LibraryProgram,
+    ...lazyProgram(() => import("@/programs/library")),
   },
   {
     id: "jap",
@@ -97,7 +106,7 @@ export const PROGRAMS: readonly ProgramDef[] = [
     group: "court",
     start: "#jap",
     visible: (who) => who.commissioner,
-    View: JapProgram,
+    ...lazyProgram(() => import("@/programs/jap")),
   },
   {
     id: "control",
@@ -106,7 +115,7 @@ export const PROGRAMS: readonly ProgramDef[] = [
     group: "main",
     start: "#control",
     visible: everyone,
-    View: ControlPanelProgram,
+    ...lazyProgram(() => import("@/programs/control")),
   },
 ];
 
