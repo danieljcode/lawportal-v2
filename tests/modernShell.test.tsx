@@ -5,7 +5,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import App from "@/components/App";
+import App from "@/shell/App";
 import { characterStore } from "@/lib/characters";
 import { getShell, setShell, SHELL_KEY } from "@/lib/shell";
 import * as sync from "@/lib/sync";

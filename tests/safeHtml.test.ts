@@ -3,9 +3,9 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import type { DiscordPanelProps } from "@/components/DiscordPanel";
-import type { FormOutput } from "@/components/FormView";
-import type { OutputPaneProps } from "@/components/OutputPane";
+import type { DiscordPanelProps } from "@/programs/filings/DiscordPanel";
+import type { FormOutput } from "@/programs/filings/FormView";
+import type { OutputPaneProps } from "@/programs/filings/OutputPane";
 import { copyRich } from "@/lib/clipboard";
 import { renderDiscordHtml } from "@/lib/discordPreview";
 import { docxRequestBody } from "@/lib/docx/request";

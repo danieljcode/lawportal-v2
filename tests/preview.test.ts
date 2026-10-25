@@ -10,7 +10,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import App from "@/components/App";
+import App from "@/shell/App";
 import { characterStore } from "@/lib/characters";
 import { docketStore } from "@/lib/dockets";
 import { EMPTY_STATE, LAST_FORM_KEY, writeDraft } from "@/lib/formState";
