@@ -20,6 +20,13 @@ lost. Sync is optional and runs entirely on the computer that runs the app.
 
 `src/lib/server/syncStore.ts`:
 
+- **Hosted (Vercel).** When `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` (or Vercel's
+  `KV_REST_API_URL` and `KV_REST_API_TOKEN`) are set, records live in Upstash Redis instead
+  (`src/lib/server/syncRedis.ts`): one hash per code at `lp:sync:<hash>`, each operation one Lua
+  script, so no locks or temp files. Unused codes expire through a Redis TTL, and the sorted set
+  `lp:sync:index` counts codes for the 1,000 cap. The API also needs `LAWAPP_ALLOW_LAN=1` there, or
+  it only answers on `localhost`. `tests/sync-redis.test.ts` runs against a real database when
+  those variables are set. The per-hash locks and atomic writes below are for the file store only.
 - **One JSON file per code** in `data/sync/` (or `LAWAPP_SYNC_DIR`), named by the **SHA-256 hash of
   the code**. The raw code never reaches the file system or the logs (logs show the first 8 hex
   characters of the hash at most).
