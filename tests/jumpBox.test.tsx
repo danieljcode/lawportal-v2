@@ -93,6 +93,24 @@ describe("the jump box (LP-128)", () => {
     expect(isOpen()).toBe(true);
   });
 
+  it("doesn't open with Ctrl+K over another dialog, so what's typed there stays (LP-131)", () => {
+    mount("#cases");
+    act(() => must("#open-characters").click());
+    act(() => must("#new-character").click());
+    const name = must<HTMLInputElement>("#char-name");
+    act(() => {
+      const set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!;
+      set.call(name, "Half typed");
+      name.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    name.focus();
+    const e = press("k", { ctrlKey: true }, name);
+    expect(e.defaultPrevented).toBe(false);
+    expect(isOpen()).toBe(false);
+    expect(must("#characters-dialog").hasAttribute("open")).toBe(true);
+    expect(must<HTMLInputElement>("#char-name").value).toBe("Half typed");
+  });
+
   it('opens with "/" but not while typing in a field', () => {
     mount("#clients/intake");
     const field = document.createElement("input");
