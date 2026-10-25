@@ -70,8 +70,8 @@ test("Download .docx gives a Word file", async ({ page }) => {
 });
 
 test("add a character, and it becomes the one filing", async ({ page }) => {
-  await page.goto("/");
-  await page.locator("#open-characters").click();
+  // Characters are a section of Settings (LP-109).
+  await page.goto("/#control");
   await page.locator("#new-character").click();
   await page.locator("#char-name").fill("Casey Counsel");
   await page.locator("#char-title").fill("Attorney at Law");

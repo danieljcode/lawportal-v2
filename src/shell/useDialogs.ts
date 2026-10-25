@@ -22,6 +22,8 @@ export interface Dialogs {
   openDockets(charId: string | null): void;
   openCharacters(startSync?: boolean): void;
   openChangelog(): void;
+  /** What's new was read without the dialog (Settings, LP-109): clear the unread dot. */
+  markChangelogSeen(): void;
   /** Filing history (LP-15). */
   openFilings(): void;
   /** Help → About (LP-22). */
@@ -64,9 +66,13 @@ export function useDialogs(): Dialogs {
   const openFilings = () => setDialog("filings");
   const openAbout = () => setDialog("about");
 
-  const openChangelog = () => {
+  const markChangelogSeen = useCallback(() => {
     markSeen();
     setChangelogUnread(false);
+  }, []);
+
+  const openChangelog = () => {
+    markChangelogSeen();
     setDialog("changelog");
   };
 
@@ -79,6 +85,7 @@ export function useDialogs(): Dialogs {
     openDockets,
     openCharacters,
     openChangelog,
+    markChangelogSeen,
     openFilings,
     openAbout,
     openJump,

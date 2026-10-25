@@ -19,7 +19,7 @@ const channel = process.env.PLAYWRIGHT_CHANNEL || undefined;
 const SHOTS = [
   { name: "home", hash: "" },
   { name: "form", hash: "#civil-complaint" },
-  { name: "dialog", hash: "", open: "#open-characters" },
+  { name: "settings", hash: "#control" },
   { name: "discord", hash: "#civil-complaint", click: "#tab-discord" },
 ];
 

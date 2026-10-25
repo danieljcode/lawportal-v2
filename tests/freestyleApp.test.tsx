@@ -235,7 +235,8 @@ describe("App without a server choice (LP-70)", () => {
 
   it("the Characters dialog has no Server field, and a saved character has no server", () => {
     mountApp();
-    click("#open-characters");
+    click("#menu-file");
+    click("#menu-characters");
     click("#new-character");
     expect($("#char-server")).toBeNull();
     type("#char-name", "Jane Roe");

@@ -111,15 +111,16 @@ in, your searches and where you'd scrolled to are still there when you come back
   progress and the finished BBCode. Only Court Commissioners see it.
 - **Home.** A tile for each program, and what needs your attention: deadlines due in the next 48
   hours or overdue, your latest filings to open again, and the cases you worked on most recently.
-- **Control Panel.** Characters, sync and backups, the theme (automatic, light or dark), the startup
-  screen, What's new and About.
+- **Settings.** Characters, sync and backups, the theme (automatic, light or dark), the startup
+  screen, What's new and About, on one page. The top bar of every program shows who you're filing
+  as, with a quick switch, and the sync status.
 - **Jump to anything.** Press **Ctrl+K** (**Cmd+K** on a Mac) or **/**, or choose View → Jump to, and
   type a few letters to go straight to a program, a section such as Upcoming or Precedents, or any
   court form.
 
-Prefer the 1990 look? **Classic layout** (Control Panel, or View in the menus) puts the programs in a
+Prefer the 1990 look? **Classic layout** (Settings, or View in the menus) puts the programs in a
 Windows 3.x window with a taskbar, a Program Manager and a DOS-style startup screen once per session.
-The programs are the same in both.
+The programs are the same in both; in Classic, Settings is called the Control Panel.
 
 ## Your data and sync
 

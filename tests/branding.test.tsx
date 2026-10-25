@@ -97,14 +97,12 @@ describe("the firm's name in the app (LP-22)", () => {
     vi.unstubAllGlobals();
   });
 
-  it("is in the window title, the toolbar and the browser tab", () => {
+  it("is in the window title and the browser tab", () => {
     // The home screen is the Program Manager (LP-104); the tab keeps the system's name.
     expect(document.querySelector(".app-title .title-bar-text")!.textContent).toBe(
       "Program Manager - Friedman & Associates",
     );
     expect(document.title).toBe("Friedman & Associates: Court Filing System");
-    expect(document.querySelector(".brand-name")!.textContent).toBe("Friedman & Associates");
-    expect(document.querySelector(".brand-sub")!.textContent).toBe("Court Filing System");
     act(() => {
       history.pushState(null, "", "#cases");
       window.dispatchEvent(new HashChangeEvent("hashchange"));
@@ -113,7 +111,8 @@ describe("the firm's name in the app (LP-22)", () => {
   });
 
   it("is in Help → About, with the version and credits", () => {
-    act(() => document.querySelector<HTMLButtonElement>("#open-about")!.click());
+    act(() => document.querySelector<HTMLButtonElement>("#menu-help")!.click());
+    act(() => document.querySelector<HTMLButtonElement>("#menu-about")!.click());
     const about = document.querySelector("#about-dialog")!;
     expect(about.querySelector("#about-licence")!.textContent).toBe("Licensed to Friedman & Associates");
     expect(about.querySelector("#about-version")!.textContent).toBe("Version " + APP_VERSION);
