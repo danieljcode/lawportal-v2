@@ -382,7 +382,7 @@ export default function App() {
         const View = p.View;
         return (
           <Activity key={p.id} mode={program?.id === p.id ? "visible" : "hidden"}>
-            <ErrorBoundary where={p.title} resetKey={p.id}>
+            <ErrorBoundary where={p.title} resetKey={p.id} onHome={() => goHome()}>
               <View shell={shellFor(p.id, r)} />
             </ErrorBoundary>
           </Activity>
