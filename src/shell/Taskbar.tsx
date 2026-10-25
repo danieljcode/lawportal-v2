@@ -3,11 +3,11 @@
 // character (the same in every program) and a clock.
 
 import { useEffect, useState, type MouseEvent } from "react";
+import { gameTime } from "@/lib/freestyle";
 import type { Character } from "@/lib/types";
 
-function clock(d = new Date()): string {
-  return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
-}
+/** New York time of day (LP-135). */
+const clock = () => gameTime().time;
 
 export interface TaskbarProps {
   /** The open program's icon and name ("Program Manager" at home). */

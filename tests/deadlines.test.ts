@@ -41,17 +41,19 @@ const mk = (id: string, deadlines: Deadline[], over: Partial<Case> = {}): Case =
 
 describe("the 1990 calendar", () => {
   it("today is the in-game date", () => {
-    expect(gameToday(new Date(2026, 9, 19, 12, 0))).toBe("1990-10-19");
+    expect(gameToday(new Date("2026-10-19T16:00:00Z"))).toBe("1990-10-19");
   });
 
-  it("formats a day with 1990's own weekday", () => {
-    expect(formatDay("1990-10-19")).toBe("Fri 19 Oct 1990");
-    expect(formatDay("1990-12-25")).toBe("Tue 25 Dec 1990");
+  it("formats a day with the real weekday (LP-135), not 1990's", () => {
+    expect(formatDay("1990-10-19")).toBe("Mon 19 Oct 1990");
+    expect(formatDay("1990-12-25")).toBe("Fri 25 Dec 1990");
+    expect(formatDay("1988-02-29")).toBe("Thu 29 Feb 1988");
   });
 
   it("adds days across months and years, and says how far away a day is", () => {
     expect(addDays("1990-12-30", 3)).toBe("1991-01-02");
     expect(addDays("1990-03-01", -1)).toBe("1990-02-28");
+    expect(addDays("not a date", 3)).toBe("");
     expect(relativeDay("1990-10-19", TODAY)).toBe("today");
     expect(relativeDay("1990-10-20", TODAY)).toBe("tomorrow");
     expect(relativeDay("1990-10-25", TODAY)).toBe("in 6 days");

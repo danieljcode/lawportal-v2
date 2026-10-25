@@ -51,7 +51,7 @@ beforeEach(() => {
   localStorage.clear();
   sessionStorage.clear();
   vi.useFakeTimers({ toFake: ["Date"] });
-  vi.setSystemTime(new Date(2026, 9, 19, 12, 0)); // in-game Fri 19 Oct 1990
+  vi.setSystemTime(new Date("2026-10-19T16:00:00Z")); // in-game Mon 19 Oct 1990
   vi.stubGlobal("requestAnimationFrame", () => 0);
   vi.stubGlobal("cancelAnimationFrame", () => {});
   vi.spyOn(sync, "init").mockResolvedValue(undefined);
@@ -118,7 +118,7 @@ describe("the modern home screen (LP-127)", () => {
     const items = [...document.querySelectorAll("#home-due li")];
     expect(items.map((li) => li.querySelector("strong")!.textContent)).toEqual(["Response due", "Hearing"]);
     expect(items[0].className).toBe("overdue");
-    expect(items[0].textContent).toContain("Wed 17 Oct 1990, overdue, 2 days ago");
+    expect(items[0].textContent).toContain("Sat 17 Oct 1990, overdue, 2 days ago");
     expect(items[0].textContent).toContain("90SCCR00147 · People v. Lee");
     expect(items[0].querySelector("a")!.getAttribute("href")).toBe("#cases/case0001");
     expect(items[1].textContent).toContain("in 2 days");
@@ -143,7 +143,7 @@ describe("the modern home screen (LP-127)", () => {
 
   it("lists the character's cases worked on most recently first, linking to each", () => {
     caseStore().save({ id: "case0001", caseNumber: "90SCCR00001", lead: "alice001" });
-    vi.setSystemTime(new Date(2026, 9, 19, 13, 0));
+    vi.setSystemTime(new Date("2026-10-19T17:00:00Z"));
     caseStore().save({ id: "case0002", caseNumber: "90SCCR00002", lead: "carl0001", assigned: ["alice001"] });
     caseStore().save({ id: "case0003", caseNumber: "90SCCR00003", lead: "carl0001" });
     mount();
