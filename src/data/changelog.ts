@@ -29,6 +29,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "fix",
         text: "Sync no longer loses an edit made while it's saving, or a change to a ruling in the Law Library that another device changed too: yours is kept, and Restore my version brings it back.",
       },
+      {
+        type: "fix",
+        text: "Ctrl+K no longer closes a dialog you're typing in (such as a new character) to open the jump box, so what you've typed stays.",
+      },
     ],
   },
   {
