@@ -139,7 +139,7 @@ The programs are the same in both.
 | `src/programs/`   | One folder per program (`filings`, `cases`, `clients`, `library`, `jap`, `control`), each reached only through its `index.ts`. Court Filings' form inputs are in `filings/fields/`.         |
 | `src/ui/`         | Components and hooks shared by the shell and programs: `Dialog`, `ErrorBoundary`, the store hooks (`useStore.ts`) and Filing history.                                                       |
 | `src/lib/`        | Everything that isn't interface: the stores (characters, cases, filings…), the template engine (`template/`), form state, Discord and `.docx` output, sync, and `server/` code for the API. |
-| `src/data/`       | The court forms (`forms.json`), the firm's templates (`extra-forms.ts`), the penal code and What's new.                                                                                     |
+| `src/data/`       | The court forms (`forms.json`), the firm's templates (`extra-forms.ts`), their index (`form-index.json`), the penal code and What's new.                                                    |
 | `src/branding.ts` | The firm's name, short name, logo and colours.                                                                                                                                              |
 | `tests/`, `e2e/`  | Vitest suites, and the Playwright smoke tests.                                                                                                                                              |
 | `scripts/`        | The npm scripts' code: form porting, the penal code import, smoke checks, release notes, hooks.                                                                                             |
@@ -148,10 +148,11 @@ The programs are the same in both.
 ### First-load budget
 
 Each program's code loads the first time it's opened (and when the browser is idle), so the home screen
-downloads only the shell. **The home screen's first load may download at most 950 KiB of JavaScript**
-(uncompressed). A smoke test in `e2e/smoke.spec.ts` measures it on the production build and fails CI above
-that. At LP-122 it was 892 KiB, down from 1,078 KiB; React and Next.js are about 460 KiB of it. Raise the budget
-only on purpose, in the same pull request as the change that needs it.
+downloads only the shell; the court forms' templates come with Court Filings, and the shell lists them from a
+small index. **The home screen's first load may download at most 650 KiB of JavaScript** (uncompressed). A
+smoke test in `e2e/smoke.spec.ts` measures it on the production build and fails CI above that. It was 1,078 KiB
+before LP-122, 892 KiB after it and 612 KiB after LP-133; React and Next.js are about 460 KiB of it. Raise the
+budget only on purpose, in the same pull request as the change that needs it.
 
 ## Contributing
 

@@ -2,7 +2,8 @@
 // AC 24 (unit part): the Additional Templates, with the four Firm Letters (LP-9) and
 // the three Judge templates (LP-90).
 import { describe, expect, it } from "vitest";
-import { ALL_FORMS, COURTS, getForm } from "@/data";
+import { ALL_FORMS, getForm } from "@/data";
+import { COURTS } from "@/data/form-index";
 import { EXTRA_FORMS } from "@/data/extra-forms";
 import { fromHtml } from "@/lib/bbcode";
 import {

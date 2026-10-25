@@ -6,14 +6,14 @@ import type { Filing } from "@/lib/filings";
 import type { SyncState } from "@/lib/sync";
 import type { ShellMode } from "@/lib/shell";
 import type { ThemeMode } from "@/lib/theme";
-import type { Character, FormDef } from "@/lib/types";
+import type { Character, FormInfo } from "@/lib/types";
 import type { DocketRequest, DraftRequest, FormTools } from "@/programs/filings";
 import type { Route } from "./useRoute";
 
 export interface Shell {
   route: Route;
   /** The open form (Court Filings), or null. */
-  form: FormDef | null;
+  form: FormInfo | null;
   characters: Character[];
   /** The active character, the same in every program. */
   active: Character | null;

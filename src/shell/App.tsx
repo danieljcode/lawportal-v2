@@ -9,8 +9,8 @@
 // programs are in registry.ts; routing is useRoute.ts and the dialogs
 // useDialogs.ts (LP-7). Ctrl+K or "/" opens the jump box (JumpBox.tsx, LP-128).
 
-import { Activity, Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { ALL_FORMS, getForm } from "@/data";
+import { Activity, lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { FORM_INDEX, formInfo } from "@/data/form-index";
 import { BRANDING } from "@/branding";
 import { characterStore, hasDocket } from "@/lib/characters";
 import { caseStore } from "@/lib/cases";
@@ -30,7 +30,6 @@ import ChangelogDialog from "./ChangelogDialog";
 import CharactersDialog from "./CharactersDialog";
 import DocketsDialog from "./DocketsDialog";
 import ErrorBoundary from "@/ui/ErrorBoundary";
-import FilingsDialog from "@/ui/FilingsDialog";
 import JumpBox, { isJumpKey, jumpShortcut } from "./JumpBox";
 import type { DraftRequest, FormTools } from "@/programs/filings";
 import MenuBar, { type Menu, type MenuItem } from "./MenuBar";
@@ -49,6 +48,10 @@ import { useCaseVersion, useCharacterVersion, useSetAsideVersion, useSyncState }
 export type { DialogName } from "./useDialogs";
 export type { Route } from "./useRoute";
 import type { Route } from "./useRoute";
+
+// Filing history renders filings with their templates, so its code and the forms load the first
+// time it opens (LP-133).
+const FilingsDialog = lazy(() => import("@/ui/FilingsDialog"));
 
 export default function App() {
   const { route, form, goHome } = useRoute();
@@ -69,6 +72,9 @@ export default function App() {
     loadDocketInForm,
   } = useDialogs();
   const [navOpen, setNavOpen] = useState(false);
+  /** Filing history has been opened, so it stays mounted (and its open/close works as the other dialogs'). */
+  const [filingsUsed, setFilingsUsed] = useState(false);
+  if (dialog === "filings" && !filingsUsed) setFilingsUsed(true);
   /** Filing history's "Use as new draft" for the form already open (LP-15). */
   const [draftRequest, setDraftRequest] = useState<DraftRequest | null>(null);
   /** The open form shows its docket bar (it has a Case number and the active character keeps a docket). */
@@ -242,7 +248,7 @@ export default function App() {
       : {
           ...shell,
           route: r,
-          form: r.program === "filings" && r.formId ? getForm(r.formId) || null : null,
+          form: r.program === "filings" && r.formId ? formInfo(r.formId) || null : null,
           navOpen: false,
           visible: false,
         };
@@ -278,7 +284,7 @@ export default function App() {
         href: s.href,
       })),
     ),
-    ...ALL_FORMS.map((f): JumpEntry => ({
+    ...FORM_INDEX.map((f): JumpEntry => ({
       id: "form-" + f.id,
       kind: "form",
       label: f.title,
@@ -518,7 +524,16 @@ export default function App() {
         />
       </ErrorBoundary>
       <ErrorBoundary where="Filing history" variant="dialog" resetKey={dialog} onDismiss={closeDialog}>
-        <FilingsDialog open={dialog === "filings"} onClose={closeDialog} characters={characters} onUse={openFiling} />
+        {filingsUsed && (
+          <Suspense fallback={null}>
+            <FilingsDialog
+              open={dialog === "filings"}
+              onClose={closeDialog}
+              characters={characters}
+              onUse={openFiling}
+            />
+          </Suspense>
+        )}
       </ErrorBoundary>
     </>
   );

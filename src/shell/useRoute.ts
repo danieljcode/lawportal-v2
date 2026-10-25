@@ -8,11 +8,11 @@
 // and are rewritten to the new ones.
 
 import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
-import { getForm } from "@/data";
+import { formInfo } from "@/data/form-index";
 import { appTitle } from "@/branding";
 import { LAST_FORM_KEY } from "@/lib/formState";
 import { defaultKV } from "@/lib/storage";
-import type { FormDef } from "@/lib/types";
+import type { FormInfo } from "@/lib/types";
 
 export type ProgramId = "filings" | "cases" | "clients" | "library" | "jap" | "control";
 export type ClientsPage = "intake" | "conflicts";
@@ -82,7 +82,7 @@ export function parseHash(hash: string): Route {
     case "":
       return { program: "home" };
     case "filings":
-      return { program: "filings", formId: rest && getForm(rest) ? rest : null };
+      return { program: "filings", formId: rest && formInfo(rest) ? rest : null };
     case "cases":
       if (rest === "upcoming") return { program: "cases", caseId: null, upcoming: true };
       return { program: "cases", caseId: CASE_ID.test(rest) ? rest : null };
@@ -108,12 +108,12 @@ export function parseHash(hash: string): Route {
     case "conflicts":
       return { program: "clients", page: "conflicts" };
   }
-  if (!rest && getForm(head)) return { program: "filings", formId: head };
+  if (!rest && formInfo(head)) return { program: "filings", formId: head };
   return { program: "home" };
 }
 
 /** The page's own name, for the browser tab ("Case File", a form's title…); null for home. */
-export function pageTitle(r: Route, form: FormDef | null): string | null {
+export function pageTitle(r: Route, form: FormInfo | null): string | null {
   switch (r.program) {
     case "home":
       return null;
@@ -152,7 +152,7 @@ function initialRoute(): Route {
 export interface RouteState {
   route: Route;
   /** The open form (Court Filings), or null. */
-  form: FormDef | null;
+  form: FormInfo | null;
   /** The brand and Exit: back to the start page. */
   goHome(e?: MouseEvent): void;
 }
@@ -184,7 +184,7 @@ export function useRoute(): RouteState {
     };
   }, []);
 
-  const form = route.program === "filings" && route.formId ? getForm(route.formId) || null : null;
+  const form = route.program === "filings" && route.formId ? formInfo(route.formId) || null : null;
 
   useEffect(() => {
     if (route.program === "home") {
