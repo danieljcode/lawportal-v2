@@ -11,7 +11,8 @@ async function blocked(file: string, code: string): Promise<boolean> {
   return result.messages.some((m) => m.ruleId === "no-restricted-imports");
 }
 
-describe("import rules (LP-121)", () => {
+// The first lint loads the whole ESLint config, which takes seconds while the rest of the suite runs.
+describe("import rules (LP-121)", { timeout: 30_000 }, () => {
   it("lets the shell and other programs use a program's index, never its internals", async () => {
     expect(await blocked("src/shell/x.ts", 'import "@/programs/cases";')).toBe(false);
     expect(await blocked("src/shell/x.ts", 'import "@/programs/cases/CaseFileView";')).toBe(true);
