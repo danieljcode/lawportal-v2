@@ -276,9 +276,10 @@ async function phaseNav(browser, theme, mode, ctx) {
   await page.click('#form-list a[href="#filings/criminal-arraignment"]');
   await firstDisplay(page, ctx, "nav search result -> arraignment", ["CRIMINAL DIVISION"]);
 
-  // Theme toggle x3 (auto, light, dark in some order) keeps the preview.
-  for (let i = 0; i < 3; i++) {
-    await page.click("#theme-toggle");
+  // Each theme from View (light, dark, then back to auto) keeps the preview.
+  for (const [i, mode] of ["light", "dark", "auto"].entries()) {
+    await page.click("#menu-view");
+    await page.click("#menu-theme-" + mode);
     await page.waitForTimeout(50);
     checks++;
     if (!(await page.evaluate(previewText)).includes("CRIMINAL DIVISION"))

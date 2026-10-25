@@ -85,7 +85,7 @@ describe("the modern shell (LP-125)", () => {
     expect(title()).toBe("Home");
     expect(must("#home")).toBeTruthy();
     expect(document.querySelector("#program-manager")).toBeNull();
-    expect(railNames()).toEqual(["Home", "Court Filings", "Case File", "Clients", "Law Library", "Control Panel"]);
+    expect(railNames()).toEqual(["Home", "Court Filings", "Case File", "Clients", "Law Library", "Settings"]);
     expect(must("#rail-home").getAttribute("aria-current")).toBe("page");
   });
 
@@ -141,7 +141,7 @@ describe("the modern shell (LP-125)", () => {
   it("shows the sync status in the top bar when sync is on", () => {
     vi.spyOn(sync, "code").mockReturnValue("ABCD-EFGH-IJKL");
     mount("#cases");
-    expect(must(".m-topbar #sync-dot").getAttribute("aria-label")).toMatch(/^Sync: /);
+    expect(must(".m-topbar #sync-status").getAttribute("aria-label")).toMatch(/^Sync: /);
   });
 
   it("has a ☰ for programs with a navigation pane, opening it as a drawer", () => {

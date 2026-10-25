@@ -81,7 +81,8 @@ describe("a crash in one panel (LP-88)", () => {
     // Inside a program, a panel's box has no Go home: the program itself still works.
     expect(document.querySelector("#crash-home")).toBeNull();
     // The rest of the app still works: another dialog opens fine.
-    click("#open-characters");
+    click("#menu-file");
+    click("#menu-characters");
     expect(must("#characters-dialog").hasAttribute("open")).toBe(true);
   });
 

@@ -87,8 +87,10 @@ describe("the program registry", () => {
       "Clients",
       "Law Library",
       "J.A.P.",
-      "Control Panel",
+      "Settings",
     ]);
+    // Settings keeps its Control Panel name in the Classic layout (LP-109).
+    expect(PROGRAMS.find((p) => p.id === "control")?.classicTitle).toBe("Control Panel");
     for (const p of PROGRAMS) expect(programFor(parseHash(p.start))?.id, p.id).toBe(p.id);
     expect(programFor({ program: "home" })).toBeNull();
     expect(PROGRAMS.filter((p) => p.group === "main").map((p) => p.id)).toEqual(["control"]);
@@ -202,11 +204,10 @@ describe("the program shell (LP-103)", () => {
     expect(must<HTMLDialogElement>("#about-dialog").open).toBe(true);
     expect(document.querySelector(".menu-list")).toBeNull();
 
-    // View → theme, the same choice as the toolbar's button.
+    // View → theme, the same choice as Settings' Theme.
     click("#menu-view");
     click("#menu-theme-dark");
     expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
-    expect(must("#theme-toggle").getAttribute("aria-label")).toContain("dark");
 
     // File → Exit: back to the start page.
     click("#menu-file");

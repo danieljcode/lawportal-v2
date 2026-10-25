@@ -16,6 +16,20 @@ export default function AboutDialog({ open, onClose }: { open: boolean; onClose(
       titleId="about-title"
       title={"About " + BRANDING.productName}
     >
+      <AboutContent />
+      <div className="row">
+        <button type="button" className="btn primary" onClick={onClose}>
+          OK
+        </button>
+      </div>
+    </Dialog>
+  );
+}
+
+/** The dialog's text, also shown in Settings (LP-109). */
+export function AboutContent() {
+  return (
+    <>
       <div className="about-head">
         {BRANDING.logo ? (
           // A 48px logo from branding, possibly a data: URL: next/image would add nothing here.
@@ -55,11 +69,6 @@ export default function AboutDialog({ open, onClose }: { open: boolean; onClose(
         {/* Not read from the penal code, so its 115 KB loads with the Law Library only (LP-122). */}
         <li>State of San Andreas Penal Code: FreestyleRP.</li>
       </ul>
-      <div className="row">
-        <button type="button" className="btn primary" onClick={onClose}>
-          OK
-        </button>
-      </div>
-    </Dialog>
+    </>
   );
 }
