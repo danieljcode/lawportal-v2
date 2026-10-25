@@ -23,7 +23,7 @@ path itself.
 | Safety           | `xss.test.ts`, `template-safety.test.ts`, `safeHtml.test.ts`                                                       |
 | Wording          | `strings.test.ts` (no outside branding or links in the app's own text)                                             |
 | Outputs          | `bbcode.test.ts`, `discord*.test.ts`, `docx.test.ts`, `preview.test.ts`                                            |
-| Forms and state  | `formState.test.ts`, `formView.test.ts`, `extra-forms.test.ts`, `draftWriter.test.ts`                              |
+| Forms and state  | `formState.test.ts`, `formView.test.ts`, `extra-forms.test.ts`, `form-index.test.ts`, `draftWriter.test.ts`        |
 | FreestyleRP      | `freestyle.test.ts`, `freestyle-wording.test.ts`, `freestyleApp.test.tsx`                                          |
 | Stores and files | `stores.test.ts`, `characterFile.test.ts`                                                                          |
 | Sync             | `sync-api.test.ts` (the routes, against a temp directory), `sync-client.test.ts` (stubbed `fetch`), `body.test.ts` |

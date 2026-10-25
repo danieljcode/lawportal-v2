@@ -4,7 +4,7 @@
 // filing tools go up to the shell's Form menu.
 
 import { useCallback, useState } from "react";
-import { ALL_FORMS } from "@/data";
+import { ALL_FORMS, getForm } from "@/data";
 import { EMPTY_HTML } from "@/lib/safeHtml";
 import EmptyState from "./EmptyState";
 import ErrorBoundary from "@/ui/ErrorBoundary";
@@ -23,7 +23,9 @@ const EMPTY_OUTPUT: FormOutput = {
 };
 
 export default function CourtFilingsProgram({ shell }: ProgramProps) {
-  const { form, active } = shell;
+  const { active } = shell;
+  // The shell knows the open form only by its index entry (LP-133); its template comes with this program.
+  const form = shell.form ? getForm(shell.form.id) || null : null;
   const [highlight, setHighlight] = useState(true);
   /** The last output FormView reported, with the form it belongs to (out is null when that template failed to compile). */
   const [output, setOutput] = useState<{ formId: string; out: FormOutput | null } | null>(null);
