@@ -172,6 +172,14 @@ Lint (`eslint.config.mjs`, tested by `tests/import-rules.test.ts`) keeps the fol
   clients, library), imported by its `index.ts`, so they load with its code. A rule goes in a
   program's stylesheet only if nothing outside that program uses its classes; anything two programs
   share stays in `globals.css`.
+- **Looks and themes** (LP-110). `html[data-look]` (modern or classic; it follows the layout until the
+  Classic theme, LP-112) and `html[data-theme]` (light, dark, or absent for automatic) are separate,
+  both set before the first paint by `THEME_SCRIPT`. Everything that changes between looks is a
+  variable in `globals.css`: the colours, the bevels (`--bevel-raised`, `--bevel-sunken`…), the type
+  scale (`--text-sm`…`--text-6xl`), radii and control sizes. A program's stylesheet uses only these;
+  `tests/stylesheets.test.ts` fails on a hard-coded colour, font, font size, radius or bevel there,
+  and on any variable that isn't defined. The forum preview, the Discord message, the boot screen and
+  the print sheets keep fixed looks on purpose.
 
 ## From form to filing
 

@@ -193,11 +193,14 @@ describe("the modern shell (LP-125)", () => {
     expect(must(".taskbar")).toBeTruthy();
     expect(document.querySelector(".m-app")).toBeNull();
     expect(getShell()).toBe("classic");
+    // The look follows the layout until the Classic theme (LP-110, LP-112).
+    expect(document.documentElement.dataset.look).toBe("classic");
     // Back from the View menu.
     click("#menu-view");
     expect(must("#menu-classic").getAttribute("aria-checked")).toBe("true");
     click("#menu-classic");
     expect(must(".m-app")).toBeTruthy();
     expect(getShell()).toBe("modern");
+    expect(document.documentElement.dataset.look).toBe("modern");
   });
 });
