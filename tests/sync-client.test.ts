@@ -204,6 +204,26 @@ describe("change tracking", () => {
     expect(calls).toEqual(["PUT", "PUT"]);
   });
 
+  it("an edit made while a push is in flight stays marked unsent (LP-132)", async () => {
+    let release: () => void = () => undefined;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (_url: string, init: RequestInit) => {
+        if (init.method !== "PUT") return { status: 200, json: async () => ({ rev: 0, data: { characters: [] } }) };
+        await new Promise<void>((r) => (release = r));
+        return { status: 200, json: async () => ({ rev: 1, updated: "u1" }) };
+      }),
+    );
+    await sync.init();
+    const pushed = sync.push();
+    await Promise.resolve();
+    characterStore().save({ name: "Typed During The Push" });
+    release();
+    await pushed;
+    expect(localStorage.getItem(sync.REV_KEY)).toBe("1");
+    expect(localStorage.getItem(sync.DIRTY_KEY)).toBe("1");
+  });
+
   it("a 409 merges the server copy, keeps a character added here, and sends the merge", async () => {
     characterStore().save({ id: "local001", name: "Local Person" });
     const calls = stubFetch(

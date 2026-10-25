@@ -107,6 +107,8 @@ const listeners = new Set<(s: SyncState) => void>();
 let applying = false;
 let timer: ReturnType<typeof setTimeout> | null = null;
 let inflight: Promise<void> | null = null;
+/** Bumped by every data change, so a push knows whether anything changed while it was in flight (LP-132). */
+let edits = 0;
 let lastPull = 0;
 let initPromise: Promise<void> | null = null;
 let teardown: Array<() => void> = [];
@@ -623,6 +625,7 @@ function send(retry: boolean): Promise<void> {
   if (inflight) return inflight.then(() => send(retry));
   set("saving", "Saving…");
   const sent = snapshot();
+  const editsSent = edits;
   let again = false;
   inflight = request("PUT", "data", { rev: rev(), data: sent })
     .then(
@@ -630,7 +633,8 @@ function send(retry: boolean): Promise<void> {
         const b = r.body || {};
         if (r.status === 200) {
           lsSet(REV_KEY, String(b.rev));
-          lsSet(DIRTY_KEY, null);
+          // An edit made during the request isn't in `sent`: it stays unsent (LP-132).
+          if (edits === editsSent) lsSet(DIRTY_KEY, null);
           saveBase(sent);
           set("synced", "", b.updated);
           return;
@@ -707,6 +711,7 @@ export async function pull(force = false): Promise<boolean> {
 /** Called after any data change in the stores (never for the active-character switch). */
 function changed(): void {
   if (applying || !code()) return;
+  edits++;
   lsSet(DIRTY_KEY, "1");
   if (timer) clearTimeout(timer);
   set("pending", "Saving…");
@@ -815,6 +820,7 @@ export function __resetForTests(): void {
   timer = null;
   initPromise = null;
   inflight = null;
+  edits = 0;
   lastPull = 0;
   applying = false;
   state = INITIAL;
