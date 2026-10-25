@@ -86,9 +86,11 @@ edits. Instead of replacing local data, `resolve()` merges **one character at a 
 - **Deletions stand.** `lawapp_sync_base` remembers the last server copy this browser saw, so the
   merge can tell a character added on one side from one deleted on the other. A character deleted
   on one device but edited on the other since is kept.
-- **Nothing is lost silently.** A local version that loses is kept under `lawapp_sync_lost`, and the
-  sync panel shows **Restore my version** (or Dismiss). Restoring saves it with a fresh `updatedAt`,
-  so it wins the next merge.
+- **Nothing is lost silently.** A local version of a character, case or precedent that loses is kept
+  under `lawapp_sync_lost`, and the sync panel shows **Restore my version** (or Dismiss). Restoring
+  saves it with a fresh stamp, so it wins the next merge. Filings and conflict checks never change
+  once made, so they never lose. An edit made while a push is in flight keeps `lawapp_sync_dirty`
+  set, so it's still sent if the tab closes first (LP-132).
 - The merged result is pushed straight away.
 - "Newer" goes by each device's clock, so a badly wrong clock can pick the wrong winner.
 
