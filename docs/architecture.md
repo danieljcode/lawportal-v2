@@ -351,8 +351,8 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
 - **Deadlines and hearing dates** (`src/lib/deadlines.ts`, LP-18) live on each case
   (`deadlines`: an in-game date, a label, a note, done), so they sync and back up with it; merging
   two copies of a case keeps both copies' deadlines. Dates are on the 1990 calendar: "today" is
-  `gameToday()`, from `gameDate()` (see "Dates are in-game" under [From form to filing](#from-form-to-filing) for how it differs from a
-  form's Today until LP-135).
+  `gameToday()`, from `gameDate()`. Until LP-135, that can differ from a form's Today: see "Dates
+  are in-game" under [From form to filing](#from-form-to-filing).
   - **On a case** (`CaseDeadlines.tsx`): add, tick off and remove, each saved straight away. The
     case details form above only reloads when the case's details change, so unsaved edits there
     survive a deadline change.
