@@ -5,6 +5,7 @@ import { caseStore } from "@/lib/cases";
 import { characterStore } from "@/lib/characters";
 import { docketStore } from "@/lib/dockets";
 import { portfolioStore } from "@/lib/portfolio";
+import { precedentStore } from "@/lib/precedents";
 import { S_SYNC_APPLY_FAIL, S_SYNC_LOST } from "@/lib/strings";
 import * as sync from "@/lib/sync";
 
@@ -202,6 +203,26 @@ describe("change tracking", () => {
     release();
     await Promise.all([first, second]);
     expect(calls).toEqual(["PUT", "PUT"]);
+  });
+
+  it("an edit made while a push is in flight stays marked unsent (LP-132)", async () => {
+    let release: () => void = () => undefined;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (_url: string, init: RequestInit) => {
+        if (init.method !== "PUT") return { status: 200, json: async () => ({ rev: 0, data: { characters: [] } }) };
+        await new Promise<void>((r) => (release = r));
+        return { status: 200, json: async () => ({ rev: 1, updated: "u1" }) };
+      }),
+    );
+    await sync.init();
+    const pushed = sync.push();
+    await Promise.resolve();
+    characterStore().save({ name: "Typed During The Push" });
+    release();
+    await pushed;
+    expect(localStorage.getItem(sync.REV_KEY)).toBe("1");
+    expect(localStorage.getItem(sync.DIRTY_KEY)).toBe("1");
   });
 
   it("a 409 merges the server copy, keeps a character added here, and sends the merge", async () => {
@@ -492,6 +513,44 @@ describe("conflicts keep unsent edits (LP-64)", () => {
     await vi.advanceTimersByTimeAsync(1000);
     expect(calls.map((c) => c.method)).toEqual(["GET", "PUT"]);
     expect(pushedNames(calls[1])).toEqual(["Mine"]);
+  });
+
+  it("a precedent edit that loses is kept aside and Restore my version brings it back (LP-132)", async () => {
+    seed([], { "precedent:prec0001": "2025-12-01T00:00:00.000Z" });
+    precedentStore().replaceAll([{ id: "prec0001", caseName: "Mine v. State", tags: [], created: T0, updated: T0 }]);
+    localStorage.setItem(sync.DIRTY_KEY, "1");
+    stubFetch(
+      {
+        status: 200,
+        body: {
+          rev: 2,
+          updated: "u2",
+          data: {
+            characters: [],
+            precedents: [{ id: "prec0001", caseName: "Theirs v. State", tags: [], created: T0, updated: T1 }],
+          },
+        },
+      },
+      { status: 200, body: { rev: 3, updated: "u3" } },
+    );
+    await sync.pull(true);
+    expect(
+      precedentStore()
+        .list()
+        .map((p) => p.caseName),
+    ).toEqual(["Theirs v. State"]);
+    expect(sync.getState()).toMatchObject({ status: "conflict", message: S_SYNC_LOST(0, 0, 1), lostPrecedents: 1 });
+    const kept = JSON.parse(localStorage.getItem(sync.LOST_KEY) || "{}") as sync.SyncDoc;
+    expect(kept.precedents?.map((p) => p.caseName)).toEqual(["Mine v. State"]);
+
+    expect(sync.restoreLost()).toBe(1);
+    expect(
+      precedentStore()
+        .list()
+        .map((p) => p.caseName),
+    ).toEqual(["Mine v. State"]);
+    expect(precedentStore().get("prec0001")!.updated > T1).toBe(true);
+    expect(sync.getState().lostPrecedents).toBe(0);
   });
 
   it("discardLost forgets the kept copy", () => {
