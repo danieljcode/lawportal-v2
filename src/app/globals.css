@@ -281,11 +281,7 @@ dialog {
     select,
     textarea
   ) {
-  box-shadow:
-    inset -1px -1px var(--hilite),
-    inset 1px 1px var(--shadow),
-    inset -2px -2px var(--light),
-    inset 2px 2px var(--dkshadow);
+  box-shadow: var(--bevel-sunken);
 }
 /* thin sunken: status bars and the task button */
 .status-bar,
