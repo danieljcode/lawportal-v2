@@ -18,5 +18,8 @@ release-notes.md
 /test-results/
 /playwright-report/
 
+# Git worktrees for other branches (LP-134)
+/.worktrees/
+
 # Written by next dev for coding agents (Next.js 16, LP-97); re-created on every run
 /AGENTS.md
