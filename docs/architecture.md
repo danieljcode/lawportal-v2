@@ -165,7 +165,13 @@ Lint (`eslint.config.mjs`, tested by `tests/import-rules.test.ts`) keeps the fol
   `@/ui/…`, `@/lib/…` or `@/shell/…`; programs talk through the registry, routes and shared stores.
 - **`src/lib` and `src/ui` never import the shell or a program**, so the shared layers stay shared.
 - Something two programs need moves to `src/ui/` (a component or hook) or `src/lib/` (logic, a
-  store). Tests stay in `tests/`, and styles in `globals.css` until LP-110.
+  store). Tests stay in `tests/`.
+- **Styles** (LP-110). `src/app/globals.css` holds the theme variables and everything shared: the
+  base, buttons and fields, dialogs, panes, the shell (both layouts), Home and the dialogs any
+  program opens. A program's own rules are in `src/programs/<id>/<id>.css` (filings, cases,
+  clients, library), imported by its `index.ts`, so they load with its code. A rule goes in a
+  program's stylesheet only if nothing outside that program uses its classes; anything two programs
+  share stays in `globals.css`.
 
 ## From form to filing
 
