@@ -18,6 +18,8 @@ export interface ErrorBoundaryProps {
   resetKey?: unknown;
   /** Dialogs: close it (shown as Close instead of Try again). */
   onDismiss?(): void;
+  /** A whole program: leave it for home (Go home, beside Try again; LP-123). */
+  onHome?(): void;
   /** Told when this boundary shows its crash screen, and when Try again clears it. */
   onError?(): void;
   onReset?(): void;
@@ -65,6 +67,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, State> 
         componentStack={this.state.componentStack}
         onRetry={this.props.variant === "app" || this.props.onDismiss ? undefined : this.retry}
         onDismiss={this.props.onDismiss}
+        onHome={this.props.onHome}
       />
     );
   }
@@ -77,9 +80,10 @@ interface CrashScreenProps {
   componentStack: string | null;
   onRetry?(): void;
   onDismiss?(): void;
+  onHome?(): void;
 }
 
-function CrashScreen({ where, variant, error, componentStack, onRetry, onDismiss }: CrashScreenProps) {
+function CrashScreen({ where, variant, error, componentStack, onRetry, onDismiss, onHome }: CrashScreenProps) {
   const [status, setStatus] = useState("");
 
   const backup = () => {
@@ -97,6 +101,7 @@ function CrashScreen({ where, variant, error, componentStack, onRetry, onDismiss
       error,
       componentStack,
       where,
+      route: location.hash,
       userAgent: typeof navigator === "undefined" ? undefined : navigator.userAgent,
     });
     const ok = await copyText(text);
@@ -134,6 +139,11 @@ function CrashScreen({ where, variant, error, componentStack, onRetry, onDismiss
           {onRetry && (
             <button type="button" className="btn primary" id="crash-retry" onClick={onRetry}>
               Try again
+            </button>
+          )}
+          {onHome && (
+            <button type="button" className="btn" id="crash-home" onClick={onHome}>
+              Go home
             </button>
           )}
           {onDismiss && (
