@@ -48,8 +48,9 @@ browser.
   (`upcoming(…, SOON_DAYS)`, each linking to its case), the latest 5 filings (opened again through
   App's `openFiling`) and the 5 cases updated most recently, each with an empty state. With no
   character it shows the whole firm's.
-- **Jump box** (`JumpBox.tsx`, `src/lib/jump.ts`, LP-128). Ctrl+K (Cmd+K on a Mac) anywhere, or "/"
-  outside a text field and any dialog, opens it (App's keydown listener, `isJumpKey`), as does View →
+- **Jump box** (`JumpBox.tsx`, `src/lib/jump.ts`, LP-128). Ctrl+K (Cmd+K on a Mac) anywhere but
+  another dialog (it would replace it, losing what's typed, LP-131), or "/" outside a text field and
+  any dialog, opens it (App's keydown listener, `isJumpKey`), as does View →
   Jump to; it's one of `useDialogs`' dialogs, in both layouts. It lists the programs the character
   can see (going back to where each was left), their `sections` from the registry (which are also
   their File menu items) and every court form. `search()` ranks by name: the whole name, its start,

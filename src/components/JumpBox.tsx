@@ -148,10 +148,14 @@ function isTyping(target: EventTarget | null): boolean {
   );
 }
 
-/** The keys that open the jump box: Ctrl+K or Cmd+K anywhere, or "/" outside a field and any dialog. */
+/**
+ * The keys that open the jump box: Ctrl+K or Cmd+K anywhere but another dialog (opening it there
+ * would close that one and lose what's typed in it, LP-131), or "/" outside a field and any dialog.
+ */
 export function isJumpKey(e: globalThis.KeyboardEvent): boolean {
   if (e.isComposing || e.altKey) return false;
-  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "k") return true;
+  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "k")
+    return !document.querySelector("dialog[open]:not(#jump-box)");
   return e.key === "/" && !e.ctrlKey && !e.metaKey && !isTyping(e.target) && !document.querySelector("dialog[open]");
 }
 
