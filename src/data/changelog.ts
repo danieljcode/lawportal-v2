@@ -18,6 +18,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-10-25",
+    title: "Jump to any program or form",
+    items: [
+      {
+        type: "new",
+        text: "Press Ctrl+K (Cmd+K on a Mac) or / and type a few letters to jump straight to a program, a section such as Upcoming or Precedents, or any court form. The arrow keys and Enter pick one, and Esc closes it. It's also in the View menu.",
+      },
+    ],
+  },
+  {
     date: "2026-10-21",
     title: "A home screen that shows what's next",
     items: [

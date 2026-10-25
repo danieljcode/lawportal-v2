@@ -30,6 +30,8 @@ export interface ProgramDef {
   visible(who: { commissioner: boolean }): boolean;
   /** Its navigation pane, shown as a drawer at phone width: the pane's id and what it lists. */
   nav?: { id: string; label: string };
+  /** Its pages, for the File menu and the jump box (LP-128). */
+  sections?: readonly { label: string; href: string }[];
   View: ComponentType<ProgramProps>;
 }
 
@@ -54,6 +56,10 @@ export const PROGRAMS: readonly ProgramDef[] = [
     start: "#cases",
     visible: everyone,
     nav: { id: "case-nav", label: "Case File pages" },
+    sections: [
+      { label: "All cases", href: "#cases" },
+      { label: "Upcoming", href: "#cases/upcoming" },
+    ],
     View: CaseFileProgram,
   },
   {
@@ -64,6 +70,10 @@ export const PROGRAMS: readonly ProgramDef[] = [
     start: "#clients/intake",
     visible: everyone,
     nav: { id: "clients-nav", label: "Clients pages" },
+    sections: [
+      { label: "New client intake", href: "#clients/intake" },
+      { label: "Conflict check", href: "#clients/conflicts" },
+    ],
     View: ClientsProgram,
   },
   {
@@ -74,6 +84,10 @@ export const PROGRAMS: readonly ProgramDef[] = [
     start: "#library/penal-code",
     visible: everyone,
     nav: { id: "library-nav", label: "Law Library sections" },
+    sections: [
+      { label: "Penal Code", href: "#library/penal-code" },
+      { label: "Precedents", href: "#library/precedents" },
+    ],
     View: LibraryProgram,
   },
   {

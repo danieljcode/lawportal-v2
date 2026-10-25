@@ -121,3 +121,25 @@ test("Case File: add a case, find it, and open it", async ({ page }, testInfo) =
   await expect(page.locator(".case-row")).toHaveCount(1);
   await expect(page.locator(".case-row")).toContainText("Lead: Judy Bench");
 });
+
+test("Ctrl+K jumps to a form, and Esc closes the box and gives the focus back", async ({ page }) => {
+  await page.goto("/#cases");
+  await expect(page.locator("#case-file-title")).toHaveText("Case File");
+  const rail = page.locator("#rail-cases");
+  await rail.focus();
+
+  // "/" opens it (not typing in a field); Esc closes it, back where the focus was (LP-128).
+  await page.keyboard.press("/");
+  await expect(page.locator("#jump-input")).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#jump-box")).toBeHidden();
+  await expect(rail).toBeFocused();
+
+  await page.keyboard.press("Control+k");
+  await expect(page.locator("#jump-input")).toBeFocused();
+  await page.keyboard.type("civil compl");
+  await expect(page.locator("#jump-results [aria-selected=true]")).toContainText("Civil Complaint");
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/#filings\/civil-complaint$/);
+  await expect(page.locator("#form-view")).toBeVisible();
+});

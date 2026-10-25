@@ -48,6 +48,15 @@ browser.
   (`upcoming(…, SOON_DAYS)`, each linking to its case), the latest 5 filings (opened again through
   App's `openFiling`) and the 5 cases updated most recently, each with an empty state. With no
   character it shows the whole firm's.
+- **Jump box** (`JumpBox.tsx`, `src/lib/jump.ts`, LP-128). Ctrl+K (Cmd+K on a Mac) anywhere, or "/"
+  outside a text field and any dialog, opens it (App's keydown listener, `isJumpKey`), as does View →
+  Jump to; it's one of `useDialogs`' dialogs, in both layouts. It lists the programs the character
+  can see (going back to where each was left), their `sections` from the registry (which are also
+  their File menu items) and every court form. `search()` ranks by name: the whole name, its start,
+  the start of a word, every typed word starting a word, the name containing it, then the court,
+  section or program containing it, then the letters in order; ties go programs, sections, forms.
+  The input is an ARIA combobox over a listbox (`aria-activedescendant`), with the result count in a
+  live region; Esc or ✕ gives the focus back to where it was.
 - **Programs keep their place** (LP-126). Every program opened stays mounted inside React's
   `<Activity>`, hidden while another shows (App remembers each one's last route in `visited`), so
   coming back finds the same form, scroll position, searches and half-typed intake. A hidden
