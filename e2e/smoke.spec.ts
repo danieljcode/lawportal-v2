@@ -143,3 +143,22 @@ test("Ctrl+K jumps to a form, and Esc closes the box and gives the focus back", 
   await expect(page).toHaveURL(/#filings\/civil-complaint$/);
   await expect(page.locator("#form-view")).toBeVisible();
 });
+
+/** The first-load JavaScript budget for the home screen, uncompressed (README, "First-load budget"; LP-122). */
+const FIRST_LOAD_BUDGET_KIB = 950;
+
+test("the home screen's first load stays within the JavaScript budget", async ({ page }) => {
+  // First load only: the idle preload of the programs never fires.
+  await page.addInitScript(() => {
+    window.requestIdleCallback = () => 0;
+  });
+  const sizes: Promise<number>[] = [];
+  page.on("response", (r) => {
+    if (/\.js(\?|$)/.test(r.url())) sizes.push(r.body().then((b) => b.length));
+  });
+  await page.goto("/");
+  await expect(page.locator("#home")).toBeVisible();
+  await page.waitForLoadState("networkidle");
+  const kib = (await Promise.all(sizes)).reduce((a, b) => a + b, 0) / 1024;
+  expect(kib, `first-load JavaScript is ${kib.toFixed(0)} KiB`).toBeLessThanOrEqual(FIRST_LOAD_BUDGET_KIB);
+});
