@@ -9,8 +9,8 @@ Discord, or download it as a Word `.docx`. Alongside the forms are the firm's ow
 with evidence and deadlines, client intake and conflict checks, and a Law Library with the penal
 code and the firm's precedents.
 
-It's for Daniel, his friends and the firm's members, run on your own computer (it may be hosted
-later). The firm's name and colours come from one file, `src/branding.ts`; **court forms never carry
+It's for Daniel, his friends and the firm's members. It's hosted on Vercel, and it also runs on your
+own computer. The firm's name and colours come from one file, `src/branding.ts`; **court forms never carry
 firm branding**, so anything posted to the forum looks official. FreestyleRP is set in 1990, so every
 date the app fills in is 36 years before today's real date.
 
@@ -41,6 +41,14 @@ npm run build && npm run start:lan  # or the production build, on 0.0.0.0
 Both set **`LAWAPP_ALLOW_LAN=1`**, which lets the app's server answer requests from other machines,
 not only `localhost`. Without it, sync and the `.docx` download only work on the computer running the
 app. [Development](docs/development.md) has the details and the other settings.
+
+### Hosted (Vercel)
+
+The hosted app is a normal Next.js deploy on Vercel. Vercel's file system doesn't keep writes, so
+sync is stored in **Upstash Redis**: set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` (or
+add Vercel's Upstash integration, which sets `KV_REST_API_URL` and `KV_REST_API_TOKEN`), and
+`LAWAPP_ALLOW_LAN=1` so the API answers on the site's own address, not only `localhost`. See
+[Development](docs/development.md#hosted-on-vercel).
 
 ### npm scripts
 
@@ -122,10 +130,11 @@ The programs are the same in both.
   data is set aside, never deleted, and can be downloaded.
 - **Sync** shares your characters (with their J.A.P.), cases, filings, precedents and conflict checks between browsers
   and devices through the app's own server. Turning it on gives you a **sync code**; enter the same
-  code on another device to join it. Anyone with the code who can reach the computer running the
-  app can read and change that data, so keep it private.
-- **Sync files** are kept on the computer running the app, one JSON file per code in `data/sync/`
-  (or the folder in `LAWAPP_SYNC_DIR`), named by a hash of the code. `data/` is ignored by Git:
+  code on another device to join it. Anyone with the code who can reach the app's server can read
+  and change that data, so keep it private.
+- **Where the server copy lives:** on the hosted app, in Upstash Redis, one record per code, keyed
+  by a hash of the code. Run on your own computer, in one JSON file per code in `data/sync/` (or the
+  folder in `LAWAPP_SYNC_DIR`), also named by a hash of the code. `data/` is ignored by Git:
   **never commit sync files**, or anything else with players' data in it.
 
 [Sync, storage and recovery](docs/sync.md) explains how merging and recovery work.

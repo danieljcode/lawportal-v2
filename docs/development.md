@@ -81,6 +81,22 @@ npm run build && npm run start:lan
 - Traffic is unencrypted: only use LAN mode on a network you trust. The sync API is rate limited
   (see [Sync](sync.md#server-storage)).
 
+## Hosted on Vercel
+
+The hosted app is a normal Next.js deploy: Vercel runs `npm run build` and serves the page and the
+three API routes as functions. Two things differ from running it yourself:
+
+- **Sync is stored in Upstash Redis**, because Vercel's file system doesn't keep writes. Set
+  `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`, or add Vercel's Upstash integration,
+  which sets `KV_REST_API_URL` and `KV_REST_API_TOKEN`. With either pair set,
+  `src/lib/server/syncStore.ts` uses Redis (`syncRedis.ts`) instead of `data/sync/`. Without them,
+  sync writes would be lost between requests.
+- **`LAWAPP_ALLOW_LAN=1` must be set**, or every API route answers `421`: the host check only
+  accepts `localhost` otherwise.
+
+The in-memory rate limits are kept per function instance on Vercel, so they're weaker there (see
+[Sync](sync.md#server-storage) and LP-137).
+
 ## Scripts
 
 | Command                 | What it does                                                                                                                               |
@@ -104,13 +120,17 @@ npm run build && npm run start:lan
 
 ## Environment variables
 
-| Variable                     | Used by            | Effect                                                                          |
-| ---------------------------- | ------------------ | ------------------------------------------------------------------------------- |
-| `LAWAPP_ALLOW_LAN=1`         | API routes         | Answer requests from any host, not only `localhost`. The `:lan` scripts set it. |
-| `LAWAPP_SYNC_DIR`            | Sync API           | Where sync files go (default `data/sync/`).                                     |
-| `LAWAPP_REQUIRE_REFERENCE=1` | Tests              | Fail instead of skipping when the reference data is missing. CI sets it.        |
-| `PLAYWRIGHT_CHANNEL`         | Playwright scripts | Use an installed browser, e.g. `msedge`.                                        |
-| `BASE_URL`                   | Playwright scripts | The app's address, instead of passing it as an argument.                        |
+| Variable                     | Used by            | Effect                                                                              |
+| ---------------------------- | ------------------ | ----------------------------------------------------------------------------------- |
+| `LAWAPP_ALLOW_LAN=1`         | API routes         | Answer requests from any host, not only `localhost`. The `:lan` scripts set it.     |
+| `LAWAPP_SYNC_DIR`            | Sync API           | Where sync files go (default `data/sync/`).                                         |
+| `UPSTASH_REDIS_REST_URL`     | Sync API           | With `UPSTASH_REDIS_REST_TOKEN`: keep sync in Upstash Redis instead of files.       |
+| `UPSTASH_REDIS_REST_TOKEN`   | Sync API           | The Upstash database's REST token.                                                  |
+| `KV_REST_API_URL`            | Sync API           | The same pair as set by Vercel's Upstash integration (used when the above are not). |
+| `KV_REST_API_TOKEN`          | Sync API           | The integration's REST token.                                                       |
+| `LAWAPP_REQUIRE_REFERENCE=1` | Tests              | Fail instead of skipping when the reference data is missing. CI sets it.            |
+| `PLAYWRIGHT_CHANNEL`         | Playwright scripts | Use an installed browser, e.g. `msedge`.                                            |
+| `BASE_URL`                   | Playwright scripts | The app's address, instead of passing it as an argument.                            |
 
 ## Where things are saved
 
@@ -118,16 +138,18 @@ npm run build && npm run start:lan
   [Architecture](architecture.md#client-data-the-stores)).
 - **On this computer:** sync files in `data/sync/` (gitignored), and the reference data and
   screenshots in `.agents/` (gitignored).
+- **On the hosted app:** the sync server copies in Upstash Redis (`lp:sync:<hash of the code>`).
 
 ## Common problems
 
-| Symptom                                                       | Cause and fix                                                                                                |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Another device gets errors, or the API answers `421`          | The app wasn't started in LAN mode. Use `npm run start:lan`.                                                 |
-| Copy doesn't work on another device                           | Expected over plain http: the app falls back to a text selection, so paste should still work.                |
-| `[parity] skipped: reference data not found`                  | Normal without access to the reference data. With access, clone it into `.agents/reference/jsa` (see above). |
-| `port-forms: the reference forms aren't here`                 | The same: `port-forms` needs the reference data.                                                             |
-| `bad option: --experimental-strip-types`                      | Node is older than 22.6. Upgrade Node.                                                                       |
-| Snapshot files show as changed after running tests on Windows | Only line endings changed: `git checkout -- tests/__snapshots__`.                                            |
-| A commit is refused with "doesn't follow the convention"      | The commit-message hook. Fix the message as it explains, or see [Contributing](contributing.md).             |
-| "Some saved data couldn't be read and was set aside."         | A saved value was damaged. See [Sync, storage and recovery](sync.md#damaged-data).                           |
+| Symptom                                                       | Cause and fix                                                                                                            |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Another device gets errors, or the API answers `421`          | The app wasn't started in LAN mode. Use `npm run start:lan`.                                                             |
+| On the hosted app, sync or `.docx` answers `421`              | `LAWAPP_ALLOW_LAN=1` isn't set in the Vercel project's environment variables. See [Hosted on Vercel](#hosted-on-vercel). |
+| Copy doesn't work on another device                           | Expected over plain http: the app falls back to a text selection, so paste should still work.                            |
+| `[parity] skipped: reference data not found`                  | Normal without access to the reference data. With access, clone it into `.agents/reference/jsa` (see above).             |
+| `port-forms: the reference forms aren't here`                 | The same: `port-forms` needs the reference data.                                                                         |
+| `bad option: --experimental-strip-types`                      | Node is older than 22.6. Upgrade Node.                                                                                   |
+| Snapshot files show as changed after running tests on Windows | Only line endings changed: `git checkout -- tests/__snapshots__`.                                                        |
+| A commit is refused with "doesn't follow the convention"      | The commit-message hook. Fix the message as it explains, or see [Contributing](contributing.md).                         |
+| "Some saved data couldn't be read and was set aside."         | A saved value was damaged. See [Sync, storage and recovery](sync.md#damaged-data).                                       |
