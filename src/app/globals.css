@@ -151,7 +151,7 @@
 :root {
   --shadow-menu: 2px 2px 0 rgba(0, 0, 0, 0.35);
   --backdrop: rgba(0, 0, 0, 0.4);
-  /* the modern frame's font, until the modern look sets --ui-font (LP-110 part 3) */
+  /* the modern frame's font; the modern look makes it --ui-font */
   --frame-font: system-ui, "Segoe UI", Roboto, sans-serif;
   --text-xs: 11px;
   --text-sm: 12px;
@@ -167,6 +167,7 @@
   --radius: 0;
   --radius-tab: 3px 3px 0 0;
   --radius-rail: 6px;
+  --radius-window: 0;
   /* buttons and fields; a pressed button's label moves by --press */
   --control-height: 23px;
   --btn-pad-y: 3px;
@@ -184,6 +185,179 @@
   --alert-text: #fff;
   --ring: #c0c0c0;
   --hover-text: #000;
+  /* the accent on cards and lists, and the default button's colours */
+  --accent: var(--select-bg);
+  --primary-bg: var(--face);
+  --primary-text: var(--text);
+}
+
+/* ---------- the modern look (LP-110): slate and brass ---------- */
+/* The default look. It sets the same variables as the 1990 values above, so the layout and every
+   program stay as they are: only colours, type, corners, sizes and bevels change. Light first, then
+   dark (chosen, or automatic with a dark system theme). */
+:root[data-look="modern"] {
+  --desktop: #f3f4f6;
+  --face: #ffffff;
+  --hilite: #ffffff;
+  --light: #e7eaee;
+  --shadow: #d3d8df;
+  --dkshadow: #8a929e;
+  --text: #1e2530;
+  --title-from: #ffffff;
+  --title-to: #ffffff;
+  --title-text: #1e2530;
+  --field: #ffffff;
+  --select-bg: #2b3442;
+  --select-text: #ffffff;
+  --accent: #9a7b3f;
+  --primary-bg: #2b3442;
+  --primary-text: #ffffff;
+  --link: #7a5f2b;
+  --mark: #f3e6c4;
+  --focus: #9a7b3f;
+  --muted: #5d6673;
+  --good: #2f6b3f;
+  --bad: #a33a2c;
+  --on-bg: #f7f1e3;
+  --dot-synced: #3d8b57;
+  --dot-busy: #b38b2d;
+  --dot-conflict: #c0692a;
+  --missing: #9a5a1c;
+  --dot-offline: #8a929e;
+  --dot-error: #b8432f;
+  --notify: #9a7b3f;
+  --task-bg: var(--light);
+  --task-text: var(--text);
+  --disabled-emboss: none;
+  --check-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.2 3.8l1.9 1.9L6.8 2' fill='none' stroke='%231e2530' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --select-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cpath d='M4.5 6.5L8 10l3.5-3.5' fill='none' stroke='%235d6673' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --ui-font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --frame-font: var(--ui-font);
+  --mono: ui-monospace, "Cascadia Mono", Consolas, "Courier New", monospace;
+  --backdrop: rgba(22, 25, 30, 0.45);
+  --shadow-menu: 0 8px 24px rgba(22, 25, 30, 0.14), 0 2px 6px rgba(22, 25, 30, 0.08);
+  --desktop-text: var(--muted);
+  --alert-bg: var(--bad);
+  --ring: var(--shadow);
+  --hover-text: var(--text);
+
+  /* Flat: a hairline where 1990 had a bevel, a soft shadow on what floats. */
+  --bevel-raised: inset 0 0 0 1px var(--shadow);
+  --bevel-window: 0 0 0 1px var(--shadow), 0 12px 32px rgba(22, 25, 30, 0.16);
+  --bevel-sunken: inset 0 0 0 1px var(--shadow);
+  --bevel-pressed: inset 0 0 0 1px var(--dkshadow);
+  --bevel-default: none;
+  --bevel-thin: inset 0 0 0 1px var(--shadow);
+  --bevel-groove: none;
+  --bevel-tab: inset 0 0 0 1px var(--shadow);
+  --bevel-taskbar: inset 0 1px var(--shadow);
+  --bevel-rule: none;
+  --bevel-rule-inset: none;
+
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 15px;
+  --text-lg: 16px;
+  --text-xl: 17px;
+  --text-2xl: 20px;
+  --text-3xl: 22px;
+  --text-4xl: 24px;
+  --text-5xl: 28px;
+  --text-6xl: 30px;
+  --radius: 6px;
+  --radius-tab: 6px 6px 0 0;
+  --radius-rail: 8px;
+  --radius-window: 10px;
+  --control-height: 32px;
+  --btn-pad-y: 5px;
+  --btn-pad-x: 14px;
+  --mini-height: 26px;
+  --mini-pad-y: 3px;
+  --mini-pad-x: 10px;
+  --icon-pad-y: 4px;
+  --icon-pad-x: 8px;
+  --press: 0px;
+  --field-pad: 5px 10px;
+  color-scheme: light;
+}
+:root[data-look="modern"][data-theme="dark"] {
+  --desktop: #16191e;
+  --face: #1e2229;
+  --hilite: #2a2f37;
+  --light: #262b33;
+  --shadow: #363c45;
+  --dkshadow: #5a626d;
+  --text: #e4e6ea;
+  --title-from: #1e2229;
+  --title-to: #1e2229;
+  --title-text: #e4e6ea;
+  --field: #1a1d23;
+  --select-bg: #3a4350;
+  --select-text: #ffffff;
+  --accent: #c9a961;
+  --primary-bg: #c9a961;
+  --primary-text: #1b1608;
+  --link: #d8bc7a;
+  --mark: #4a3f22;
+  --focus: #c9a961;
+  --muted: #9aa1ab;
+  --good: #7cc492;
+  --bad: #f08a78;
+  --on-bg: #2a2619;
+  --dot-synced: #6fbf86;
+  --dot-busy: #d6b25a;
+  --dot-conflict: #e0905a;
+  --missing: #e0a15a;
+  --dot-offline: #8a929e;
+  --dot-error: #f08a78;
+  --notify: #c9a961;
+  --check-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.2 3.8l1.9 1.9L6.8 2' fill='none' stroke='%23e4e6ea' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --select-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cpath d='M4.5 6.5L8 10l3.5-3.5' fill='none' stroke='%239aa1ab' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --backdrop: rgba(0, 0, 0, 0.6);
+  --shadow-menu: 0 8px 24px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
+  --bevel-window: 0 0 0 1px var(--shadow), 0 12px 32px rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-look="modern"]:not([data-theme="light"]) {
+    --desktop: #16191e;
+    --face: #1e2229;
+    --hilite: #2a2f37;
+    --light: #262b33;
+    --shadow: #363c45;
+    --dkshadow: #5a626d;
+    --text: #e4e6ea;
+    --title-from: #1e2229;
+    --title-to: #1e2229;
+    --title-text: #e4e6ea;
+    --field: #1a1d23;
+    --select-bg: #3a4350;
+    --select-text: #ffffff;
+    --accent: #c9a961;
+    --primary-bg: #c9a961;
+    --primary-text: #1b1608;
+    --link: #d8bc7a;
+    --mark: #4a3f22;
+    --focus: #c9a961;
+    --muted: #9aa1ab;
+    --good: #7cc492;
+    --bad: #f08a78;
+    --on-bg: #2a2619;
+    --dot-synced: #6fbf86;
+    --dot-busy: #d6b25a;
+    --dot-conflict: #e0905a;
+    --missing: #e0a15a;
+    --dot-offline: #8a929e;
+    --dot-error: #f08a78;
+    --notify: #c9a961;
+    --check-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.2 3.8l1.9 1.9L6.8 2' fill='none' stroke='%23e4e6ea' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    --select-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cpath d='M4.5 6.5L8 10l3.5-3.5' fill='none' stroke='%239aa1ab' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    --backdrop: rgba(0, 0, 0, 0.6);
+    --shadow-menu: 0 8px 24px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
+    --bevel-window: 0 0 0 1px var(--shadow), 0 12px 32px rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+  }
 }
 
 /* ---------- base ---------- */
@@ -255,6 +429,7 @@ body {
   background: var(--face);
   color: var(--text);
   border: 0;
+  border-radius: var(--radius);
   box-shadow: var(--bevel-raised);
 }
 .app-window,
@@ -262,6 +437,7 @@ body {
 dialog {
   background: var(--face);
   color: var(--text);
+  border-radius: var(--radius-window);
   box-shadow: var(--bevel-window);
 }
 /* sunken: fields, the sidebar tree, the preview frame, the clock tray */
@@ -271,7 +447,7 @@ dialog {
 .code-area,
 .checklist,
 .dc-settings select,
-:where(.classic-bar, .sidebar, .editor, .taskbar, dialog)
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog)
   :is(
     input[type="text"],
     input[type="url"],
@@ -313,6 +489,8 @@ dialog {
 .btn.primary {
   /* the default button's extra black frame */
   box-shadow: var(--bevel-default);
+  background: var(--primary-bg);
+  color: var(--primary-text);
   font-weight: 700;
 }
 .btn:active:not(:disabled),
@@ -364,12 +542,12 @@ summary:focus-visible {
   outline: 1px dotted var(--focus);
   outline-offset: -4px;
 }
-:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) a:focus-visible,
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) a:focus-visible,
 .post-frame a:focus-visible {
   outline: 1px dotted var(--focus);
   outline-offset: 1px;
 }
-:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) :is(input, select, textarea):focus,
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) :is(input, select, textarea):focus,
 .dc-settings select:focus,
 .code-area:focus,
 .win-check:focus-visible {
@@ -378,12 +556,12 @@ summary:focus-visible {
 }
 
 /* ---------- fields ---------- */
-:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) :is(button, input, select, textarea),
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) :is(button, input, select, textarea),
 .dc-settings select {
   font: inherit;
   color: inherit;
 }
-:where(.classic-bar, .sidebar, .editor, .taskbar, dialog)
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog)
   :is(
     input[type="text"],
     input[type="url"],
@@ -404,29 +582,29 @@ summary:focus-visible {
   color: var(--text);
   font-size: var(--text-base);
 }
-:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) select:not([multiple]),
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) select:not([multiple]),
 .dc-settings select {
   appearance: none;
   padding-right: 22px;
   background: var(--field) var(--select-img) no-repeat right 2px center;
   cursor: pointer;
 }
-:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) textarea,
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) textarea,
 .code-area {
   resize: vertical;
   line-height: 1.35;
   min-height: 60px;
 }
-:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) :is(input, textarea)::placeholder {
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) :is(input, textarea)::placeholder {
   color: var(--muted);
   opacity: 1;
 }
-:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) :is(input, select, textarea):disabled {
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) :is(input, select, textarea):disabled {
   background-color: var(--face);
   color: var(--shadow);
 }
 
-:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) input[type="checkbox"],
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) input[type="checkbox"],
 .win-check {
   appearance: none;
   flex: none;
@@ -437,7 +615,7 @@ summary:focus-visible {
   box-shadow: var(--bevel-sunken);
   cursor: pointer;
 }
-:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) input[type="checkbox"]:checked,
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) input[type="checkbox"]:checked,
 .win-check:checked {
   background-image: var(--check-img);
 }
@@ -652,10 +830,10 @@ summary:focus-visible {
   margin: 14px 4px 0;
   font-size: var(--text-sm);
 }
-:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) a {
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) a {
   color: var(--link);
 }
-:where(.classic-bar, .sidebar, .editor, .taskbar, dialog) a.btn {
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) a.btn {
   color: var(--text);
 }
 
@@ -902,7 +1080,7 @@ summary:focus-visible {
 }
 .check-row.on {
   background: var(--on-bg);
-  border-left-color: var(--select-bg);
+  border-left-color: var(--accent);
 }
 .check-row.sub {
   padding-left: 30px;
@@ -1548,7 +1726,7 @@ dialog.jump-box {
   border-left: 3px solid var(--shadow);
 }
 .char-list li.current {
-  border-left-color: var(--select-bg);
+  border-left-color: var(--accent);
   border-left-width: 5px;
 }
 .char-list li.muted {
@@ -1683,7 +1861,7 @@ dialog.changelog {
 .jap-note {
   padding: 6px 10px;
   margin-bottom: 10px;
-  border-left: 3px solid var(--select-bg);
+  border-left: 3px solid var(--accent);
 }
 .jap-note p:last-child {
   margin-bottom: 0;
@@ -1920,7 +2098,7 @@ dialog.changelog {
   cursor: pointer;
 }
 .history-item.current {
-  border-left: 5px solid var(--select-bg);
+  border-left: 5px solid var(--accent);
   font-weight: 700;
 }
 .history-preview .post-frame {
@@ -2002,7 +2180,7 @@ dialog.changelog {
   background: var(--field);
 }
 .filing.current {
-  border-left: 5px solid var(--select-bg);
+  border-left: 5px solid var(--accent);
 }
 .filing-main {
   flex: 1 1 200px;

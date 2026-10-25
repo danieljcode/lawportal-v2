@@ -81,6 +81,13 @@ describe("variables (LP-110)", () => {
     expect(bad.map((d) => d.selector)).toEqual([]);
   });
 
+  it("are all a look sets: data-look rules hold only variables, so the layout is the same in both", () => {
+    const css = [GLOBALS, ...PROGRAMS].map(read).join("\n");
+    const lookRules = declarations(css).filter((d) => d.selector.includes("data-look"));
+    expect(lookRules.length).toBeGreaterThan(50);
+    expect(lookRules.filter((d) => !d.prop.startsWith("--") && d.prop !== "color-scheme")).toEqual([]);
+  });
+
   it("include the look tokens, with the 1990 values for now", () => {
     const css = read(GLOBALS);
     for (const t of ["--bevel-raised", "--bevel-sunken", "--radius", "--text-base", "--control-height", "--ui-font"])
