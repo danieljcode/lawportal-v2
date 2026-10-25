@@ -81,7 +81,7 @@ describe("the Court Filings program (LP-105)", () => {
     expect(must("#empty-state").textContent).toContain("Pick a form");
   });
 
-  it("has a Form menu only in Court Filings, with the tools off until a form is open", () => {
+  it("has a Form menu only in Court Filings, with the tools off until a form is open", async () => {
     mount("#cases");
     expect(document.querySelector("#menu-form")).toBeNull();
     act(() => {
@@ -100,7 +100,8 @@ describe("the Court Filings program (LP-105)", () => {
     expect(off("menu-law-library")).toBe(true);
     expect(off("menu-draft-history")).toBe(true);
     expect(off("menu-filing-history")).toBe(false);
-    click("#menu-filing-history");
+    // Filing history loads the first time it opens (LP-133).
+    await act(async () => must("#menu-filing-history").click());
     expect(must<HTMLDialogElement>("#filings-dialog").open).toBe(true);
   });
 

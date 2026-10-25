@@ -2,7 +2,7 @@
 // court phrases and courthouses, and no GTAW wording left in the form data.
 import { describe, expect, it } from "vitest";
 import { ALL_FORMS } from "@/data";
-import { COURTS } from "@/data";
+import { COURTS } from "@/data/form-index";
 import { APPELLATE_COURT, DIVISION_COURTS, GENERAL_COURT, SUPREME_COURT } from "@/lib/courts";
 import { compile, render } from "@/lib/template";
 import { COURT_NAMES, toFreestyle } from "../scripts/freestyle-wording.mjs";

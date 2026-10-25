@@ -13,6 +13,9 @@ export interface FormDef {
   html: string;
 }
 
+/** A form without its template (src/data/form-index.ts): enough to route to it and list it. */
+export type FormInfo = Pick<FormDef, "id" | "court" | "section" | "title">;
+
 export type FieldType =
   "text" | "textarea" | "date" | "number" | "select" | "check" | "spoiler" | "image" | "url" | "list" | "paras";
 
