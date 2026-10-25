@@ -1,7 +1,8 @@
 # Sync, storage and recovery
 
 How sync works end to end, how conflicts are merged, and how damaged saved data is kept rather than
-lost. Sync is optional and runs entirely on the computer that runs the app.
+lost. Sync is optional. On the hosted app (Vercel) the server copy lives in Upstash Redis; when the
+app runs on your own computer, it lives in files on that computer.
 
 ## Sync codes
 
@@ -14,7 +15,7 @@ lost. Sync is optional and runs entirely on the computer that runs the app.
 - **Use code** in another browser fetches that code's data and merges this browser's characters
   into it.
 - **Stop syncing on this device** keeps the local copy. **Delete server copy** (`DELETE
-/api/account`) removes the file; every device using that code stops syncing.
+/api/account`) removes the server copy; every device using that code stops syncing.
 
 ## Server storage
 
@@ -39,20 +40,26 @@ lost. Sync is optional and runs entirely on the computer that runs the app.
   settled, so two requests can't interleave on one file.
 - **Atomic writes.** A write goes to a temp file and is renamed over the real one, retried briefly
   while Windows (antivirus, indexing) holds the target.
-- **Limits.** At most 1,000 sync files (`POST` answers `503` after that), a 1 MB body, and 200
-  characters, 2,000 cases, 500 filings and 500 conflict checks per `PUT`. The app keeps the newest 150 filings, so the
-  history fits.
+- **Limits.** At most 1,000 sync codes (`POST` answers `503` after that), a 1 MB body, and 200
+  characters, 2,000 cases, 500 filings, 500 conflict checks and 1,000 precedents per `PUT`. The app
+  keeps the newest 150 filings, so the history fits the list limit. The 1 MB body is the tighter
+  limit: each filing carries its whole form, so a big filing history can pass it, and then every
+  push gets `413` until data is removed. LP-138 raises it.
 - **Rate limits** (LP-8, `src/lib/server/rateLimit.ts`), answered with `429` and a `Retry-After`:
   - new codes: 5 an hour per IP, and 5 an hour across the whole server;
   - requests with a malformed or unknown code: 30 a minute per IP. Once over, that IP's sync
     requests are all refused until the minute is up, good code or not.
 
-  The counts are kept in memory, so restarting the app clears them. The IP comes from
-  `X-Forwarded-For`, which a client can fake, so the per-IP limits only stop casual abuse; the
-  overall cap is what stops anyone filling the 1,000 files.
+  The counts are kept in the server process's memory, so restarting the app clears them. The IP
+  comes from `X-Forwarded-For`, which a client can fake when the app runs on its own (Vercel sets
+  it from the connection), so the per-IP limits only stop casual abuse; the overall cap is what
+  stops anyone filling the 1,000 codes. **On Vercel the counts are per instance:** the API runs as
+  many short-lived instances, each starting at zero, so there the limits don't add up across the
+  server. LP-137 moves them into Redis.
 
 - **Unused codes expire.** A code that was made but never written to (still `rev` 0) is deleted
-  after 7 days, checked each time a new code is made. Turning sync on uploads straight away, so in
+  after 7 days: by a Redis TTL on the hosted app, and in the file store by a check each time a new
+  code is made. Turning sync on uploads straight away, so in
   practice this only removes codes nobody used.
 - **Optimistic writes.** `PUT /api/data` sends the `rev` it last saw. If the stored `rev` is
   different, another device saved first: the server answers `409` with its copy instead of writing.
