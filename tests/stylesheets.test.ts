@@ -34,7 +34,8 @@ function declarations(css: string): Array<{ selector: string; media: string; pro
   }
   return out;
 }
-const UNTHEMED = /\.post\b|\.dc-(message|frame)|\.boot-|:has\(#/;
+// `.post` itself, not `.post-frame` (the themed frame round the preview).
+const UNTHEMED = /\.post(?![\w-])|\.dc-(message|frame)(?![\w-])|\.boot-|:has\(#/;
 
 describe("program stylesheets (LP-110)", () => {
   it("exist for the programs with their own styles", () => {
@@ -71,6 +72,13 @@ describe("variables (LP-110)", () => {
     const defined = new Set([...sheets.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]));
     const used = new Set([...sheets.matchAll(/var\((--[\w-]+)\s*[,)]/g)].map((m) => m[1]));
     expect([...used].filter((v) => !defined.has(v))).toEqual([]);
+  });
+
+  it("are the only bevels: no box-shadow outside the token definitions spells out the 1990 insets", () => {
+    const bad = declarations(read(GLOBALS)).filter(
+      (d) => d.prop === "box-shadow" && /inset -?\dpx -?\dpx/.test(d.value) && !UNTHEMED.test(d.selector),
+    );
+    expect(bad.map((d) => d.selector)).toEqual([]);
   });
 
   it("include the look tokens, with the 1990 values for now", () => {
