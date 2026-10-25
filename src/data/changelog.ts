@@ -30,6 +30,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         text: "Settings: your characters, sync and backups, the theme and layout, What's new and About, all on one page (it's still the Control Panel in the Classic layout). The top bar now shows just who you're filing as, with a quick switch, and the sync status, which opens Settings. Characters, the theme, What's new and About are also in the File, View and Help menus.",
       },
       {
+        type: "update",
+        text: "A new modern look: a clear system font, more room in buttons and fields, soft corners and muted slate and brass colours, in light and dark. Choosing the Classic (1990) layout in Settings brings back the Windows 3.x look exactly as it was. Forum previews and everything you copy or download are unchanged.",
+      },
+      {
         type: "fix",
         text: "Sync no longer loses an edit made while it's saving, or a change to a ruling in the Law Library that another device changed too: yours is kept, and Restore my version brings it back.",
       },
