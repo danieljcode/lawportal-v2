@@ -39,7 +39,6 @@ import {
   type MissingField,
   type Undoable,
 } from "@/lib/formState";
-import { gameDate } from "@/lib/freestyle";
 import { defaultKV, readJson, writeJson } from "@/lib/storage";
 import { S_DISCLAIMER } from "@/lib/strings";
 import { caseNumberPattern, compile, fields, render } from "@/lib/template";
@@ -182,11 +181,11 @@ export default function FormView({
   draftRequest,
   onTools,
 }: FormViewProps) {
-  // The in-game "now" (FreestyleRP, 36 years back) fed to every date producer: Today, Auto,
-  // prefills and the case-number year. Fixed while the form is open (new Date() on every
-  // render would thrash the ctx memo); opening a form takes the current date again.
+  // The real "now" fed to every date producer: Today, Auto, prefills and the case-number year,
+  // which turn it into game time (New York, 36 years back; LP-135). Fixed while the form is open
+  // (new Date() on every render would thrash the ctx memo); opening a form takes the time again.
   // eslint-disable-next-line react-hooks/exhaustive-deps -- form.id is the signal: a new form takes today's date
-  const now = useMemo(() => gameDate(new Date()), [form.id]);
+  const now = useMemo(() => new Date(), [form.id]);
 
   // `now` also feeds the case-number placeholder/fallback pattern.
   const compiled = useMemo(() => compileForm(form, now), [form, now]);

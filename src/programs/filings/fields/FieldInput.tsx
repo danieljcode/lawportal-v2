@@ -49,7 +49,7 @@ export default function FieldInput({
     onState((s) => {
       const next = setValue(s, path, f.label, v);
       // Dates computed from this one (e.g. a schedule from the judgement) follow it,
-      // using the server-offset `now` so a reflow stays on the active server's year.
+      // using the form's `now`, which the prefills turn into game time.
       return hasDependents(entries, next.values, f.label) ? applyPrefills(entries, next, now) : next;
     }, id);
 

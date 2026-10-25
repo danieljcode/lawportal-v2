@@ -1,12 +1,12 @@
 // Chain of custody for an exhibit (LP-14): who handled it, when and how.
 // Entries are only ever added (a mistake is corrected with a new entry), kept
 // in time order on the exhibit, so they sync and back up with its case. Times
-// are in-game (1990), local, to the minute: "1990-10-20T14:05". The log copies
+// are in-game (1990), New York time, to the minute: "1990-10-20T14:05". The log copies
 // as a list for a filing through the template engine, so every value is
 // escaped like any other filing text. Pure: no storage.
 
-import { formatDay, gameToday } from "./deadlines";
-import { gameDate } from "./freestyle";
+import { formatDay } from "./deadlines";
+import { gameTime } from "./freestyle";
 import { isId, newId } from "./storage";
 import { compile, render } from "./template";
 import type { SafeHtml } from "./safeHtml";
@@ -24,7 +24,7 @@ export const ACTION_LABELS: Record<CustodyAction, string> = {
 
 export interface CustodyEntry {
   id: string;
-  /** In-game local time, YYYY-MM-DDTHH:MM. */
+  /** In-game New York time, YYYY-MM-DDTHH:MM. */
   at: string;
   action: CustodyAction;
   /** Who handled it: the character's name at the time (kept if the character goes). */
@@ -40,12 +40,10 @@ const AT_RE = /^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})$/;
 
 const text = (v: unknown, max: number) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : undefined);
 
-const pad = (n: number) => String(n).padStart(2, "0");
-
-/** Now in the game (1990), to the minute. */
+/** Now in the game (1990), New York time, to the minute. */
 export function gameNow(now: Date = new Date()): string {
-  const d = gameDate(now);
-  return gameToday(now) + "T" + pad(d.getHours()) + ":" + pad(d.getMinutes());
+  const t = gameTime(now);
+  return t.date + "T" + t.time;
 }
 
 /** A real time of day on a real date: no 25:00 or 30 Feb. */

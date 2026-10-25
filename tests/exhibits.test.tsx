@@ -171,7 +171,7 @@ describe("the Evidence area on a case (LP-12)", () => {
     const a = must<HTMLAnchorElement>(".exhibit a");
     expect(a.getAttribute("href")).toBe("https://example.com/dashcam.mp4");
     expect(a.rel).toContain("noopener");
-    expect(must(".exhibit").textContent).toContain("Obtained Thu 18 Oct 1990");
+    expect(must(".exhibit").textContent).toContain("Obtained Sun 18 Oct 1990");
     expect(caseStore().get("case0001")!.exhibits).toHaveLength(2);
   });
 

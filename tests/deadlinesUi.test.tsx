@@ -50,7 +50,7 @@ function submit(sel: string): void {
 beforeEach(() => {
   localStorage.clear();
   vi.useFakeTimers({ toFake: ["Date"] });
-  vi.setSystemTime(new Date(2026, 9, 19, 12, 0)); // in-game Fri 19 Oct 1990
+  vi.setSystemTime(new Date("2026-10-19T16:00:00Z")); // in-game Mon 19 Oct 1990
   vi.stubGlobal("requestAnimationFrame", () => 0);
   vi.stubGlobal("cancelAnimationFrame", () => {});
   vi.spyOn(sync, "init").mockResolvedValue(undefined);
@@ -80,7 +80,7 @@ describe("deadlines on a case (LP-18)", () => {
     expect(caseStore().get("case0001")!.deadlines).toMatchObject([
       { date: "1990-10-25", label: "Response due", note: "From the summons" },
     ]);
-    expect(must("#deadline-list").textContent).toContain("Thu 25 Oct 1990 (in 6 days)");
+    expect(must("#deadline-list").textContent).toContain("Sun 25 Oct 1990 (in 6 days)");
     expect(must<HTMLTextAreaElement>("#case-notes").value).toBe("Not saved yet");
 
     act(() => must<HTMLInputElement>("#deadline-list input[type=checkbox]").click());
@@ -108,7 +108,7 @@ describe("Upcoming and the toolbar dot (LP-18)", () => {
     ]);
     mount("#upcoming");
     expect(must("#upcoming-title").textContent).toBe("Upcoming");
-    expect(must("#upcoming-scope").textContent).toContain("Today is Fri 19 Oct 1990");
+    expect(must("#upcoming-scope").textContent).toContain("Today is Mon 19 Oct 1990");
     expect(must("#upcoming-scope").textContent).toContain("Alice Judge's cases");
     const items = [...document.querySelectorAll(".upcoming-item")];
     expect(items.map((li) => li.querySelector(".upcoming-what strong")!.textContent)).toEqual([
@@ -158,7 +158,7 @@ describe("dates from a form (LP-18)", () => {
     act(() => must("#dates-open").click());
     const boxes = [...document.querySelectorAll<HTMLInputElement>("#dates-panel input[type=checkbox]")];
     const labels = [...document.querySelectorAll("#dates-panel li span")].map((s) => s.textContent);
-    expect(labels).toContain("Judgement · Fri 9 Nov 1990");
+    expect(labels).toContain("Judgement · Mon 9 Nov 1990");
     // The filing date isn't suggested; the computed schedule dates are.
     const filed = labels.findIndex((l) => l!.startsWith("Filing date"));
     expect(boxes[filed].checked).toBe(false);

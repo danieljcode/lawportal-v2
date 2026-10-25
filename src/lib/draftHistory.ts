@@ -9,7 +9,8 @@
 // drafts aren't.
 
 import { toFormState, type FormState } from "./formState";
-import { gameDate } from "./freestyle";
+import { formatDay } from "./deadlines";
+import { gameTime } from "./freestyle";
 import { defaultKV, ISO_TIME_RE, type KV } from "./storage";
 import { createKeyedStore } from "./store";
 import type { Values } from "./types";
@@ -63,17 +64,10 @@ export function filledCount(values: Values): number {
   return n;
 }
 
-const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-/** A snapshot's time on the 1990 calendar: "Fri 19 Oct 1990, 14:05". */
+/** A snapshot's time on the 1990 calendar, New York time: "Sun 25 Oct 1990, 14:05". */
 export function snapshotTime(at: string): string {
-  const d = gameDate(new Date(at));
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return (
-    `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}, ` +
-    `${pad(d.getHours())}:${pad(d.getMinutes())}`
-  );
+  const t = gameTime(new Date(at));
+  return formatDay(t.date) + ", " + t.time;
 }
 
 export interface DraftHistory {
