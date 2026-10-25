@@ -1,8 +1,10 @@
-// Theme: automatic / light / dark (INV §e.6, design §Theme).
+// Theme: automatic / light / dark (INV §e.6, design §Theme), set as html[data-theme].
 //
 // THEME_SCRIPT runs inline in <head> before paint, so a saved choice applies
-// without a flash. The rest is used by the toolbar's theme button. Nothing here
-// touches `window` at import time (layout.tsx imports THEME_SCRIPT on the server).
+// without a flash. It also sets html[data-look] from the saved layout (LP-110):
+// the look (modern or classic) and light/dark are separate attributes, so they
+// combine freely. Nothing here touches `window` at import time (layout.tsx
+// imports THEME_SCRIPT on the server).
 
 import { defaultKV } from "./storage";
 
@@ -10,10 +12,8 @@ export const THEME_KEY = "lawapp_theme";
 
 export type ThemeMode = "auto" | "light" | "dark";
 
-/** Click order of the theme button. */
+/** The choices, in the order Settings and the View menu list them. */
 export const MODES: readonly ThemeMode[] = ["auto", "light", "dark"];
-
-export const ICONS: Readonly<Record<ThemeMode, string>> = { auto: "◐", light: "☀", dark: "☾" };
 
 export const LABELS: Readonly<Record<ThemeMode, string>> = {
   auto: "automatic (follows your system)",
@@ -21,9 +21,9 @@ export const LABELS: Readonly<Record<ThemeMode, string>> = {
   dark: "dark",
 };
 
-/** Inline <head> script: apply a saved light/dark choice before the first paint. */
+/** Inline <head> script: apply a saved light/dark choice and the look before the first paint. */
 export const THEME_SCRIPT =
-  '(function(){try{var t=localStorage.getItem("lawapp_theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}})();';
+  '(function(){var d=document.documentElement;d.dataset.look="modern";try{var t=localStorage.getItem("lawapp_theme");if(t==="light"||t==="dark")d.dataset.theme=t;if(localStorage.getItem("lawapp_shell")==="classic")d.dataset.look="classic"}catch(e){}})();';
 
 function isMode(v: unknown): v is ThemeMode {
   return typeof v === "string" && (MODES as readonly string[]).includes(v);
@@ -54,16 +54,4 @@ export function setTheme(mode: ThemeMode): void {
     // private mode: still switch for this visit
   }
   applyTheme(mode);
-}
-
-/** Step auto → light → dark → auto; returns the new mode. */
-export function cycle(current: ThemeMode = getTheme()): ThemeMode {
-  const next = MODES[(MODES.indexOf(current) + 1) % MODES.length];
-  setTheme(next);
-  return next;
-}
-
-/** The button's title and aria-label. */
-export function themeLabel(mode: ThemeMode): string {
-  return "Theme: " + LABELS[mode] + ". Click to change.";
 }

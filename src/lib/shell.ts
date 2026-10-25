@@ -17,6 +17,11 @@ export function getShell(): ShellMode {
   }
 }
 
+/** The look follows the layout (LP-110), until the Classic theme (LP-112) chooses it: html[data-look]. */
+export function applyLook(mode: ShellMode): void {
+  document.documentElement.dataset.look = mode;
+}
+
 export function setShell(mode: ShellMode): void {
   try {
     if (mode === "classic") defaultKV().set(SHELL_KEY, "classic");

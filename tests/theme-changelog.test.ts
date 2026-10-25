@@ -1,26 +1,28 @@
 // @vitest-environment jsdom
-// Theme toggle (AC 19, INV §e.6) and the changelog unread stamp (AC 18, INV §e.5).
+// The theme (AC 19, INV §e.6), the look (LP-110) and the changelog unread stamp (AC 18, INV §e.5).
 import { beforeEach, describe, expect, it } from "vitest";
 import { CHANGELOG, type ChangelogEntry } from "@/data/changelog";
 import { friendlyDate, isUnread, markSeen, SEEN_KEY, stamp } from "@/lib/changelog";
 import { memoryKV } from "@/lib/storage";
-import { cycle, getTheme, ICONS, setTheme, THEME_KEY, THEME_SCRIPT, themeLabel } from "@/lib/theme";
+import { SHELL_KEY } from "@/lib/shell";
+import { getTheme, setTheme, THEME_KEY, THEME_SCRIPT } from "@/lib/theme";
 
 beforeEach(() => {
   localStorage.clear();
   document.documentElement.removeAttribute("data-theme");
+  document.documentElement.removeAttribute("data-look");
 });
 
 describe("theme", () => {
-  it("cycles auto → light → dark → auto and persists each step", () => {
+  it("saves and applies each choice; auto leaves the system to decide", () => {
     expect(getTheme()).toBe("auto");
-    expect(cycle()).toBe("light");
+    setTheme("light");
     expect(localStorage.getItem(THEME_KEY)).toBe("light");
     expect(document.documentElement.dataset.theme).toBe("light");
-    expect(cycle()).toBe("dark");
+    setTheme("dark");
     expect(getTheme()).toBe("dark");
     expect(document.documentElement.dataset.theme).toBe("dark");
-    expect(cycle()).toBe("auto");
+    setTheme("auto");
     expect(localStorage.getItem(THEME_KEY)).toBe("auto");
     expect(document.documentElement.hasAttribute("data-theme")).toBe(false);
   });
@@ -28,13 +30,6 @@ describe("theme", () => {
   it("reads an unknown saved value as auto", () => {
     localStorage.setItem(THEME_KEY, "neon");
     expect(getTheme()).toBe("auto");
-  });
-
-  it("labels the button with the reference wording", () => {
-    expect(themeLabel("auto")).toBe("Theme: automatic (follows your system). Click to change.");
-    expect(themeLabel("light")).toBe("Theme: light. Click to change.");
-    expect(themeLabel("dark")).toBe("Theme: dark. Click to change.");
-    expect([ICONS.auto, ICONS.light, ICONS.dark]).toEqual(["◐", "☀", "☾"]);
   });
 
   it("THEME_SCRIPT applies a saved light/dark choice and ignores anything else", () => {
@@ -47,6 +42,16 @@ describe("theme", () => {
     localStorage.setItem(THEME_KEY, "auto");
     new Function(THEME_SCRIPT)();
     expect(document.documentElement.hasAttribute("data-theme")).toBe(false);
+  });
+
+  it("THEME_SCRIPT sets the look from the saved layout, apart from light/dark (LP-110)", () => {
+    new Function(THEME_SCRIPT)();
+    expect(document.documentElement.dataset.look).toBe("modern");
+    localStorage.setItem(SHELL_KEY, "classic");
+    setTheme("dark");
+    new Function(THEME_SCRIPT)();
+    expect(document.documentElement.dataset.look).toBe("classic");
+    expect(document.documentElement.dataset.theme).toBe("dark");
   });
 });
 
