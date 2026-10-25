@@ -253,11 +253,13 @@ export function isId(id: unknown): id is string {
   return typeof id === "string" && ID_RE.test(id);
 }
 
-/** A fresh id: base-36 time plus 4 random base-36 chars. */
+/**
+ * A fresh id: base-36 time plus 12 random base-36 chars (LP-157). Many ids are made in one
+ * millisecond (cleaning a synced or imported list), and the stores drop a repeated id.
+ */
 export function newId(): string {
-  let rand = "";
-  while (rand.length < 4) rand += Math.random().toString(36).slice(2);
-  return Date.now().toString(36) + rand.slice(0, 4);
+  const bytes = crypto.getRandomValues(new Uint8Array(12));
+  return Date.now().toString(36) + Array.from(bytes, (b) => (b % 36).toString(36)).join("");
 }
 
 /** ISO timestamp as produced by Date#toISOString. */
