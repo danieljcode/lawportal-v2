@@ -145,6 +145,14 @@ The programs are the same in both.
 | `scripts/`        | The npm scripts' code: form porting, the penal code import, smoke checks, release notes, hooks.                                                                                             |
 | `docs/`           | Developer documentation.                                                                                                                                                                    |
 
+### First-load budget
+
+Each program's code loads the first time it's opened (and when the browser is idle), so the home screen
+downloads only the shell. **The home screen's first load may download at most 950 KiB of JavaScript**
+(uncompressed). A smoke test in `e2e/smoke.spec.ts` measures it on the production build and fails CI above
+that. At LP-122 it was 892 KiB, down from 1,078 KiB; React and Next.js are about 460 KiB of it. Raise the budget
+only on purpose, in the same pull request as the change that needs it.
+
 ## Contributing
 
 Work is planned in Jira, project **LP**: [freestylelawportal.atlassian.net](https://freestylelawportal.atlassian.net/jira/software/projects/LP/boards/1).

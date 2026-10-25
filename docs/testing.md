@@ -90,7 +90,8 @@ a real Chromium, at **desktop** (1440×900) and **phone** (Pixel 7) sizes, each 
 - **Copy for forum**: the clipboard holds the filing as HTML;
 - **Download .docx**: a real Word file (a zip) downloads;
 - add a character, and it appears in "Filing as";
-- add a case to a judge's docket.
+- add a case to a judge's docket;
+- the home screen's first load stays within the JavaScript budget (README, "First-load budget").
 
 The suite takes a few seconds. It needs Chromium once: `npx playwright install chromium`. The
 server gets a throwaway sync directory (`test-results/sync`). A failing test keeps a screenshot and
