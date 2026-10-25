@@ -34,16 +34,16 @@ export function S_SYNC_APPLY_FAIL(n: number): string {
 
 export const S_SYNC_MERGED = "Merged your changes with another device's.";
 
-/** "1 character", "2 cases", "1 character and 3 cases". */
-export function S_LOST_ITEMS(characters: number, cases: number): string {
+/** "1 character", "2 cases", "1 character and 3 cases", "1 ruling" (a precedent, LP-132). */
+export function S_LOST_ITEMS(characters: number, cases: number, rulings = 0): string {
   const part = (n: number, one: string) => (n ? n + " " + one + (n === 1 ? "" : "s") : "");
-  return [part(characters, "character"), part(cases, "case")].filter(Boolean).join(" and ");
+  return [part(characters, "character"), part(cases, "case"), part(rulings, "ruling")].filter(Boolean).join(" and ");
 }
 
 /** After a merge where another device's newer copy replaced this browser's edits. */
-export function S_SYNC_LOST(n: number, cases = 0): string {
-  if (cases) {
-    return `Another device changed ${S_LOST_ITEMS(n, cases)} more recently, so its versions are shown. Yours are kept: use Restore my version to bring them back.`;
+export function S_SYNC_LOST(n: number, cases = 0, rulings = 0): string {
+  if (cases || rulings) {
+    return `Another device changed ${S_LOST_ITEMS(n, cases, rulings)} more recently, so its versions are shown. Yours are kept: use Restore my version to bring them back.`;
   }
   return n === 1
     ? "Another device changed the same character more recently, so its version is shown. Your version is kept: use Restore my version to bring it back."
