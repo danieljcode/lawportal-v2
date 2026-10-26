@@ -1,13 +1,13 @@
 // @vitest-environment jsdom
 // The modern shell (LP-125): the default layout, with an app rail and a top bar
-// round the same programs; the Windows 3.x Classic layout kept behind a setting
-// (until the Classic theme, LP-112); every program in both; routes unchanged.
+// round the same programs; the Windows 3.x Classic layout comes with the Classic
+// theme (LP-112); every program in both; routes unchanged.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import App from "@/shell/App";
 import { characterStore } from "@/lib/characters";
-import { getShell, setShell, SHELL_KEY } from "@/lib/shell";
+import { getShell, READABLE_FONT_KEY, setShell, SHELL_KEY } from "@/lib/shell";
 import * as sync from "@/lib/sync";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -47,8 +47,11 @@ const click = (sel: string) => act(() => must(sel).click());
 const title = () => must("#m-title").textContent;
 const railNames = () => [...document.querySelectorAll(".m-rail .m-rail-label")].map((l) => l.textContent);
 
-describe("the layout setting", () => {
-  beforeEach(() => localStorage.clear());
+describe("the theme setting (LP-112)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    delete document.documentElement.dataset.font;
+  });
 
   it("is modern unless Classic was chosen", () => {
     expect(getShell()).toBe("modern");
@@ -193,7 +196,7 @@ describe("the modern shell (LP-125)", () => {
     expect(must(".taskbar")).toBeTruthy();
     expect(document.querySelector(".m-app")).toBeNull();
     expect(getShell()).toBe("classic");
-    // The look follows the layout until the Classic theme (LP-110, LP-112).
+    // The theme sets the look too (LP-110, LP-112).
     expect(document.documentElement.dataset.look).toBe("classic");
     // Back from the View menu.
     click("#menu-view");
@@ -202,5 +205,23 @@ describe("the modern shell (LP-125)", () => {
     expect(must(".m-app")).toBeTruthy();
     expect(getShell()).toBe("modern");
     expect(document.documentElement.dataset.look).toBe("modern");
+  });
+
+  it("offers the startup screen and the readable font only in Classic", () => {
+    mount("#control");
+    expect(document.querySelector("#boot-setting")).toBeNull();
+    expect(document.querySelector("#readable-font-setting")).toBeNull();
+    unmount();
+    setShell("classic");
+    mount("#control");
+    expect(must("#boot-setting")).toBeTruthy();
+    const box = must<HTMLInputElement>("#readable-font-setting");
+    expect(box.checked).toBe(false);
+    act(() => box.click());
+    expect(localStorage.getItem(READABLE_FONT_KEY)).toBe("1");
+    expect(document.documentElement.dataset.font).toBe("readable");
+    act(() => box.click());
+    expect(localStorage.getItem(READABLE_FONT_KEY)).toBeNull();
+    expect(document.documentElement.hasAttribute("data-font")).toBe(false);
   });
 });

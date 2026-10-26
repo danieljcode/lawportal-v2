@@ -4,13 +4,14 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { CHANGELOG, type ChangelogEntry } from "@/data/changelog";
 import { friendlyDate, isUnread, markSeen, SEEN_KEY, stamp } from "@/lib/changelog";
 import { memoryKV } from "@/lib/storage";
-import { SHELL_KEY } from "@/lib/shell";
+import { READABLE_FONT_KEY, SHELL_KEY } from "@/lib/shell";
 import { getTheme, setTheme, THEME_KEY, THEME_SCRIPT } from "@/lib/theme";
 
 beforeEach(() => {
   localStorage.clear();
   document.documentElement.removeAttribute("data-theme");
   document.documentElement.removeAttribute("data-look");
+  document.documentElement.removeAttribute("data-font");
 });
 
 describe("theme", () => {
@@ -44,7 +45,7 @@ describe("theme", () => {
     expect(document.documentElement.hasAttribute("data-theme")).toBe(false);
   });
 
-  it("THEME_SCRIPT sets the look from the saved layout, apart from light/dark (LP-110)", () => {
+  it("THEME_SCRIPT sets the look from the saved theme, apart from light/dark (LP-110, LP-112)", () => {
     new Function(THEME_SCRIPT)();
     expect(document.documentElement.dataset.look).toBe("modern");
     localStorage.setItem(SHELL_KEY, "classic");
@@ -53,13 +54,21 @@ describe("theme", () => {
     expect(document.documentElement.dataset.look).toBe("classic");
     expect(document.documentElement.dataset.theme).toBe("dark");
   });
+
+  it("THEME_SCRIPT applies Classic's readable font only when ticked (LP-112)", () => {
+    new Function(THEME_SCRIPT)();
+    expect(document.documentElement.hasAttribute("data-font")).toBe(false);
+    localStorage.setItem(READABLE_FONT_KEY, "1");
+    new Function(THEME_SCRIPT)();
+    expect(document.documentElement.dataset.font).toBe("readable");
+  });
 });
 
 describe("changelog", () => {
   const added: ChangelogEntry[] = [{ date: "2026-12-01", items: [{ type: "fix", text: "A fix." }] }, ...CHANGELOG];
 
   it("stamps the newest entry and the entry count", () => {
-    expect(stamp()).toBe("2026-10-25|Jump to any program or form|10|42");
+    expect(stamp()).toBe("2026-10-26|The Classic (1990) theme|1|43");
     expect(stamp([])).toBe("");
   });
 
