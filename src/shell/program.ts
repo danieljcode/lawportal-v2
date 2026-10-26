@@ -41,9 +41,10 @@ export interface Shell {
   openDockets(charId: string): void;
   /** Settings showed What's new: clear its unread dot. */
   markChangelogSeen(): void;
+  /** Light, dark or system, separate from the theme. */
   theme: ThemeMode;
   setTheme(mode: ThemeMode): void;
-  /** The frame round the programs (LP-125): modern or Classic, until the Classic theme (LP-112). */
+  /** The theme (LP-112): Modern or Classic, which picks the frame round the programs (LP-125) and the look. */
   layout: ShellMode;
   setLayout(mode: ShellMode): void;
   /** This program is the one showing; false while it's kept, hidden, for coming back to (LP-126). */
