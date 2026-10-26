@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { BRANDING, iconHref, titleScript } from "@/branding";
 import { THEME_SCRIPT } from "@/lib/theme";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 // The favicon comes from the firm's branding (LP-22): its logo when it has one, otherwise a
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: titleScript() }} />
       </head>
       <body>{children}</body>
+      <Analytics />
     </html>
   );
 }
