@@ -190,6 +190,10 @@
   --primary-bg: var(--face);
   --primary-text: var(--text);
 }
+/* Classic's "Use a readable font" (LP-112): the modern system font, in Classic's sizes. */
+:root[data-look="classic"][data-font="readable"] {
+  --ui-font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+}
 
 /* ---------- the modern look (LP-110): slate and brass ---------- */
 /* The default look. It sets the same variables as the 1990 values above, so the layout and every
@@ -2431,6 +2435,7 @@ dialog.changelog {
   display: flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
 }
 
 @media (max-width: 760px) {
