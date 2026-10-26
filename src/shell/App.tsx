@@ -86,7 +86,7 @@ export default function App() {
     saveTheme(mode);
     setThemeState(mode);
   };
-  /** The frame round the programs (LP-125): modern unless Classic was chosen. */
+  /** The theme (LP-112), which picks the frame round the programs (LP-125): modern unless Classic was chosen. */
   const [layout, setLayoutState] = useState<ShellMode>(getShell);
   const setLayout = (mode: ShellMode) => {
     setShell(mode);
@@ -349,19 +349,19 @@ export default function App() {
     {
       label: "View",
       items: [
-        ...MODES.map((m): MenuItem => ({
-          label: "Theme: " + LABELS[m].replace(/ \(.*/, ""),
-          id: "menu-theme-" + m,
-          checked: theme === m,
-          onSelect: () => setTheme(m),
-        })),
-        "-",
         {
-          label: "Classic (1990) layout",
+          label: "Classic (1990) theme",
           id: "menu-classic",
           checked: layout === "classic",
           onSelect: () => setLayout(layout === "classic" ? "modern" : "classic"),
         },
+        "-",
+        ...MODES.map((m): MenuItem => ({
+          label: LABELS[m],
+          id: "menu-theme-" + m,
+          checked: theme === m,
+          onSelect: () => setTheme(m),
+        })),
         { label: layout === "classic" ? CONTROL_TITLE : SETTINGS_TITLE, href: "#control" },
         "-",
         { label: "Jump to… (" + jumpShortcut() + ")", id: "menu-jump", onSelect: openJump },

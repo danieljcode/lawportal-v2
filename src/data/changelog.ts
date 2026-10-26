@@ -18,6 +18,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-10-26",
+    title: "The Classic (1990) theme",
+    items: [
+      {
+        type: "new",
+        text: "Settings → Appearance now has a Theme, Modern or Classic (1990), and a separate Light, Dark or System choice, so any pair works. Classic is the Windows 3.x office computer: the window and taskbar, the Program Manager, the Control Panel and the startup screen, with an optional readable font. Modern stays the default, and forms, previews and everything you copy are the same in both.",
+      },
+    ],
+  },
+  {
     date: "2026-10-25",
     title: "Jump to any program or form",
     items: [

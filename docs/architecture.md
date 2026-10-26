@@ -37,8 +37,8 @@ browser.
   in Settings (the Control Panel in Classic).
 - **Two layouts round the programs** (LP-125). `App.tsx` builds the program, its menus, the set-aside
   notice and the dialogs once, then draws one of two frames, picked by `lawapp_shell`
-  (`src/lib/shell.ts`; a temporary setting in Settings and the View menu until the Classic
-  theme, LP-112). **Modern** (the default, `ModernFrame.tsx`): an app rail (Home and each visible
+  (`src/lib/shell.ts`), the **theme** (LP-112: Settings → Appearance and the View menu).
+  **Modern** (the default, `ModernFrame.tsx`): an app rail (Home and each visible
   program; a bottom bar at phone width) and a top bar (the program or page name, the `MenuBar`, Dockets for a character who keeps one, the
   active character and the sync status, `SyncDot.tsx`, which links to Settings; LP-109). Characters,
   the theme, What's new and About are in the menus and Settings, and What's new's unread dot is on
@@ -106,7 +106,8 @@ browser.
   in section order or by title (`sortCharges`; a search ranks its matches instead). The J.A.P. is
   single-pane. **Settings** (`ControlPanelProgram.tsx`, LP-109; titled "Control Panel" in Classic,
   the registry's `classicTitle`) is one page of sections: Characters and Sync (the Characters
-  dialog's body, `CharactersBody`, and `SyncPanel`), Appearance (theme, layout, startup screen),
+  dialog's body, `CharactersBody`, and `SyncPanel`), Appearance (the theme, Modern or Classic
+  (1990); light, dark or system; and, in Classic only, the readable font and the startup screen),
   What's new (`ChangelogList`) and About (`AboutContent`). Seeing it marks What's new read. Its
   dialog-backed sections are drawn only while it shows, so a dialog another program opens never
   doubles their ids, and in Settings the File and Help menu items scroll to the section instead.
@@ -172,9 +173,10 @@ Lint (`eslint.config.mjs`, tested by `tests/import-rules.test.ts`) keeps the fol
   clients, library), imported by its `index.ts`, so they load with its code. A rule goes in a
   program's stylesheet only if nothing outside that program uses its classes; anything two programs
   share stays in `globals.css`.
-- **Looks and themes** (LP-110). `html[data-look]` (modern or classic; it follows the layout until the
-  Classic theme, LP-112) and `html[data-theme]` (light, dark, or absent for automatic) are separate,
-  both set before the first paint by `THEME_SCRIPT`. Everything that changes between looks is a
+- **Looks and themes** (LP-110, LP-112). `html[data-look]` (modern or classic, from the theme,
+  `lawapp_shell`) and `html[data-theme]` (light, dark, or absent for system) are separate, both set
+  before the first paint by `THEME_SCRIPT`, as is `html[data-font="readable"]`, Classic's "Use a
+  readable font" (`lawapp_readable_font`), which swaps only `--ui-font` for the modern one. Everything that changes between looks is a
   variable in `globals.css`: the colours, the bevels (`--bevel-raised`, `--bevel-sunken`…), the type
   scale (`--text-sm`…`--text-6xl`), radii and control sizes. A program's stylesheet uses only these;
   `tests/stylesheets.test.ts` fails on a hard-coded colour, font, font size, radius or bevel there,

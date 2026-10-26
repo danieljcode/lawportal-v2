@@ -7,7 +7,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { BRANDING } from "@/branding";
 import { bootEnabled, setBootEnabled } from "@/lib/boot";
-import type { ShellMode } from "@/lib/shell";
+import { getReadableFont, setReadableFont, type ShellMode } from "@/lib/shell";
 import { LABELS, type ThemeMode, MODES } from "@/lib/theme";
 import { AboutContent } from "@/shell/AboutDialog";
 import { ChangelogList } from "@/shell/ChangelogDialog";
@@ -27,6 +27,7 @@ function Section({ id, title, children }: { id: string; title: string; children:
 
 export default function ControlPanelProgram({ shell }: ProgramProps) {
   const [boot, setBoot] = useState(bootEnabled);
+  const [readable, setReadable] = useState(getReadableFont);
   const { visible, markChangelogSeen } = shell;
   // What's new is on the page, so seeing Settings reads it.
   useEffect(() => {
@@ -63,47 +64,65 @@ export default function ControlPanelProgram({ shell }: ProgramProps) {
               <label className="control-theme">
                 <span>Theme</span>
                 <select
+                  id="control-shell"
+                  value={shell.layout}
+                  onChange={(e) => shell.setLayout(e.target.value as ShellMode)}
+                >
+                  <option value="modern">Modern</option>
+                  <option value="classic">Classic (1990)</option>
+                </select>
+              </label>
+            </li>
+            <li>
+              <label className="control-theme">
+                <span>Light or dark</span>
+                <select
                   id="control-theme"
                   value={shell.theme}
                   onChange={(e) => shell.setTheme(e.target.value as ThemeMode)}
                 >
                   {MODES.map((m) => (
                     <option key={m} value={m}>
-                      {LABELS[m][0].toUpperCase() + LABELS[m].slice(1)}
+                      {LABELS[m]}
                     </option>
                   ))}
                 </select>
               </label>
             </li>
-            <li>
-              {/* Modern or Classic layout (LP-125), until the Classic theme (LP-112) replaces this. */}
-              <label className="control-theme">
-                <span>Layout</span>
-                <select
-                  id="control-shell"
-                  value={shell.layout}
-                  onChange={(e) => shell.setLayout(e.target.value as ShellMode)}
-                >
-                  <option value="modern">Modern</option>
-                  <option value="classic">Classic (1990): window, taskbar and startup screen</option>
-                </select>
-              </label>
-            </li>
-            <li>
-              {/* The startup screen (LP-21); it was on the start page until the Program Manager (LP-104). */}
-              <label className="check boot-setting">
-                <input
-                  type="checkbox"
-                  id="boot-setting"
-                  checked={boot}
-                  onChange={(e) => {
-                    setBootEnabled(e.target.checked);
-                    setBoot(e.target.checked);
-                  }}
-                />
-                <span>Show the startup screen when the office system starts (once per browser session)</span>
-              </label>
-            </li>
+            {/* Classic's own options (LP-112); Modern has no startup screen to turn off. */}
+            {shell.layout === "classic" && (
+              <li>
+                <label className="check">
+                  <input
+                    type="checkbox"
+                    id="readable-font-setting"
+                    checked={readable}
+                    onChange={(e) => {
+                      setReadableFont(e.target.checked);
+                      setReadable(e.target.checked);
+                    }}
+                  />
+                  <span>Use a readable font</span>
+                </label>
+              </li>
+            )}
+            {shell.layout === "classic" && (
+              <li>
+                {/* The startup screen (LP-21); it was on the start page until the Program Manager (LP-104). */}
+                <label className="check boot-setting">
+                  <input
+                    type="checkbox"
+                    id="boot-setting"
+                    checked={boot}
+                    onChange={(e) => {
+                      setBootEnabled(e.target.checked);
+                      setBoot(e.target.checked);
+                    }}
+                  />
+                  <span>Show the startup screen when the office system starts (once per browser session)</span>
+                </label>
+              </li>
+            )}
           </ul>
         </Section>
         {visible && (
