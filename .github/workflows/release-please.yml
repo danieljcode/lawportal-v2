@@ -41,6 +41,17 @@ jobs:
             git commit --amend --no-edit --all
             git push --force-with-lease
           fi
+      # The Release PR's description holds the same notes, and release-please writes the GitHub Release
+      # from it on merge.
+      - name: Tidy the Release PR's description
+        if: steps.release.outputs.pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ fromJSON(steps.release.outputs.pr).number }}
+        run: |
+          gh pr view "$PR" --json body --jq .body > body.md
+          node scripts/tidy-changelog.mjs body.md
+          gh pr edit "$PR" --body-file body.md
 
       # …and in the GitHub Release's notes once it's published.
       - name: Check out the release
