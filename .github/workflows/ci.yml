@@ -7,6 +7,11 @@ on:
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
+    # Playwright's Linux image, with Chromium and its fonts, so the screenshot tests (LP-117) render the
+    # same every run. Keep the tag at the @playwright/test version in package.json.
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
     env:
       # Read-only token for the private reference repo (docs/templates-and-forms.md, Reference data).
       REFERENCE_TOKEN: ${{ secrets.REFERENCE_TOKEN }}
@@ -44,11 +49,11 @@ jobs:
           LAWAPP_REQUIRE_REFERENCE: ${{ env.REFERENCE_TOKEN != '' && '1' || '' }}
       - run: npm run build
 
-      # Real-browser smoke tests of the key journeys, at desktop and phone widths (LP-6).
-      - name: Install Chromium for the end-to-end tests
-        run: npx playwright install --with-deps chromium
-      - name: End-to-end smoke tests
+      # Real-browser smoke tests of the key journeys, at desktop and phone widths (LP-6), and the
+      # screenshot comparisons (LP-117). Chromium comes with the container image.
+      - name: End-to-end smoke and screenshot tests
         run: npm run test:e2e
+      # A failed screenshot comparison leaves its expected, actual and diff images here.
       - name: Upload screenshots and traces of failed end-to-end tests
         if: failure()
         uses: actions/upload-artifact@v7
