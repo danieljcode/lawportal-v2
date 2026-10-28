@@ -69,8 +69,12 @@ using the [reference data](templates-and-forms.md#reference-data) in `.agents/re
 2. `npm ci`, then `npm audit --omit=dev --audit-level=high` (see [Dependencies](dependencies.md)),
    `npm run lint` and `npm run format:check` (see [Development](development.md#code-style-and-editor-set-up)),
    `npm test` (with `LAWAPP_REQUIRE_REFERENCE=1` when the data was checked out) and `npm run build`.
-3. The [end-to-end smoke tests](#end-to-end-smoke-tests-lp-6) against that build. If any fail, their
-   screenshots and traces are uploaded as the `e2e-failures` artefact on the run.
+3. The [end-to-end smoke tests](#end-to-end-smoke-tests-lp-6) and [screenshot tests](#screenshot-tests-lp-117)
+   against that build. If any fail, their screenshots and traces (and a screenshot test's expected,
+   actual and diff images) are uploaded as the `e2e-failures` artefact on the run.
+
+The job runs in Playwright's Linux image (`mcr.microsoft.com/playwright`), which brings Chromium and
+its fonts. Keep its tag at the `@playwright/test` version in `package.json` when that's updated.
 
 A second workflow, **Conventions** (`.github/workflows/conventions.yml`), runs on pull requests and
 checks every commit message and the PR title against the commit format (LP-84). It's covered by
@@ -99,6 +103,21 @@ The suite takes a few seconds. It needs Chromium once: `npx playwright install c
 server gets a throwaway sync directory (`test-results/sync`). A failing test keeps a screenshot and
 a trace in `test-results/`; open a trace with `npx playwright show-trace <path>/trace.zip`. Locally,
 an app already running on port 3210 is reused, without building, so stop it first if it's out of date.
+
+## Screenshot tests (LP-117)
+
+`e2e/visual.spec.ts` screenshots the home screen and each program's start page in the Modern and
+Classic layouts, light and dark, at both sizes, and compares them with the approved screenshots in
+`e2e/screenshots/`. The clock is frozen, new ids come out the same, and the storage is seeded with
+one character and one case, so a screenshot only changes when the layout does.
+
+Fonts render differently on each system, so the tests only run on Linux, where CI runs them in
+Playwright's image; on Windows and macOS they skip. To change the approved screenshots on purpose:
+
+1. Push the change. CI fails the screenshots that differ (or are new) and uploads the new ones.
+2. Check the diff images in the run's `e2e-failures` artefact.
+3. `npm run screenshots:accept` (needs the GitHub CLI, `gh`) copies them from the branch's latest
+   failed run into `e2e/screenshots/`; pass a run id to pick another run. Commit them.
 
 ## Playwright scripts
 

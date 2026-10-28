@@ -12,6 +12,9 @@ export default defineConfig({
   testDir: "e2e",
   timeout: 30_000,
   expect: { timeout: 10_000 },
+  // e2e/visual.spec.ts (LP-117): one flat folder, named by project, layout, theme and view. No platform
+  // suffix, as only CI's Linux image compares.
+  snapshotPathTemplate: "{testDir}/screenshots/{arg}{ext}",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
