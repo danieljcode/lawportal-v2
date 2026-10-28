@@ -17,6 +17,8 @@ jobs:
       REFERENCE_TOKEN: ${{ secrets.REFERENCE_TOKEN }}
     steps:
       - uses: actions/checkout@v7
+      # The container runs as root over files the runner owns; checkout trusts them only for its own step.
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       # The parity tests need it; without the secret (forks) they skip with a note.
       - name: Check out reference data
