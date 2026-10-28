@@ -6,6 +6,8 @@
 import { expect, test } from "@playwright/test";
 
 test.skip(process.platform !== "linux", "screenshots are compared in CI's Playwright Linux image");
+// The phone's fractional pixel ratio (Pixel 7, 2.625) smooths text differently from run to run.
+test.use({ deviceScaleFactor: 1 });
 
 /** The frozen moment: 19 October 2026, noon in New York (game date 1990). */
 const NOW = new Date("2026-10-19T16:00:00Z");
