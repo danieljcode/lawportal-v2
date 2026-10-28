@@ -21,17 +21,18 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
-      # release-please only links GitHub issues, so link the Jira keys: in the Release PR's CHANGELOG.md
-      # (folded into its one commit, which release-please replaces on its next run anyway)…
+      # Tidy what release-please writes (scripts/tidy-changelog.mjs: repeats dropped, Jira keys linked):
+      # in the Release PR's CHANGELOG.md, folded into its one commit (release-please replaces it on its
+      # next run anyway)…
       - name: Check out the Release PR
         if: steps.release.outputs.pr
         uses: actions/checkout@v7
         with:
           ref: ${{ fromJSON(steps.release.outputs.pr).headBranchName }}
-      - name: Link the Jira keys in CHANGELOG.md
+      - name: Tidy CHANGELOG.md
         if: steps.release.outputs.pr
         run: |
-          node scripts/link-jira.mjs CHANGELOG.md
+          node scripts/tidy-changelog.mjs CHANGELOG.md
           if ! git diff --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -43,12 +44,12 @@ jobs:
       - name: Check out the release
         if: steps.release.outputs.release_created
         uses: actions/checkout@v7
-      - name: Link the Jira keys in the release notes
+      - name: Tidy the release notes
         if: steps.release.outputs.release_created
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.release.outputs.tag_name }}
         run: |
           gh release view "$TAG" --json body --jq .body > notes.md
-          node scripts/link-jira.mjs notes.md
+          node scripts/tidy-changelog.mjs notes.md
           gh release edit "$TAG" --notes-file notes.md
