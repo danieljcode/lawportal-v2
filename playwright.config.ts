@@ -16,6 +16,8 @@ export default defineConfig({
   // suffix, as only CI's Linux image compares.
   snapshotPathTemplate: "{testDir}/screenshots/{arg}{ext}",
   fullyParallel: true,
+  // CI's runner has 2 cores, where Playwright's default is 1 worker; 2 keep the axe check (LP-118) quick.
+  workers: process.env.CI ? 2 : undefined,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["list"], ["github"]] : "list",

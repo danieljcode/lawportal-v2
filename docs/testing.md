@@ -69,9 +69,10 @@ using the [reference data](templates-and-forms.md#reference-data) in `.agents/re
 2. `npm ci`, then `npm audit --omit=dev --audit-level=high` (see [Dependencies](dependencies.md)),
    `npm run lint` and `npm run format:check` (see [Development](development.md#code-style-and-editor-set-up)),
    `npm test` (with `LAWAPP_REQUIRE_REFERENCE=1` when the data was checked out) and `npm run build`.
-3. The [end-to-end smoke tests](#end-to-end-smoke-tests-lp-6) and [screenshot tests](#screenshot-tests-lp-117)
-   against that build. If any fail, their screenshots and traces (and a screenshot test's expected,
-   actual and diff images) are uploaded as the `e2e-failures` artefact on the run.
+3. The [end-to-end smoke tests](#end-to-end-smoke-tests-lp-6), [screenshot tests](#screenshot-tests-lp-117)
+   and [accessibility check](#accessibility-check-lp-118) against that build. If any fail, their
+   screenshots and traces (and a screenshot test's expected, actual and diff images) are
+   uploaded as the `e2e-failures` artefact on the run.
 
 The job runs in Playwright's Linux image (`mcr.microsoft.com/playwright`), which brings Chromium and
 its fonts. Keep its tag at the `@playwright/test` version in `package.json` when that's updated.
@@ -104,12 +105,26 @@ server gets a throwaway sync directory (`test-results/sync`). A failing test kee
 a trace in `test-results/`; open a trace with `npx playwright show-trace <path>/trace.zip`. Locally,
 an app already running on port 3210 is reused, without building, so stop it first if it's out of date.
 
+## Accessibility check (LP-118)
+
+`e2e/a11y.spec.ts` runs [axe](https://github.com/dequelabs/axe-core) (`@axe-core/playwright`) on the
+same screens as the screenshot tests: the home screen and each program's start page, Modern and
+Classic, light and dark, at both sizes. It runs everywhere `npm run test:e2e` does.
+
+- **Serious and critical** issues fail the test, listed with the elements they're on.
+- **Minor and moderate** ones are printed in the test output but don't fail.
+- A known issue that can't be fixed straight away goes in `ALLOWED` at the top of the spec: the axe
+  rule id, with the Jira key of the issue that fixes it.
+
+It's an automatic first pass; the full manual review is LP-29.
+
 ## Screenshot tests (LP-117)
 
 `e2e/visual.spec.ts` screenshots the home screen and each program's start page in the Modern and
 Classic layouts, light and dark, at both sizes, and compares them with the approved screenshots in
-`e2e/screenshots/`. The clock is frozen, new ids come out the same, and the storage is seeded with
-one character and one case, so a screenshot only changes when the layout does.
+`e2e/screenshots/`. The screens are opened by `e2e/views.ts`: the clock is frozen, new ids come out
+the same, and the storage is seeded with one character and one case, so a screenshot only changes
+when the layout does.
 
 Fonts render differently on each system, so the tests only run on Linux, where CI runs them in
 Playwright's image; on Windows and macOS they skip. To change the approved screenshots on purpose:
