@@ -12,7 +12,9 @@ it so each change can be traced back to its issue.
 - **Branch:** starts with the key, then a short description: `LP-64-merge-sync-conflicts`
 - **Commit:** `<type>(<area>): <summary> [LP-<n>]`, for example
   `fix(sync): merge conflicts per character [LP-64]`
-  - type: `feat`, `fix`, `refactor`, `test`, `docs`, `ci`, `chore`, `style` or `perf`
+  - type: `feat`, `fix`, `refactor`, `test`, `docs`, `ci`, `chore`, `style` or `perf`. The type
+    decides where the commit lands in `CHANGELOG.md` (LP-116): `feat`, `fix`, `perf` and `docs` are
+    listed there, the rest are left out. See [Releasing](releasing.md).
   - area: the issue's area label (see Labels)
   - summary: imperative ("add", not "added"), lowercase, no full stop; the whole line is at most
     72 characters, including the key
@@ -37,7 +39,8 @@ reviews and merges.
   How it was tested and the Definition of Done.
 - Allowed as they are: GitHub's `Merge pull request …` commits, `Revert "…"` commits, local
   `fixup!`/`squash!` commits, and dependency updates (`chore(deps): …`, `chore(deps-dev): …`,
-  `ci(deps): …`), which have no Jira key.
+  `ci(deps): …`), which have no Jira key, and the Release PR that release-please opens (LP-116),
+  titled like `chore(main): release 0.3.0`.
 - The checker is `scripts/commit-format.mjs`. To check a message by hand:
   `node scripts/commit-format.mjs --file <file>`, or a PR title with
   `PR_TITLE="…" node scripts/commit-format.mjs --title`.
@@ -84,7 +87,8 @@ reviews and merges.
 - No Fix version: unscheduled ideas
 
 A version ships when all its issues are Done. Then it's tagged in Git, gets a GitHub Release, and the
-Jira version is marked Released: see [Releasing](releasing.md).
+Jira version is marked Released: see [Releasing](releasing.md). Since LP-116, merging release-please's
+Release PR does the tag and the GitHub Release.
 
 ## Board columns
 
