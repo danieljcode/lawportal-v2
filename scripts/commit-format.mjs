@@ -20,12 +20,14 @@ export const EXAMPLE = "fix(sync): merge conflicts per character [LP-64]";
 const GENERATED = /^(Merge (pull request|branch|remote-tracking branch) |Revert ")/;
 /** Dependency updates (Dependabot, LP-85) carry no Jira key and can run long. */
 const DEPENDENCIES = /^(chore|ci)\(deps(-dev)?\): \S/;
+/** The Release PR release-please keeps open (LP-116, docs/releasing.md). */
+const RELEASE = /^chore\(main\): release \d+\.\d+\.\d+$/;
 
 /** What's wrong with a commit header or PR title; empty when it follows the convention. */
 export function checkHeader(header) {
   const h = String(header ?? "").replace(/\r?\n[\s\S]*$/, "");
   if (!h.trim()) return ["It's empty."];
-  if (GENERATED.test(h) || DEPENDENCIES.test(h)) return [];
+  if (GENERATED.test(h) || DEPENDENCIES.test(h) || RELEASE.test(h)) return [];
 
   const m = /^([A-Za-z]+)(?:\(([^)]*)\))?: (.*)$/.exec(h);
   if (!m) return [`It doesn't start with "<type>(<area>): ", for example "fix(sync): ".`];
