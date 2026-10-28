@@ -29,6 +29,8 @@ jobs:
         uses: actions/checkout@v7
         with:
           ref: ${{ fromJSON(steps.release.outputs.pr).headBranchName }}
+          # The commit's parent too: in a one-commit clone it has none, and the amend would drop its history.
+          fetch-depth: 2
       - name: Tidy CHANGELOG.md
         if: steps.release.outputs.pr
         run: |
