@@ -1,0 +1,137 @@
+/* clients program styles (LP-110): only this program uses these; the shared components are in
+   src/app/globals.css. Loaded with the program's code. */
+
+/* ---------- new client intake (LP-19) ---------- */
+.intake-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(220px, 2fr);
+  gap: 12px;
+  align-items: start;
+}
+.intake-sheet {
+  padding: 8px 10px;
+  border: 1px solid var(--shadow);
+  background: var(--field);
+  color: var(--text);
+}
+.intake-sheet h3 {
+  margin: 0 0 6px;
+}
+.intake-sheet pre {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: var(--ui-font);
+  font-size: var(--text-base);
+}
+@media (max-width: 800px) {
+  .intake-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- conflict check (LP-10) ---------- */
+.conflict-result {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0;
+}
+.conflict-verdict {
+  margin: 0;
+  padding: 6px 10px;
+  font-weight: 700;
+  border: 2px solid var(--good);
+  color: var(--good);
+  background: var(--field);
+}
+.conflict-verdict.review {
+  border-color: var(--bad);
+  color: var(--bad);
+}
+.conflict-matches,
+.conflict-log ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.conflict-matches li,
+.conflict-log li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  padding: 4px 8px;
+  border: 1px solid var(--shadow);
+  border-left: 3px solid var(--bad);
+  background: var(--field);
+  color: var(--text);
+}
+.conflict-log li {
+  flex-direction: column;
+  border-left-color: var(--shadow);
+}
+.conflict-memo {
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--shadow);
+  background: var(--field);
+  color: var(--text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: var(--ui-font);
+  font-size: var(--text-base);
+}
+.conflict-log h3 {
+  margin: 16px 0 6px;
+}
+
+/* Printing the intake prints only the client sheet, as one page. */
+@media print {
+  html:has(#intake-sheet),
+  body:has(#intake-sheet) {
+    background: #fff;
+  }
+  body:has(#intake-sheet) * {
+    visibility: hidden;
+  }
+  body:has(#intake-sheet) #intake-sheet,
+  body:has(#intake-sheet) #intake-sheet * {
+    visibility: visible;
+  }
+  body:has(#intake-sheet) #intake-sheet {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    border: 0;
+    background: #fff;
+    color: #000;
+    font-size: 12pt;
+  }
+}
+
+/* Printing the conflict check prints only the memo. */
+@media print {
+  html:has(#conflict-memo),
+  body:has(#conflict-memo) {
+    background: #fff;
+  }
+  body:has(#conflict-memo) * {
+    visibility: hidden;
+  }
+  body:has(#conflict-memo) #conflict-memo,
+  body:has(#conflict-memo) #conflict-memo * {
+    visibility: visible;
+  }
+  body:has(#conflict-memo) #conflict-memo {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    border: 0;
+    background: #fff;
+    color: #000;
+    font-size: 12pt;
+  }
+}

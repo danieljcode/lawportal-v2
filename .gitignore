@@ -1,0 +1,25 @@
+/node_modules
+/.next
+/out
+/build
+*.log
+.env*
+.DS_Store
+/dist
+*.tsbuildinfo
+next-env.d.ts
+/data/
+/.agents/
+
+# npm run release-notes output
+release-notes.md
+
+# Playwright end-to-end output (LP-6)
+/test-results/
+/playwright-report/
+
+# Git worktrees for other branches (LP-134)
+/.worktrees/
+
+# Written by next dev for coding agents (Next.js 16, LP-97); re-created on every run
+/AGENTS.md

@@ -1,0 +1,13 @@
+Copyright (c) 2026 Daniel (https://github.com/danieljcode). All rights reserved.
+
+Access to this repository does not grant a licence. No one may use, copy,
+modify, merge, publish, distribute, sublicense or sell any part of it without
+written permission from the copyright holder.
+
+Third-party material, not covered by the above:
+
+- The court form templates in src/data/forms.json are adapted from the San
+  Andreas court forms published in the GTA World forum's court petitions
+  directory, as collected by the JSA Form Generator by Awucard. They remain
+  the work of their authors.
+- The dependencies listed in package.json are used under their own licences.

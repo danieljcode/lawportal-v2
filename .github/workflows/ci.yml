@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    # Playwright's Linux image, with Chromium and its fonts, so the screenshot tests (LP-117) render the
+    # same every run. Keep the tag at the @playwright/test version in package.json.
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
+    env:
+      # Read-only token for the private reference repo (docs/templates-and-forms.md, Reference data).
+      REFERENCE_TOKEN: ${{ secrets.REFERENCE_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+      # The container runs as root over files the runner owns; checkout trusts them only for its own step.
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      # The parity tests need it; without the secret (forks) they skip with a note.
+      - name: Check out reference data
+        if: env.REFERENCE_TOKEN != ''
+        uses: actions/checkout@v7
+        with:
+          repository: danieljcode/lawportal-reference
+          token: ${{ secrets.REFERENCE_TOKEN }}
+          path: .agents/reference/jsa
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Fails on high or critical advisories in what ships (devDependencies are left
+      # to Dependabot). See docs/dependencies.md.
+      - name: Security audit
+        run: npm audit --omit=dev --audit-level=high
+
+      # ESLint with no warnings allowed, and Prettier formatting (LP-86).
+      - run: npm run lint
+      - run: npm run format:check
+
+      - run: npm test
+        env:
+          # With the data checked out, a missing file fails the run instead of skipping.
+          LAWAPP_REQUIRE_REFERENCE: ${{ env.REFERENCE_TOKEN != '' && '1' || '' }}
+      - run: npm run build
+
+      # Real-browser smoke tests of the key journeys, at desktop and phone widths (LP-6), and the
+      # screenshot comparisons (LP-117). Chromium comes with the container image.
+      - name: End-to-end smoke and screenshot tests
+        run: npm run test:e2e
+      # A failed screenshot comparison leaves its expected, actual and diff images here.
+      - name: Upload screenshots and traces of failed end-to-end tests
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-failures
+          path: test-results/
+          retention-days: 14

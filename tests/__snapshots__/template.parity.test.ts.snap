@@ -1,0 +1,1371 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`template engine snapshot > criminal-arraignment > empty, highlighted 1`] = `
+"<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td>
+<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td style="text-align:right">
+<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td>
+<p style="text-align:center">
+<strong><span style="font-size:28px">SAN ANDREAS COURT</span></strong>
+</p>
+<p style="text-align:center">
+<strong><span style="font-size:28px">COUNTY OF LOS SANTOS</span></strong>
+</p>
+<p style="text-align:center">
+<span style="font-size:28px">CRIMINAL DIVISION</span>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<span style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;</span>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<img alt="150x150court.png" width="150" src="https://i.ibb.co/zQMVtSr/150x150court.png" />
+</td>
+</tr>
+</tbody>
+</table>
+<hr style="font-size:13px" />
+<p style="font-size:13px;text-align:center">
+<span style="font-size:22px"><strong>People of the State of San Andreas v. <mark class="unfilled" title="Defendant name">Defendant Name</mark></strong></span>
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+<p style="font-size:13px;text-align:justify">
+The undersigned, on information and belief, accuses defendant&nbsp;<strong><mark class="unfilled" title="Defendant name">Defendant's Name</mark></strong>&nbsp;of the following crimes:
+</p>
+<p style="font-size:13px">
+&nbsp;
+</p>
+
+<p style="font-size:13px;text-align:center">
+<span style="font-size:16px"><strong><u>COUNT 1</u></strong></span>
+</p>
+<ul style="font-size:13px">
+<li style="font-size:13px">
+<strong><mark class="unfilled" title="Charge">PC ###. CHARGE NAME</mark>&nbsp;</strong>
+</li>
+</ul>
+
+<p style="font-size:13px;text-align:center">
+<span style="font-size:16px"><strong><u>COUNT 2</u></strong></span>
+</p>
+<ul style="font-size:13px">
+<li style="font-size:13px">
+<strong><mark class="unfilled" title="Charge">PC ###. CHARGE NAME</mark>&nbsp;</strong>
+</li>
+</ul>
+
+<p style="font-size:13px;text-align:center">
+<span style="font-size:16px"><strong><u>COUNT 3</u></strong></span>
+</p>
+<ul style="font-size:13px">
+<li style="font-size:13px">
+<strong><mark class="unfilled" title="Charge">PC ###. CHARGE NAME</mark>&nbsp;</strong>
+</li>
+</ul>
+
+<p style="font-size:13px;text-align:center">
+<span style="font-size:16px"><strong><u>COUNT 4</u></strong></span>
+</p>
+<ul style="font-size:13px">
+<li style="font-size:13px">
+<strong><mark class="unfilled" title="Charge">PC ###. CHARGE NAME</mark>&nbsp;</strong>
+</li>
+</ul>
+
+<p style="font-size:13px">
+&nbsp;
+</p>
+<hr style="font-size:13px" />
+<p style="font-size:13px;text-align:center">
+<span style="font-size:20px"><b>Evidence</b></span>
+</p>
+<p style="font-size:13px;text-align:justify">
+&nbsp;
+</p>
+<p style="font-size:13px;text-align:justify">
+<span style="font-size:16px">In support of the foregoing narrative, the following evidence shall be submitted into the court record:</span>
+</p>
+<p style="font-size:13px;text-align:justify">
+&nbsp;
+</p>
+
+<p style="font-size:13px">
+<strong><span style="font-size:16px">Exhibit One (<mark class="unfilled" title="Exhibit title">TITLE</mark>):</span></strong>
+</p>
+<mark class="unfilled" title="Exhibit content (links, images, text)"><p style="font-size:13px">Replace with spoiler</p></mark>
+
+<p style="font-size:13px">
+<strong><span style="font-size:16px">Exhibit Two (<mark class="unfilled" title="Exhibit title">TITLE</mark>):</span></strong>
+</p>
+<mark class="unfilled" title="Exhibit content (links, images, text)"><p style="font-size:13px">Replace with spoiler</p></mark>
+
+<p style="font-size:13px">
+<strong><span style="font-size:16px">Exhibit Three (<mark class="unfilled" title="Exhibit title">TITLE</mark>):</span></strong>
+</p>
+<mark class="unfilled" title="Exhibit content (links, images, text)"><p style="font-size:13px">Replace with spoiler</p></mark>
+
+<hr style="font-size:13px" />
+<p style="font-size:13px;text-align:center">
+<span style="font-size:20px"><b>Sentencing</b></span>
+</p>
+<p style="font-size:13px">
+<br />
+<span style="font-size:16px">Upon motion by the People of the State of San Andreas, it is hereby demanded that, upon sentencing, the following punishments be imposed:</span>
+</p>
+<p style="font-size:13px">
+&nbsp;
+</p>
+<p style="font-size:13px">
+<span style="font-size:16px">[ ] - Capital Punishment</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:16px">[ ] - Life imprisonment without parole</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:16px">[ ] - Life imprisonment with parole</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:16px">[ ] - Maximum statutory sentencing recommendation</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:16px">[ ] - Time served</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:16px">[ ] - Other: <mark class="unfilled" title="Other sentence">_____________________</mark></span>
+</p>
+<p style="font-size:13px">
+&nbsp;
+</p>
+<p style="font-size:13px">
+<span style="color:#000000"><span style="font-size:14px">(( Note: 1 Hour = 1 Day, 1 Day = 1 Month, 1 Month = 1 Year. ))&nbsp;</span></span>
+</p>
+<hr style="font-size:13px" />
+<p style="font-size:13px;text-align:center">
+<b><span style="font-size:20px">Bail Recommendations</span></b>
+</p>
+<p style="font-size:13px">
+<br />
+<span style="font-size:16px">Upon motion by the People of the State of San Andreas, it is hereby recommended that the Court impose or otherwise uphold the following bail recommendations:</span>
+</p>
+<p style="font-size:13px">
+&nbsp;
+</p>
+<p style="font-size:13px">
+[ ] - Uphold Stationhouse Bail —&nbsp;<u><strong><mark class="unfilled" title="Stationhouse bail amount">$AMOUNT</mark></strong>;</u>&nbsp;or,
+</p>
+<p style="font-size:13px">
+[ ] - Impose Bail —&nbsp;<u><strong><mark class="unfilled" title="Imposed bail amount">$AMOUNT</mark></strong></u>.
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [ ] - Abstain from excessive use of alcohol and any use of a controlled substance without a prescription.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [ ] - Appear before the court on each date the case is assigned to call.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [ ] - Abstain from criminal activity while subject to the bail order.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [ ] - Wear an ankle monitor at all times.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [ ] - Surrender any illegal or legally owned firearms to the respective agency.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [ ] - Possess and keep on at all times an active cell phone with its number registered to Defendant.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [ ] - Refrain from contact with any victim/witness relating to this arrest.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [ ] - Refrain from associating with known gang members or violent felons.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [ ] - Other: <mark class="unfilled" title="Other bail condition">_________________________________________________________________________________</mark></span>
+</p>
+<p style="font-size:13px">
+[ ] - Order Defendant's Detention.
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [ ] - The defendant is charged with a felony crime of violence and has over 30 criminal points on record.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [ ] - The defendant is charged with an offense for which the maximum sentence is life imprisonment or death.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [ ] - The defendant has a history of violating bail conditions.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [ ] - There exists a serious risk that the defendant will threaten, injure, or intimidate a prospective witness.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [ ] - The People&nbsp; believe that no condition or combination of conditions will reasonably assure the defendant's appearance as required and the safety of any person or the community.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [ ] - Other: <mark class="unfilled" title="Other detention ground">_________________________________________________________________________________</mark></span>
+</p>
+<p style="font-size:13px">
+&nbsp;
+</p>
+<p style="font-size:13px">
+&nbsp;
+</p>
+<hr style="font-size:13px" />
+<p style="font-size:13px;text-align:center">
+<span style="font-size:20px"><b>Verification</b></span>
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+<p style="font-size:13px">
+&nbsp;
+</p>
+<p style="font-size:13px;text-align:justify">
+I, the undersigned, hereby declare under penalty of perjury under the laws of the State of San Andreas that the foregoing is true and correct to the best of my knowledge. Signed on the&nbsp;<u><mark class="unfilled" title="Signed on">DAY</mark></u>&nbsp;day of&nbsp;<u><mark class="unfilled" title="Signed on">MONTH</mark></u>, <mark class="unfilled" title="Signed on">2026</mark>.
+</p>
+"
+`;
+
+exports[`template engine snapshot > criminal-arraignment > fixture A 1`] = `
+"<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td>
+<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td style="text-align:right">
+<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td>
+<p style="text-align:center">
+<strong><span style="font-size:28px">SAN ANDREAS COURT</span></strong>
+</p>
+<p style="text-align:center">
+<strong><span style="font-size:28px">COUNTY OF LOS SANTOS</span></strong>
+</p>
+<p style="text-align:center">
+<span style="font-size:28px">CRIMINAL DIVISION</span>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<span style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;</span>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<img alt="150x150court.png" width="150" src="https://i.ibb.co/zQMVtSr/150x150court.png" />
+</td>
+</tr>
+</tbody>
+</table>
+<hr style="font-size:13px" />
+<p style="font-size:13px;text-align:center">
+<span style="font-size:22px"><strong>People of the State of San Andreas v. X&lt;&amp;&gt;&quot;1
+
+X2</strong></span>
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+<p style="font-size:13px;text-align:justify">
+The undersigned, on information and belief, accuses defendant&nbsp;<strong>X&lt;&amp;&gt;&quot;1
+
+X2</strong>&nbsp;of the following crimes:
+</p>
+<p style="font-size:13px">
+&nbsp;
+</p>
+
+<p style="font-size:13px;text-align:center">
+<span style="font-size:16px"><strong><u>COUNT 1</u></strong></span>
+</p>
+<ul style="font-size:13px">
+<li style="font-size:13px">
+<strong>X&lt;&amp;&gt;&quot;1
+
+X2&nbsp;</strong>
+</li>
+</ul>
+
+<p style="font-size:13px;text-align:center">
+<span style="font-size:16px"><strong><u>COUNT 2</u></strong></span>
+</p>
+<ul style="font-size:13px">
+<li style="font-size:13px">
+<strong>X&lt;&amp;&gt;&quot;1
+
+X2&nbsp;</strong>
+</li>
+</ul>
+
+<p style="font-size:13px;text-align:center">
+<span style="font-size:16px"><strong><u>COUNT 3</u></strong></span>
+</p>
+<ul style="font-size:13px">
+<li style="font-size:13px">
+<strong>X&lt;&amp;&gt;&quot;1
+
+X2&nbsp;</strong>
+</li>
+</ul>
+
+<p style="font-size:13px">
+&nbsp;
+</p>
+<hr style="font-size:13px" />
+<p style="font-size:13px;text-align:center">
+<span style="font-size:20px"><b>Evidence</b></span>
+</p>
+<p style="font-size:13px;text-align:justify">
+&nbsp;
+</p>
+<p style="font-size:13px;text-align:justify">
+<span style="font-size:16px">In support of the foregoing narrative, the following evidence shall be submitted into the court record:</span>
+</p>
+<p style="font-size:13px;text-align:justify">
+&nbsp;
+</p>
+
+<p style="font-size:13px">
+<strong><span style="font-size:16px">Exhibit One (X&lt;&amp;&gt;&quot;1
+
+X2):</span></strong>
+</p>
+<div class="ipsSpoiler" data-ipsspoiler=""><div class="ipsSpoiler_header"><span>Spoiler</span></div><div class="ipsSpoiler_contents"><p>X&lt;&amp;&gt;&quot;1</p><p>&nbsp;</p><p>X2</p></div></div>
+
+<p style="font-size:13px">
+<strong><span style="font-size:16px">Exhibit Two (X&lt;&amp;&gt;&quot;1
+
+X2):</span></strong>
+</p>
+<div class="ipsSpoiler" data-ipsspoiler=""><div class="ipsSpoiler_header"><span>Spoiler</span></div><div class="ipsSpoiler_contents"><p>X&lt;&amp;&gt;&quot;1</p><p>&nbsp;</p><p>X2</p></div></div>
+
+<p style="font-size:13px">
+<strong><span style="font-size:16px">Exhibit Three (X&lt;&amp;&gt;&quot;1
+
+X2):</span></strong>
+</p>
+<div class="ipsSpoiler" data-ipsspoiler=""><div class="ipsSpoiler_header"><span>Spoiler</span></div><div class="ipsSpoiler_contents"><p>X&lt;&amp;&gt;&quot;1</p><p>&nbsp;</p><p>X2</p></div></div>
+
+<hr style="font-size:13px" />
+<p style="font-size:13px;text-align:center">
+<span style="font-size:20px"><b>Sentencing</b></span>
+</p>
+<p style="font-size:13px">
+<br />
+<span style="font-size:16px">Upon motion by the People of the State of San Andreas, it is hereby demanded that, upon sentencing, the following punishments be imposed:</span>
+</p>
+<p style="font-size:13px">
+&nbsp;
+</p>
+<p style="font-size:13px">
+<span style="font-size:16px">[X] - Capital Punishment</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:16px">[X] - Life imprisonment without parole</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:16px">[X] - Life imprisonment with parole</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:16px">[X] - Maximum statutory sentencing recommendation</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:16px">[X] - Time served</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:16px">[X] - Other: X&lt;&amp;&gt;&quot;1
+
+X2</span>
+</p>
+<p style="font-size:13px">
+&nbsp;
+</p>
+<p style="font-size:13px">
+<span style="color:#000000"><span style="font-size:14px">(( Note: 1 Hour = 1 Day, 1 Day = 1 Month, 1 Month = 1 Year. ))&nbsp;</span></span>
+</p>
+<hr style="font-size:13px" />
+<p style="font-size:13px;text-align:center">
+<b><span style="font-size:20px">Bail Recommendations</span></b>
+</p>
+<p style="font-size:13px">
+<br />
+<span style="font-size:16px">Upon motion by the People of the State of San Andreas, it is hereby recommended that the Court impose or otherwise uphold the following bail recommendations:</span>
+</p>
+<p style="font-size:13px">
+&nbsp;
+</p>
+<p style="font-size:13px">
+[X] - Uphold Stationhouse Bail —&nbsp;<u><strong>X&lt;&amp;&gt;&quot;1
+
+X2</strong>;</u>&nbsp;or,
+</p>
+<p style="font-size:13px">
+[X] - Impose Bail —&nbsp;<u><strong>X&lt;&amp;&gt;&quot;1
+
+X2</strong></u>.
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [X] - Abstain from excessive use of alcohol and any use of a controlled substance without a prescription.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [X] - Appear before the court on each date the case is assigned to call.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [X] - Abstain from criminal activity while subject to the bail order.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [X] - Wear an ankle monitor at all times.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [X] - Surrender any illegal or legally owned firearms to the respective agency.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [X] - Possess and keep on at all times an active cell phone with its number registered to Defendant.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [X] - Refrain from contact with any victim/witness relating to this arrest.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [X] - Refrain from associating with known gang members or violent felons.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [X] - Other: X&lt;&amp;&gt;&quot;1
+
+X2</span>
+</p>
+<p style="font-size:13px">
+[X] - Order Defendant's Detention.
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [X] - The defendant is charged with a felony crime of violence and has over 30 criminal points on record.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [X] - The defendant is charged with an offense for which the maximum sentence is life imprisonment or death.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [X] - The defendant has a history of violating bail conditions.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [X] - There exists a serious risk that the defendant will threaten, injure, or intimidate a prospective witness.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [X] - The People&nbsp; believe that no condition or combination of conditions will reasonably assure the defendant's appearance as required and the safety of any person or the community.</span>
+</p>
+<p style="font-size:13px">
+<span style="font-size:12px">&nbsp; &nbsp; [X] - Other: X&lt;&amp;&gt;&quot;1
+
+X2</span>
+</p>
+<p style="font-size:13px">
+&nbsp;
+</p>
+<p style="font-size:13px">
+&nbsp;
+</p>
+<hr style="font-size:13px" />
+<p style="font-size:13px;text-align:center">
+<span style="font-size:20px"><b>Verification</b></span>
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+<p style="font-size:13px">
+&nbsp;
+</p>
+<p style="font-size:13px;text-align:justify">
+I, the undersigned, hereby declare under penalty of perjury under the laws of the State of San Andreas that the foregoing is true and correct to the best of my knowledge. Signed on the&nbsp;<u>2nd</u>&nbsp;day of&nbsp;<u>January</u>, 2026.
+</p>
+"
+`;
+
+exports[`template engine snapshot > misc-bail-application > empty, highlighted 1`] = `
+"<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td>
+<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td style="text-align:right">
+<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td>
+<p style="text-align:center">
+<strong><span style="font-size:28px">SAN ANDREAS COURT</span></strong>
+</p>
+<p style="text-align:center">
+<strong><span style="font-size:28px">COUNTY OF LOS SANTOS</span></strong>
+</p>
+<p style="text-align:center">
+<span style="font-size:28px">CRIMINAL DIVISION</span>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<span style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;</span>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<img alt="150x150court.png" width="150" src="https://i.ibb.co/zQMVtSr/150x150court.png" />
+</td>
+</tr>
+</tbody>
+</table>
+<hr style="font-size:13px" />
+<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td>
+<div style="border:1px solid #000000;padding:15px">
+<p>
+<span style="text-align:left">THE PEOPLE OF</span>
+</p>
+<p>
+<span style="text-align:left">THE STATE OF SAN ANDREAS</span>
+</p>
+<p>
+<strong><span style="text-align:left">(Plaintiff)</span></strong><br />
+&nbsp;
+</p>
+<p>
+<span style="text-align:left">- against -&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;</span><br />
+<br />
+<span style="text-align:left"><mark class="unfilled" title="Defendant name">Firstname Lastname</mark></span>
+</p>
+<p>
+<strong><span style="text-align:left">(Defendant)</span></strong>
+</p>
+</div>
+</td>
+<td>
+<span style="text-align:left">)<br />
+)<br />
+)<br />
+)<br />
+)<br />
+)<br />
+)<br />
+)</span>
+</td>
+<td>
+<p style="text-align:center">
+Court File: <mark class="unfilled" title="Case number">YYSCCR#####</mark>
+</p>
+<p style="text-align:center">
+&nbsp;
+</p>
+<div style="border:1px solid #000000;padding:15px">
+<p style="text-align:center">
+<strong>BAIL PETITION</strong>
+</p>
+</div>
+<p style="text-align:center">
+&nbsp;
+</p>
+<p style="text-align:center">
+<em>Action Filed: <mark class="unfilled" title="Action filed">Month&nbsp;DD, YYYY</mark></em>
+</p>
+<p style="text-align:center">
+&nbsp;
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<hr style="font-size:13px" />
+<p style="font-size:13px;text-align:center">
+<span style="font-size:16px"><strong>I. CRIMINAL STATEMENT</strong></span>
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+<p style="font-size:13px;text-align:justify">
+<span style="font-size:14px">By decree of the State of San Andreas Penal Code and enforcement&nbsp;authority of the&nbsp;San Andreas State Constitution, the Defendant,&nbsp;<strong><mark class="unfilled" title="Defendant name">Defendants Name</mark></strong>,&nbsp;has been officially arrested by the State of San Andreas for&nbsp;the following charge(s):</span>
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+
+<p style="font-size:13px;text-align:center">
+<span style="font-size:16px"><strong><u>COUNT 1</u></strong></span>
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+<ul style="font-size:13px">
+<li style="font-size:13px">
+<strong><mark class="unfilled" title="Charge">PC ###. CHARGE NAME</mark></strong>
+</li>
+</ul>
+<p style="font-size:13px">
+&nbsp;
+</p>
+
+<p style="font-size:13px;text-align:center">
+<span style="font-size:16px"><strong><u>COUNT 2</u></strong></span>
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+<ul style="font-size:13px">
+<li style="font-size:13px">
+<strong><mark class="unfilled" title="Charge">PC ###. CHARGE NAME</mark></strong>
+</li>
+</ul>
+<p style="font-size:13px">
+&nbsp;
+</p>
+
+<p style="font-size:13px;text-align:center">
+<span style="font-size:16px"><strong><u>COUNT 3</u></strong></span>
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+<ul style="font-size:13px">
+<li style="font-size:13px">
+<strong><mark class="unfilled" title="Charge">PC ###. CHARGE NAME</mark></strong>
+</li>
+</ul>
+<p style="font-size:13px">
+&nbsp;
+</p>
+
+<p style="font-size:13px;text-align:center">
+<span style="font-size:16px"><strong><u>COUNT 4</u></strong></span>
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+<ul style="font-size:13px">
+<li style="font-size:13px">
+<strong><mark class="unfilled" title="Charge">PC ###. CHARGE NAME</mark></strong>
+</li>
+</ul>
+<p style="font-size:13px">
+&nbsp;
+</p>
+
+<p style="font-size:13px">
+&nbsp;
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+<hr style="font-size:13px" />
+<p style="font-size:13px;text-align:center">
+<span style="font-size:16px"><strong>II. BAIL APPLICATION</strong></span>
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+<p style="font-size:14px;text-align:justify">
+This matter coming before this court for setting of bail with the defendant present and being advised of their rights herein, the People of the State of San Andreas move this Honorable&nbsp;Court to enter an order to&nbsp;<strong style="color:#000000;font-size:14px">grant bail</strong>&nbsp;and in support thereof state as follows:
+</p>
+<p style="font-size:13px">
+&nbsp;
+</p>
+<p style="font-size:14px">
+<span style="font-size:14px">That Defendant shall deposit, with the clerk of the court, $<mark class="unfilled" title="Bail amount">X.XXX</mark> as bail security indicated on his bail bond with the following conditions:</span>
+</p>
+<p style="font-size:14px">
+&nbsp;
+</p>
+<ol style="font-size:13px">
+
+<li>
+<span style="font-size:14px">Appearing at all court dates.</span>
+</li>
+
+
+<li>
+<span style="font-size:14px">Surrendering all firearms, ammunition and permits.</span>
+</li>
+
+
+<li>
+<span style="font-size:14px">Submitting to psychological evaluations, medical care, or treatment.</span>
+</li>
+
+
+<li>
+<span style="font-size:14px">Have no contact or communication, direct or indirect with the witnesses of the victim.</span>
+</li>
+
+
+<li>
+<span style="font-size:14px">Refraining from alcohol or drug use and possession</span>
+</li>
+
+
+<li>
+<span style="font-size:14px">Undergoing alcohol or drug testing.</span>
+</li>
+
+
+<li>
+<span style="font-size:14px">Submit to electronic monitoring.</span>
+</li>
+
+<mark class="unfilled" title="Additional conditions (one per line)"><li>
+<span style="font-size:14px">ADD/REMOVE CONDITIONS AS REQUIRED.</span>
+</li></mark>
+</ol>
+<p style="font-size:13px">
+&nbsp;
+</p>
+<hr style="font-size:13px" />
+<p style="font-size:13px;text-align:center">
+<span style="font-size:14px"><u>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; Declaration&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u></span>
+</p>
+<p style="font-size:14px;text-align:justify">
+In conclusion of this complaint, I,&nbsp;<strong><mark class="unfilled" title="Filer title">Deputy District Attorney</mark> <mark class="unfilled" title="Filer name">Firstname Lastname</mark></strong>, affirm that the above-stated facts are true and accurate to the best of my knowledge and belief. This shall be the official arraignment for the Superior Court to commence proceedings.
+</p>
+<p style="font-size:13px">
+&nbsp;
+</p>
+<p style="font-size:13px">
+<span style="font-size:14px">on&nbsp;<strong><mark class="unfilled" title="Declaration date">MONTH DD, YYYY</mark></strong></span>
+</p>
+"
+`;
+
+exports[`template engine snapshot > misc-bail-application > fixture A 1`] = `
+"<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td>
+<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td style="text-align:right">
+<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td>
+<p style="text-align:center">
+<strong><span style="font-size:28px">SAN ANDREAS COURT</span></strong>
+</p>
+<p style="text-align:center">
+<strong><span style="font-size:28px">COUNTY OF LOS SANTOS</span></strong>
+</p>
+<p style="text-align:center">
+<span style="font-size:28px">CRIMINAL DIVISION</span>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<span style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;</span>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<img alt="150x150court.png" width="150" src="https://i.ibb.co/zQMVtSr/150x150court.png" />
+</td>
+</tr>
+</tbody>
+</table>
+<hr style="font-size:13px" />
+<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td>
+<div style="border:1px solid #000000;padding:15px">
+<p>
+<span style="text-align:left">THE PEOPLE OF</span>
+</p>
+<p>
+<span style="text-align:left">THE STATE OF SAN ANDREAS</span>
+</p>
+<p>
+<strong><span style="text-align:left">(Plaintiff)</span></strong><br />
+&nbsp;
+</p>
+<p>
+<span style="text-align:left">- against -&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;</span><br />
+<br />
+<span style="text-align:left">X&lt;&amp;&gt;&quot;1
+
+X2</span>
+</p>
+<p>
+<strong><span style="text-align:left">(Defendant)</span></strong>
+</p>
+</div>
+</td>
+<td>
+<span style="text-align:left">)<br />
+)<br />
+)<br />
+)<br />
+)<br />
+)<br />
+)<br />
+)</span>
+</td>
+<td>
+<p style="text-align:center">
+Court File: X&lt;&amp;&gt;&quot;1
+
+X2
+</p>
+<p style="text-align:center">
+&nbsp;
+</p>
+<div style="border:1px solid #000000;padding:15px">
+<p style="text-align:center">
+<strong>BAIL PETITION</strong>
+</p>
+</div>
+<p style="text-align:center">
+&nbsp;
+</p>
+<p style="text-align:center">
+<em>Action Filed: January 2, 2026</em>
+</p>
+<p style="text-align:center">
+&nbsp;
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<hr style="font-size:13px" />
+<p style="font-size:13px;text-align:center">
+<span style="font-size:16px"><strong>I. CRIMINAL STATEMENT</strong></span>
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+<p style="font-size:13px;text-align:justify">
+<span style="font-size:14px">By decree of the State of San Andreas Penal Code and enforcement&nbsp;authority of the&nbsp;San Andreas State Constitution, the Defendant,&nbsp;<strong>X&lt;&amp;&gt;&quot;1
+
+X2</strong>,&nbsp;has been officially arrested by the State of San Andreas for&nbsp;the following charge(s):</span>
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+
+<p style="font-size:13px;text-align:center">
+<span style="font-size:16px"><strong><u>COUNT 1</u></strong></span>
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+<ul style="font-size:13px">
+<li style="font-size:13px">
+<strong>X&lt;&amp;&gt;&quot;1
+
+X2</strong>
+</li>
+</ul>
+<p style="font-size:13px">
+&nbsp;
+</p>
+
+<p style="font-size:13px;text-align:center">
+<span style="font-size:16px"><strong><u>COUNT 2</u></strong></span>
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+<ul style="font-size:13px">
+<li style="font-size:13px">
+<strong>X&lt;&amp;&gt;&quot;1
+
+X2</strong>
+</li>
+</ul>
+<p style="font-size:13px">
+&nbsp;
+</p>
+
+<p style="font-size:13px;text-align:center">
+<span style="font-size:16px"><strong><u>COUNT 3</u></strong></span>
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+<ul style="font-size:13px">
+<li style="font-size:13px">
+<strong>X&lt;&amp;&gt;&quot;1
+
+X2</strong>
+</li>
+</ul>
+<p style="font-size:13px">
+&nbsp;
+</p>
+
+<p style="font-size:13px">
+&nbsp;
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+<hr style="font-size:13px" />
+<p style="font-size:13px;text-align:center">
+<span style="font-size:16px"><strong>II. BAIL APPLICATION</strong></span>
+</p>
+<p style="font-size:13px;text-align:center">
+&nbsp;
+</p>
+<p style="font-size:14px;text-align:justify">
+This matter coming before this court for setting of bail with the defendant present and being advised of their rights herein, the People of the State of San Andreas move this Honorable&nbsp;Court to enter an order to&nbsp;<strong style="color:#000000;font-size:14px">grant bail</strong>&nbsp;and in support thereof state as follows:
+</p>
+<p style="font-size:13px">
+&nbsp;
+</p>
+<p style="font-size:14px">
+<span style="font-size:14px">That Defendant shall deposit, with the clerk of the court, $X&lt;&amp;&gt;&quot;1
+
+X2 as bail security indicated on his bail bond with the following conditions:</span>
+</p>
+<p style="font-size:14px">
+&nbsp;
+</p>
+<ol style="font-size:13px">
+
+<li>
+<span style="font-size:14px">Appearing at all court dates.</span>
+</li>
+
+
+<li>
+<span style="font-size:14px">Surrendering all firearms, ammunition and permits.</span>
+</li>
+
+
+<li>
+<span style="font-size:14px">Submitting to psychological evaluations, medical care, or treatment.</span>
+</li>
+
+
+<li>
+<span style="font-size:14px">Have no contact or communication, direct or indirect with the witnesses of the victim.</span>
+</li>
+
+
+<li>
+<span style="font-size:14px">Refraining from alcohol or drug use and possession</span>
+</li>
+
+
+<li>
+<span style="font-size:14px">Undergoing alcohol or drug testing.</span>
+</li>
+
+
+<li>
+<span style="font-size:14px">Submit to electronic monitoring.</span>
+</li>
+
+<li>X&lt;&amp;&gt;&quot;1</li>
+<li>X2</li>
+</ol>
+<p style="font-size:13px">
+&nbsp;
+</p>
+<hr style="font-size:13px" />
+<p style="font-size:13px;text-align:center">
+<span style="font-size:14px"><u>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; Declaration&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u></span>
+</p>
+<p style="font-size:14px;text-align:justify">
+In conclusion of this complaint, I,&nbsp;<strong>X&lt;&amp;&gt;&quot;1
+
+X2 X&lt;&amp;&gt;&quot;1
+
+X2</strong>, affirm that the above-stated facts are true and accurate to the best of my knowledge and belief. This shall be the official arraignment for the Superior Court to commence proceedings.
+</p>
+<p style="font-size:13px">
+&nbsp;
+</p>
+<p style="font-size:13px">
+<span style="font-size:14px">on&nbsp;<strong>January 2, 2026</strong></span>
+</p>
+"
+`;
+
+exports[`template engine snapshot > misc-order-decree > empty, highlighted 1`] = `
+"<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td>
+<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td>
+<p style="text-align:center">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><strong><span style="font-size:28px">SAN ANDREAS COURT</span></strong></span></span>
+</p>
+<p style="text-align:center">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><strong><span style="font-size:28px">COUNTY OF LOS SANTOS</span></strong></span></span>
+</p>
+<p style="text-align:center">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><span style="font-size:28px"><mark class="unfilled" title="Division">DIVISION</mark></span></span></span>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<span style="font-family:Arial, Helvetica, sans-serif"><img alt="150x150court.png" width="150" src="https://i.ibb.co/zQMVtSr/150x150court.png" /></span>
+</td>
+</tr>
+</tbody>
+</table>
+<hr style="font-size:13px" />
+<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td>
+<div style="border:1px solid #000000;padding:15px">
+<p>
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><mark class="unfilled" title="Plaintiff name(s)">PLAINTIFF NAME(S)</mark>,</span></span>
+</p>
+<p>
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><strong><mark class="unfilled" title="Plaintiff label">Plaintiff(s)</mark></strong>,</span></span><br />
+&nbsp;
+</p>
+<p>
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000">- against -</span></span>
+</p>
+<p>
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><mark class="unfilled" title="Defendant name(s)">DEFENDANT NAME(S)</mark>,</span></span>
+</p>
+<p>
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><strong><mark class="unfilled" title="Defendant label">Defendant(s)</mark></strong>.</span></span>
+</p>
+</div>
+</td>
+<td>
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000">)<br />
+)<br />
+)<br />
+)<br />
+)<br />
+)<br />
+)<br />
+)</span></span>
+</td>
+<td>
+<p style="text-align:center">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000">Court File: <mark class="unfilled" title="Case number">YYSCXX#####</mark></span></span>
+</p>
+<p style="text-align:center">
+&nbsp;
+</p>
+<div style="border:1px solid #000000;padding:15px">
+<p style="text-align:center">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><strong><mark class="unfilled" title="Order title">ORDER TITLE</mark></strong></span></span>
+</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<hr style="font-size:13px" />
+
+<p style="font-size:13px;text-align:center">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><span style="font-size:16px"><strong>I. <mark class="unfilled" title="Section heading">SECTION HEADING</mark></strong></span></span></span>
+</p>
+
+
+<p style="font-size:13px">
+&nbsp;
+</p>
+
+<p style="font-size:13px;text-align:center">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><span style="font-size:16px"><strong>II. <mark class="unfilled" title="Section heading">SECTION HEADING</mark></strong></span></span></span>
+</p>
+
+
+<p style="font-size:13px">
+&nbsp;
+</p>
+
+<hr style="font-size:13px" />
+<p style="font-size:13px;text-align:center">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><span style="font-size:16px"><strong>III. ORDER</strong></span></span></span>
+</p>
+<p style="font-size:14px">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000">It is hereby <strong>ORDERED</strong>:</span></span>
+</p>
+<ol style="font-size:14px">
+<mark class="unfilled" title="Orders (one per line)"><li>Order.</li></mark>
+</ol>
+<p style="font-size:14px">
+&nbsp;
+</p>
+<p style="font-size:14px">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><strong>SO ORDERED.</strong></span></span>
+</p>
+<p style="font-size:14px">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><em>/s/ <mark class="unfilled" title="Judge title">JUDGE</mark> <mark class="unfilled" title="Judge name">NAME</mark></em></span></span>
+</p>
+<p style="font-size:14px">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000">SAN ANDREAS COURT<br />
+County of Los Santos</span></span>
+</p>
+"
+`;
+
+exports[`template engine snapshot > misc-order-decree > fixture A 1`] = `
+"<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td>
+<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td>
+<p style="text-align:center">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><strong><span style="font-size:28px">SAN ANDREAS COURT</span></strong></span></span>
+</p>
+<p style="text-align:center">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><strong><span style="font-size:28px">COUNTY OF LOS SANTOS</span></strong></span></span>
+</p>
+<p style="text-align:center">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><span style="font-size:28px">CRIMINAL DIVISION</span></span></span>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<span style="font-family:Arial, Helvetica, sans-serif"><img alt="150x150court.png" width="150" src="https://i.ibb.co/zQMVtSr/150x150court.png" /></span>
+</td>
+</tr>
+</tbody>
+</table>
+<hr style="font-size:13px" />
+<table align="center" border="0" cellpadding="3" cellspacing="2" style="border-collapse:collapse;border-spacing:0px;font-size:14px">
+<tbody>
+<tr>
+<td>
+<div style="border:1px solid #000000;padding:15px">
+<p>
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000">X&lt;&amp;&gt;&quot;1
+
+X2,</span></span>
+</p>
+<p>
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><strong>Plaintiff</strong>,</span></span><br />
+&nbsp;
+</p>
+<p>
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000">- against -</span></span>
+</p>
+<p>
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000">X&lt;&amp;&gt;&quot;1
+
+X2,</span></span>
+</p>
+<p>
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><strong>Defendant</strong>.</span></span>
+</p>
+</div>
+</td>
+<td>
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000">)<br />
+)<br />
+)<br />
+)<br />
+)<br />
+)<br />
+)<br />
+)</span></span>
+</td>
+<td>
+<p style="text-align:center">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000">Court File: X&lt;&amp;&gt;&quot;1
+
+X2</span></span>
+</p>
+<p style="text-align:center">
+&nbsp;
+</p>
+<div style="border:1px solid #000000;padding:15px">
+<p style="text-align:center">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><strong>X&lt;&amp;&gt;&quot;1
+
+X2</strong></span></span>
+</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<hr style="font-size:13px" />
+
+<p style="font-size:13px;text-align:center">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><span style="font-size:16px"><strong>I. X&lt;&amp;&gt;&quot;1
+
+X2</strong></span></span></span>
+</p>
+<p style="text-align:justify">X&lt;&amp;&gt;&quot;1</p>
+<p style="text-align:justify">X2</p>
+
+<p style="font-size:14px">
+<strong>A. X&lt;&amp;&gt;&quot;1
+
+X2</strong>
+</p>
+<p style="text-align:justify">X&lt;&amp;&gt;&quot;1</p>
+<p style="text-align:justify">X2</p>
+
+<p style="font-size:14px">
+<strong>B. X&lt;&amp;&gt;&quot;1
+
+X2</strong>
+</p>
+<p style="text-align:justify">X&lt;&amp;&gt;&quot;1</p>
+<p style="text-align:justify">X2</p>
+
+<p style="font-size:14px">
+<strong>C. X&lt;&amp;&gt;&quot;1
+
+X2</strong>
+</p>
+<p style="text-align:justify">X&lt;&amp;&gt;&quot;1</p>
+<p style="text-align:justify">X2</p>
+
+<p style="font-size:13px">
+&nbsp;
+</p>
+
+<p style="font-size:13px;text-align:center">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><span style="font-size:16px"><strong>II. X&lt;&amp;&gt;&quot;1
+
+X2</strong></span></span></span>
+</p>
+<p style="text-align:justify">X&lt;&amp;&gt;&quot;1</p>
+<p style="text-align:justify">X2</p>
+
+<p style="font-size:14px">
+<strong>A. X&lt;&amp;&gt;&quot;1
+
+X2</strong>
+</p>
+<p style="text-align:justify">X&lt;&amp;&gt;&quot;1</p>
+<p style="text-align:justify">X2</p>
+
+<p style="font-size:14px">
+<strong>B. X&lt;&amp;&gt;&quot;1
+
+X2</strong>
+</p>
+<p style="text-align:justify">X&lt;&amp;&gt;&quot;1</p>
+<p style="text-align:justify">X2</p>
+
+<p style="font-size:14px">
+<strong>C. X&lt;&amp;&gt;&quot;1
+
+X2</strong>
+</p>
+<p style="text-align:justify">X&lt;&amp;&gt;&quot;1</p>
+<p style="text-align:justify">X2</p>
+
+<p style="font-size:13px">
+&nbsp;
+</p>
+
+<p style="font-size:13px;text-align:center">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><span style="font-size:16px"><strong>III. X&lt;&amp;&gt;&quot;1
+
+X2</strong></span></span></span>
+</p>
+<p style="text-align:justify">X&lt;&amp;&gt;&quot;1</p>
+<p style="text-align:justify">X2</p>
+
+<p style="font-size:14px">
+<strong>A. X&lt;&amp;&gt;&quot;1
+
+X2</strong>
+</p>
+<p style="text-align:justify">X&lt;&amp;&gt;&quot;1</p>
+<p style="text-align:justify">X2</p>
+
+<p style="font-size:14px">
+<strong>B. X&lt;&amp;&gt;&quot;1
+
+X2</strong>
+</p>
+<p style="text-align:justify">X&lt;&amp;&gt;&quot;1</p>
+<p style="text-align:justify">X2</p>
+
+<p style="font-size:14px">
+<strong>C. X&lt;&amp;&gt;&quot;1
+
+X2</strong>
+</p>
+<p style="text-align:justify">X&lt;&amp;&gt;&quot;1</p>
+<p style="text-align:justify">X2</p>
+
+<p style="font-size:13px">
+&nbsp;
+</p>
+
+<hr style="font-size:13px" />
+<p style="font-size:13px;text-align:center">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><span style="font-size:16px"><strong>IV. ORDER</strong></span></span></span>
+</p>
+<p style="font-size:14px">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000">It is hereby <strong>ORDERED</strong>:</span></span>
+</p>
+<ol style="font-size:14px">
+<li>X&lt;&amp;&gt;&quot;1</li>
+<li>X2</li>
+</ol>
+<p style="font-size:14px">
+&nbsp;
+</p>
+<p style="font-size:14px">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><strong>SO ORDERED.</strong></span></span>
+</p>
+<p style="font-size:14px">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000"><em>/s/ X&lt;&amp;&gt;&quot;1
+
+X2 X&lt;&amp;&gt;&quot;1
+
+X2</em></span></span>
+</p>
+<p style="font-size:14px">
+<span style="font-family:Arial, Helvetica, sans-serif"><span style="color:#000000">SAN ANDREAS COURT<br />
+County of Los Santos</span></span>
+</p>
+"
+`;

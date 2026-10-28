@@ -1,0 +1,40 @@
+# Weekly dependency update PRs (LP-85). How to handle one: docs/dependencies.md.
+#
+# Titles come out as "chore(deps): …", "chore(deps-dev): …" and "ci(deps): …",
+# which the commit check (scripts/commit-format.mjs) accepts without a Jira key.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore
+      prefix-development: chore
+      include: scope
+    groups:
+      # playwright and @playwright/test must stay on the same version (each wants its
+      # own browser build), so they always move together, majors included.
+      playwright:
+        patterns: ["playwright", "@playwright/test"]
+      # Likewise next and its ESLint config (see LP-97).
+      next:
+        patterns: ["next", "eslint-config-next"]
+      # Minor and patch updates arrive as one PR; each major update gets its own,
+      # since those need their changelog read first.
+      npm-minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: ci
+      include: scope
+    groups:
+      github-actions:
+        update-types: [minor, patch]

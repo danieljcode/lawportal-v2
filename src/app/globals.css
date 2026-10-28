@@ -1,0 +1,2787 @@
+/* The app's shared styles. The modern look is the default (html[data-look="modern"], LP-125); the
+   Classic 1990 look is an option in Settings (data-look="classic", LP-112). Each has light and dark
+   (data-theme). What differs between looks is a variable set here (LP-110), and each program's own
+   stylesheet only uses them.
+   The forum preview (.post) is always a light forum post and is isolated from both looks: it
+   redeclares every variable, and no rule styles bare a/hr/table/ul/ol/p/img globally (element
+   rules are scoped with :where(...)). */
+
+/* ---------- skin variables ---------- */
+:root {
+  --desktop: #008080;
+  --face: #c0c0c0;
+  --hilite: #fff;
+  --light: #dfdfdf;
+  --shadow: #808080;
+  --dkshadow: #000;
+  --text: #000;
+  --title-from: #000080;
+  --title-to: #0a5fa8;
+  --title-text: #fff;
+  --field: #fff;
+  --select-bg: #000080;
+  --select-text: #fff;
+  --link: #0000ee;
+  --mark: #ffff80;
+  --focus: #000;
+  --muted: #404040;
+  --good: #005000;
+  --bad: #900000;
+  --on-bg: #ffffe1;
+  --dot-synced: #008000;
+  --dot-busy: #c0a000;
+  --dot-conflict: #d06000;
+  --missing: #a04800;
+  --dot-offline: #808080;
+  --dot-error: #c00000;
+  --notify: #c00000;
+  --task-bg: var(--light);
+  --task-text: #000;
+  --disabled-emboss: 1px 1px var(--hilite);
+  --sidebar: 280px;
+  --check-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.2 3.8l1.9 1.9L6.8 2' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E");
+  --select-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='16' height='16' fill='%23000'/%3E%3Crect width='15' height='15' fill='%23dfdfdf'/%3E%3Crect x='1' y='1' width='14' height='14' fill='%23808080'/%3E%3Crect x='1' y='1' width='13' height='13' fill='%23fff'/%3E%3Crect x='2' y='2' width='12' height='12' fill='%23c0c0c0'/%3E%3Cpath d='M4.5 6h7L8 9.5z' fill='%23000'/%3E%3C/svg%3E");
+  --ui-font: "MS Sans Serif", "Microsoft Sans Serif", Tahoma, "Segoe UI", sans-serif;
+  --mono: "Courier New", monospace;
+  color-scheme: light;
+}
+
+/* High Contrast Black: chosen explicitly, or automatic with a dark system theme. */
+:root[data-theme="dark"] {
+  --desktop: #000;
+  --face: #000;
+  --hilite: #fff;
+  --light: #c0c0c0;
+  --shadow: #808080;
+  --dkshadow: #fff;
+  --text: #fff;
+  --title-from: #800080;
+  --title-to: #800080;
+  --title-text: #fff;
+  --field: #000;
+  --select-bg: #00ffff;
+  --select-text: #000;
+  --link: #ffff00;
+  --mark: #808000;
+  --focus: #ffff00;
+  --muted: #c0c0c0;
+  --good: #00ff00;
+  --bad: #ff8080;
+  --on-bg: #000080;
+  --dot-synced: #00ff00;
+  --dot-busy: #ffff00;
+  --dot-conflict: #ff9900;
+  --missing: #ff9900;
+  --dot-offline: #c0c0c0;
+  --dot-error: #ff4040;
+  --notify: #ffff00;
+  --task-bg: #000;
+  --task-text: #fff;
+  --disabled-emboss: none;
+  --check-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.2 3.8l1.9 1.9L6.8 2' fill='none' stroke='%23fff' stroke-width='1.5'/%3E%3C/svg%3E");
+  --select-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='16' height='16' fill='%23fff'/%3E%3Crect width='15' height='15' fill='%23c0c0c0'/%3E%3Crect x='1' y='1' width='14' height='14' fill='%23808080'/%3E%3Crect x='1' y='1' width='13' height='13' fill='%23fff'/%3E%3Crect x='2' y='2' width='12' height='12' fill='%23000'/%3E%3Cpath d='M4.5 6h7L8 9.5z' fill='%23fff'/%3E%3C/svg%3E");
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --desktop: #000;
+    --face: #000;
+    --hilite: #fff;
+    --light: #c0c0c0;
+    --shadow: #808080;
+    --dkshadow: #fff;
+    --text: #fff;
+    --title-from: #800080;
+    --title-to: #800080;
+    --title-text: #fff;
+    --field: #000;
+    --select-bg: #00ffff;
+    --select-text: #000;
+    --link: #ffff00;
+    --mark: #808000;
+    --focus: #ffff00;
+    --muted: #c0c0c0;
+    --good: #00ff00;
+    --bad: #ff8080;
+    --on-bg: #000080;
+    --dot-synced: #00ff00;
+    --dot-busy: #ffff00;
+    --dot-conflict: #ff9900;
+    --missing: #ff9900;
+    --dot-offline: #c0c0c0;
+    --dot-error: #ff4040;
+    --notify: #ffff00;
+    --task-bg: #000;
+    --task-text: #fff;
+    --disabled-emboss: none;
+    --check-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.2 3.8l1.9 1.9L6.8 2' fill='none' stroke='%23fff' stroke-width='1.5'/%3E%3C/svg%3E");
+    --select-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='16' height='16' fill='%23fff'/%3E%3Crect width='15' height='15' fill='%23c0c0c0'/%3E%3Crect x='1' y='1' width='14' height='14' fill='%23808080'/%3E%3Crect x='1' y='1' width='13' height='13' fill='%23fff'/%3E%3Crect x='2' y='2' width='12' height='12' fill='%23000'/%3E%3Cpath d='M4.5 6h7L8 9.5z' fill='%23fff'/%3E%3C/svg%3E");
+    color-scheme: dark;
+  }
+}
+
+/* ---------- look tokens (LP-110) ---------- */
+/* What changes between looks besides the colours above: bevels, type, radii and control sizes.
+   These are the 1990 look's values, which the Classic theme keeps (LP-112). The bevels are set on
+   .post too, so the forum preview's own fixed colours feed them. */
+:root,
+.post {
+  --bevel-raised:
+    inset -1px -1px var(--dkshadow), inset 1px 1px var(--hilite), inset -2px -2px var(--shadow),
+    inset 2px 2px var(--light);
+  --bevel-window:
+    inset -1px -1px var(--dkshadow), inset 1px 1px var(--light), inset -2px -2px var(--shadow),
+    inset 2px 2px var(--hilite);
+  --bevel-sunken:
+    inset -1px -1px var(--hilite), inset 1px 1px var(--shadow), inset -2px -2px var(--light),
+    inset 2px 2px var(--dkshadow);
+  --bevel-pressed:
+    inset -1px -1px var(--hilite), inset 1px 1px var(--dkshadow), inset -2px -2px var(--light),
+    inset 2px 2px var(--shadow);
+  /* the default button's extra black frame */
+  --bevel-default:
+    inset 0 0 0 1px var(--dkshadow), inset -2px -2px var(--dkshadow), inset 2px 2px var(--hilite),
+    inset -3px -3px var(--shadow), inset 3px 3px var(--light);
+  --bevel-thin: inset -1px -1px var(--hilite), inset 1px 1px var(--shadow);
+  --bevel-groove: 1px 1px var(--hilite), inset 1px 1px var(--hilite);
+  --bevel-tab:
+    inset 1px 1px var(--hilite), inset 2px 2px var(--light), inset -1px 0 var(--dkshadow), inset -2px 0 var(--shadow);
+  --bevel-taskbar: inset 0 1px var(--light), inset 0 2px var(--hilite);
+  --bevel-rule: 0 1px var(--hilite);
+  --bevel-rule-inset: inset 0 1px var(--hilite);
+}
+/* A second :root block on purpose: the skin colours come first, the look tokens here. */
+:root {
+  --shadow-menu: 2px 2px 0 rgba(0, 0, 0, 0.35);
+  --backdrop: rgba(0, 0, 0, 0.4);
+  /* the modern frame's font; the modern look makes it --ui-font */
+  --frame-font: system-ui, "Segoe UI", Roboto, sans-serif;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 13px;
+  --text-md: 14px;
+  --text-lg: 15px;
+  --text-xl: 16px;
+  --text-2xl: 18px;
+  --text-3xl: 20px;
+  --text-4xl: 22px;
+  --text-5xl: 26px;
+  --text-6xl: 28px;
+  --radius: 0;
+  --radius-tab: 3px 3px 0 0;
+  --radius-rail: 6px;
+  --radius-window: 0;
+  /* buttons and fields; a pressed button's label moves by --press */
+  --control-height: 23px;
+  --btn-pad-y: 3px;
+  --btn-pad-x: 12px;
+  --mini-height: 21px;
+  --mini-pad-y: 1px;
+  --mini-pad-x: 8px;
+  --icon-pad-y: 2px;
+  --icon-pad-x: 6px;
+  --press: 1px;
+  --field-pad: 3px 5px;
+  /* text on the desktop colour, the error icon, the About mark's ring, a hovered rail item */
+  --desktop-text: #fff;
+  --alert-bg: #c00000;
+  --alert-text: #fff;
+  --ring: #c0c0c0;
+  --hover-text: #000;
+  /* the accent on cards and lists, and the default button's colours */
+  --accent: var(--select-bg);
+  --primary-bg: var(--face);
+  --primary-text: var(--text);
+}
+/* Classic's "Use a readable font" (LP-112): the modern system font, in Classic's sizes. */
+:root[data-look="classic"][data-font="readable"] {
+  --ui-font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ---------- the modern look (LP-110): slate and brass ---------- */
+/* The default look. It sets the same variables as the 1990 values above, so the layout and every
+   program stay as they are: only colours, type, corners, sizes and bevels change. Light first, then
+   dark (chosen, or automatic with a dark system theme). */
+:root[data-look="modern"] {
+  --desktop: #f3f4f6;
+  --face: #ffffff;
+  --hilite: #ffffff;
+  --light: #e7eaee;
+  --shadow: #d3d8df;
+  --dkshadow: #8a929e;
+  --text: #1e2530;
+  --title-from: #ffffff;
+  --title-to: #ffffff;
+  --title-text: #1e2530;
+  --field: #ffffff;
+  --select-bg: #2b3442;
+  --select-text: #ffffff;
+  --accent: #9a7b3f;
+  --primary-bg: #2b3442;
+  --primary-text: #ffffff;
+  --link: #7a5f2b;
+  --mark: #f3e6c4;
+  --focus: #9a7b3f;
+  --muted: #5d6673;
+  --good: #2f6b3f;
+  --bad: #a33a2c;
+  --on-bg: #f7f1e3;
+  --dot-synced: #3d8b57;
+  --dot-busy: #b38b2d;
+  --dot-conflict: #c0692a;
+  --missing: #9a5a1c;
+  --dot-offline: #8a929e;
+  --dot-error: #b8432f;
+  --notify: #9a7b3f;
+  --task-bg: var(--light);
+  --task-text: var(--text);
+  --disabled-emboss: none;
+  --check-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.2 3.8l1.9 1.9L6.8 2' fill='none' stroke='%231e2530' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --select-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cpath d='M4.5 6.5L8 10l3.5-3.5' fill='none' stroke='%235d6673' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --ui-font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --frame-font: var(--ui-font);
+  --mono: ui-monospace, "Cascadia Mono", Consolas, "Courier New", monospace;
+  --backdrop: rgba(22, 25, 30, 0.45);
+  --shadow-menu: 0 8px 24px rgba(22, 25, 30, 0.14), 0 2px 6px rgba(22, 25, 30, 0.08);
+  --desktop-text: var(--muted);
+  --alert-bg: var(--bad);
+  --ring: var(--shadow);
+  --hover-text: var(--text);
+
+  /* Flat: a hairline where 1990 had a bevel, a soft shadow on what floats. */
+  --bevel-raised: inset 0 0 0 1px var(--shadow);
+  --bevel-window: 0 0 0 1px var(--shadow), 0 12px 32px rgba(22, 25, 30, 0.16);
+  --bevel-sunken: inset 0 0 0 1px var(--shadow);
+  --bevel-pressed: inset 0 0 0 1px var(--dkshadow);
+  --bevel-default: none;
+  --bevel-thin: inset 0 0 0 1px var(--shadow);
+  --bevel-groove: none;
+  --bevel-tab: inset 0 0 0 1px var(--shadow);
+  --bevel-taskbar: inset 0 1px var(--shadow);
+  --bevel-rule: none;
+  --bevel-rule-inset: none;
+
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 15px;
+  --text-lg: 16px;
+  --text-xl: 17px;
+  --text-2xl: 20px;
+  --text-3xl: 22px;
+  --text-4xl: 24px;
+  --text-5xl: 28px;
+  --text-6xl: 30px;
+  --radius: 6px;
+  --radius-tab: 6px 6px 0 0;
+  --radius-rail: 8px;
+  --radius-window: 10px;
+  --control-height: 32px;
+  --btn-pad-y: 5px;
+  --btn-pad-x: 14px;
+  --mini-height: 26px;
+  --mini-pad-y: 3px;
+  --mini-pad-x: 10px;
+  --icon-pad-y: 4px;
+  --icon-pad-x: 8px;
+  --press: 0px;
+  --field-pad: 5px 10px;
+  color-scheme: light;
+}
+:root[data-look="modern"][data-theme="dark"] {
+  --desktop: #16191e;
+  --face: #1e2229;
+  --hilite: #2a2f37;
+  --light: #262b33;
+  --shadow: #363c45;
+  --dkshadow: #5a626d;
+  --text: #e4e6ea;
+  --title-from: #1e2229;
+  --title-to: #1e2229;
+  --title-text: #e4e6ea;
+  --field: #1a1d23;
+  --select-bg: #3a4350;
+  --select-text: #ffffff;
+  --accent: #c9a961;
+  --primary-bg: #c9a961;
+  --primary-text: #1b1608;
+  --link: #d8bc7a;
+  --mark: #4a3f22;
+  --focus: #c9a961;
+  --muted: #9aa1ab;
+  --good: #7cc492;
+  --bad: #f08a78;
+  --on-bg: #2a2619;
+  --dot-synced: #6fbf86;
+  --dot-busy: #d6b25a;
+  --dot-conflict: #e0905a;
+  --missing: #e0a15a;
+  --dot-offline: #8a929e;
+  --dot-error: #f08a78;
+  --notify: #c9a961;
+  --check-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.2 3.8l1.9 1.9L6.8 2' fill='none' stroke='%23e4e6ea' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --select-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cpath d='M4.5 6.5L8 10l3.5-3.5' fill='none' stroke='%239aa1ab' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --backdrop: rgba(0, 0, 0, 0.6);
+  --shadow-menu: 0 8px 24px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
+  --bevel-window: 0 0 0 1px var(--shadow), 0 12px 32px rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-look="modern"]:not([data-theme="light"]) {
+    --desktop: #16191e;
+    --face: #1e2229;
+    --hilite: #2a2f37;
+    --light: #262b33;
+    --shadow: #363c45;
+    --dkshadow: #5a626d;
+    --text: #e4e6ea;
+    --title-from: #1e2229;
+    --title-to: #1e2229;
+    --title-text: #e4e6ea;
+    --field: #1a1d23;
+    --select-bg: #3a4350;
+    --select-text: #ffffff;
+    --accent: #c9a961;
+    --primary-bg: #c9a961;
+    --primary-text: #1b1608;
+    --link: #d8bc7a;
+    --mark: #4a3f22;
+    --focus: #c9a961;
+    --muted: #9aa1ab;
+    --good: #7cc492;
+    --bad: #f08a78;
+    --on-bg: #2a2619;
+    --dot-synced: #6fbf86;
+    --dot-busy: #d6b25a;
+    --dot-conflict: #e0905a;
+    --missing: #e0a15a;
+    --dot-offline: #8a929e;
+    --dot-error: #f08a78;
+    --notify: #c9a961;
+    --check-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.2 3.8l1.9 1.9L6.8 2' fill='none' stroke='%23e4e6ea' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    --select-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cpath d='M4.5 6.5L8 10l3.5-3.5' fill='none' stroke='%239aa1ab' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    --backdrop: rgba(0, 0, 0, 0.6);
+    --shadow-menu: 0 8px 24px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
+    --bevel-window: 0 0 0 1px var(--shadow), 0 12px 32px rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+  }
+}
+
+/* ---------- base ---------- */
+* {
+  box-sizing: border-box;
+}
+[hidden] {
+  display: none !important;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  background: var(--desktop);
+  color: var(--text);
+  font-family: var(--ui-font);
+  font-size: var(--text-base);
+  line-height: 1.4;
+  scrollbar-color: var(--face) var(--light);
+}
+.muted {
+  color: var(--muted);
+}
+.small {
+  font-size: var(--text-sm);
+}
+::selection {
+  background: var(--select-bg);
+  color: var(--select-text);
+}
+
+.booting {
+  margin: 0;
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--desktop-text);
+  font-size: var(--text-md);
+}
+
+/* Classic scrollbars (WebKit; Firefox and new Chromium use scrollbar-color above). */
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+::-webkit-scrollbar-track {
+  background: var(--light);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--face);
+  box-shadow: var(--bevel-raised);
+}
+::-webkit-scrollbar-corner {
+  background: var(--face);
+}
+
+/* ---------- bevels ---------- */
+/* Grouped by bevel, so each look's edges are in one place; a selector's other rules are with its component. */
+/* raised: buttons, window frames, the taskbar's Start */
+.btn,
+.mini,
+.tab,
+.start-btn,
+.title-bar-controls span,
+.dialog-head [data-close],
+.step-num {
+  background: var(--face);
+  color: var(--text);
+  border: 0;
+  border-radius: var(--radius);
+  box-shadow: var(--bevel-raised);
+}
+.app-window,
+.window,
+dialog {
+  background: var(--face);
+  color: var(--text);
+  border-radius: var(--radius-window);
+  box-shadow: var(--bevel-window);
+}
+/* sunken: fields, the sidebar tree, the preview frame, the clock tray */
+.sidebar,
+.post-frame,
+.tray,
+.code-area,
+.checklist,
+.dc-settings select,
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog)
+  :is(
+    input[type="text"],
+    input[type="url"],
+    input[type="search"],
+    input[type="date"],
+    input:not([type]),
+    select,
+    textarea
+  ) {
+  box-shadow: var(--bevel-sunken);
+}
+/* thin sunken: status bars and the task button */
+.status-bar,
+.task-btn {
+  box-shadow: var(--bevel-thin);
+}
+
+/* ---------- buttons ---------- */
+.btn,
+.mini {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: var(--control-height);
+  padding: var(--btn-pad-y) var(--btn-pad-x);
+  font: inherit;
+  font-size: var(--text-base);
+  white-space: nowrap;
+  cursor: pointer;
+  text-decoration: none;
+  position: relative;
+}
+.mini {
+  min-height: var(--mini-height);
+  padding: var(--mini-pad-y) var(--mini-pad-x);
+  font-size: var(--text-sm);
+}
+.btn.primary {
+  /* the default button's extra black frame */
+  box-shadow: var(--bevel-default);
+  background: var(--primary-bg);
+  color: var(--primary-text);
+  font-weight: 700;
+}
+.btn:active:not(:disabled),
+.mini:active:not(:disabled),
+.start-btn:active,
+.btn[aria-pressed="true"],
+.start-btn[aria-pressed="true"] {
+  box-shadow: var(--bevel-pressed);
+  padding-top: calc(var(--btn-pad-y) + var(--press));
+  padding-left: calc(var(--btn-pad-x) + var(--press));
+  padding-bottom: calc(var(--btn-pad-y) - var(--press));
+  padding-right: calc(var(--btn-pad-x) - var(--press));
+}
+.mini:active:not(:disabled) {
+  padding: calc(var(--mini-pad-y) + var(--press)) calc(var(--mini-pad-x) - var(--press))
+    calc(var(--mini-pad-y) - var(--press)) calc(var(--mini-pad-x) + var(--press));
+}
+.btn.icon-btn:active:not(:disabled) {
+  padding: calc(var(--icon-pad-y) + var(--press)) calc(var(--icon-pad-x) - var(--press))
+    calc(var(--icon-pad-y) - var(--press)) calc(var(--icon-pad-x) + var(--press));
+}
+.btn:disabled,
+.mini:disabled {
+  color: var(--shadow);
+  text-shadow: var(--disabled-emboss);
+  cursor: default;
+}
+.danger-quiet {
+  color: var(--bad);
+}
+.btn.icon-btn {
+  min-width: 28px;
+  padding: var(--icon-pad-y) var(--icon-pad-x);
+  font-size: var(--text-lg);
+  line-height: 1;
+}
+.btn.add {
+  margin-top: 8px;
+  align-self: flex-start;
+}
+
+/* focus: a dotted rectangle on buttons, a solid outline on inputs, always visible */
+.btn:focus-visible,
+.mini:focus-visible,
+.tab:focus-visible,
+.start-btn:focus-visible,
+.dialog-head [data-close]:focus-visible,
+summary:focus-visible {
+  outline: 1px dotted var(--focus);
+  outline-offset: -4px;
+}
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) a:focus-visible,
+.post-frame a:focus-visible {
+  outline: 1px dotted var(--focus);
+  outline-offset: 1px;
+}
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) :is(input, select, textarea):focus,
+.dc-settings select:focus,
+.code-area:focus,
+.win-check:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 0;
+}
+
+/* ---------- fields ---------- */
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) :is(button, input, select, textarea),
+.dc-settings select {
+  font: inherit;
+  color: inherit;
+}
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog)
+  :is(
+    input[type="text"],
+    input[type="url"],
+    input[type="search"],
+    input[type="date"],
+    input:not([type]),
+    select,
+    textarea
+  ),
+.dc-settings select,
+.code-area {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: var(--field-pad);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--field);
+  color: var(--text);
+  font-size: var(--text-base);
+}
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) select:not([multiple]),
+.dc-settings select {
+  appearance: none;
+  padding-right: 22px;
+  background: var(--field) var(--select-img) no-repeat right 2px center;
+  cursor: pointer;
+}
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) textarea,
+.code-area {
+  resize: vertical;
+  line-height: 1.35;
+  min-height: 60px;
+}
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) :is(input, textarea)::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) :is(input, select, textarea):disabled {
+  background-color: var(--face);
+  color: var(--shadow);
+}
+
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) input[type="checkbox"],
+.win-check {
+  appearance: none;
+  flex: none;
+  width: 13px;
+  height: 13px;
+  margin: 2px 0 0;
+  background: var(--field) no-repeat center / 9px 9px;
+  box-shadow: var(--bevel-sunken);
+  cursor: pointer;
+}
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) input[type="checkbox"]:checked,
+.win-check:checked {
+  background-image: var(--check-img);
+}
+
+/* ---------- desktop window ---------- */
+.app-window {
+  position: fixed;
+  inset: 8px 8px 38px 8px;
+  display: flex;
+  flex-direction: column;
+  padding: 3px;
+  min-width: 0;
+}
+.title-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  min-height: 20px;
+  padding: 2px 3px 2px 4px;
+  background: linear-gradient(90deg, var(--title-from), var(--title-to));
+  color: var(--title-text);
+  font-weight: 700;
+  font-size: var(--text-base);
+}
+.title-bar-icon {
+  font-size: var(--text-base);
+  line-height: 1;
+}
+.title-bar-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.title-bar-controls {
+  display: flex;
+  gap: 2px;
+}
+.title-bar-controls span {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 14px;
+  font-size: var(--text-sm);
+  line-height: 1;
+  font-weight: 700;
+}
+.title-bar-controls span:last-child {
+  margin-left: 2px;
+}
+
+/* ---------- Classic: the menu bar row, with ☰ at phone width (LP-109) ---------- */
+.classic-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+}
+.classic-bar .menu-bar {
+  flex: 1;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  text-decoration: none;
+  min-width: 0;
+  padding: 1px 4px;
+}
+.char-picker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.char-picker .muted {
+  white-space: nowrap;
+}
+.changelog-dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 7px;
+  height: 7px;
+  background: var(--notify);
+  outline: 1px solid var(--dkshadow);
+}
+.only-narrow {
+  display: none !important;
+}
+
+/* sync status: a dot and its word, linking to Settings (LP-109) */
+.sync-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.sync-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-left: 2px;
+  background: var(--dot-synced);
+  outline: 1px solid var(--dkshadow);
+}
+.sync-dot.pending,
+.sync-dot.saving,
+.sync-dot.loading {
+  background: var(--dot-busy);
+}
+.sync-dot.conflict {
+  background: var(--dot-conflict);
+}
+.sync-dot.offline {
+  background: var(--dot-offline);
+}
+.sync-dot.error {
+  background: var(--dot-error);
+}
+
+/* ---------- three panes ---------- */
+.layout {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: var(--sidebar) minmax(0, 1fr);
+  gap: 3px;
+}
+.layout.with-output {
+  grid-template-columns: var(--sidebar) minmax(0, 1fr) minmax(380px, 40%);
+}
+.sidebar,
+.editor,
+.output {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ---------- sidebar: an Explorer tree ---------- */
+.sidebar {
+  background: var(--field);
+  color: var(--text);
+  padding: 6px 6px 14px;
+}
+.sidebar input[type="search"] {
+  margin-bottom: 4px;
+}
+.tree details {
+  margin-top: 6px;
+}
+.tree summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 1px 3px;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+.tree summary::-webkit-details-marker {
+  display: none;
+}
+.tree summary::before {
+  content: "📁";
+  flex: none;
+}
+.tree details[open] > summary::before {
+  content: "📂";
+}
+.tree summary:hover {
+  text-decoration: underline;
+}
+.tree ul {
+  list-style: none;
+  margin: 0 0 2px 10px;
+  padding: 0 0 0 8px;
+  border-left: 1px dotted var(--shadow);
+}
+.tree li a {
+  display: flex;
+  gap: 4px;
+  padding: 1px 4px;
+  margin: 1px 0;
+  color: var(--text);
+  text-decoration: none;
+}
+.tree li a::before {
+  content: "📄";
+  flex: none;
+}
+.tree li a:hover {
+  text-decoration: underline;
+}
+.tree li a.active {
+  background: var(--select-bg);
+  color: var(--select-text);
+  outline: 1px dotted var(--focus);
+  outline-offset: -1px;
+}
+.section-label {
+  margin: 6px 0 1px 12px;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--muted);
+}
+.tree > .muted {
+  margin: 8px 4px;
+}
+.sidebar-foot {
+  margin: 14px 4px 0;
+  font-size: var(--text-sm);
+}
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) a {
+  color: var(--link);
+}
+:where(.classic-bar, .m-topbar, .sidebar, .editor, .taskbar, dialog) a.btn {
+  color: var(--text);
+}
+
+/* ---------- editor (window client area) ---------- */
+.editor {
+  padding: 10px 14px 0;
+}
+:where(.editor) h2 {
+  margin: 0;
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  line-height: 1.25;
+}
+:where(.editor) p {
+  margin: 0 0 6px;
+}
+
+/* start page */
+.empty {
+  max-width: 620px;
+  margin: 4vh auto 16px;
+}
+.eyebrow {
+  margin: 0 0 4px;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--muted);
+}
+.empty h2 {
+  margin-bottom: 6px;
+  font-size: var(--text-4xl);
+}
+.lede {
+  margin: 0 0 14px;
+  font-size: var(--text-md);
+}
+:where(.editor) .steps {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px;
+  display: grid;
+  gap: 8px;
+}
+.steps li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid var(--shadow);
+  box-shadow: var(--bevel-groove);
+}
+.steps p {
+  margin: 2px 0 0;
+}
+.step-num {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+
+/* form header */
+.form-head {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--shadow);
+  box-shadow: var(--bevel-rule);
+}
+.crumb {
+  margin: 0 0 2px;
+  font-size: var(--text-sm);
+}
+.form-head-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* docket bar */
+.docket-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 6px 8px;
+  margin-bottom: 10px;
+  border: 1px solid var(--shadow);
+  box-shadow: var(--bevel-groove);
+}
+.docket-bar label {
+  font-weight: 700;
+}
+.docket-bar select {
+  width: auto;
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+#fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* sections as group boxes */
+.section {
+  border: 1px solid var(--shadow);
+  box-shadow: var(--bevel-groove);
+  padding: 0;
+}
+.section > summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.section > summary::-webkit-details-marker {
+  display: none;
+}
+.section > summary::before {
+  content: "+";
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 13px;
+  height: 13px;
+  font-size: var(--text-sm);
+  line-height: 1;
+  border: 1px solid var(--shadow);
+  background: var(--field);
+  color: var(--text);
+}
+.section[open] > summary::before {
+  content: "−";
+}
+.section-title {
+  font-weight: 700;
+}
+.section-meta {
+  margin-left: auto;
+  font-size: var(--text-sm);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.section.done .section-meta {
+  color: var(--good);
+  font-weight: 700;
+}
+.section.done .section-meta::before {
+  content: "✓ ";
+}
+.section-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px 12px;
+  align-items: start;
+  padding: 4px 10px 10px;
+}
+.section-body > .field.wide,
+.section-body > .block,
+.section-body > .cond,
+.section-body > .checklist {
+  grid-column: 1 / -1;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.field > label {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.field.check {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 6px;
+}
+.help {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+.inline {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.inline .mini {
+  flex: none;
+}
+.tag {
+  font-size: var(--text-sm);
+  padding: 0 4px;
+  border: 1px solid var(--shadow);
+  background: var(--field);
+  color: var(--text);
+  font-weight: 400;
+}
+
+.tag.req {
+  border-color: var(--missing);
+  color: var(--missing);
+}
+#missing-list {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+#missing-list li {
+  margin: 2px 0;
+}
+/* checklists */
+.checklist {
+  display: flex;
+  flex-direction: column;
+  background: var(--field);
+  color: var(--text);
+  padding: 2px;
+}
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 4px 10px;
+  flex-wrap: wrap;
+  padding: 3px 6px;
+  border-left: 3px solid transparent;
+}
+.check-row + .check-row {
+  border-top: 1px dotted var(--shadow);
+}
+.check-row.on {
+  background: var(--on-bg);
+  border-left-color: var(--accent);
+}
+.check-row.sub {
+  padding-left: 30px;
+}
+.check-row label {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  flex: 1 1 260px;
+  cursor: pointer;
+}
+.check-detail {
+  display: flex;
+  gap: 4px;
+  flex: 0 1 260px;
+}
+
+/* repeatable blocks and optional sections */
+.block,
+.cond {
+  margin: 0;
+  padding: 6px 10px 10px;
+  border: 1px solid var(--shadow);
+  box-shadow: var(--bevel-groove);
+  min-width: 0;
+}
+.block > legend {
+  padding: 0 4px;
+  font-weight: 700;
+}
+.item {
+  margin-top: 8px;
+  padding: 6px 8px 8px;
+  border: 1px solid var(--shadow);
+  box-shadow: var(--bevel-groove);
+}
+.item:first-of-type {
+  margin-top: 2px;
+}
+.item-head {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.item-num {
+  font-weight: 700;
+}
+.spacer {
+  flex: 1;
+}
+.item-body,
+.cond-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px 10px;
+  align-items: start;
+}
+.item-body > .block,
+.item-body > .cond,
+.item-body > .field.wide,
+.item-body > .checklist,
+.cond-body > .block,
+.cond-body > .cond,
+.cond-body > .field.wide,
+.cond-body > .checklist {
+  grid-column: 1 / -1;
+}
+.cond-toggle {
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+.cond-body {
+  margin-top: 6px;
+}
+
+/* the template error box */
+.error-box {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid var(--shadow);
+}
+.error-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--alert-bg);
+  color: var(--alert-text);
+  font-weight: 700;
+  outline: 1px solid var(--dkshadow);
+}
+
+.disclaimer {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  padding: 4px 6px;
+  margin: 12px 0 0;
+  border-left: 3px solid var(--shadow);
+}
+.form-foot {
+  margin-top: 16px;
+}
+
+/* status bars host the 4 s flashes */
+.status-bar {
+  display: flex;
+  align-items: center;
+  flex: none;
+  min-height: 22px;
+  padding: 2px 6px;
+  font-size: var(--text-sm);
+  background: var(--face);
+  color: var(--text);
+}
+.editor-status {
+  position: sticky;
+  bottom: 0;
+  margin: 12px -14px 0;
+  z-index: 2;
+}
+.status.good {
+  color: var(--good);
+}
+.status.bad {
+  color: var(--bad);
+  font-weight: 700;
+}
+
+/* ---------- output window ---------- */
+.output.window {
+  display: flex;
+  flex-direction: column;
+  padding: 3px;
+  overflow: hidden;
+}
+.output-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+}
+.output-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.tabs {
+  display: flex;
+  padding-left: 2px;
+  position: relative;
+  z-index: 1;
+}
+.tab {
+  padding: 3px 12px 2px;
+  margin-right: -1px;
+  font: inherit;
+  cursor: pointer;
+  box-shadow: var(--bevel-tab);
+  border-radius: var(--radius-tab);
+  margin-top: 2px;
+}
+.tab[aria-selected="true"] {
+  margin-top: 0;
+  padding: 4px 14px 5px;
+  margin-bottom: -2px;
+  position: relative;
+  z-index: 2;
+  font-weight: 700;
+}
+.toggle {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding-bottom: 4px;
+  cursor: pointer;
+}
+.tab-panel {
+  flex: 1;
+  padding: 8px;
+  box-shadow: var(--bevel-raised);
+}
+.copy-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0 0 8px;
+}
+.note {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  margin: 0 0 6px;
+}
+.code-area {
+  min-height: 55vh;
+  font-family: var(--mono);
+  font-size: var(--text-sm);
+}
+.post-frame {
+  background: #fff;
+  padding: 2px;
+}
+.copy-buffer {
+  position: fixed;
+  left: -9999px;
+  top: 0;
+}
+
+/* ---------- the forum preview: always a light forum post ---------- */
+.post {
+  /* Rule 1: every skin variable at its light value, so a dark :root never reaches the post. */
+  --desktop: #008080;
+  --face: #fff;
+  --hilite: #fff;
+  --light: #dfdfdf;
+  --shadow: #808080;
+  --dkshadow: #000;
+  --text: #353c41;
+  --title-from: #000080;
+  --title-to: #0a5fa8;
+  --title-text: #fff;
+  --field: #fff;
+  --select-bg: #000080;
+  --select-text: #fff;
+  --link: #0e5ba6;
+  --mark: #ffff80;
+  --focus: #000;
+  --muted: #404040;
+  --good: #005000;
+  --bad: #900000;
+  --on-bg: #ffffe1;
+  --dot-synced: #008000;
+  --dot-busy: #c0a000;
+  --dot-conflict: #d06000;
+  --missing: #a04800;
+  --dot-offline: #808080;
+  --dot-error: #c00000;
+  --notify: #c00000;
+  --sidebar: 280px;
+  --check-img: none;
+  --select-img: none;
+  --ui-font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: "Courier New", monospace;
+  color-scheme: light;
+  color: #353c41;
+  background: #fff;
+  padding: 16px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+/* Rule 3: element rules inside the post come only from this block. */
+.post a {
+  color: #0e5ba6;
+  text-decoration: underline;
+}
+.post img {
+  max-width: 100%;
+  height: auto;
+}
+.post p {
+  margin: 0 0 4px;
+}
+.post table {
+  max-width: 100%;
+}
+.post hr {
+  border: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.25);
+  margin: 12px 0;
+}
+.post ul,
+.post ol {
+  margin: 0 0 4px;
+  padding-left: 28px;
+}
+.post mark.unfilled {
+  background: #fff1b8;
+  color: inherit;
+  outline: 1px dashed #a87b1f;
+}
+.post .ipsSpoiler {
+  border-left: 4px solid #c9d1d9;
+  background: #f6f8fa;
+  margin: 8px 0;
+  padding: 0;
+}
+.post .ipsSpoiler_header {
+  padding: 6px 10px;
+  font-weight: 600;
+  font-size: 13px;
+  color: #57606a;
+}
+.post .ipsSpoiler_contents {
+  padding: 4px 12px 10px;
+}
+
+/* ---------- taskbar ---------- */
+.taskbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 3px 2px;
+  background: var(--face);
+  color: var(--text);
+  box-shadow: var(--bevel-taskbar);
+}
+.start-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 23px;
+  padding: 2px 8px 2px 5px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.start-btn:active {
+  padding: 3px 7px 1px 6px;
+}
+.start-logo {
+  display: grid;
+  grid-template-columns: 6px 6px;
+  gap: 1px;
+  transform: skewY(-6deg);
+}
+.start-logo i {
+  width: 6px;
+  height: 6px;
+}
+.start-logo i:nth-child(1) {
+  background: #ff0000;
+}
+.start-logo i:nth-child(2) {
+  background: #00a000;
+}
+.start-logo i:nth-child(3) {
+  background: #0000ff;
+}
+.start-logo i:nth-child(4) {
+  background: #ffcc00;
+}
+.taskbar-sep {
+  width: 2px;
+  align-self: stretch;
+  margin: 1px 2px;
+  border-left: 1px solid var(--shadow);
+  border-right: 1px solid var(--hilite);
+}
+.task-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 1 240px;
+  min-width: 0;
+  height: 23px;
+  padding: 2px 8px;
+  font-weight: 700;
+  background: var(--task-bg);
+  color: var(--task-text);
+}
+.task-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.clock {
+  font-size: var(--text-sm);
+}
+
+/* ---------- dialogs ---------- */
+dialog {
+  border: 0;
+  padding: 3px;
+  width: min(880px, calc(100vw - 24px));
+  max-height: calc(100vh - 60px);
+  overflow: auto;
+}
+dialog::backdrop {
+  background: var(--backdrop);
+}
+.dialog-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 8px;
+  padding: 2px 3px 2px 6px;
+  background: linear-gradient(90deg, var(--title-from), var(--title-to));
+  color: var(--title-text);
+  position: sticky;
+  top: -3px;
+  z-index: 3;
+}
+.dialog-head h2 {
+  margin: 0;
+  flex: 1;
+  font-size: var(--text-base);
+  font-weight: 700;
+}
+.dialog-head [data-close] {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 16px;
+  padding: 0;
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+.dialog-body {
+  padding: 0 8px 8px;
+}
+.row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.error {
+  color: var(--bad);
+  margin: 0;
+  min-height: 1em;
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+:where(dialog) h3 {
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: 700;
+}
+:where(dialog) p {
+  margin: 0 0 6px;
+}
+:where(dialog) ul {
+  margin: 0;
+}
+
+/* group box: the sync panel, list rows, J.A.P. notes */
+.sync-panel,
+.char-list li,
+.jap-note {
+  border: 1px solid var(--shadow);
+  box-shadow: var(--bevel-groove);
+}
+
+/* Jump box (LP-128) */
+dialog.jump-box {
+  width: min(560px, calc(100vw - 24px));
+  margin-top: 12vh;
+}
+.jump-label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+.jump-input {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: var(--text-md);
+}
+.jump-results {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  max-height: min(360px, 50vh);
+  overflow-y: auto;
+  border: 1px solid var(--shadow);
+  background: var(--field);
+}
+.jump-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 12px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+.jump-result.current {
+  background: var(--select-bg);
+  color: var(--select-text);
+}
+.jump-where {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+.jump-result.current .jump-where {
+  color: inherit;
+}
+.jump-kind {
+  font-weight: 700;
+}
+.jump-empty {
+  margin: 8px 0 0;
+}
+.jump-hint {
+  margin: 6px 0 0;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Characters dialog */
+.sync-panel {
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+.sync-panel .row {
+  margin-top: 6px;
+}
+.sync-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.sync-badge {
+  font-size: var(--text-sm);
+  padding: 0 6px;
+  border: 1px solid var(--shadow);
+  background: var(--field);
+  color: var(--text);
+}
+.sync-badge.synced,
+.sync-badge.conflict {
+  color: var(--good);
+  font-weight: 700;
+}
+.sync-badge.loading,
+.sync-badge.pending,
+.sync-badge.saving {
+  font-style: italic;
+}
+.sync-badge.error,
+.sync-badge.offline {
+  color: var(--bad);
+  font-weight: 700;
+}
+.sync-link input {
+  flex: 1 1 260px;
+  width: auto;
+  font-family: var(--mono);
+}
+.sync-code-row {
+  align-items: center;
+}
+.sync-code {
+  font-family: var(--mono);
+  font-size: var(--text-base);
+  padding: 2px 6px;
+  background: var(--field);
+  color: var(--text);
+  box-shadow: var(--bevel-thin);
+  word-break: break-all;
+}
+.sync-message {
+  min-height: 1em;
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+.sync-message.warn {
+  color: var(--bad);
+  font-weight: 700;
+}
+.backup-box {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--shadow);
+}
+.backup-box p {
+  margin: 0 0 6px;
+}
+.backup-box .warn {
+  color: var(--bad);
+  font-weight: 700;
+}
+.set-aside-notice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: center;
+  margin: 4px 6px;
+  padding: 6px 8px;
+  border: 2px solid var(--bad);
+}
+.set-aside-notice strong {
+  color: var(--bad);
+}
+.set-aside-notice .mini {
+  margin-left: auto;
+}
+.char-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+  margin-top: 8px;
+  align-items: start;
+}
+:where(dialog) .char-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.char-list li {
+  padding: 6px 8px;
+  border-left: 3px solid var(--shadow);
+}
+.char-list li.current {
+  border-left-color: var(--accent);
+  border-left-width: 5px;
+}
+.char-list li.muted {
+  border: 0;
+  box-shadow: none;
+  padding: 4px 0;
+}
+.char-name {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+.char-actions {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.char-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#char-fields,
+#docket-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Dockets dialog */
+.docket-tools {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 4px 0 8px;
+}
+.docket-tools input {
+  flex: 1 1 220px;
+  width: auto;
+}
+.docket-tools select {
+  width: auto;
+}
+.docket-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.docket-list li.closed {
+  color: var(--muted);
+}
+
+/* What's new */
+dialog.changelog {
+  width: min(640px, calc(100vw - 24px));
+}
+#changelog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.log-entry header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.log-entry time {
+  font-weight: 700;
+  font-size: var(--text-md);
+}
+.log-title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.log-version {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  padding: 0 4px;
+  border: 1px solid var(--muted);
+}
+.log-group {
+  margin: 6px 0 0;
+}
+.log-type {
+  display: inline-block;
+  margin: 0 0 2px;
+  padding: 0 6px;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  border: 1px solid var(--shadow);
+  background: var(--field);
+}
+.log-type.new {
+  color: var(--good);
+}
+.log-type.update {
+  color: var(--link);
+}
+.log-type.fix {
+  color: var(--bad);
+}
+:where(dialog) .log-group ul {
+  padding-left: 20px;
+}
+.log-group li {
+  margin: 3px 0;
+  line-height: 1.4;
+}
+.log-entry + .log-entry {
+  border-top: 1px solid var(--shadow);
+  box-shadow: var(--bevel-rule-inset);
+  padding-top: 10px;
+}
+
+/* J.A.P. view */
+.jap-level {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-weight: 700;
+}
+.jap-level select {
+  width: auto;
+}
+.jap-note {
+  padding: 6px 10px;
+  margin-bottom: 10px;
+  border-left: 3px solid var(--accent);
+}
+.jap-note p:last-child {
+  margin-bottom: 0;
+}
+.jap-server.off {
+  border-left-color: var(--bad);
+}
+.jap-server .btn {
+  margin-top: 6px;
+}
+#jap-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.jap-section {
+  grid-template-columns: minmax(0, 1fr);
+}
+.jap-intro {
+  grid-column: 1 / -1;
+}
+.jap-task legend {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  padding: 0 4px;
+  font-weight: 700;
+}
+.jap-count {
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--muted);
+}
+.jap-count.done {
+  color: var(--good);
+  font-weight: 700;
+}
+.jap-entry {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 8px 10px;
+  align-items: start;
+}
+.jap-entry input.invalid {
+  outline: 2px solid var(--bad);
+  outline-offset: -2px;
+}
+.jap-topic {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.jap-topic code {
+  font-family: var(--mono);
+  font-size: var(--text-base);
+  padding: 2px 6px;
+  background: var(--field);
+  color: var(--text);
+  box-shadow: var(--bevel-thin);
+}
+
+/* ---------- responsive (ported reference rules) ---------- */
+@media (max-width: 1200px) {
+  .layout,
+  .layout.with-output {
+    grid-template-columns: 270px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    overflow-y: auto;
+  }
+  .sidebar {
+    grid-row: 1 / span 2;
+  }
+  .editor,
+  .output {
+    overflow: visible;
+  }
+  .output.window {
+    min-height: 60vh;
+  }
+  .output-body {
+    overflow: visible;
+  }
+}
+
+@media (max-width: 760px) {
+  .only-narrow {
+    display: inline-flex !important;
+  }
+  .app-window {
+    inset: 0 0 30px 0;
+  }
+  .char-picker {
+    flex: 1 1 100%;
+  }
+  .char-picker .muted {
+    display: none;
+  }
+  .layout,
+  .layout.with-output {
+    display: block;
+    overflow-y: auto;
+  }
+  .sidebar {
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 30px;
+    height: calc(100% - 130px);
+    z-index: 30;
+    border-top: 2px solid var(--title-from);
+  }
+  .nav-open .sidebar {
+    display: block;
+  }
+  .editor {
+    padding: 8px 10px 0;
+  }
+  .editor-status {
+    margin: 12px -10px 0;
+  }
+  .output.window {
+    margin-top: 3px;
+  }
+  .empty {
+    margin-top: 12px;
+  }
+  .empty h2 {
+    font-size: var(--text-3xl);
+  }
+  .section-body,
+  .item-body,
+  .cond-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .char-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- crash screen (LP-88): a Windows 3.0 style "Application Error" box ---------- */
+.crash-wrap {
+  display: grid;
+  place-items: center;
+}
+.crash-app {
+  position: fixed;
+  inset: 0;
+  padding: 16px;
+  background: var(--desktop);
+  overflow: auto;
+}
+.crash-panel {
+  padding: 16px 8px;
+}
+.crash-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  padding: 16px;
+  background: var(--backdrop);
+  overflow: auto;
+}
+.crash {
+  width: min(520px, 100%);
+  padding: 3px;
+}
+.crash-body {
+  padding: 12px;
+}
+.crash-message {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.crash-message p {
+  margin: 0 0 8px;
+}
+.crash-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--text);
+  background: var(--bad);
+  color: var(--face);
+  font-weight: 700;
+  font-size: var(--text-2xl);
+}
+.crash-actions {
+  justify-content: flex-end;
+}
+.crash-status {
+  margin: 8px 0 0;
+  min-height: 1em;
+}
+
+/* ---------- draft history (LP-89) ---------- */
+.history-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+  gap: 12px;
+  margin-top: 8px;
+  align-items: start;
+}
+:where(dialog) .history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 60vh;
+  overflow: auto;
+}
+.history-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid var(--shadow);
+  border-left: 3px solid var(--shadow);
+  background: var(--face);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.history-item.current {
+  border-left: 5px solid var(--accent);
+  font-weight: 700;
+}
+.history-preview .post-frame {
+  max-height: 55vh;
+  overflow: auto;
+}
+@media (max-width: 700px) {
+  .history-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  :where(dialog) .history-list {
+    max-height: 30vh;
+  }
+}
+
+/* ---------- Case File (LP-101) ---------- */
+.case-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.case-filters input[type="search"] {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+.case-filters select {
+  flex: 1 1 110px;
+  min-width: 0;
+}
+.case-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.case-form h3 {
+  margin: 0;
+}
+.case-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+.case-fields .field.wide {
+  grid-column: 1 / -1;
+}
+.case-people {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  border: 1px solid var(--shadow);
+}
+@media (max-width: 800px) {
+  .case-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- filing history (LP-15) ---------- */
+:where(dialog, .case-links) .filing-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 60vh;
+  overflow: auto;
+}
+.filing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 4px 6px;
+  border: 1px solid var(--shadow);
+  border-left: 3px solid var(--shadow);
+  background: var(--field);
+}
+.filing.current {
+  border-left: 5px solid var(--accent);
+}
+.filing-main {
+  flex: 1 1 200px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.filing-main:disabled {
+  cursor: default;
+}
+.filing-actions {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.case-links {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.case-links #case-filings {
+  grid-column: 1 / -1;
+}
+.status-bar #open-filings {
+  margin-left: auto;
+}
+@media (max-width: 800px) {
+  .case-links {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- deadlines (LP-18) ---------- */
+.deadline-list,
+.upcoming-list,
+.dates-panel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+/* ---------- boot screen (LP-21): a DOS screen, the same in every theme ---------- */
+.boot-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+  background: #000;
+  color: #c0c0c0;
+  font-family: var(--mono);
+  font-size: 16px;
+  pointer-events: none;
+}
+.boot-screen pre {
+  margin: 0;
+  font: inherit;
+  white-space: pre-wrap;
+}
+.boot-skip {
+  margin: 0;
+  color: #808080;
+  font-size: 14px;
+}
+.boot-cursor {
+  animation: boot-blink 1s steps(1) infinite;
+}
+@keyframes boot-blink {
+  50% {
+    visibility: hidden;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .boot-cursor {
+    animation: none;
+  }
+}
+.boot-setting {
+  margin: 12px 0;
+}
+
+/* ---------- About (LP-22) ---------- */
+.about-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.about-head p {
+  margin: 0;
+}
+.about-logo {
+  width: 48px;
+  height: 48px;
+  flex: none;
+}
+.about-mark {
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--ring);
+  font-size: var(--text-6xl);
+}
+.about-credits {
+  margin: 0;
+  padding-left: 18px;
+}
+
+/* ---------- program shell (LP-103) ---------- */
+/* Programs without a navigation pane: the page, and its output beside it. */
+.layout.no-nav {
+  grid-template-columns: minmax(0, 1fr);
+}
+.layout.no-nav.with-output {
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 40%);
+}
+
+/* The menu bar: File, View, Help, as in Windows 3.x. */
+.menu-bar {
+  display: flex;
+  flex: none;
+  gap: 0;
+  padding: 1px 2px;
+  position: relative;
+  z-index: 25;
+}
+.menu {
+  position: relative;
+}
+.menu-top {
+  padding: 2px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.menu-top:hover,
+.menu-top.open,
+.menu-top:focus-visible {
+  background: var(--select-bg);
+  color: var(--select-text);
+  outline: none;
+}
+.menu-list {
+  position: absolute;
+  margin: 0;
+  padding: 2px;
+  list-style: none;
+  min-width: 190px;
+  background: var(--face);
+  color: var(--text);
+  border: 1px solid var(--text);
+  box-shadow: var(--shadow-menu);
+  z-index: 50;
+  top: 100%;
+  left: 0;
+}
+.menu-list a,
+.menu-list button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 3px 18px 3px 22px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  position: relative;
+}
+.menu-list a:hover,
+.menu-list button:hover,
+.menu-list a:focus,
+.menu-list button:focus {
+  background: var(--select-bg);
+  color: var(--select-text);
+  outline: none;
+}
+.menu-list [aria-checked="true"]::before {
+  content: "•";
+  position: absolute;
+  left: 9px;
+}
+.menu-list [aria-disabled="true"] {
+  color: var(--shadow);
+  cursor: default;
+}
+.menu-sep {
+  height: 0;
+  margin: 3px 2px;
+  border-top: 1px solid var(--shadow);
+  border-bottom: 1px solid var(--hilite);
+}
+
+/* The tray, with the active character in it, in every program. */
+.tray {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  height: 23px;
+  gap: 10px;
+  padding: 0 6px 0 10px;
+}
+.tray-char select {
+  max-width: 220px;
+  min-width: 140px;
+  height: 21px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Settings (the Control Panel in Classic): one section per area (LP-109). */
+.settings-section {
+  margin: 0 0 24px;
+}
+.settings-section > h3 {
+  margin: 0 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--shadow);
+}
+.control-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 8px 0;
+  padding: 0;
+  list-style: none;
+}
+.control-items li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.control-theme {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .tray-char .muted,
+  .clock {
+    display: none;
+  }
+  .tray {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0 2px 0 4px;
+  }
+  .tray-char {
+    flex: 1;
+    min-width: 0;
+  }
+  .tray-char select {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+  .task-btn {
+    display: none;
+  }
+}
+
+/* ---------- Program Manager (LP-104) ---------- */
+.program-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  background: var(--desktop, #008080);
+}
+.pm-group {
+  background: var(--field);
+  color: var(--text);
+  padding: 3px;
+}
+.pm-group-title {
+  margin: 0;
+  font-size: var(--text-base);
+}
+.pm-icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 10px 6px;
+  list-style: none;
+}
+.pm-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 6px 2px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.pm-glyph {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--shadow);
+  background: var(--face);
+  font-size: var(--text-4xl);
+  line-height: 1;
+}
+.pm-label {
+  padding: 0 3px;
+  font-size: var(--text-sm);
+}
+.pm-icon:hover .pm-label,
+.pm-icon:focus-visible .pm-label {
+  background: var(--select-bg);
+  color: var(--select-text);
+}
+.pm-icon:focus-visible {
+  outline: 1px dotted var(--text);
+  outline-offset: -1px;
+}
+.pm-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--text);
+  border-radius: 50%;
+  background: var(--notify);
+}
+
+/* ---------- modern shell (LP-125): app rail, top bar, only panes scroll ----------
+   Plain styles on the current colour tokens; LP-110 gives it the modern design. */
+body:has(.m-app) {
+  overflow: hidden;
+}
+.m-app {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  background: var(--face);
+  color: var(--text);
+  font-family: var(--frame-font);
+}
+.m-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 84px;
+  padding: 8px 6px;
+  overflow-y: auto;
+  border-right: 1px solid var(--shadow);
+}
+.m-rail-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 2px;
+  border-radius: var(--radius-rail);
+  color: var(--text);
+  font-size: var(--text-sm);
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+}
+.m-rail-item:hover {
+  background: var(--light);
+  color: var(--hover-text);
+}
+.m-rail-item[aria-current="page"] {
+  background: var(--select-bg);
+  color: var(--select-text);
+}
+.m-rail-item:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+.m-rail-icon {
+  font-size: var(--text-3xl);
+  line-height: 1;
+}
+.m-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--field);
+}
+.m-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--shadow);
+  background: var(--face);
+}
+.m-title {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+.m-topbar .menu-bar {
+  padding: 0;
+}
+.m-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+.m-char {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.m-char select {
+  max-width: 240px;
+}
+.m-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: 6px;
+}
+
+/* Phone width: the rail is a bottom bar, and the navigation pane a drawer above it. */
+@media (max-width: 760px) {
+  .m-app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .m-rail {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    flex-direction: row;
+    width: auto;
+    height: 62px;
+    padding: 4px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-top: 1px solid var(--shadow);
+    border-right: 0;
+    background: var(--face);
+  }
+  .m-rail-item {
+    flex: 1 0 64px;
+    padding: 4px 2px;
+    font-size: var(--text-xs);
+  }
+  .m-main {
+    padding-bottom: 62px;
+  }
+  .m-app .sidebar {
+    bottom: 62px;
+  }
+  .m-char .muted {
+    display: none;
+  }
+  .m-char select {
+    max-width: 160px;
+  }
+  /* The File, View and Help menus have these on a phone; the top bar keeps who's filing and sync. */
+  .m-actions #open-dockets,
+  .m-actions #open-changelog,
+  .m-actions #open-about,
+  .m-actions #theme-toggle {
+    display: none;
+  }
+}
+
+/* ---------- modern home screen (LP-127): program tiles and what needs attention ---------- */
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+}
+.home-heading {
+  margin: 0;
+  font-size: var(--text-lg);
+}
+.home-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.home-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 6px;
+  border: 1px solid var(--shadow);
+  background: var(--field);
+  color: var(--text);
+  text-align: center;
+  text-decoration: none;
+}
+.home-tile:hover {
+  background: var(--light);
+}
+.home-tile:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+.home-tile-icon {
+  position: relative;
+  font-size: var(--text-5xl);
+  line-height: 1;
+}
+.home-attention {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 8px;
+}
+.home-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--shadow);
+  background: var(--field);
+  color: var(--text);
+}
+.home-card h3 {
+  margin: 0;
+  font-size: var(--text-base);
+}
+.home-card p {
+  margin: 0;
+}
+.home-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.home-list a,
+.home-link {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+  padding: 5px 6px;
+  border: 0;
+  border-left: 3px solid transparent;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.home-list a:hover,
+.home-link:hover {
+  background: var(--light);
+}
+.home-list .overdue a {
+  border-left-color: var(--bad);
+}
+.home-list .soon a {
+  border-left-color: var(--dot-conflict);
+}
+@media (max-width: 760px) {
+  .home-tiles {
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  }
+}

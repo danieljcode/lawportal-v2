@@ -1,0 +1,171 @@
+/* filings program styles (LP-110): only this program uses these; the shared components are in
+   src/app/globals.css. Loaded with the program's code. */
+
+/* ---------- the Discord tab: Win95 controls, a dark Discord message that ignores the skin ---------- */
+.dc-settings {
+  display: flex;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0 0 6px;
+}
+.dc-settings select {
+  width: auto;
+}
+.dc-settings .toggle {
+  padding-bottom: 0;
+}
+.dc-part {
+  margin: 0 0 4px;
+}
+.dc-part + .dc-part {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--shadow);
+}
+.dc-part-head {
+  display: flex;
+  gap: 6px 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0 0 6px;
+}
+.dc-count {
+  font-family: var(--mono);
+  font-size: var(--text-sm);
+  margin-right: auto;
+}
+.code-area.dc-raw {
+  min-height: 30vh;
+}
+.dc-frame {
+  background: #313338;
+  padding: 2px;
+}
+.dc-message {
+  color-scheme: dark;
+  color: #fff;
+  background: #313338;
+  font-family: "gg sans", "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.375;
+  padding: 12px 16px;
+  overflow-wrap: anywhere;
+}
+.dc-message .dc-line,
+.dc-message .dc-li {
+  min-height: 1.375em;
+}
+.dc-message .dc-blank {
+  height: 0.6em;
+}
+.dc-message .dc-h1 {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.375;
+  margin: 8px 0 0;
+}
+.dc-message .dc-h2 {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.375;
+  margin: 8px 0 0;
+}
+.dc-message .dc-h3 {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.375;
+  margin: 8px 0 0;
+}
+.dc-message .dc-sub {
+  font-size: 12px;
+  color: #949ba4;
+}
+.dc-message .dc-quote {
+  border-left: 4px solid #4e5058;
+  padding-left: 12px;
+  margin: 0;
+}
+.dc-message .dc-li {
+  padding-left: 16px;
+  text-indent: -12px;
+}
+.dc-message .dc-depth-1 {
+  margin-left: 16px;
+}
+.dc-message .dc-depth-2 {
+  margin-left: 32px;
+}
+.dc-message .dc-depth-3 {
+  margin-left: 48px;
+}
+.dc-message .dc-depth-4 {
+  margin-left: 64px;
+}
+.dc-message .dc-codeblock {
+  margin: 4px 0;
+  background: #2b2d31;
+  color: #dbdee1;
+  border: 1px solid #1e1f22;
+  border-radius: 4px;
+  padding: 8px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 14px;
+  line-height: 1.125;
+  white-space: pre-wrap;
+}
+.dc-message .dc-code {
+  background: #2b2d31;
+  color: #dbdee1;
+  border-radius: 3px;
+  padding: 0 2px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 85%;
+}
+.dc-message .dc-spoiler {
+  background: #1e1f22;
+  color: transparent;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.dc-message .dc-spoiler:not(:hover):not(:focus) * {
+  color: transparent;
+}
+.dc-message .dc-spoiler:hover,
+.dc-message .dc-spoiler:focus {
+  background: #3b3d44;
+  color: inherit;
+}
+.dc-message .dc-spoiler:focus-visible {
+  outline: 2px solid #00a8fc;
+  outline-offset: 0;
+}
+.dc-message a {
+  color: #00a8fc;
+  text-decoration: none;
+}
+.dc-message a:hover {
+  text-decoration: underline;
+}
+.dc-message a:focus-visible {
+  outline: 1px dotted #fff;
+  outline-offset: 1px;
+}
+
+/* ---------- dates from a form, for its case (LP-18) ---------- */
+.dates-panel {
+  margin: 0 0 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--shadow);
+  background: var(--field);
+  color: var(--text);
+}
+.dates-panel p {
+  margin: 0 0 4px;
+}
+
+/* Insert exhibit under a form's text boxes (LP-13): only as wide as it needs. */
+.field .exhibit-insert {
+  width: auto;
+  max-width: 100%;
+}
