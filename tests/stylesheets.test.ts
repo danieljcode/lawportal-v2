@@ -47,6 +47,29 @@ describe("program stylesheets (LP-110)", () => {
     ]);
   });
 
+  it("give each selector one block of its own (LP-156)", () => {
+    // Shared groups (`.btn, .mini { … }`) are fine; a second `.mini { … }` is the later one silently winning.
+    const ok = new Set([":root"]); // skin colours and look tokens, split on purpose (globals.css)
+    const twice: string[] = [];
+    for (const f of [GLOBALS, ...PROGRAMS]) {
+      const seen = new Set<string>();
+      const stack: string[] = [];
+      for (const m of read(f).matchAll(/([^{};]+)\{|\}/g)) {
+        if (m[1] === undefined) {
+          stack.pop();
+          continue;
+        }
+        const selector = m[1].trim().replace(/\s+/g, " ");
+        const key = [...stack, selector].join(" | ");
+        if (!selector.startsWith("@") && !selector.includes(",") && !ok.has(selector) && seen.has(key))
+          twice.push(`${path.basename(f)}: ${key}`);
+        seen.add(key);
+        stack.push(selector);
+      }
+    }
+    expect(twice).toEqual([]);
+  });
+
   it("hard-code no colours, fonts, font sizes, radii or bevels", () => {
     const bad: string[] = [];
     for (const f of PROGRAMS) {
