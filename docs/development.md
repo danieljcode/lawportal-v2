@@ -116,7 +116,7 @@ The in-memory rate limits are kept per function instance on Vercel, so they're w
 | `npm run screenshots`        | Screenshots of the running app into `.agents/screenshots/` (Playwright).                                                                   |
 | `npm run screenshots:accept` | Takes the new approved screenshots from the branch's last failed CI run. See [Testing](testing.md#screenshot-tests-lp-117).                |
 | `npm run smoke:preview`      | Browser smoke test of every form against the running app (Playwright).                                                                     |
-| `npm run release-notes`      | Prints the GitHub Release notes for the version in `package.json`. See [Releasing](releasing.md).                                          |
+| `npm run release-notes`      | Prints the GitHub Release notes for the version in `package.json`, for a manual release. See [Releasing](releasing.md).                    |
 | `npm run prepare`            | Runs on `npm install`: turns on the commit-message hook in `.githooks/`.                                                                   |
 
 ## Environment variables

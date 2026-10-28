@@ -56,6 +56,12 @@ describe("checkHeader", () => {
     }
   });
 
+  it("accepts release-please's Release PR title and commit (LP-116), and nothing like it", () => {
+    expect(checkHeader("chore(main): release 0.3.0")).toEqual([]);
+    expect(checkHeader("chore(main): release the hounds")).not.toEqual([]);
+    expect(checkHeader("chore(main): release 0.3.0 early")).not.toEqual([]);
+  });
+
   it("only looks at the first line", () => {
     expect(checkHeader(EXAMPLE + "\n\nBody text that is long enough to go well past seventy-two characters.")).toEqual(
       [],
