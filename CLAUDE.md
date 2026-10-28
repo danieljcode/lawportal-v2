@@ -14,3 +14,36 @@ How to work here: [docs/contributing.md](docs/contributing.md) (branches, commit
 `npm run lint` enforces the import rules (see "Code layout" in docs/architecture.md): no deep imports into a program,
 no `../` out of one, and nothing in `src/lib` or `src/ui` importing the shell or a program. New code shared by two
 programs goes in `src/ui/` or `src/lib/`.
+
+## Direction: modern first
+
+The modern look is the default and what new work is designed for (LP-125). Classic (1990) is an optional theme
+(LP-112) that must keep working: build for Modern, then check Classic. The smoke and screenshot tests run both.
+
+## Programs
+
+The programs are one registry, `PROGRAMS` in `src/shell/registry.ts`: a new program is one entry there plus its folder.
+Routes are prefixed by program (`src/shell/useRoute.ts`); an empty hash is home.
+
+| Program                             | Folder                  | Routes                                       |
+| ----------------------------------- | ----------------------- | -------------------------------------------- |
+| Court Filings                       | `src/programs/filings/` | `#filings`, `#filings/<formId>`              |
+| Case File                           | `src/programs/cases/`   | `#cases`, `#cases/<id>`, `#cases/upcoming`   |
+| Clients                             | `src/programs/clients/` | `#clients/intake`, `#clients/conflicts`      |
+| Law Library                         | `src/programs/library/` | `#library/penal-code`, `#library/precedents` |
+| J.A.P. (Court Commissioners)        | `src/programs/jap/`     | `#jap`                                       |
+| Settings (Control Panel in Classic) | `src/programs/control/` | `#control`                                   |
+
+Home is `src/shell/ModernHome.tsx` in Modern and `src/shell/ProgramManager.tsx` in Classic.
+
+## Themes
+
+- `html[data-look]` (`modern` or `classic`) and `html[data-theme]` (`light`, `dark`, or absent for system) are
+  separate, both set before the first paint by `THEME_SCRIPT` (`src/lib/theme.ts`).
+- What differs between looks is a variable in `src/app/globals.css`. `data-look` rules hold only variables, and a
+  program's stylesheet (`src/programs/<id>/<id>.css`) uses only variables, never hard-coded colours, fonts, font
+  sizes, radii or bevels. `tests/stylesheets.test.ts` checks both.
+- The forum preview (`.post`), the Discord message and the print sheets keep fixed looks in every theme, and court
+  forms never carry firm branding.
+- A change that moves a screen fails the screenshot tests; take the new ones with `npm run screenshots:accept`
+  (docs/testing.md).

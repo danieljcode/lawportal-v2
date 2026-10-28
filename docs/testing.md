@@ -93,7 +93,14 @@ In CI the build is its own step, so `test:e2e` only starts the app.
 `e2e/smoke.spec.ts` uses Playwright's test runner (`playwright.config.ts`) to walk the key journeys in
 a real Chromium, at **desktop** (1440×900) and **phone** (Pixel 7) sizes, each from empty storage:
 
-- open a form from the sidebar (behind ☰ on a phone), fill it in, and see the preview follow;
+- each program's key journey, opened from the home screen (a tile in Modern, an icon in Classic's
+  Program Manager) and run in **both layouts** (LP-111):
+  - **Court Filings**: open a form from the sidebar (behind ☰ on a phone), fill it in, and see the
+    preview follow;
+  - **Case File**: add a case, search for it and find it;
+  - **Clients**: a new client's intake opens a case;
+  - **Law Library**: search the penal code;
+  - **Settings**: switch to the dark theme;
 - **Copy for forum**: the clipboard holds the filing as HTML;
 - **Download .docx**: a real Word file (a zip) downloads;
 - add a character, and it appears in "Filing as";
@@ -145,5 +152,5 @@ an argument (default `http://127.0.0.1:3000`).
   speed, and checks the preview renders on load, reload, restore, back/forward, search and with
   seeded characters and dockets, plus the FreestyleRP wording and case numbers. Prints
   `OK: <n> preview checks … passed.` or lists the failures.
-- **`npm run screenshots`**: saves home, form, dialog and Discord-tab screenshots in both themes to
-  `.agents/screenshots/`. The README's screenshots are copied from there into `docs/screenshots/`.
+- **`npm run screenshots`**: saves home, form, Settings, Discord-tab and Classic home screenshots
+  in light and dark, with one character and one case, to `.agents/screenshots/`. The README's screenshots are copied from there into `docs/screenshots/`.

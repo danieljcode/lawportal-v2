@@ -83,6 +83,8 @@ and **Help** menus, and the character you're filing as, the same in every progra
 scroll, never the whole page. Switching programs keeps each one's place: the form you were filling
 in, your searches and where you'd scrolled to are still there when you come back.
 
+![The home screen: a tile for each program, and what needs your attention](docs/screenshots/home-light.png)
+
 - **Court Filings.** 39 FreestyleRP court forms grouped by court (Criminal, Civil, Traffic, Small
   Claims, Appellate, Supreme, general), plus 13 of the firm's own templates: General Petition,
   Petition for Name Change, General Motion, Interrogatories, Subpoena, Service Agreement, four firm
@@ -112,8 +114,8 @@ in, your searches and where you'd scrolled to are still there when you come back
   progress and the finished BBCode. Only Court Commissioners see it.
 - **Home.** A tile for each program, and what needs your attention: deadlines due in the next 48
   hours or overdue, your latest filings to open again, and the cases you worked on most recently.
-- **Settings.** Characters, sync and backups, the theme (automatic, light or dark), the startup
-  screen, What's new and About, on one page. The top bar of every program shows who you're filing
+- **Settings.** Characters, sync and backups, Appearance (the theme, Modern or Classic, and light,
+  dark or system), What's new and About, on one page. The top bar of every program shows who you're filing
   as, with a quick switch, and the sync status.
 - **Jump to anything.** Press **Ctrl+K** (**Cmd+K** on a Mac) or **/**, or choose View → Jump to, and
   type a few letters to go straight to a program, a section such as Upcoming or Precedents, or any
@@ -124,6 +126,8 @@ puts the programs in a Windows 3.x window with a taskbar, a Program Manager and 
 screen once per session, with an optional readable font. Light, dark or system is a separate
 choice, so it works with either theme. The programs are the same in both; in Classic, Settings is
 called the Control Panel.
+
+![The Classic (1990) theme's Program Manager](docs/screenshots/classic-home-light.png)
 
 ## Your data and sync
 
