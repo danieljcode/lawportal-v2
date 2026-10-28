@@ -52,24 +52,25 @@ add Vercel's Upstash integration, which sets `KV_REST_API_URL` and `KV_REST_API_
 
 ### npm scripts
 
-| Script                  | What it does                                                                                  |
-| ----------------------- | --------------------------------------------------------------------------------------------- |
-| `npm run dev`           | Development server on `127.0.0.1:3000`, with hot reload.                                      |
-| `npm run dev:lan`       | The same on `0.0.0.0`, open to your network.                                                  |
-| `npm run build`         | Type-checks the app and the tests, and makes a production build.                              |
-| `npm start`             | Serves the production build on `127.0.0.1:3000`.                                              |
-| `npm run start:lan`     | The same on `0.0.0.0`, open to your network.                                                  |
-| `npm test`              | Runs every test suite once (Vitest).                                                          |
-| `npm run test:e2e`      | Browser smoke tests at desktop and phone sizes (Playwright; builds the app first).            |
-| `npm run lint`          | ESLint; fails on any error or warning.                                                        |
-| `npm run format`        | Formats every file with Prettier.                                                             |
-| `npm run format:check`  | Checks formatting without changing anything.                                                  |
-| `npm run port-forms`    | Regenerates `src/data/forms.json` from the reference data (needs access to its private repo). |
-| `npm run penal-code`    | Updates `src/data/penal-code.json` from the FreestyleRP penal code sheet.                     |
-| `npm run screenshots`   | Takes screenshots of the running app into `.agents/screenshots/`.                             |
-| `npm run smoke:preview` | Checks every form's preview in a browser against the running app.                             |
-| `npm run release-notes` | Prints the release notes for the version in `package.json`.                                   |
-| `npm run prepare`       | Runs on `npm install`: turns on the commit-message check in `.githooks/`.                     |
+| Script                       | What it does                                                                                  |
+| ---------------------------- | --------------------------------------------------------------------------------------------- |
+| `npm run dev`                | Development server on `127.0.0.1:3000`, with hot reload.                                      |
+| `npm run dev:lan`            | The same on `0.0.0.0`, open to your network.                                                  |
+| `npm run build`              | Type-checks the app and the tests, and makes a production build.                              |
+| `npm start`                  | Serves the production build on `127.0.0.1:3000`.                                              |
+| `npm run start:lan`          | The same on `0.0.0.0`, open to your network.                                                  |
+| `npm test`                   | Runs every test suite once (Vitest).                                                          |
+| `npm run test:e2e`           | Browser smoke tests at desktop and phone sizes (Playwright; builds the app first).            |
+| `npm run lint`               | ESLint; fails on any error or warning.                                                        |
+| `npm run format`             | Formats every file with Prettier.                                                             |
+| `npm run format:check`       | Checks formatting without changing anything.                                                  |
+| `npm run port-forms`         | Regenerates `src/data/forms.json` from the reference data (needs access to its private repo). |
+| `npm run penal-code`         | Updates `src/data/penal-code.json` from the FreestyleRP penal code sheet.                     |
+| `npm run screenshots`        | Takes screenshots of the running app into `.agents/screenshots/`.                             |
+| `npm run screenshots:accept` | Takes the new approved screenshots from the branch's last failed CI run (`docs/testing.md`).  |
+| `npm run smoke:preview`      | Checks every form's preview in a browser against the running app.                             |
+| `npm run release-notes`      | Prints the release notes for the version in `package.json`.                                   |
+| `npm run prepare`            | Runs on `npm install`: turns on the commit-message check in `.githooks/`.                     |
 
 CI runs the tests, lint, the format check, the build and the smoke tests on every push and pull
 request.
