@@ -188,6 +188,10 @@ Work is planned in Jira, project **LP**: [freestylelawportal.atlassian.net](http
 [Contributing](docs/contributing.md) has the full conventions, and [Releasing](docs/releasing.md) the
 release steps.
 
+**How to release:** release-please keeps a Release PR open with the next version and `CHANGELOG.md`,
+built from the commit messages. To ship a Jira version, merge the Release PR (it tags the version and
+publishes the GitHub Release), release the Jira version, then check What's new matches.
+
 ## Roadmap
 
 Releases are tracked in [Jira](https://freestylelawportal.atlassian.net/projects/LP?selectedItem=com.atlassian.jira.jira-projects-plugin%3Arelease-page).

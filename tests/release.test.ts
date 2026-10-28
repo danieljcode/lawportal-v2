@@ -1,10 +1,11 @@
 // Release process (LP-74): the version shown in the app, What's new versions,
-// and the GitHub Release notes built from them.
+// and the GitHub Release notes built from them; release-please's Jira links (LP-116).
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { CHANGELOG, type ChangelogEntry } from "@/data/changelog";
 import { APP_VERSION } from "@/lib/version";
+import { linkJiraKeys } from "../scripts/link-jira.mjs";
 import { buildNotes, issueKeys, JIRA_BROWSE } from "../scripts/release-notes.mjs";
 
 const pkg = JSON.parse(readFileSync(path.resolve(process.cwd(), "package.json"), "utf8")) as { version: string };
@@ -86,5 +87,17 @@ describe("release notes", () => {
 
   it("refuse a version with no What's new entry", () => {
     expect(() => buildNotes("0.3.0", log, [])).toThrow(/no What's new entry has version: "0.3.0"/);
+  });
+});
+
+describe("Jira links in release-please's changelog (LP-116)", () => {
+  it("link every [LP-n], and leave a linked one alone", () => {
+    const md = "* **e2e:** screenshot tests [LP-117] ([8f9c76a](https://github.com/x))\n* [LP-118] and [LP-7]";
+    const linked = linkJiraKeys(md);
+    expect(linked).toBe(
+      `* **e2e:** screenshot tests [LP-117](${JIRA_BROWSE}LP-117) ([8f9c76a](https://github.com/x))\n` +
+        `* [LP-118](${JIRA_BROWSE}LP-118) and [LP-7](${JIRA_BROWSE}LP-7)`,
+    );
+    expect(linkJiraKeys(linked)).toBe(linked);
   });
 });
