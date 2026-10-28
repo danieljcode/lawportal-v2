@@ -1,8 +1,10 @@
-/* Court Filing Generator: a Windows 95/98 skin (design D8, §Styling).
-   Light = classic Win95 grey, dark = High Contrast Black. System fonts only.
-   The forum preview (.post) is always a light forum post and is isolated from
-   the skin: it redeclares every skin variable, and the skin never styles bare
-   a/hr/table/ul/ol/p/img globally (element rules are scoped with :where(...)). */
+/* The app's shared styles. The modern look is the default (html[data-look="modern"], LP-125); the
+   Classic 1990 look is an option in Settings (data-look="classic", LP-112). Each has light and dark
+   (data-theme). What differs between looks is a variable set here (LP-110), and each program's own
+   stylesheet only uses them.
+   The forum preview (.post) is always a light forum post and is isolated from both looks: it
+   redeclares every variable, and no rule styles bare a/hr/table/ul/ol/p/img globally (element
+   rules are scoped with :where(...)). */
 
 /* ---------- skin variables ---------- */
 :root {
@@ -148,6 +150,7 @@
   --bevel-rule: 0 1px var(--hilite);
   --bevel-rule-inset: inset 0 1px var(--hilite);
 }
+/* A second :root block on purpose: the skin colours come first, the look tokens here. */
 :root {
   --shadow-menu: 2px 2px 0 rgba(0, 0, 0, 0.35);
   --backdrop: rgba(0, 0, 0, 0.4);
@@ -422,6 +425,7 @@ body {
 }
 
 /* ---------- bevels ---------- */
+/* Grouped by bevel, so each look's edges are in one place; a selector's other rules are with its component. */
 /* raised: buttons, window frames, the taskbar's Start */
 .btn,
 .mini,
@@ -1468,13 +1472,6 @@ summary:focus-visible {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.tray {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  height: 23px;
-  padding: 0 10px;
-}
 .clock {
   font-size: var(--text-sm);
 }
@@ -2156,8 +2153,7 @@ dialog.changelog {
   border: 1px solid var(--shadow);
 }
 @media (max-width: 800px) {
-  .case-fields,
-  .case-links {
+  .case-fields {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -2349,8 +2345,6 @@ dialog.changelog {
   border: 1px solid var(--text);
   box-shadow: var(--shadow-menu);
   z-index: 50;
-}
-.menu-list {
   top: 100%;
   left: 0;
 }
@@ -2395,8 +2389,12 @@ dialog.changelog {
   border-bottom: 1px solid var(--hilite);
 }
 
-/* The active character in the tray, in every program. */
+/* The tray, with the active character in it, in every program. */
 .tray {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  height: 23px;
   gap: 10px;
   padding: 0 6px 0 10px;
 }
