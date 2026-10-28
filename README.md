@@ -72,8 +72,8 @@ add Vercel's Upstash integration, which sets `KV_REST_API_URL` and `KV_REST_API_
 | `npm run release-notes`      | Prints the release notes for the version in `package.json`.                                   |
 | `npm run prepare`            | Runs on `npm install`: turns on the commit-message check in `.githooks/`.                     |
 
-CI runs the tests, lint, the format check, the build and the smoke tests on every push and pull
-request.
+CI runs the tests, lint, the format check, the build, and the smoke, screenshot and accessibility
+tests on every push and pull request.
 
 ## What's in it
 
