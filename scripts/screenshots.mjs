@@ -1,9 +1,9 @@
-// Screenshots of the Win95 skin for the verify step (design §Testing, AC 23).
+// Screenshots of the app, for checking a change by eye and for the README (docs/screenshots/).
 //
 // Needs the app running (`npm start` or `npm run dev`) and a Playwright browser
 // (`npx playwright install chromium`, or set PLAYWRIGHT_CHANNEL=msedge to use an
-// installed Edge). Writes home, form, settings and Discord-tab shots in light and dark to
-// .agents/screenshots/{home,form,settings,discord}-{light,dark}.png.
+// installed Edge). Writes home, form, settings, Discord-tab and Classic home shots in light and
+// dark, with one character and one case, to .agents/screenshots/<shot>-<theme>.png.
 //
 // Usage: node scripts/screenshots.mjs [baseUrl]   (default http://127.0.0.1:3000)
 import { mkdir } from "node:fs/promises";
@@ -18,9 +18,27 @@ const channel = process.env.PLAYWRIGHT_CHANNEL || undefined;
 
 const SHOTS = [
   { name: "home", hash: "" },
-  { name: "form", hash: "#civil-complaint", form: true },
+  { name: "form", hash: "#filings/civil-complaint", form: true },
   { name: "settings", hash: "#control" },
-  { name: "discord", hash: "#civil-complaint", form: true, click: "#tab-discord" },
+  { name: "discord", hash: "#filings/civil-complaint", form: true, click: "#tab-discord" },
+  { name: "classic-home", hash: "", classic: true },
+];
+
+const CHARS = [{ id: "alice001", name: "Alice Lawyer", title: "Attorney at Law" }];
+const CASES = [
+  {
+    id: "case0001",
+    caseNumber: "90SCCR00147",
+    status: "Open",
+    plaintiff: "People of San Andreas",
+    defendant: "John Doe",
+    lead: "alice001",
+    assigned: [],
+    created: "2026-10-28T12:00:00.000Z",
+    updated: "2026-10-28T12:00:00.000Z",
+    deadlines: [],
+    exhibits: [],
+  },
 ];
 
 await mkdir(outDir, { recursive: true });
@@ -29,20 +47,33 @@ try {
   for (const theme of ["light", "dark"]) {
     // A fresh context per theme: the theme is in localStorage before any page script runs.
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-    await context.addInitScript((t) => {
-      try {
-        localStorage.setItem("lawapp_theme", t);
-        localStorage.removeItem("lawapp_last_form");
-        // FreestyleRP only (epic LP-67); the app's own default stays until LP-70.
-        localStorage.setItem("lawapp_server", "freestyle");
-      } catch {
-        // storage blocked: the shot falls back to the system theme
-      }
-    }, theme);
+    await context.addInitScript(
+      ({ t, chars, cases }) => {
+        try {
+          localStorage.setItem("lawapp_theme", t);
+          localStorage.setItem("lawapp_chars", JSON.stringify(chars));
+          localStorage.setItem("lawapp_active_char", "alice001");
+          localStorage.setItem("lawapp_cases", JSON.stringify(cases));
+          localStorage.removeItem("lawapp_last_form");
+          // FreestyleRP only (epic LP-67); the app's own default stays until LP-70.
+          localStorage.setItem("lawapp_server", "freestyle");
+        } catch {
+          // storage blocked: the shot falls back to the system theme
+        }
+      },
+      { t: theme, chars: CHARS, cases: CASES },
+    );
     for (const shot of SHOTS) {
       // A new page per shot, so a form shot is a fresh page load with its hash (going from "/" to
       // "/#form" on one page would only be a same-document hash change).
       const page = await context.newPage();
+      // Classic for this page only, without its once-a-session startup screen.
+      if (shot.classic)
+        await page.addInitScript(() => {
+          localStorage.setItem("lawapp_shell", "classic");
+          sessionStorage.setItem("lawapp_booted", "1");
+        });
+      else await page.addInitScript(() => localStorage.removeItem("lawapp_shell"));
       await page.goto(base + "/" + shot.hash, { waitUntil: "networkidle" });
       await page.waitForSelector(".m-app, .app-window");
       if (shot.form) {
