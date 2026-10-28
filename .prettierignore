@@ -2,6 +2,7 @@
 src/data/forms.json
 tests/__snapshots__/
 package-lock.json
+CHANGELOG.md
 .next/
 data/
 .agents/
