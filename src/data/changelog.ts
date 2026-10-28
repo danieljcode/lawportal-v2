@@ -18,6 +18,27 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-10-28",
+    title: "Where things moved",
+    items: [
+      {
+        type: "update",
+        text: "Everything is now a program, opened from the home screen or the bar down the side: the court forms are in Court Filings, and the Case File, Clients, Law Library and J.A.P. each have their own.",
+      },
+      { type: "update", text: "Upcoming is inside the Case File, in its side pane." },
+      { type: "update", text: "New client intake and the Conflict check are in Clients." },
+      { type: "update", text: "The penal code and the firm's precedents are in the Law Library." },
+      {
+        type: "update",
+        text: "Your characters, sync and backups, What's new and About are in Settings (the Control Panel in Classic). Characters are also in the File menu.",
+      },
+      {
+        type: "update",
+        text: "Light or dark, and the 1990 look (Theme → Classic (1990)), are in Settings → Appearance and the View menu.",
+      },
+    ],
+  },
+  {
     date: "2026-10-26",
     title: "The Classic (1990) theme",
     items: [
