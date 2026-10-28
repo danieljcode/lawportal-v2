@@ -39,8 +39,8 @@ reviews and merges.
   How it was tested and the Definition of Done.
 - Allowed as they are: GitHub's `Merge pull request …` commits, `Revert "…"` commits, local
   `fixup!`/`squash!` commits, and dependency updates (`chore(deps): …`, `chore(deps-dev): …`,
-  `ci(deps): …`), which have no Jira key, and release-please's Release PR (`chore(main): release
-X.Y.Z`, LP-116).
+  `ci(deps): …`), which have no Jira key, and the Release PR that release-please opens (LP-116),
+  titled like `chore(main): release 0.3.0`.
 - The checker is `scripts/commit-format.mjs`. To check a message by hand:
   `node scripts/commit-format.mjs --file <file>`, or a PR title with
   `PR_TITLE="…" node scripts/commit-format.mjs --title`.

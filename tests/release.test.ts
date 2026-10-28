@@ -5,8 +5,8 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { CHANGELOG, type ChangelogEntry } from "@/data/changelog";
 import { APP_VERSION } from "@/lib/version";
-import { linkJiraKeys } from "../scripts/link-jira.mjs";
 import { buildNotes, issueKeys, JIRA_BROWSE } from "../scripts/release-notes.mjs";
+import { dropRepeats, linkJiraKeys } from "../scripts/tidy-changelog.mjs";
 
 const pkg = JSON.parse(readFileSync(path.resolve(process.cwd(), "package.json"), "utf8")) as { version: string };
 const SEMVER = /^\d+\.\d+\.\d+$/;
@@ -90,7 +90,7 @@ describe("release notes", () => {
   });
 });
 
-describe("Jira links in release-please's changelog (LP-116)", () => {
+describe("tidying release-please's changelog (LP-116)", () => {
   it("link every [LP-n], and leave a linked one alone", () => {
     const md = "* **e2e:** screenshot tests [LP-117] ([8f9c76a](https://github.com/x))\n* [LP-118] and [LP-7]";
     const linked = linkJiraKeys(md);
@@ -99,5 +99,21 @@ describe("Jira links in release-please's changelog (LP-116)", () => {
         `* [LP-118](${JIRA_BROWSE}LP-118) and [LP-7](${JIRA_BROWSE}LP-7)`,
     );
     expect(linkJiraKeys(linked)).toBe(linked);
+  });
+
+  it("drop an entry repeated in the same version (a merge commit holds its PR's title)", () => {
+    const md = [
+      "## [0.3.0](https://github.com/x) (2026-10-28)",
+      "### Features",
+      "* **cases:** add the Case File program [LP-101] ([9e6bcb4](https://github.com/x/9e6bcb4))",
+      "* **cases:** add the Case File program [LP-101] ([3d2eb70](https://github.com/x/3d2eb70))",
+      "* **forms:** mark the required fields [LP-87] ([1a8b742](https://github.com/x/1a8b742))",
+      "## [0.2.1](https://github.com/x) (2026-10-20)",
+      "* **cases:** add the Case File program [LP-101] ([0000000](https://github.com/x/0000000))",
+    ].join("\n");
+    const lines = dropRepeats(md).split("\n");
+    expect(lines).toHaveLength(6);
+    expect(lines.filter((l: string) => l.includes("Case File program"))).toEqual([md.split("\n")[2], md.split("\n")[6]]);
+    expect(dropRepeats(dropRepeats(md))).toBe(dropRepeats(md));
   });
 });

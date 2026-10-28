@@ -12,8 +12,9 @@ messages since the last release. Nothing is released until that PR is merged.
 
 - **The changelog** groups commits by type: Features (`feat`), Fixes (`fix`), Performance (`perf`)
   and Docs (`docs`). `refactor`, `test`, `ci`, `chore` and `style` are left out, and Dependabot's
-  `chore(deps)` updates with them. The workflow links every `[LP-n]` to its Jira issue, since
-  release-please only links GitHub issues (`scripts/link-jira.mjs`).
+  `chore(deps)` updates with them. The workflow then tidies it (`scripts/tidy-changelog.mjs`): it
+  drops an entry repeated in a version (a merge commit holds its PR's title, which release-please
+  reads as one more commit) and links every `[LP-n]` to its Jira issue, which release-please can't.
 - **The version:** before 1.0, a `feat` bumps the patch (0.2.0 → 0.2.1) and a breaking change
   (`feat!:` or a `BREAKING CHANGE:` footer) bumps the minor. To ship a Jira version, set it with a
   `Release-As: 0.3.0` footer on a commit to `main` (a line on its own at the end of the message);
@@ -31,7 +32,7 @@ When every issue in the Jira version is Done:
 
 1. **Check the Release PR** shows the Jira version (add a `Release-As:` footer if not) and its
    changelog reads well, then **merge it**. release-please tags `vX.Y.Z`, publishes the GitHub
-   Release with the same notes (the workflow links their Jira keys), and the merge bumps
+   Release with the same notes (the workflow tidies them too), and the merge bumps
    `package.json`.
 2. **Release the Jira version** (`v0.3`): mark it Released, with today's date.
 3. **Check What's new matches.** The in-app What's new stays hand-written for players: in a normal
