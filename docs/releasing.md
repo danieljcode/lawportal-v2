@@ -12,9 +12,10 @@ messages since the last release. Nothing is released until that PR is merged.
 
 - **The changelog** groups commits by type: Features (`feat`), Fixes (`fix`), Performance (`perf`)
   and Docs (`docs`). `refactor`, `test`, `ci`, `chore` and `style` are left out, and Dependabot's
-  `chore(deps)` updates with them. The workflow then tidies it (`scripts/tidy-changelog.mjs`): it
-  drops an entry repeated in a version (a merge commit holds its PR's title, which release-please
-  reads as one more commit) and links every `[LP-n]` to its Jira issue, which release-please can't.
+  `chore(deps)` updates with them. The workflow then tidies it and the Release PR's description
+  (`scripts/tidy-changelog.mjs`): it drops an entry repeated in a version (a merge commit holds its
+  PR's title, which release-please reads as one more commit) and links every `[LP-n]` to its Jira
+  issue, which release-please can't.
 - **The version:** before 1.0, a `feat` bumps the patch (0.2.0 → 0.2.1) and a breaking change
   (`feat!:` or a `BREAKING CHANGE:` footer) bumps the minor. To ship a Jira version, set it with a
   `Release-As: 0.3.0` footer on a commit to `main` (a line on its own at the end of the message);
