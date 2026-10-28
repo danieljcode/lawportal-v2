@@ -113,7 +113,10 @@ describe("tidying release-please's changelog (LP-116)", () => {
     ].join("\n");
     const lines = dropRepeats(md).split("\n");
     expect(lines).toHaveLength(6);
-    expect(lines.filter((l: string) => l.includes("Case File program"))).toEqual([md.split("\n")[2], md.split("\n")[6]]);
+    expect(lines.filter((l: string) => l.includes("Case File program"))).toEqual([
+      md.split("\n")[2],
+      md.split("\n")[6],
+    ]);
     expect(dropRepeats(dropRepeats(md))).toBe(dropRepeats(md));
   });
 });
