@@ -447,6 +447,7 @@ The only server code is three route handlers and `src/lib/server/`:
   `readCapped`: 4 MB for sync data, 2 MB for `.docx`.
 - **Rate limits** (`rateLimit.ts`). The sync routes answer `429` when an IP (or the server overall)
   makes too many codes, or an IP sends too many bad codes: see [Sync](sync.md#server-storage).
+  `/api/docx` answers `429` after 30 documents a minute from one IP (LP-160).
 - **Sync storage** is Upstash Redis on the hosted app (`syncRedis.ts`, used when its environment
   variables are set), or one JSON file per sync code when the app runs on its own: see
   [Sync, storage and recovery](sync.md).

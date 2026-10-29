@@ -1,5 +1,6 @@
 // Form state types, empty state, field-label groups, scope paths and walking helpers.
 
+import { isObject } from "../storage";
 import type { Entry, Field, Scalar, Values } from "../types";
 
 export interface FormState {
@@ -31,9 +32,7 @@ export const FILED_LABELS = ["Action filed", "Filing date"];
 
 /* ------------------------------------------------------------ scope paths */
 
-export function isItem(v: unknown): v is Values {
-  return !!v && typeof v === "object" && !Array.isArray(v);
-}
+export const isItem = isObject as (v: unknown) => v is Values;
 
 export function itemsOf(scope: Values, block: string): Values[] | null {
   const items = scope["#" + block];

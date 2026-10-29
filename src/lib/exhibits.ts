@@ -6,12 +6,10 @@
 // they sync and back up with it. Pure: no storage.
 
 import { cleanCustody, unionCustody } from "./custody";
-import { isId, ISO_DATE_RE, newId } from "./storage";
+import { isId, ISO_DATE_RE, newId, text, uniqueById } from "./storage";
 import type { Exhibit } from "./types";
 
 export const MAX_EXHIBITS = 200;
-
-const text = (v: unknown, max: number) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : undefined);
 
 /** An http(s) link as given, or undefined: no javascript:, data: or anything else. */
 export function safeLink(v: unknown): string | undefined {
@@ -47,16 +45,7 @@ export function cleanExhibit(input: unknown): Exhibit | null {
 
 /** A case's exhibits, cleaned, in their saved order, without repeated ids. */
 export function cleanExhibits(input: unknown): Exhibit[] {
-  if (!Array.isArray(input)) return [];
-  const seen = new Set<string>();
-  const out: Exhibit[] = [];
-  for (const item of input) {
-    const e = cleanExhibit(item);
-    if (!e || seen.has(e.id)) continue;
-    seen.add(e.id);
-    out.push(e);
-  }
-  return out.slice(0, MAX_EXHIBITS);
+  return uniqueById(input, cleanExhibit).slice(0, MAX_EXHIBITS);
 }
 
 /** The letter for the exhibit at `index`: 0 → A, 25 → Z, 26 → AA, 27 → AB… */

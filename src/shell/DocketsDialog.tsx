@@ -5,6 +5,7 @@ import { useState, type FormEvent } from "react";
 import { COURTS } from "@/data/form-index";
 import { characterStore } from "@/lib/characters";
 import { docketStore, FIELDS, MAX_TEXT, STATUSES } from "@/lib/dockets";
+import { safeLink } from "@/lib/exhibits";
 import { formatDate } from "@/lib/template";
 import type { Docket } from "@/lib/types";
 import Dialog from "@/ui/Dialog";
@@ -163,7 +164,7 @@ function DocketsBody({ charId, canUse, onUse, onClose }: DocketsDialogProps & { 
                 {parties && <div className="small">{parties}</div>}
                 {d.filed && <div className="small muted">{"Filed " + formatDate(d.filed, "long")}</div>}
                 {next && <div className="small muted">{"Next: " + next}</div>}
-                {/^https?:\/\//i.test(d.link || "") && (
+                {safeLink(d.link) && (
                   <a className="small" href={d.link} target="_blank" rel="noopener noreferrer">
                     Forum thread
                   </a>

@@ -9,7 +9,7 @@
 
 import type { FormState } from "./formState";
 import { toFormState } from "./formState";
-import { defaultKV, isId, ISO_TIME_RE, newId, type KV } from "./storage";
+import { defaultKV, isId, ISO_TIME_RE, newId, text, uniqueById, type KV } from "./storage";
 import { createStore } from "./store";
 
 export const FILINGS_KEY = "lawapp_filings";
@@ -43,7 +43,6 @@ export interface Filing {
 }
 
 const FORM_ID = /^[a-z0-9][a-z0-9-]{0,79}$/;
-const text = (v: unknown, max = 200) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : undefined);
 
 /** Normalise an untrusted filing (sync, backup); null when it isn't one. */
 export function cleanFiling(input: unknown): Filing | null {
@@ -67,16 +66,7 @@ export function cleanFiling(input: unknown): Filing | null {
 }
 
 function validList(raw: unknown): Filing[] {
-  if (!Array.isArray(raw)) return [];
-  const seen = new Set<string>();
-  const out: Filing[] = [];
-  for (const item of raw) {
-    const f = cleanFiling(item);
-    if (!f || seen.has(f.id)) continue;
-    seen.add(f.id);
-    out.push(f);
-  }
-  return out.sort((a, b) => (a.at < b.at ? -1 : a.at > b.at ? 1 : 0));
+  return uniqueById(raw, cleanFiling).sort((a, b) => (a.at < b.at ? -1 : a.at > b.at ? 1 : 0));
 }
 
 export interface FilingFilter {

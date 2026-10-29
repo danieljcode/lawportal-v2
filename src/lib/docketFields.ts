@@ -3,6 +3,7 @@
 // the case store (cases.ts) and the docket view over it (dockets.ts).
 
 import { DIVISION_COURTS } from "./courts";
+import { safeLink } from "./exhibits";
 import { isId, ISO_DATE_RE, ISO_TIME_RE, newId } from "./storage";
 import type { Docket, DocketStatus } from "./types";
 
@@ -70,7 +71,7 @@ export function clean(input: unknown): Docket {
     if (s) out[f.key] = s.slice(0, MAX_TEXT);
   }
   // Only real web links: an imported file could otherwise plant a javascript: link.
-  if (out.link && !/^https?:\/\//i.test(out.link)) delete out.link;
+  if (out.link && !safeLink(out.link)) delete out.link;
   if (!(STATUSES as readonly string[]).includes(out.status)) out.status = STATUSES[0];
   if (out.nextDate && !ISO_DATE_RE.test(out.nextDate)) delete out.nextDate;
   if (out.filed && !ISO_DATE_RE.test(out.filed)) delete out.filed;

@@ -253,6 +253,35 @@ export function isId(id: unknown): id is string {
   return typeof id === "string" && ID_RE.test(id);
 }
 
+/** A plain object (not null, not an array). */
+export function isObject(v: unknown): v is Record<string, unknown> {
+  return !!v && typeof v === "object" && !Array.isArray(v);
+}
+
+/** Trimmed text cut to `max` characters, or undefined when it isn't a non-empty string. */
+export const text = (v: unknown, max = 200): string | undefined =>
+  typeof v === "string" && v.trim() ? v.trim().slice(0, max) : undefined;
+
+/** Each item of an untrusted list cleaned by `clean`, in order, dropping nulls and repeated ids. */
+export function uniqueById<T extends { id: string }>(raw: unknown, clean: (item: unknown) => T | null): T[] {
+  if (!Array.isArray(raw)) return [];
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const item of raw) {
+    const x = clean(item);
+    if (!x || seen.has(x.id)) continue;
+    seen.add(x.id);
+    out.push(x);
+  }
+  return out;
+}
+
+/** `fresh` plus every item of `kept` whose id isn't in `fresh`: by id, the fresh copy wins. */
+export function replaceById<T extends { id?: unknown }>(kept: readonly T[], fresh: readonly T[]): T[] {
+  const ids = new Set<unknown>(fresh.map((x) => x.id));
+  return [...kept.filter((x) => !ids.has(x.id)), ...fresh];
+}
+
 /**
  * A fresh id: base-36 time plus 12 random base-36 chars (LP-157). Many ids are made in one
  * millisecond (cleaning a synced or imported list), and the stores drop a repeated id.
