@@ -19,8 +19,10 @@ There are two kinds of form:
   Representation. Each signs off from the active character (name, title, bar number, signature)
   and carries a case number for the case bar; the Letter of Representation has both parties too.
   They use a `Letter date`, not a `Filing date`, so saving one to the Case File records no filing.
-  The retainer's fees start with prefills (`{{Hourly rate=$250 per hour|…}}`), and the firm's name
-  and address are plain fields: no branding, as there's no letterhead yet (LP-23).
+  The retainer's fees start with prefills (`{{Hourly rate=$250 per hour|…}}`). The Engagement,
+  Demand and Representation letters open with the firm's letterhead (`{{Letterhead@letterhead|…}}`,
+  LP-23), set in Settings → Letterhead. It's the only firm branding a template may carry, and only
+  the Firm Letters use it. The firm's name in a letter's body is still a plain field.
 
 ## Token syntax
 
@@ -35,6 +37,7 @@ A template is the forum post's own HTML with `{{tokens}}` (engine: `src/lib/temp
 | `{{Label=prefill}}`                                             | A prefill: `today`, `today+21`, `<Other label>-2` for dates; `YY` and `<Division?CRIMINAL DIVISION=CR;…>` for text.                                                      |
 | `{{@name}}` / `{{Label@title}}`                                 | Filled from the active character (`name`, `title`, `dob`, `gender`, `phone`, `address`, `occupation`, `bar`, `email`, `signature`).                                      |
 | `{{Exhibits@exhibits\|<p>None.</p>}}`                           | The exhibit list of the firm case with the form's case number (LP-13): each exhibit's letter, title and link, escaped. Never typed; the fallback shows without exhibits. |
+| `{{Letterhead@letterhead                                        | <p>…</p>}}`                                                                                                                                                              | The firm's letterhead from Settings (LP-23): its name, address lines, and phone · email, escaped, with empty parts left out. Never typed. Firm Letters only, never a court form. |
 | `{{Label>strong}}`                                              | Wraps a filled value in a tag.                                                                                                                                           |
 | `{{#Items\|3}} … {{/Items}}`                                    | A repeatable block (default 1 item).                                                                                                                                     |
 | `{{?Optional\|off}} … {{/Optional}}`                            | An optional section (on unless `\|off`).                                                                                                                                 |

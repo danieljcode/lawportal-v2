@@ -75,6 +75,18 @@ export default function FieldInput({
     );
   }
 
+  // The letterhead (LP-23) comes from Settings; nothing to type.
+  if (f.character === "letterhead") {
+    return (
+      <div className="field wide">
+        <label>{f.label}</label>
+        <p className="help" id={id}>
+          {"The firm's name, address, phone and email, from Settings → Letterhead."}
+        </p>
+      </div>
+    );
+  }
+
   // Insert a reference at the cursor (or in place of the selection); it keeps the exhibit's id.
   const insertExhibit = (exhibitId: string) => {
     const ref = exhibits.find((e) => e.id === exhibitId);

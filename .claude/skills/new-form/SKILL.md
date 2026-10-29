@@ -33,8 +33,8 @@ given, says which form.
 ## Rules every form keeps
 
 1. **Court forms never carry firm branding.** Anything posted to the forum must look official: no firm name, colours
-   or letterhead from `src/branding.ts` in a template. A firm name is a plain field (`{{Firm|FIRM NAME}}`), as in the
-   letters.
+   or logo from `src/branding.ts` in a template. A firm name is a plain field (`{{Firm|FIRM NAME}}`). The one
+   exception is the Firm Letters' `{{Letterhead@letterhead|…}}` (LP-23), which a test keeps to that section.
 2. **User text is never markup.** Every value goes through `escapeHtml` in `render()`. Never loosen escaping, never
    call `trustAsSafeHtml` or cast to `SafeHtml` outside the renderers, and never relax `tests/xss.test.ts` or
    `tests/safeHtml.test.ts`. If a field needs structure, express it in the template (a `list`, `paras` or `>tag`

@@ -261,19 +261,19 @@ const serviceContract: FormDef = {
 /** Our "Additional Templates" forms, in sidebar order. */
 
 /* ---------- Firm Letters (LP-9) ----------
- * Letters and agreements the firm sends clients and other parties. Unbranded:
- * the firm's name and address are plain fields (no letterhead yet, LP-23). The
- * sign-off fills from the active character. They use a "Letter date", not a
- * filing date, so saving one to the Case File doesn't record a filing date. */
+ * Letters and agreements the firm sends clients and other parties. They open
+ * with the firm's letterhead from Settings (LP-23), the only firm branding a
+ * template may carry; court forms never do. The firm's name in the body is
+ * still a plain field. The sign-off fills from the active character. They use
+ * a "Letter date", not a filing date, so saving one to the Case File doesn't
+ * record a filing date. */
 
 const LETTER_SECTION = "Firm Letters";
 
-/** The firm's name and address at the top of a letter, and the date. */
+/** The firm's letterhead at the top of a letter, and the date. */
 const LETTERHEAD =
   "{{-- Letterhead}}\n" +
-  '<p style="text-align:center"><strong>{{Firm|FIRM NAME}}</strong><br />\n' +
-  "{{Firm address|FIRM ADDRESS}}<br />\n" +
-  "{{Phone@phone|PHONE}} · {{Email@email|EMAIL}}</p>\n" +
+  '{{Letterhead@letterhead|<p style="text-align:center"><strong>FIRM NAME</strong></p>}}\n' +
   "<hr />\n" +
   "<p>{{Letter date=today:date:long|__________}}</p>\n";
 
