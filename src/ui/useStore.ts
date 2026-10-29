@@ -11,6 +11,7 @@ import { conflictLog } from "@/lib/conflicts";
 import { precedentStore } from "@/lib/precedents";
 import { filingStore } from "@/lib/filings";
 import { docketStore } from "@/lib/dockets";
+import { letterheadStore } from "@/lib/letterhead";
 import { portfolioStore } from "@/lib/portfolio";
 import { setAsideVersion, subscribeSetAside } from "@/lib/storage";
 import * as sync from "@/lib/sync";
@@ -90,4 +91,12 @@ const precedentSnapshot = () => precedentStore().version();
 /** Bumps on every change to the Law Library's precedents (LP-16). */
 export function usePrecedentVersion(): number {
   return useSyncExternalStore(subscribePrecedents, precedentSnapshot, precedentSnapshot);
+}
+
+const subscribeLetterhead = (fn: () => void) => letterheadStore().subscribe(fn);
+const letterheadSnapshot = () => letterheadStore().version();
+
+/** Bumps when the letterhead is edited in Settings (LP-23). */
+export function useLetterheadVersion(): number {
+  return useSyncExternalStore(subscribeLetterhead, letterheadSnapshot, letterheadSnapshot);
 }

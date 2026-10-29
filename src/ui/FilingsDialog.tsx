@@ -9,6 +9,7 @@ import { copyRich } from "@/lib/clipboard";
 import { caseStore } from "@/lib/cases";
 import { snapshotTime } from "@/lib/draftHistory";
 import { exhibitRefs, resolveExhibitRefs } from "@/lib/exhibits";
+import { letterheadStore } from "@/lib/letterhead";
 import { filterFilings, filingStore, VIA_LABELS, type Filing } from "@/lib/filings";
 import { compileForm, render } from "@/lib/template";
 import type { Character } from "@/lib/types";
@@ -28,7 +29,10 @@ export function renderFiling(f: Filing) {
     // Exhibit references and the exhibit list follow the case as it is now (LP-13).
     const c = (f.caseId && caseStore().get(f.caseId)) || (f.caseNumber ? caseStore().byNumber(f.caseNumber) : null);
     const exhibits = c ? exhibitRefs(c.exhibits) : [];
-    return render(tree, resolveExhibitRefs(f.state.values, exhibits), { exhibits });
+    return render(tree, resolveExhibitRefs(f.state.values, exhibits), {
+      exhibits,
+      letterhead: letterheadStore().get(),
+    });
   } catch {
     return null;
   }

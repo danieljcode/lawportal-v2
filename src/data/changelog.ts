@@ -18,6 +18,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-10-29",
+    title: "Letterhead",
+    items: [
+      {
+        type: "new",
+        text: "Firm letters open with the firm's letterhead: its name, address, phone and email. Set them once in Settings → Letterhead. Court forms never carry it.",
+      },
+    ],
+  },
+  {
     date: "2026-10-28",
     title: "Where things moved",
     items: [

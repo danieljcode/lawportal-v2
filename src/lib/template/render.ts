@@ -157,6 +157,29 @@ export interface RenderOptions {
   highlight?: boolean;
   /** The loaded case's exhibits, for an `{{Exhibits@exhibits}}` list (LP-13). */
   exhibits?: ReadonlyArray<{ letter: string; title: string; link?: string }>;
+  /** The firm's letterhead from Settings, for a `{{Letterhead@letterhead}}` block (LP-23). */
+  letterhead?: { firmName: string; address: string; phone: string; email: string };
+}
+
+/** The letterhead: the firm's name, address lines, and phone · email, all escaped. Empty parts are left out. */
+function renderLetterhead(f: Field, opts: RenderOptions): string {
+  const lh = opts.letterhead;
+  if (!lh) {
+    if (!f.fallback) return "";
+    return opts.highlight ? `<mark class="unfilled" title="${escapeHtml(f.label)}">${f.fallback}</mark>` : f.fallback;
+  }
+  // In the preview, an unset part shows where it goes; the copied post leaves it out.
+  const unset = (what: string) =>
+    opts.highlight ? `<mark class="unfilled" title="${escapeHtml(f.label)}">${what}</mark>` : "";
+  const name = lh.firmName.trim() ? `<strong>${escapeHtml(lh.firmName.trim())}</strong>` : unset("FIRM NAME");
+  const address = nonEmptyLines(lh.address).map((l) => escapeHtml(l.trim()));
+  const contact = [lh.phone.trim(), lh.email.trim()].filter(Boolean).map(escapeHtml);
+  const lines = [
+    name,
+    ...(address.length ? address : [unset("FIRM ADDRESS")]),
+    contact.length ? contact.join(" · ") : unset("PHONE · EMAIL"),
+  ].filter(Boolean);
+  return lines.length ? `<p style="text-align:center">${lines.join("<br />\n")}</p>` : "";
 }
 
 /** The exhibit list: each exhibit's letter, title and (http(s) only) link, all escaped. */
@@ -235,6 +258,8 @@ function renderValue(f: Field, value: unknown, opts: RenderOptions): string {
 function renderField(f: Field, value: unknown, opts: RenderOptions): string {
   // `{{Label@exhibits}}` is filled from the loaded case's evidence, not typed (LP-13).
   if (f.character === "exhibits") return renderExhibits(f, opts);
+  // `{{Label@letterhead}}` is the firm's letterhead from Settings, not typed (LP-23).
+  if (f.character === "letterhead") return renderLetterhead(f, opts);
   const html = renderValue(f, value, opts);
   return f.wrap && !isEmpty(value) && f.type !== "check" ? `<${f.wrap}>${html}</${f.wrap}>` : html;
 }

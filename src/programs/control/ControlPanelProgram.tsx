@@ -7,6 +7,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { BRANDING } from "@/branding";
 import { bootEnabled, setBootEnabled } from "@/lib/boot";
+import { letterheadStore, MAX_LETTERHEAD_FIELD, type Letterhead } from "@/lib/letterhead";
 import { getReadableFont, setReadableFont, type ShellMode } from "@/lib/shell";
 import { LABELS, type ThemeMode, MODES } from "@/lib/theme";
 import { AboutContent } from "@/shell/AboutDialog";
@@ -22,6 +23,64 @@ function Section({ id, title, children }: { id: string; title: string; children:
       <h3 id={id + "-title"}>{title}</h3>
       {children}
     </section>
+  );
+}
+
+/** The letterhead on firm letters (LP-23), saved as it's typed. */
+function LetterheadSettings() {
+  const [letterhead, setLetterhead] = useState<Letterhead>(() => letterheadStore().get());
+  const [failed, setFailed] = useState(false);
+  const change = (key: keyof Letterhead, value: string) => {
+    const next = { ...letterhead, [key]: value };
+    setLetterhead(next);
+    try {
+      letterheadStore().set(next);
+      setFailed(false);
+    } catch {
+      setFailed(true);
+    }
+  };
+  const input = (key: Exclude<keyof Letterhead, "address">, label: string, inputMode?: "tel" | "email") => (
+    <li>
+      <label className="control-theme">
+        <span>{label}</span>
+        <input
+          id={"letterhead-" + key}
+          type="text"
+          inputMode={inputMode}
+          value={letterhead[key]}
+          maxLength={MAX_LETTERHEAD_FIELD}
+          onChange={(e) => change(key, e.target.value)}
+        />
+      </label>
+    </li>
+  );
+  return (
+    <>
+      <p className="muted">{"At the top of firm letters. Court forms never carry it."}</p>
+      <ul className="control-items letterhead-fields">
+        {input("firmName", "Firm name")}
+        <li>
+          <label className="control-theme">
+            <span>Address</span>
+            <textarea
+              id="letterhead-address"
+              rows={3}
+              value={letterhead.address}
+              maxLength={MAX_LETTERHEAD_FIELD}
+              onChange={(e) => change("address", e.target.value)}
+            />
+          </label>
+        </li>
+        {input("phone", "Phone", "tel")}
+        {input("email", "Email", "email")}
+      </ul>
+      {failed && (
+        <p className="error" role="alert">
+          {"Couldn't save the letterhead: this browser's storage is full or blocked."}
+        </p>
+      )}
+    </>
   );
 }
 
@@ -56,6 +115,11 @@ export default function ControlPanelProgram({ shell }: ProgramProps) {
         {visible && (
           <Section id="settings-sync" title="Sync">
             <SyncPanel />
+          </Section>
+        )}
+        {visible && (
+          <Section id="settings-letterhead" title="Letterhead">
+            <LetterheadSettings />
           </Section>
         )}
         <Section id="settings-appearance" title="Appearance">
