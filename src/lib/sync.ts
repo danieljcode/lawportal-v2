@@ -393,41 +393,15 @@ export interface Resolved {
  * set up before this existed) nothing is treated as deleted.
  */
 export function resolve(serverDoc: unknown, base: Map<string, string> | null = readBase()): Resolved {
-  const local = new Map<string, Doc>();
-  for (const c of snapshot().characters) local.set(c.id as string, c);
-  const changedHere = (c: Doc) => !base || base.get(c.id as string) !== stampOf(c);
-  const out: Doc[] = [];
-  const lost: Doc[] = [];
-  let keptLocal = false;
-  const seen = new Set<string>();
-  for (const s of charactersOf(serverDoc)) {
-    const id = String(s.id);
-    seen.add(id);
-    const l = local.get(id);
-    if (!l) {
-      // Deleted here: that stands unless the other device has changed it since.
-      if (base?.get(id) === stampOf(s)) keptLocal = true;
-      else out.push(s);
-      continue;
-    }
-    if (stampOf(l) > stampOf(s)) {
-      out.push(l);
-      keptLocal = true;
-    } else {
-      out.push(s);
-      if (stampOf(l) !== stampOf(s) && changedHere(l)) lost.push(l);
-    }
-  }
-  for (const [id, l] of local) {
-    if (seen.has(id)) continue;
-    if (base?.has(id)) {
-      // Deleted on the other device; keep this browser's edits to it aside.
-      if (changedHere(l)) lost.push(l);
-      continue;
-    }
-    out.push(l);
-    keptLocal = true;
-  }
+  // Characters are stamped in the base under their bare id. A server id that isn't a string
+  // still matches the same local character (LP-139).
+  const chars = resolveList(
+    charactersOf(serverDoc).map((s) => ({ ...s, id: String(s.id) })),
+    snapshot().characters as Array<Doc & { id: string }>,
+    base,
+    "",
+    stampOf,
+  );
 
   // Cases (LP-4): the same rules, one case at a time, by each case's own `updated`.
   const cases = resolveList(casesOf(serverDoc), caseStore().list(), base, "case:", (c) => c.updated);
@@ -453,22 +427,22 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
   return {
     // Two devices can make the same case number separately: they become one case.
     doc: {
-      characters: out,
+      characters: chars.out,
       cases: unifyCases(cases.out),
       filings: filings.out,
       conflictChecks: checks.out,
       precedents: precedents.out,
     },
-    lost,
+    lost: chars.lost,
     lostCases: cases.lost,
     lostPrecedents: precedents.lost,
-    keptLocal: keptLocal || cases.keptLocal || filings.keptLocal || checks.keptLocal || precedents.keptLocal,
+    keptLocal: chars.keptLocal || cases.keptLocal || filings.keptLocal || checks.keptLocal || precedents.keptLocal,
   };
 }
 
 /**
- * Merge one list of items with their own stamps (cases, filings) the way
- * characters merge: the newer stamp wins and the server wins a tie; `base`
+ * Merge one list of items with their own stamps (characters, cases, filings…):
+ * the newer stamp wins and the server wins a tie; `base`
  * (under `prefix + id`) tells an item added on one side from one deleted on
  * the other. Returns the result, this browser's losing edits, and whether the
  * result holds anything of this browser's.
