@@ -11,6 +11,7 @@ import { DEFAULT_COURTHOUSE } from "./courts";
 import type { Character, Portfolio, PortfolioEntry, PortfolioLevel } from "./types";
 import { defaultKV, isId, ISO_DATE_RE, ISO_TIME_RE, touchCharacter, type KV } from "./storage";
 import { createKeyedStore, type Migration } from "./store";
+import { formatDate } from "./template";
 
 export const JAP_PREFIX = "lawapp_jap_";
 /** The saved portfolios' schema version (LP-99). */
@@ -19,8 +20,6 @@ export const JAP_VERSION = 2;
 /** Version 1 was the bare portfolio; version 2 is the same object in the store envelope. */
 export const JAP_MIGRATIONS: readonly Migration[] = [{ to: 2, up: (data) => data }];
 export const MAX_ENTRIES = 60;
-
-const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
 export const NOTE_MOTIONS =
   'This includes standalone motions (such as when the defendant files a motion to dismiss for a speedy trial violation under a standalone docket) or motions made as part of an ongoing case. If you are linking the latter, make sure you hit "share" on your response and use that link.';
@@ -284,8 +283,7 @@ export function isEmpty(p: Portfolio | null | undefined): boolean {
 
 /** `2026-01-02` → `02/JAN/2026`; anything else → "". */
 export function shortDate(iso: string | undefined): string {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
-  return m ? `${m[3]}/${MONTHS[Number(m[2]) - 1]}/${m[1]}` : "";
+  return iso && ISO_DATE_RE.test(iso) ? formatDate(iso, "short") : "";
 }
 
 function line(kind: TaskKind, e: PortfolioEntry | undefined): string {
