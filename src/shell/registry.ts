@@ -4,6 +4,7 @@
 // ones as icons, in their group.
 
 import { createElement, lazy, type ComponentType } from "react";
+import { flagOn, type Flag } from "@/lib/flags";
 import type { ShellMode } from "@/lib/shell";
 import { CONTROL_TITLE, SETTINGS_TITLE, type ProgramId, type Route } from "./useRoute";
 import type { ProgramProps } from "./program";
@@ -38,6 +39,8 @@ export interface ProgramDef {
   start: string;
   /** Who can see it in the Program Manager (anyone can open a link to it). */
   visible(who: { commissioner: boolean }): boolean;
+  /** Unfinished: listed only while this flag is on (LP-120). */
+  flag?: Flag;
   /** Its navigation pane, shown as a drawer at phone width: the pane's id and what it lists. */
   nav?: { id: string; label: string };
   /** Its pages, for the File menu and the jump box (LP-128). */
@@ -122,6 +125,11 @@ export const PROGRAMS: readonly ProgramDef[] = [
     ...lazyProgram(() => import("@/programs/control")),
   },
 ];
+
+/** Whether a program is listed (Program Manager, Home, jump box, preload) for this character. */
+export function shown(p: Pick<ProgramDef, "visible" | "flag">, who: { commissioner: boolean }): boolean {
+  return (!p.flag || flagOn(p.flag)) && p.visible(who);
+}
 
 /** A program's name in this layout. */
 export function titleIn(p: Pick<ProgramDef, "title" | "classicTitle">, layout: ShellMode): string {
