@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { fromHtml } from "@/lib/bbcode";
 import { copyRich, copyText } from "@/lib/clipboard";
 import { docxRequestBody } from "@/lib/docx/request";
+import { download } from "@/lib/download";
 import type { FilingVia } from "@/lib/filings";
 import type { MissingField } from "@/lib/formState";
 import type { SafeHtml } from "@/lib/safeHtml";
@@ -99,14 +100,7 @@ export default function OutputPane({
         flash("Couldn't build the .docx (" + res.status + ").", true);
         return;
       }
-      const url = URL.createObjectURL(await res.blob());
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = form.id + ".docx";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 0);
+      download(await res.blob(), form.id + ".docx");
       onFiled?.("docx");
     } catch {
       flash("Couldn't build the .docx (server unreachable).", true);
