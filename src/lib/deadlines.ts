@@ -58,7 +58,22 @@ export function unionDeadlines(first: Deadline[], second: Deadline[]): Deadline[
 
 /* ---------- the 1990 calendar ---------- */
 
-const pad = (n: number) => String(n).padStart(2, "0");
+export const pad = (n: number) => String(n).padStart(2, "0");
+
+export const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 /** Today in the game (1990), as YYYY-MM-DD, New York time. */
 export function gameToday(now: Date = new Date()): string {
@@ -74,13 +89,12 @@ export function addDays(iso: string, n: number): string {
 }
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 /** "Sun 25 Oct 1990" for 1990-10-25: the weekday of the real date it maps to (2026-10-25). */
 export function formatDay(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
   const t = new Date(Date.UTC(y - YEAR_OFFSET, m - 1, d));
-  return `${DAYS[t.getUTCDay()]} ${d} ${MONTHS[m - 1]} ${y}`;
+  return `${DAYS[t.getUTCDay()]} ${d} ${MONTH_NAMES[m - 1].slice(0, 3)} ${y}`;
 }
 
 /** "today", "tomorrow", "in 3 days", "yesterday", "2 days ago". */

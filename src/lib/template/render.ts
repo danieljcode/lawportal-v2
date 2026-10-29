@@ -2,22 +2,8 @@
 
 import { trustAsSafeHtml, type SafeHtml } from "../safeHtml";
 import type { Field, Node, Tree, Values } from "../types";
+import { MONTH_NAMES, pad } from "../deadlines";
 import { escapeHtml } from "./escape";
-
-const MONTH_NAMES = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
 
 const NUMBER_WORDS = [
   "One",
@@ -63,10 +49,6 @@ const ANY_URL = /^https?:\/\/\S+$/i;
 
 /* ----------------------------------------------------------------- render */
 
-function pad2(n: number): string {
-  return (n < 10 ? "0" : "") + n;
-}
-
 function ordinal(n: number): string {
   const suffix = ["th", "st", "nd", "rd"];
   const v = n % 100;
@@ -97,11 +79,11 @@ export function formatDate(value: string, fmt?: string): string {
   const mon = month.slice(0, 3).toUpperCase();
   switch ((fmt || "long").toLowerCase()) {
     case "short":
-      return `${pad2(d)}/${mon}/${y}`;
+      return `${pad(d)}/${mon}/${y}`;
     case "daymon":
-      return `${pad2(d)}/${mon}`;
+      return `${pad(d)}/${mon}`;
     case "us":
-      return `${pad2(mo)}/${pad2(d)}/${y}`;
+      return `${pad(mo)}/${pad(d)}/${y}`;
     case "day":
       return String(d);
     case "ordinal":
