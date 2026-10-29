@@ -31,7 +31,7 @@ app runs on your own computer, it lives in files on that computer.
 - **One JSON file per code** in `data/sync/` (or `LAWAPP_SYNC_DIR`), named by the **SHA-256 hash of
   the code**. The raw code never reaches the file system or the logs (logs show the first 8 hex
   characters of the hash at most).
-- **A record** is `{ rev, updated, data: { characters, cases, filings, conflictChecks, precedents } }`. Each character carries
+- **A record** is `{ rev, updated, data: { characters, cases, filings, conflictChecks, precedents, contacts } }`. Each character carries
   its J.A.P. inside it (`jap`); the firm's cases (LP-4) and the filing history (LP-15) sit beside
   the characters. A copy without `filings` (from before LP-15) leaves this browser's history alone. A copy saved before LP-4
   has no `cases` and each character's docket inside it (`dockets`): the client reads that as cases,
@@ -41,7 +41,7 @@ app runs on your own computer, it lives in files on that computer.
 - **Atomic writes.** A write goes to a temp file and is renamed over the real one, retried briefly
   while Windows (antivirus, indexing) holds the target.
 - **Limits.** At most 1,000 sync codes (`POST` answers `503` after that), a 4 MB body, and 200
-  characters, 2,000 cases, 500 filings, 500 conflict checks and 1,000 precedents per `PUT`. The app
+  characters, 2,000 cases, 500 filings, 500 conflict checks, 1,000 precedents and 2,000 contacts per `PUT`. The app
   keeps the newest 150 filings, so the history fits the list limit. Each filing carries its whole
   form, so the body cap was raised from 1 MB to 4 MB (LP-138): 150 filings of 20 KB each still
   fit. 4 MB stays under Vercel's 4.5 MB request body limit, and under Upstash's 10 MB request
@@ -96,12 +96,13 @@ edits. Instead of replacing local data, `resolve()` merges **one character at a 
   newer copy's fields win, gaps are filled from the other, and everyone working either stays on it.
 - **Filings merge one at a time too** (LP-15), by when each was filed (`filing:<id>` in the base),
   and so does the conflict check log (LP-10, `conflict:<id>`). The Law Library's precedents (LP-16)
-  are edited like cases, so each ruling's newer `updated` wins (`precedent:<id>`). They all use `resolveList` in
+  are edited like cases, so each ruling's newer `updated` wins (`precedent:<id>`), and the same goes
+  for the Rolodex's contacts (LP-30, `contact:<id>`). They all use `resolveList` in
   `sync.ts`. A copy without one of these lists leaves this browser's alone.
 - **Deletions stand.** `lawapp_sync_base` remembers the last server copy this browser saw, so the
   merge can tell a character added on one side from one deleted on the other. A character deleted
   on one device but edited on the other since is kept.
-- **Nothing is lost silently.** A local version of a character, case or precedent that loses is kept
+- **Nothing is lost silently.** A local version of a character, case, precedent or contact that loses is kept
   under `lawapp_sync_lost`, and the sync panel shows **Restore my version** (or Dismiss). Restoring
   saves it with a fresh stamp, so it wins the next merge. Filings and conflict checks never change
   once made, so they never lose. An edit made while a push is in flight keeps `lawapp_sync_dirty`

@@ -115,7 +115,7 @@ browser.
   doubles their ids, and in Settings the File and Help menu items scroll to the section instead.
 - **Hash routing** (`useRoute.ts`). Routes are prefixed by program: `#filings` and
   `#filings/<formId>`, `#cases`, `#cases/<id>` and `#cases/upcoming`, `#clients/intake` and
-  `#clients/conflicts`, `#library/penal-code` and `#library/precedents`, `#jap`, `#control`; an
+  `#clients/conflicts` (and `#clients/rolodex` behind the `rolodex` flag), `#library/penal-code` and `#library/precedents`, `#jap`, `#control`; an
   empty hash is home. `parseHash` also reads the old flat hashes (`#cases`, `#upcoming`,
   `#intake`, `#conflicts`, `#library`, `#jap`, `#<formId>`), and the hook rewrites them to the
   new ones with `replaceState`. The last place is remembered under `lawapp_last_form` as a hash
@@ -272,6 +272,7 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
 | Draft history (LP-89)             | `src/lib/draftHistory.ts`                | `lawapp_history_<form id>`           |
 | Filing history (LP-15)            | `src/lib/filings.ts`                     | `lawapp_filings`                     |
 | Conflict check log (LP-10)        | `src/lib/conflicts.ts`                   | `lawapp_conflict_log`                |
+| Rolodex contacts (LP-30)          | `src/lib/contacts.ts`                    | `lawapp_contacts`                    |
 | Sync state                        | `src/lib/sync.ts`                        | `lawapp_sync_*`                      |
 
 - **KV wrapper** (`src/lib/storage.ts`). The stores never touch the browser's storage directly:
@@ -402,6 +403,12 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
   link (`safeLink`) and lower-case topic tags. Search (`filterPrecedents`) needs every word
   somewhere in the ruling; `highlightParts` splits text for `<mark>`, rendered by React as text.
   Sync merges each ruling by `updated` (`precedent:<id>`); the server takes up to 1,000.
+- **Rolodex** (`src/lib/contacts.ts`, `src/programs/clients/RolodexView.tsx`, LP-30; behind the
+  `rolodex` flag): the Clients program's third page, at `#clients/rolodex`. One list under
+  `lawapp_contacts` (store base, v1, up to 2,000 contacts, A–Z): name, type (client, judge,
+  officer, attorney, witness, business), phone, address, organisation and notes. Search
+  (`filterContacts`) needs every word somewhere in the contact. Sync merges each contact by
+  `updated` (`contact:<id>`), with losing edits kept for Restore my version, as for precedents.
   In a form, focusing a text, textarea, list or paras field registers it (`FormCtx.onFieldFocus`);
   the **Law Library** dialog's Insert citation puts `citation(p)` at that field's cursor, reading
   the field as it is then. Citations are plain text, so they're escaped like any other value.

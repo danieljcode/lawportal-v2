@@ -121,6 +121,7 @@ export default function SyncPanel({ autoEnable = false, onAutoEnableDone }: Sync
       ? st.message || "Your characters and dockets are saved on the server." + when
       : st.message || "";
   const warn = error ? error.warn : /error|conflict|offline/.test(st.status);
+  const lostCount = st.lost + st.lostCases + st.lostPrecedents + st.lostContacts;
 
   return (
     <section className="sync-panel" id="sync-panel" aria-labelledby="sync-title">
@@ -194,12 +195,12 @@ export default function SyncPanel({ autoEnable = false, onAutoEnableDone }: Sync
       <p className={"small sync-message" + (warn ? " warn" : "")} id="sync-message" role="status" aria-live="polite">
         {message}
       </p>
-      {st.lost + st.lostCases + st.lostPrecedents > 0 && (
+      {lostCount > 0 && (
         <div className="row sync-lost" id="sync-lost">
           <span className="small warn">
-            {(st.lost + st.lostCases + st.lostPrecedents === 1 ? "Your version of " : "Your versions of ") +
-              S_LOST_ITEMS(st.lost, st.lostCases, st.lostPrecedents) +
-              (st.lost + st.lostCases + st.lostPrecedents === 1 ? " was" : " were") +
+            {(lostCount === 1 ? "Your version of " : "Your versions of ") +
+              S_LOST_ITEMS(st.lost, st.lostCases, st.lostPrecedents, st.lostContacts) +
+              (lostCount === 1 ? " was" : " were") +
               " replaced by another device's."}
           </span>
           <button className="mini" id="sync-restore" type="button" onClick={() => sync.restoreLost()}>

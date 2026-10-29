@@ -8,6 +8,7 @@ import { codeHash, read, write, type SyncRecord } from "@/lib/server/syncStore";
 import { errCode, isJson, json } from "@/lib/server/http";
 import { MAX_CASES } from "@/lib/cases";
 import { MAX_CHARACTERS } from "@/lib/characters";
+import { MAX_CONTACTS } from "@/lib/contacts";
 import { MAX_PRECEDENTS } from "@/lib/precedents";
 import { isObject } from "@/lib/storage";
 
@@ -25,6 +26,7 @@ const LISTS = {
   filings: 500,
   conflictChecks: 500,
   precedents: MAX_PRECEDENTS,
+  contacts: MAX_CONTACTS,
 };
 
 /** `{rev, data:{characters, …}}`: an integer rev ≥ 0 and each list (LISTS) an array of at most its limit of objects, else null. */
