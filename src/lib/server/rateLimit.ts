@@ -1,7 +1,9 @@
 // In-memory rate limits for the sync API (LP-8).
 //
 // Mainly for LAN mode, where anyone on the network can reach the server. The
-// counts live in this process, so a restart clears them. The client IP comes
+// counts live in this process, so a restart clears them and each process (each
+// Vercel instance) counts on its own. With Redis, new codes are counted in Redis
+// instead (syncRedis.ts, LP-137), shared by every instance. The client IP comes
 // from X-Forwarded-For, which Next fills in from the socket only when the
 // request doesn't send one, so a client can fake it: the per-IP limits stop
 // casual abuse, and the overall cap on new codes is what keeps sync storage
@@ -57,10 +59,12 @@ const MAX_KEYS = 10_000;
 const HOUR = 60 * 60 * 1000;
 const MINUTE = 60 * 1000;
 
-/** New sync codes per IP: 5 an hour. */
-export const createPerIp = new Limiter(5, HOUR);
-/** New sync codes across the server: 5 an hour, so at most 840 a week, under MAX_FILES. */
-export const createOverall = new Limiter(5, HOUR);
+/** New sync codes an hour, per IP and across the server: at most 840 a week, under MAX_FILES. */
+export const CODES_PER_HOUR = 5;
+/** New sync codes per IP, in this process. */
+export const createPerIp = new Limiter(CODES_PER_HOUR, HOUR);
+/** New sync codes across this process. */
+export const createOverall = new Limiter(CODES_PER_HOUR, HOUR);
 /** Requests with a malformed or unknown sync code per IP: 30 a minute. */
 export const failedLookups = new Limiter(30, MINUTE);
 
@@ -72,7 +76,9 @@ export function clientIp(req: Request): string {
   return first || "unknown";
 }
 
-function tooMany(error: string, seconds: number): Response {
+export const TOO_MANY_CODES = "Too many new sync codes. Try again later.";
+
+export function tooMany(error: string, seconds: number): Response {
   return Response.json(
     { error },
     { status: 429, headers: { "Cache-Control": "no-store", "Retry-After": String(seconds) } },
@@ -83,7 +89,7 @@ function tooMany(error: string, seconds: number): Response {
 export function limitCreate(req: Request): Response | null {
   const ip = clientIp(req);
   const wait = Math.max(createPerIp.retryAfter(ip), createOverall.retryAfter(OVERALL));
-  if (wait) return tooMany("Too many new sync codes. Try again later.", wait);
+  if (wait) return tooMany(TOO_MANY_CODES, wait);
   createPerIp.record(ip);
   createOverall.record(OVERALL);
   return null;
