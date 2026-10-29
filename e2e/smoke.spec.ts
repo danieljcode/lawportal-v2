@@ -24,7 +24,8 @@ async function openForm(page: Page, id: string): Promise<void> {
 /** A judge (so the Dockets button shows), already saved and active. */
 async function seedJudge(page: Page): Promise<void> {
   await page.addInitScript(() => {
-    if (localStorage.getItem("lawapp_chars")) return;
+    // Seed once: after the first load the data has moved to IndexedDB (LP-36).
+    if (localStorage.getItem("lawapp_chars") || localStorage.getItem("lawapp_idb")) return;
     localStorage.setItem("lawapp_chars", JSON.stringify([{ id: "e2ejudge1", name: "Judy Bench", title: "Judge" }]));
     localStorage.setItem("lawapp_active_char", "e2ejudge1");
   });

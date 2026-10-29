@@ -25,7 +25,7 @@ npm run dev
 ```
 
 Open http://localhost:3000. The page is client-only, so it shows "Loading…" briefly while the app
-loads. Your characters, dockets and drafts live in this browser's local storage; nothing needs
+loads. Your characters, dockets and drafts live in this browser's IndexedDB; nothing needs
 setting up first.
 
 `npm install` also runs `prepare`, which points git at `.githooks/` (`git config core.hooksPath
@@ -159,7 +159,8 @@ when its feature ships.
 
 ## Where things are saved
 
-- **In the browser:** local storage keys starting `lawapp_` (see
+- **In the browser:** IndexedDB (database `lawapp`), keys starting `lawapp_`; the theme and look
+  settings stay in localStorage (see
   [Architecture](architecture.md#client-data-the-stores)).
 - **On this computer:** sync files in `data/sync/` (gitignored), and the reference data and
   screenshots in `.agents/` (gitignored).

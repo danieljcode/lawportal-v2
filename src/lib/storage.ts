@@ -1,7 +1,8 @@
 // Key-value storage for the client stores (design D5).
 //
 // Everything goes through a tiny KV interface so the stores can be tested with
-// memoryKV(). The app uses localStorage, or an in-memory map when the browser
+// memoryKV(). The app uses IndexedDB (idb.ts, LP-36) once initStorage has
+// opened it; otherwise localStorage, or an in-memory map when the browser
 // blocks storage (private modes, disabled site data).
 
 export interface KV {
@@ -13,7 +14,7 @@ export interface KV {
   keys?(): string[];
 }
 
-export type Backend = "local" | "memory";
+export type Backend = "indexeddb" | "local" | "memory";
 
 export const SAVE_FAILED = "Couldn't save in this browser (storage is full or blocked).";
 
@@ -90,6 +91,29 @@ export function defaultKV(): KV {
 export function backend(): Backend {
   defaultKV();
   return defaultBackend;
+}
+
+/** Make `kv` the app's storage, unless defaultKV() has already picked one this page. Returns whether it did. */
+export function setDefaultKV(kv: KV, b: Backend): boolean {
+  if (defaultKv) return false;
+  defaultKv = kv;
+  defaultBackend = b;
+  return true;
+}
+
+/** Test-only: let defaultKV() pick again. */
+export function __resetDefaultKVForTests(): void {
+  defaultKv = null;
+}
+
+const saveFailedChanges = createChannel();
+
+/** Fires when a save already shown on screen fails afterwards (an IndexedDB write, LP-36). */
+export const subscribeSaveFailed = saveFailedChanges.subscribe;
+export const saveFailedVersion = saveFailedChanges.version;
+
+export function reportSaveFailed(): void {
+  saveFailedChanges.emit();
 }
 
 /**
