@@ -8,7 +8,8 @@
 
 /* ---------- skin variables ---------- */
 :root {
-  --desktop: #008080;
+  /* The firm's navy, BRANDING.colours.primary (LP-24); tests/stylesheets.test.ts keeps them equal. */
+  --desktop: #000080;
   --face: #c0c0c0;
   --hilite: #fff;
   --light: #dfdfdf;

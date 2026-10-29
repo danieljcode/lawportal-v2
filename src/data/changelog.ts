@@ -26,6 +26,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         text: "Firm letters open with the firm's letterhead: its name, address, phone and email. Set them once in Settings → Letterhead. Court forms never carry it.",
       },
       {
+        type: "update",
+        text: "The Classic (1990) desktop is the firm's navy instead of teal. High Contrast Black stays black.",
+      },
+      {
         type: "fix",
         text: "New client intake empties itself once Open case has made the case, so pressing Open case again, or coming back to the intake later, no longer makes a second case for the same client.",
       },

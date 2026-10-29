@@ -11,11 +11,12 @@ browser.
   `ssr: false`. The app reads local storage on its first render, so it never renders on the server
   (no hydration mismatches).
 - **Branding** (`src/branding.ts`, LP-22). One config holds the firm's name ("Friedman &
-  Associates"), short name ("F&A"), the product name ("Court Filing System"), logo, colours and
-  wallpaper, so another firm could be set up when it's hosted. The app's chrome reads it: the window
+  Associates"), short name ("F&A"), the product name ("Court Filing System"), logo and colours,
+  so another firm could be set up when it's hosted. The app's chrome reads it: the window
   title and browser tab (`appTitle()`, also `APP_TITLE` in `useRoute`), the app rail, the favicon
   (`iconHref()`: the logo, or scales in the firm's colours), the boot screen, the crash report and
-  Help → About (`AboutDialog.tsx`, also the About section of Settings). Court forms, the forum preview and
+  Help → About (`AboutDialog.tsx`, also the About section of Settings). The Classic desktop is the
+  firm's primary colour (navy, LP-24), set in `globals.css`. Court forms, the forum preview and
   everything posted stay unbranded; `tests/branding.test.tsx` renders every form to check.
   Changing the firm means editing that file only (the backup format's `BACKUP_APP` id stays).
   The starting tab title is set by a head script (`titleScript()`), not

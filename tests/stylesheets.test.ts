@@ -5,6 +5,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { BRANDING } from "@/branding";
 
 const SRC = path.resolve(__dirname, "../src");
 const GLOBALS = path.join(SRC, "app/globals.css");
@@ -116,5 +117,10 @@ describe("variables (LP-110)", () => {
     for (const t of ["--bevel-raised", "--bevel-sunken", "--radius", "--text-base", "--control-height", "--ui-font"])
       expect(css, t).toMatch(new RegExp(t + "\\s*:"));
     expect(css).toMatch(/--radius:\s*0;/);
+  });
+
+  it("make the Classic desktop the firm's colour (LP-24)", () => {
+    const desktop = declarations(read(GLOBALS)).find((d) => d.selector === ":root" && d.prop === "--desktop");
+    expect(desktop?.value).toBe(BRANDING.colours.primary);
   });
 });
