@@ -26,7 +26,6 @@ import {
   fillFromCharacter,
   formToDocketPatch,
   hasField,
-  LAST_FORM_KEY,
   materializeBlocks,
   missingRequired,
   openState,
@@ -189,14 +188,6 @@ export default function FormView({
       writer.flush();
     };
   }, [writer]);
-
-  useEffect(() => {
-    try {
-      defaultKV().set(LAST_FORM_KEY, form.id);
-    } catch {
-      // private mode
-    }
-  }, [form.id]);
 
   useEffect(
     () => () => {
