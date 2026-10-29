@@ -1,6 +1,6 @@
 // POST /api/account: create a sync code. DELETE /api/account: delete the server copy.
 // Design §Sync server route table; the host check runs first (D7).
-import { checkHost } from "@/lib/server/guard";
+import { checkSync } from "@/lib/server/guard";
 import { parseBearer } from "@/lib/server/code";
 import { clientIp, limitCreate, limitLookup, lookupFailed, TOO_MANY_CODES, tooMany } from "@/lib/server/rateLimit";
 import { redisConfigured } from "@/lib/server/syncRedis";
@@ -11,7 +11,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request): Promise<Response> {
-  const refused = checkHost(req);
+  const refused = checkSync(req);
   if (refused) return refused;
   if (!isJson(req)) return json({ error: "Expected application/json." }, 415);
   // Redis counts new codes itself, across every instance (LP-137).
@@ -29,7 +29,7 @@ export async function POST(req: Request): Promise<Response> {
 }
 
 export async function DELETE(req: Request): Promise<Response> {
-  const refused = checkHost(req);
+  const refused = checkSync(req);
   if (refused) return refused;
   const limited = limitLookup(req);
   if (limited) return limited;

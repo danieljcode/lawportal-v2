@@ -292,6 +292,29 @@ describe("sync API (AC 15)", () => {
     }
   });
 
+  it("a Vercel preview refuses every sync route with 503; production still answers (LP-119)", async () => {
+    const saved = process.env.VERCEL_ENV;
+    const code = generateCode();
+    const del = () => new Request(BASE + "/account", { method: "DELETE", headers: auth(code) });
+    try {
+      process.env.VERCEL_ENV = "preview";
+      for (const res of [
+        await POST(createReq()),
+        await DELETE(del()),
+        await GET(new Request(BASE + "/data", { headers: auth(code) })),
+        await PUT(put(code, { rev: 0, data: doc() })),
+      ]) {
+        expect(res.status).toBe(503);
+        expect(((await res.json()) as { error: string }).error).toMatch(/isn't available in previews/);
+      }
+      process.env.VERCEL_ENV = "production";
+      expect((await DELETE(del())).status).toBe(404);
+    } finally {
+      if (saved === undefined) delete process.env.VERCEL_ENV;
+      else process.env.VERCEL_ENV = saved;
+    }
+  });
+
   it("20 concurrent writes on one rev: 1 succeeds, 19 conflict, no .tmp left", async () => {
     const code = await newCode();
     const results = await Promise.all(
