@@ -58,7 +58,7 @@ function LetterheadSettings() {
   return (
     <>
       <p className="muted">{"At the top of firm letters. Court forms never carry it."}</p>
-      <ul className="control-items">
+      <ul className="control-items letterhead-fields">
         {input("firmName", "Firm name")}
         <li>
           <label className="control-theme">
