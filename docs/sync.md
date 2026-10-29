@@ -50,12 +50,18 @@ app runs on your own computer, it lives in files on that computer.
   - requests with a malformed or unknown code: 30 a minute per IP. Once over, that IP's sync
     requests are all refused until the minute is up, good code or not.
 
-  The counts are kept in the server process's memory, so restarting the app clears them. The IP
-  comes from `X-Forwarded-For`, which a client can fake when the app runs on its own (Vercel sets
-  it from the connection), so the per-IP limits only stop casual abuse; the overall cap is what
-  stops anyone filling the 1,000 codes. **On Vercel the counts are per instance:** the API runs as
-  many short-lived instances, each starting at zero, so there the limits don't add up across the
-  server. LP-137 moves them into Redis.
+  Where the counts are kept depends on the store:
+  - **File store (local and LAN):** in the server process's memory, so restarting the app clears
+    them, and each process counts on its own.
+  - **Redis (hosted):** the new-code counts are kept in Redis, per clock hour, in
+    `lp:sync:created:<hour>` and `lp:sync:created:ip:<sha256 of the IP>:<hour>` (LP-137). The
+    `CREATE` script checks and adds to them, so every Vercel instance shares one count, and no IP
+    is stored in clear. A refused request is told to retry when the hour ends. The bad-code limit
+    stays in each instance's memory.
+
+  The IP comes from `X-Forwarded-For`, which a client can fake when the app runs on its own
+  (Vercel sets it from the connection), so the per-IP limits only stop casual abuse; the overall
+  cap is what stops anyone filling the 1,000 codes.
 
 - **Unused codes expire.** A code that was made but never written to (still `rev` 0) is deleted
   after 7 days: by a Redis TTL on the hosted app, and in the file store by a check each time a new
