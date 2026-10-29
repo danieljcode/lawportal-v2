@@ -212,21 +212,34 @@ describe("sync API (AC 15)", () => {
     expect(got.data.cases).toHaveLength(2);
   });
 
-  it("body > 1 MiB → 413", async () => {
+  it("a 3.5 MB document (150 filings of 20 KB each, plus cases) saves (LP-138)", async () => {
     const code = await newCode();
-    const big = { rev: 0, data: { characters: [{ id: "abcd1234", name: "x".repeat(1_100_000) }] } };
-    const res = await PUT(put(code, big));
-    expect(res.status).toBe(413);
-    expect(await res.json()).toEqual({ error: "Sync data is too large (max 1 MB)." });
+    const filings = Array.from({ length: 150 }, () => ({ formId: "civil-complaint", body: "x".repeat(20_000) }));
+    const cases = Array.from({ length: 2000 }, (_, i) => ({
+      caseNumber: "90SCCR" + String(i).padStart(5, "0"),
+      notes: "y".repeat(230),
+    }));
+    const text = JSON.stringify({ rev: 0, data: { characters: [], filings, cases } });
+    expect(text.length).toBeGreaterThan(3_500_000);
+    expect(text.length).toBeLessThan(4_000_000);
+    expect((await PUT(put(code, text))).status).toBe(200);
   });
 
-  it("a PUT whose body is a 1.5 MiB stream with no Content-Length → 413", async () => {
+  it("body > 4 MB → 413", async () => {
+    const code = await newCode();
+    const big = { rev: 0, data: { characters: [{ id: "abcd1234", name: "x".repeat(4_000_001) }] } };
+    const res = await PUT(put(code, big));
+    expect(res.status).toBe(413);
+    expect(await res.json()).toEqual({ error: "Sync data is too large (max 4 MB)." });
+  });
+
+  it("a PUT whose body is a 4.5 MiB stream with no Content-Length → 413", async () => {
     const code = await newCode();
     const chunk = new Uint8Array(64 * 1024).fill(0x20);
     let sent = 0;
     const body = new ReadableStream<Uint8Array>({
       pull(controller) {
-        if (sent >= 1.5 * 1024 * 1024) {
+        if (sent >= 4.5 * 1024 * 1024) {
           controller.close();
           return;
         }
