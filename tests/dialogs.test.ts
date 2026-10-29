@@ -305,6 +305,7 @@ describe("Dockets dialog", () => {
     expect(must("#docket-list").textContent).toContain("No cases yet.");
 
     click("#new-docket");
+    expect(must<HTMLTextAreaElement>("#docket-notes").maxLength).toBe(4000); // LP-151
     type("#docket-caseNumber", "90SCCC00147");
     type("#docket-plaintiff", "Ann Smith");
     submit("#docket-form");

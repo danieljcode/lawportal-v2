@@ -17,7 +17,16 @@ import { isId, type KV } from "./storage";
 import type { Case, Docket } from "./types";
 
 // Field definitions and helpers that used to live here; imports from "./dockets" keep working.
-export { clean, DIVISION_CODES, divisionFor, DOCKETS_PREFIX, FIELDS, STATUSES, type DocketField } from "./docketFields";
+export {
+  clean,
+  DIVISION_CODES,
+  divisionFor,
+  DOCKETS_PREFIX,
+  FIELDS,
+  MAX_TEXT,
+  STATUSES,
+  type DocketField,
+} from "./docketFields";
 
 export interface DocketStore {
   list(charId: string): Docket[];

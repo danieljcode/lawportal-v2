@@ -5,7 +5,7 @@
 
 import { useMemo, useState, type FormEvent } from "react";
 import { caseProblem, caseStore, filterCases, members, needsLead, NEEDS_LEAD } from "@/lib/cases";
-import { FIELDS, STATUSES } from "@/lib/docketFields";
+import { FIELDS, MAX_TEXT, STATUSES } from "@/lib/docketFields";
 import { filingsForCase, filingStore, type Filing } from "@/lib/filings";
 import type { Case, Character } from "@/lib/types";
 import CaseDeadlines from "./CaseDeadlines";
@@ -383,12 +383,21 @@ function CaseEditor({ initial, characters, saved, onSaved, onCancel }: CaseEdito
               </select>
             );
           } else if (f.multiline) {
-            input = <textarea id={fid} rows={4} value={value} onChange={(e) => set(f.key, e.target.value)} />;
+            input = (
+              <textarea
+                id={fid}
+                rows={4}
+                maxLength={MAX_TEXT}
+                value={value}
+                onChange={(e) => set(f.key, e.target.value)}
+              />
+            );
           } else {
             input = (
               <input
                 id={fid}
                 type={f.type === "date" ? "date" : f.type === "url" ? "url" : "text"}
+                maxLength={MAX_TEXT}
                 value={value}
                 required={f.required}
                 aria-required={f.required || undefined}
@@ -401,6 +410,11 @@ function CaseEditor({ initial, characters, saved, onSaved, onCancel }: CaseEdito
               <label htmlFor={fid}>{f.label + (f.required ? " *" : "")}</label>
               {input}
               {f.hint && <p className="help">{f.hint}</p>}
+              {f.multiline && value.length > MAX_TEXT - 500 && (
+                <p className="help" id={fid + "-count"}>
+                  {value.length.toLocaleString("en-GB")} / {MAX_TEXT.toLocaleString("en-GB")}
+                </p>
+              )}
             </div>
           );
         })}
