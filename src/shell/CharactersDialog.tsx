@@ -70,10 +70,6 @@ function startEdit(c: Character | null): Editing {
   for (const f of FIELDS) {
     if (f.checkbox) {
       values[f.key] = hasDocket(c);
-    } else if (f.selectOptions) {
-      const current = c && (c[f.key] as string | undefined);
-      const firstVal = f.selectOptions[0]?.split(":")[0] || "";
-      values[f.key] = current || firstVal;
     } else {
       values[f.key] = (c && (c[f.key] as string | undefined)) || "";
     }
@@ -370,24 +366,6 @@ export function CharactersBody({
                   value: String(editing.values[f.key] || ""),
                   "aria-describedby": f.hint ? fid + "-help" : undefined,
                 };
-                if (f.selectOptions) {
-                  return (
-                    <div className="field" key={f.key}>
-                      <label htmlFor={fid}>{f.label}</label>
-                      <select {...common} onChange={(e) => setField(f.key, e.target.value)}>
-                        {f.selectOptions.map((o) => {
-                          const [val, label] = o.split(":");
-                          return (
-                            <option key={val} value={val}>
-                              {label}
-                            </option>
-                          );
-                        })}
-                      </select>
-                      {help}
-                    </div>
-                  );
-                }
                 return (
                   <div className="field" key={f.key}>
                     <label htmlFor={fid}>{f.label + (f.required ? " *" : "")}</label>

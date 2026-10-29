@@ -46,8 +46,6 @@ export interface CharacterField {
   hint?: string;
   multiline?: boolean;
   checkbox?: boolean;
-  /** "value:Label" pairs for select-style fields. */
-  selectOptions?: string[];
 }
 
 /** The reference's 12 character fields, in its order. */
@@ -100,11 +98,6 @@ export function clean(input: unknown): Character {
     const v = c[f.key];
     if (f.checkbox) {
       if (v !== undefined) out[f.key] = !!v;
-      continue;
-    }
-    if (f.selectOptions) {
-      const valid = f.selectOptions.map((o) => o.split(":")[0]);
-      if (typeof v === "string" && valid.includes(v)) out[f.key] = v;
       continue;
     }
     if (v === undefined || v === null) continue;
