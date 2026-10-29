@@ -19,7 +19,7 @@ import { draftHistory, hasContent } from "@/lib/draftHistory";
 import type { Filing } from "@/lib/filings";
 import type { JumpEntry } from "@/lib/jump";
 import { readDraft, writeDraft } from "@/lib/formState";
-import { defaultKV } from "@/lib/storage";
+import { defaultKV, SAVE_FAILED } from "@/lib/storage";
 import { isCommissioner } from "@/lib/portfolio";
 import * as sync from "@/lib/sync";
 import { applyLook, getShell, setShell, type ShellMode } from "@/lib/shell";
@@ -39,10 +39,16 @@ import ProgramManager from "./ProgramManager";
 import { PROGRAMS, programFor, shown, titleIn } from "./registry";
 import type { Shell } from "./program";
 import Taskbar from "./Taskbar";
-import { S_SET_ASIDE, S_SET_ASIDE_HINT } from "@/lib/strings";
+import { S_SAVE_FAILED_HINT, S_SET_ASIDE, S_SET_ASIDE_HINT } from "@/lib/strings";
 import { useDialogs } from "./useDialogs";
 import { CONTROL_TITLE, hashFor, navigate, pageTitle, SETTINGS_TITLE, useRoute } from "./useRoute";
-import { useCaseVersion, useCharacterVersion, useSetAsideVersion, useSyncState } from "@/ui/useStore";
+import {
+  useCaseVersion,
+  useCharacterVersion,
+  useSaveFailedVersion,
+  useSetAsideVersion,
+  useSyncState,
+} from "@/ui/useStore";
 
 export type { DialogName } from "./useDialogs";
 export type { Route } from "./useRoute";
@@ -118,6 +124,8 @@ export default function App() {
   const setAsideCount = useSetAsideVersion();
   /** The set-aside count when the notice was last dismissed; a new one shows it again. */
   const [setAsideSeen, setSetAsideSeen] = useState(0);
+  const saveFailedCount = useSaveFailedVersion();
+  const [saveFailedSeen, setSaveFailedSeen] = useState(0);
 
   /* ---------- stores ---------- */
 
@@ -379,13 +387,30 @@ export default function App() {
   const windowTitle = (program ? titleIn(program, layout) : "Program Manager") + " - " + BRANDING.firmName;
   const task = program ? pageTitle(route, form) || titleIn(program, layout) : "Program Manager";
   const icon = program ? program.icon : "▦";
-  const notice = setAsideCount > setAsideSeen && (
-    <div className="set-aside-notice" id="set-aside-notice" role="alert">
-      <strong>{S_SET_ASIDE}</strong> {S_SET_ASIDE_HINT}
-      <button type="button" className="mini" id="set-aside-dismiss" onClick={() => setSetAsideSeen(setAsideCount)}>
-        Dismiss
-      </button>
-    </div>
+  const notice = (
+    <>
+      {setAsideCount > setAsideSeen && (
+        <div className="set-aside-notice" id="set-aside-notice" role="alert">
+          <strong>{S_SET_ASIDE}</strong> {S_SET_ASIDE_HINT}
+          <button type="button" className="mini" id="set-aside-dismiss" onClick={() => setSetAsideSeen(setAsideCount)}>
+            Dismiss
+          </button>
+        </div>
+      )}
+      {saveFailedCount > saveFailedSeen && (
+        <div className="set-aside-notice" id="save-failed-notice" role="alert">
+          <strong>{SAVE_FAILED}</strong> {S_SAVE_FAILED_HINT}
+          <button
+            type="button"
+            className="mini"
+            id="save-failed-dismiss"
+            onClick={() => setSaveFailedSeen(saveFailedCount)}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+    </>
   );
   const content = (
     <>
