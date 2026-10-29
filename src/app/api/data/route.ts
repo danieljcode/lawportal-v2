@@ -9,7 +9,8 @@ import { codeHash, read, write, type SyncRecord } from "@/lib/server/syncStore";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const MAX_BODY = 1_048_576;
+// Under Vercel's 4.5 MB request body limit and Upstash's 10 MB request limit (LP-138).
+const MAX_BODY = 4_000_000;
 const MAX_CHARACTERS = 200;
 const MAX_CASES = 2000;
 const MAX_FILINGS = 500;
@@ -90,7 +91,7 @@ export async function PUT(req: Request): Promise<Response> {
     return json({ error: "Expected application/json." }, 415);
   }
   const text = await readCapped(req, MAX_BODY);
-  if (text === "too-large") return json({ error: "Sync data is too large (max 1 MB)." }, 413);
+  if (text === "too-large") return json({ error: "Sync data is too large (max 4 MB)." }, 413);
   let body: unknown;
   try {
     body = JSON.parse(text);
