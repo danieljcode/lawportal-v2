@@ -13,6 +13,7 @@ import { caseStore, filterCases, isMember } from "@/lib/cases";
 import { addDeadlines, formatDay, formDates } from "@/lib/deadlines";
 import { docketStore } from "@/lib/dockets";
 import { exhibitRefs, refreshExhibitRefs, resolveExhibitRefs, type ExhibitRef } from "@/lib/exhibits";
+import { letterheadStore } from "@/lib/letterhead";
 import { draftHistory, snapshotTime, SNAPSHOT_EVERY_MS, type Snapshot } from "@/lib/draftHistory";
 import { createDraftWriter, type DraftWriter } from "@/lib/draftWriter";
 import { filingStore, type FilingVia } from "@/lib/filings";
@@ -48,7 +49,7 @@ import Sections from "./fields/Sections";
 import DraftHistoryDialog from "./DraftHistoryDialog";
 import LawLibraryDialog from "./LawLibraryDialog";
 import type { SafeHtml } from "@/lib/safeHtml";
-import { useCaseVersion } from "@/ui/useStore";
+import { useCaseVersion, useLetterheadVersion } from "@/ui/useStore";
 
 export interface FormOutput {
   /** Final HTML (no highlight): Copy for forum, BBCode, .docx. Rendered, so SafeHtml (LP-5). */
@@ -319,18 +320,21 @@ export default function FormView({
     });
   }
 
+  const letterheadVersion = useLetterheadVersion();
+  const letterhead = useMemo(() => (letterheadVersion >= 0 ? letterheadStore().get() : undefined), [letterheadVersion]);
+
   const output = useMemo<FormOutput | null>(() => {
     if (!tree) return null;
     const values = resolveExhibitRefs(deferredValues, exhibits);
-    const finalHtml = render(tree, values, { exhibits });
+    const finalHtml = render(tree, values, { exhibits, letterhead });
     return {
       finalHtml,
-      previewHtml: highlight ? render(tree, values, { highlight: true, exhibits }) : finalHtml,
+      previewHtml: highlight ? render(tree, values, { highlight: true, exhibits, letterhead }) : finalHtml,
       missing: missingRequired(entries, deferredValues, form.required),
       jumpTo,
       onFiled,
     };
-  }, [tree, entries, deferredValues, exhibits, highlight, form.required, jumpTo, onFiled]);
+  }, [tree, entries, deferredValues, exhibits, letterhead, highlight, form.required, jumpTo, onFiled]);
 
   // Leaving clears this form's output in App, so reopening it never shows the old instance's.
   // Declared before the publish effect: on a StrictMode re-run the setups run in order, publish last.

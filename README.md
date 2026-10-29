@@ -114,8 +114,8 @@ in, your searches and where you'd scrolled to are still there when you come back
   progress and the finished BBCode. Only Court Commissioners see it.
 - **Home.** A tile for each program, and what needs your attention: deadlines due in the next 48
   hours or overdue, your latest filings to open again, and the cases you worked on most recently.
-- **Settings.** Characters, sync and backups, Appearance (the theme, Modern or Classic, and light,
-  dark or system), What's new and About, on one page. The top bar of every program shows who you're filing
+- **Settings.** Characters, sync and backups, the Letterhead on firm letters, Appearance (the theme,
+  Modern or Classic, and light, dark or system), What's new and About, on one page. The top bar of every program shows who you're filing
   as, with a quick switch, and the sync status.
 - **Jump to anything.** Press **Ctrl+K** (**Cmd+K** on a Mac) or **/**, or choose View → Jump to, and
   type a few letters to go straight to a program, a section such as Upcoming or Precedents, or any

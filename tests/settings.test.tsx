@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-// Settings (LP-109; the Control Panel in Classic): Characters, Sync, Appearance,
-// What's new and About on one page; the top bar keeps only the active character,
+// Settings (LP-109; the Control Panel in Classic): Characters, Sync, Letterhead (LP-23),
+// Appearance, What's new and About on one page; the top bar keeps only the active character,
 // sync status and Dockets; Classic has no global toolbar; the dialogs other
 // programs open still work.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -9,6 +9,7 @@ import { createRoot, type Root } from "react-dom/client";
 import App from "@/shell/App";
 import { BOOTED_KEY } from "@/lib/boot";
 import { characterStore } from "@/lib/characters";
+import { letterheadStore } from "@/lib/letterhead";
 import { setShell } from "@/lib/shell";
 import * as sync from "@/lib/sync";
 
@@ -71,11 +72,18 @@ afterEach(() => {
 });
 
 describe("Settings (LP-109)", () => {
-  it("has Characters, Sync, Appearance, What's new and About, and the top bar only the program's things", () => {
+  it("has Characters, Sync, Letterhead, Appearance, What's new and About, and the top bar only the program's things", () => {
     mount("#control");
     expect(must("#m-title").textContent).toBe("Settings");
     expect(must("#control-title").textContent).toBe("Settings");
-    expect(sections()).toEqual(["Characters", "Sync", "Appearance", "What's new", "About Court Filing System"]);
+    expect(sections()).toEqual([
+      "Characters",
+      "Sync",
+      "Letterhead",
+      "Appearance",
+      "What's new",
+      "About Court Filing System",
+    ]);
     expect(must("#settings-characters #char-list").textContent).toContain("Alice Lawyer");
     expect(must("#settings-sync #sync-badge").textContent).toBe("Off");
     // Sync has its own section, so the Characters section doesn't repeat it.
@@ -143,5 +151,15 @@ describe("Settings in the Classic layout (LP-109)", () => {
     expect(must(".classic-bar #toggle-nav").getAttribute("aria-controls")).toBe("case-nav");
     click("#toggle-nav");
     expect(must(".app-window").className).toContain("nav-open");
+  });
+});
+
+describe("Letterhead settings (LP-23)", () => {
+  it("saves what's typed", () => {
+    mount("#control");
+    setValue("#letterhead-address", "1 Vinewood Blvd\nLos Santos");
+    setValue("#letterhead-phone", "555-0100");
+    expect(letterheadStore().get()).toMatchObject({ address: "1 Vinewood Blvd\nLos Santos", phone: "555-0100" });
+    expect(must<HTMLInputElement>("#letterhead-firmName").value).toBe("Friedman & Associates");
   });
 });

@@ -2787,8 +2787,6 @@ https://example.com/a.png
 
 exports[`toDiscord on every form > extra-demand-letter > empty, code tables 1`] = `
 "**FIRM NAME**
-FIRM ADDRESS
-PHONE · EMAIL
 ────────────────────
 \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
 RECIPIENT NAME
@@ -2810,8 +2808,6 @@ FIRM NAME"
 
 exports[`toDiscord on every form > extra-demand-letter > empty, plain-line tables 1`] = `
 "**FIRM NAME**
-FIRM ADDRESS
-PHONE · EMAIL
 ────────────────────
 \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
 RECIPIENT NAME
@@ -2832,9 +2828,7 @@ FIRM NAME"
 `;
 
 exports[`toDiscord on every form > extra-demand-letter > filled, code tables 1`] = `
-"**X\\<&>"1 X2**
-X\\<&>"1 X2
-X\\<&>"1 X2 · X\\<&>"1 X2
+"**FIRM NAME**
 ────────────────────
 January 2, 2026
 X\\<&>"1 X2
@@ -2859,8 +2853,6 @@ X\\<&>"1 X2"
 
 exports[`toDiscord on every form > extra-engagement-letter > empty, code tables 1`] = `
 "**FIRM NAME**
-FIRM ADDRESS
-PHONE · EMAIL
 ────────────────────
 \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
 CLIENT NAME
@@ -2890,8 +2882,6 @@ Date: \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_"
 
 exports[`toDiscord on every form > extra-engagement-letter > empty, plain-line tables 1`] = `
 "**FIRM NAME**
-FIRM ADDRESS
-PHONE · EMAIL
 ────────────────────
 \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
 CLIENT NAME
@@ -2920,9 +2910,7 @@ Date: \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_"
 `;
 
 exports[`toDiscord on every form > extra-engagement-letter > filled, code tables 1`] = `
-"**X\\<&>"1 X2**
-X\\<&>"1 X2
-X\\<&>"1 X2 · X\\<&>"1 X2
+"**FIRM NAME**
 ────────────────────
 January 2, 2026
 X\\<&>"1 X2
@@ -3313,8 +3301,6 @@ X\\<&>"1 X2"
 
 exports[`toDiscord on every form > extra-representation-letter > empty, code tables 1`] = `
 "**FIRM NAME**
-FIRM ADDRESS
-PHONE · EMAIL
 ────────────────────
 \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
 RECIPIENT NAME
@@ -3334,8 +3320,6 @@ FIRM NAME"
 
 exports[`toDiscord on every form > extra-representation-letter > empty, plain-line tables 1`] = `
 "**FIRM NAME**
-FIRM ADDRESS
-PHONE · EMAIL
 ────────────────────
 \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_
 RECIPIENT NAME
@@ -3354,9 +3338,7 @@ FIRM NAME"
 `;
 
 exports[`toDiscord on every form > extra-representation-letter > filled, code tables 1`] = `
-"**X\\<&>"1 X2**
-X\\<&>"1 X2
-X\\<&>"1 X2 · X\\<&>"1 X2
+"**FIRM NAME**
 ────────────────────
 January 2, 2026
 X\\<&>"1 X2

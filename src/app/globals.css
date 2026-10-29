@@ -2435,6 +2435,17 @@ dialog.changelog {
   gap: 8px;
   white-space: nowrap;
 }
+/* The letterhead fields (LP-23): labels in one column, boxes wide enough for a firm's name. */
+.letterhead-fields .control-theme {
+  align-items: baseline;
+}
+.letterhead-fields .control-theme > span {
+  min-width: 6em;
+}
+.letterhead-fields input,
+.letterhead-fields textarea {
+  width: min(28rem, 70vw);
+}
 
 @media (max-width: 760px) {
   .tray-char .muted,

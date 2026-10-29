@@ -91,9 +91,9 @@ function fieldValue(f: FixtureField, variant: Variant, opts: FixtureOptions): st
 function fill(entries: FixtureEntry[], variant: Variant, opts: FixtureOptions, into: Values): Values {
   for (const e of entries) {
     if ("field" in e) {
-      // The exhibit list (LP-13) comes from the case, never a typed value: left empty, both
-      // engines show its fallback.
-      if (e.field.character === "exhibits") continue;
+      // The exhibit list (LP-13) and the letterhead (LP-23) are never typed values: left empty,
+      // both engines show their fallback.
+      if (e.field.character === "exhibits" || e.field.character === "letterhead") continue;
       into[e.field.label] = fieldValue(e.field, variant, opts);
     } else if ("cond" in e) {
       into["?" + e.cond.name] = variant === "A";

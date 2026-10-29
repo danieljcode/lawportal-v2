@@ -5,6 +5,7 @@
 import { useMemo, useState } from "react";
 import { caseStore } from "@/lib/cases";
 import { exhibitRefs, resolveExhibitRefs } from "@/lib/exhibits";
+import { letterheadStore } from "@/lib/letterhead";
 import { draftHistory, filledCount, snapshotTime, type Snapshot } from "@/lib/draftHistory";
 import { render } from "@/lib/template";
 import type { Tree } from "@/lib/types";
@@ -47,7 +48,10 @@ function HistoryBody({ formId, tree, onRestore }: DraftHistoryDialogProps) {
     const n = snap.state.values["Case number"];
     const c = typeof n === "string" && n.trim() ? caseStore().byNumber(n.trim()) : null;
     const exhibits = c ? exhibitRefs(c.exhibits) : [];
-    return render(tree, resolveExhibitRefs(snap.state.values, exhibits), { exhibits });
+    return render(tree, resolveExhibitRefs(snap.state.values, exhibits), {
+      exhibits,
+      letterhead: letterheadStore().get(),
+    });
   }, [tree, snap]);
 
   if (!snapshots.length) {
