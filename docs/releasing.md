@@ -19,7 +19,8 @@ messages since the last release. Nothing is released until that PR is merged.
 - **The version:** before 1.0, a `feat` bumps the patch (0.2.0 → 0.2.1) and a breaking change
   (`feat!:` or a `BREAKING CHANGE:` footer) bumps the minor. To ship a Jira version, set it with a
   `Release-As: 0.3.0` footer on a commit to `main` (a line on its own at the end of the message);
-  the Release PR then shows that version.
+  the Release PR then shows that version. A squash merge keeps it only if the squashed message
+  does: check the footer is in it, or merge with `gh pr merge --squash --body-file <message>`.
 - **Settings:** `release-please-config.json` (the sections, the pre-1.0 bumps) and
   `.release-please-manifest.json` (the last version released, which release-please updates).
 - **It needs** GitHub's "Allow GitHub Actions to create and approve pull requests" (Settings →
