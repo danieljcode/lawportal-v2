@@ -1,0 +1,35 @@
+[
+  {
+    "id": "criminal-sample-motion",
+    "court": "San Andreas Criminal Court",
+    "section": "Sample Forms",
+    "title": "Sample Motion",
+    "required": [
+      "Case number",
+      "Defendant name"
+    ],
+    "html": "<div style=\"border:1px solid #000000;font-size:14px;padding:15px\">\n<p>\n<span style=\"font-size:18px\"><span style=\"color:#000000\"><strong>Sample Motion</strong></span></span>\n</p>\n<p>\n<span style=\"color:#000000\">COURTHOUSE NAME:&nbsp;<u>{{Courthouse:select:SUPERIOR COURT|SUPERIOR COURT}}</u></span>\n</p>\n<p>\n<span style=\"color:#000000\">CASE NUMBER:&nbsp;<u>{{Case number=YYSCCR00XXX|YYSCCR#####}}</u></span>\n</p>\n<p>\n<span style=\"color:#000000\">FILING DATE: <u>{{Filing date:date:short|DD/MMM/YYYY}}</u></span>\n</p>\n<p>\n<span style=\"color:#000000\">DEFENDANT:&nbsp;<u>{{Defendant name|INSERT NAME}}</u></span>\n</p>\n<p>\n<span style=\"color:#000000\">FILED BY:&nbsp;<u>{{Attorney name@name|INSERT NAME}}</u>, {{Attorney title@title|ATTORNEY AT LAW}}</span>\n</p>\n</div>\n<div style=\"border:1px solid #000000;font-size:14px;padding:15px\">\n<p>\n<span style=\"color:#000000\">{{Grounds for the motion:textarea|Set out the grounds here.}}</span>\n</p>\n</div>"
+  },
+  {
+    "id": "civil-sample-complaint",
+    "court": "San Andreas Civil Court",
+    "section": "Sample Forms",
+    "title": "Sample Complaint",
+    "required": [
+      "Case number",
+      "Plaintiff name",
+      "Defendant name"
+    ],
+    "html": "<div style=\"border:1px solid #000000;font-size:14px;padding:15px\">\n<p>\n<span style=\"font-size:18px\"><span style=\"color:#000000\"><strong>Sample Complaint</strong></span></span>\n</p>\n<p>\n<span style=\"color:#000000\">COURTHOUSE NAME:&nbsp;<u>{{Courthouse:select:SUPERIOR COURT|SUPERIOR COURT}}</u></span>\n</p>\n<p>\n<span style=\"color:#000000\">CASE NUMBER:&nbsp;<u>{{Case number=YYSCCC00XXX|YYSCCC#####}}</u></span>\n</p>\n<p>\n<span style=\"color:#000000\">FILING DATE: <u>{{Filing date:date:short|DD/MMM/YYYY}}</u></span>\n</p>\n<p>\n<span style=\"color:#000000\">PLAINTIFF:&nbsp;<u>{{Plaintiff name@name|INSERT NAME}}</u></span>\n</p>\n<p>\n<span style=\"color:#000000\">DEFENDANT: <u>{{Defendant name|INSERT NAME}}</u></span>\n</p>\n</div>\n<div style=\"border:1px solid #000000;font-size:14px;padding:15px\">\n<p>\n<span style=\"color:#000000\">{{Facts:paras|State the facts, one paragraph each.}}</span>\n</p>\n<p>\n<span style=\"color:#000000\">RELIEF SOUGHT: {{Relief sought:select:Damages|Damages|An injunction|Both}}</span>\n</p>\n</div>"
+  },
+  {
+    "id": "misc-sample-notice",
+    "court": "San Andreas Court",
+    "section": "Sample Forms",
+    "title": "Sample Notice",
+    "required": [
+      "Case number"
+    ],
+    "html": "<div style=\"border:1px solid #000000;font-size:14px;padding:15px\">\n<p>\n<span style=\"font-size:18px\"><span style=\"color:#000000\"><strong>Sample Notice</strong></span></span>\n</p>\n<p>\n<span style=\"color:#000000\">COURTHOUSE NAME:&nbsp;<u>{{Courthouse:select:SUPERIOR COURT|SUPERIOR COURT}}</u></span>\n</p>\n<p>\n<span style=\"color:#000000\">CASE NUMBER:&nbsp;<u>{{Case number=YYSCCR00XXX|YYSCCR#####}}</u></span>\n</p>\n<p>\n<span style=\"color:#000000\">FILING DATE: <u>{{Filing date:date:short|DD/MMM/YYYY}}</u></span>\n</p>\n<p>\n<span style=\"color:#000000\">TO:&nbsp;<u>{{Recipient|INSERT NAME}}</u></span>\n</p>\n</div>\n<div style=\"border:1px solid #000000;font-size:14px;padding:15px\">\n<p>\n<span style=\"color:#000000\">{{Notice text:textarea|Write the notice here.}}</span>\n</p>\n<p>\n<span style=\"color:#000000\">{{Hearing date=today+14:date|DD/MMM/YYYY}}</span>\n</p>\n</div>"
+  }
+]

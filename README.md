@@ -160,7 +160,7 @@ called the Control Panel.
 | `src/programs/`   | One folder per program (`filings`, `cases`, `clients`, `library`, `jap`, `control`), each reached only through its `index.ts`. Court Filings' form inputs are in `filings/fields/`.         |
 | `src/ui/`         | Components and hooks shared by the shell and programs: `Dialog`, `ErrorBoundary`, the store hooks (`useStore.ts`) and Filing history.                                                       |
 | `src/lib/`        | Everything that isn't interface: the stores (characters, cases, filings…), the template engine (`template/`), form state, Discord and `.docx` output, sync, and `server/` code for the API. |
-| `src/data/`       | The court forms (`forms.json`), the firm's templates (`extra-forms.ts`), their index (`form-index.json`), the penal code and What's new.                                                    |
+| `src/data/`       | The firm's templates (`extra-forms.ts`) and What's new; the court forms and penal code are private, copied in at build (see Development, App data).                                         |
 | `src/branding.ts` | The firm's name, short name, logo and colours.                                                                                                                                              |
 | `tests/`, `e2e/`  | Vitest suites, and the Playwright smoke tests.                                                                                                                                              |
 | `scripts/`        | The npm scripts' code: form porting, the penal code import, smoke checks, release notes, hooks.                                                                                             |

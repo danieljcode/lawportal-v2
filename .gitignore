@@ -11,6 +11,12 @@ next-env.d.ts
 /data/
 /.agents/
 
+# The app's private data, copied in by scripts/app-data.mjs (LP-165)
+/src/data/forms.json
+/src/data/form-index.json
+/src/data/penal-code.json
+/src/data/.app-data
+
 # npm run release-notes output
 release-notes.md
 

@@ -6,6 +6,7 @@ import { escapeMarkdown, htmlToDiscordDoc, RULE, toDiscord, type DiscordOptions 
 import { compile, fields, render } from "@/lib/template";
 import { balanced, fenceCount, noTripleBlank, outsideFences } from "./discordAssert";
 import { fixture, MD_TEXT } from "./fixtures";
+import { blockList } from "../scripts/scrub-links.mjs";
 
 const parse = (html: string) => new DOMParser().parseFromString(html, "text/html");
 const md = (html: string, opts: DiscordOptions = {}) => toDiscord(html, { parser: parse, ...opts });
@@ -315,8 +316,11 @@ describe("toDiscord: blank lines", () => {
 
 /* ------------------------------------------------------------------ goldens */
 
-// The old forum and site names, split so this guard doesn't show up in the brand re-grep itself.
-const BRANDS = new RegExp(["gta[ .]?world", "gt" + "aw", "awu" + "card"].join("|"), "i");
+// The old forum and site names, from the private block list (LP-165); none without the reference data.
+const BRAND_LIST = blockList().brands;
+const BRANDS = BRAND_LIST.length
+  ? new RegExp(BRAND_LIST.map((b) => b.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "[ .]?")).join("|"), "i")
+  : /(?!)/;
 
 function checkInvariants(id: string, out: string): void {
   const outside = outsideFences(out);

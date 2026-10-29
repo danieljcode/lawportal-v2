@@ -1,5 +1,7 @@
 # Generated files: formatted by their own tools, so Prettier leaves them alone (LP-86).
 src/data/forms.json
+src/data/form-index.json
+src/data/penal-code.json
 tests/__snapshots__/
 package-lock.json
 CHANGELOG.md
