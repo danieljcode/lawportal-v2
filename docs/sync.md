@@ -40,11 +40,13 @@ app runs on your own computer, it lives in files on that computer.
   settled, so two requests can't interleave on one file.
 - **Atomic writes.** A write goes to a temp file and is renamed over the real one, retried briefly
   while Windows (antivirus, indexing) holds the target.
-- **Limits.** At most 1,000 sync codes (`POST` answers `503` after that), a 1 MB body, and 200
+- **Limits.** At most 1,000 sync codes (`POST` answers `503` after that), a 4 MB body, and 200
   characters, 2,000 cases, 500 filings, 500 conflict checks and 1,000 precedents per `PUT`. The app
-  keeps the newest 150 filings, so the history fits the list limit. The 1 MB body is the tighter
-  limit: each filing carries its whole form, so a big filing history can pass it, and then every
-  push gets `413` until data is removed. LP-138 raises it.
+  keeps the newest 150 filings, so the history fits the list limit. Each filing carries its whole
+  form, so the body cap was raised from 1 MB to 4 MB (LP-138): 150 filings of 20 KB each still
+  fit. 4 MB stays under Vercel's 4.5 MB request body limit, and under Upstash's 10 MB request
+  limit (Free and Pay-as-you-go), since a write goes to Redis in one request. A body over 4 MB
+  gets `413` until data is removed.
 - **Rate limits** (LP-8, `src/lib/server/rateLimit.ts`), answered with `429` and a `Retry-After`:
   - new codes: 5 an hour per IP, and 5 an hour across the whole server;
   - requests with a malformed or unknown code: 30 a minute per IP. Once over, that IP's sync
