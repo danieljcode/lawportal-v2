@@ -14,8 +14,8 @@ messages since the last release. Nothing is released until that PR is merged.
   and Docs (`docs`). `refactor`, `test`, `ci`, `chore` and `style` are left out, and Dependabot's
   `chore(deps)` updates with them. The workflow then tidies it and the Release PR's description
   (`scripts/tidy-changelog.mjs`): it drops an entry repeated in a version (a merge commit holds its
-  PR's title, which release-please reads as one more commit) and links every `[LP-n]` to its Jira
-  issue, which release-please can't.
+  PR's title, which release-please reads as one more commit). Jira keys stay plain `[LP-n]`: the
+  Jira site is private (LP-164).
 - **The version:** before 1.0, a `feat` bumps the patch (0.2.0 → 0.2.1) and a breaking change
   (`feat!:` or a `BREAKING CHANGE:` footer) bumps the minor. To ship a Jira version, set it with a
   `Release-As: 0.3.0` footer on a commit to `main` (a line on its own at the end of the message);
@@ -60,7 +60,7 @@ Jira version is Done, from an up-to-date `main`:
    git push origin v0.2.0
    ```
 5. **GitHub Release:** `npm run -s release-notes > release-notes.md` builds the notes from that What's
-   new entry, plus links to the Jira keys of every commit since the previous tag. Then:
+   new entry, plus the Jira keys of every commit since the previous tag. Then:
    ```bash
    gh release create v0.2.0 --title "v0.2.0" --notes-file release-notes.md
    ```

@@ -141,29 +141,29 @@ describe("storage helpers", () => {
 describe("dropping the pre-LP-70 server field (LP-71)", () => {
   const OLD = [
     {
-      id: "gtawchar1",
-      name: "Gee Taw",
+      id: "oldsrvchar1",
+      name: "Gee Tee",
       title: "Attorney at Law",
       bar: "B-12",
-      server: "gtaw",
+      server: "other",
       updatedAt: "2026-01-01T00:00:00.000Z",
     },
-    { id: "fschar001", name: "Sam Style", server: "freestyle", docket: true },
+    { id: "fschar001", name: "Sam Style", server: "other", docket: true },
     { id: "newchar01", name: "Already Clean" },
   ];
 
   it("removes server from every saved character, keeps everything else exactly, and deletes the saved default", () => {
     const { kv, chars, dockets } = stores();
     kv.set(CHARS_KEY, JSON.stringify(OLD));
-    kv.set(LEGACY_SERVER_KEY, "gtaw");
-    dockets.save("gtawchar1", { caseNumber: "26GJCC00147", plaintiff: "Ann" });
+    kv.set(LEGACY_SERVER_KEY, "other");
+    dockets.save("oldsrvchar1", { caseNumber: "26GJCC00147", plaintiff: "Ann" });
 
     expect(chars.migrateServerField()).toBe(2);
     const stored = JSON.parse(kv.get(CHARS_KEY)!) as Array<Record<string, unknown>>;
     expect(stored).toEqual([
       {
-        id: "gtawchar1",
-        name: "Gee Taw",
+        id: "oldsrvchar1",
+        name: "Gee Tee",
         title: "Attorney at Law",
         bar: "B-12",
         updatedAt: "2026-01-01T00:00:00.000Z",
@@ -173,7 +173,7 @@ describe("dropping the pre-LP-70 server field (LP-71)", () => {
     ]);
     expect(kv.get(LEGACY_SERVER_KEY)).toBeNull();
     // Dockets keep their case numbers as filed, GJ and all.
-    expect(dockets.list("gtawchar1").map((d) => d.caseNumber)).toEqual(["26GJCC00147"]);
+    expect(dockets.list("oldsrvchar1").map((d) => d.caseNumber)).toEqual(["26GJCC00147"]);
   });
 
   it("is a no-op the second time and on clean data", () => {

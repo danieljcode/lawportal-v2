@@ -45,7 +45,7 @@ export const DIVISION_CODES: Readonly<Record<string, string>> = {
 
 /**
  * A case's division: from the code in its number, otherwise from the court text
- * saved on the docket, either a FreestyleRP court name ("San Andreas Criminal
+ * saved on the docket, either one of our court names ("San Andreas Criminal
  * Court") or one saved before LP-69 ("…- Criminal Division").
  */
 export function divisionFor(d: { caseNumber?: string; court?: string }): string | undefined {

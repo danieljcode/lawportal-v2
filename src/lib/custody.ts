@@ -6,7 +6,7 @@
 // escaped like any other filing text. Pure: no storage.
 
 import { formatDay } from "./deadlines";
-import { gameTime } from "./freestyle";
+import { gameTime } from "./gameTime";
 import { isId, newId, text, uniqueById } from "./storage";
 import { compile, render } from "./template";
 import type { SafeHtml } from "./safeHtml";

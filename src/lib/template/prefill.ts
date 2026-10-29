@@ -1,7 +1,7 @@
 // Prefills: today and date rules, values computed from other fields, and case-number patterns.
 
 import { addDays } from "../deadlines";
-import { gameTime } from "../freestyle";
+import { gameTime } from "../gameTime";
 import type { Field } from "../types";
 
 /* ---------------------------------------------------------------- prefill */

@@ -2,7 +2,7 @@
 
 This is a personal project, and the code is not open for reuse (see [LICENSE](../LICENSE)). These are
 the conventions for anyone working on it with Daniel. Planning lives in the Jira project **LP**
-("Law portal") at https://freestylelawportal.atlassian.net.
+("Law portal"), which is private.
 
 ## Issue keys
 
@@ -22,7 +22,7 @@ it so each change can be traced back to its issue.
   - one logical change per commit; keep tests with the code they cover
 - **Pull request title:** the same format as a commit.
 - **Pull request description:** starts with a link to the Jira issue, for example
-  `Jira: [LP-64](https://freestylelawportal.atlassian.net/browse/LP-64)`, then a short summary of
+  `Jira: LP-64`, then a short summary of
   what changed and how it was tested.
 
 Nothing is pushed or merged to `main` directly: every change goes through a pull request, and Daniel
@@ -80,7 +80,7 @@ reviews and merges.
 
 ## Releases (Fix version)
 
-- v0.2 Stable & FreestyleRP
+- v0.2 Stable & focused
 - v0.3 Firm tools
 - v0.4 1990 desktop
 - v1.0 Hosted firm

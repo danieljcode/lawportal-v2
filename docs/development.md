@@ -125,7 +125,7 @@ Authentication). They run the real app, with these differences:
 | `npm run format`             | Formats every file with Prettier.                                                                                                          |
 | `npm run format:check`       | Checks formatting without changing anything (what CI runs).                                                                                |
 | `npm run port-forms`         | Regenerates `src/data/forms.json` from the reference data. See [Templates and forms](templates-and-forms.md#regenerating-the-court-forms). |
-| `npm run penal-code`         | Updates `src/data/penal-code.json` from the FreestyleRP penal code sheet (or `-- file.csv`). See [Architecture](architecture.md).          |
+| `npm run penal-code`         | Updates `src/data/penal-code.json` from the server's penal code sheet (or `-- file.csv`). See [Architecture](architecture.md).             |
 | `npm run screenshots`        | Screenshots of the running app into `.agents/screenshots/` (Playwright).                                                                   |
 | `npm run screenshots:accept` | Takes the new approved screenshots from the branch's last failed CI run. See [Testing](testing.md#screenshot-tests-lp-117).                |
 | `npm run smoke:preview`      | Browser smoke test of every form against the running app (Playwright).                                                                     |

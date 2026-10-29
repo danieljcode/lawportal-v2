@@ -152,7 +152,7 @@ src/
   lib/formState/  per-form state: state, update, rules, dockets, layout, drafts
   lib/services/   work spanning several stores (characters.ts: delete, duplicate, export, import)
   lib/server/     server-only: host guard, capped body reader, sync codes, rate limits, file and Redis stores
-scripts/          port-forms, FreestyleRP wording, template safety, release notes, Playwright scripts
+scripts/          port-forms, court wording, template safety, release notes, Playwright scripts
 tests/            vitest suites, snapshots, the reference-data oracle
 ```
 
@@ -231,7 +231,7 @@ flowchart LR
    - **Word:** the browser posts the HTML to `/api/docx`, and `src/lib/docx/htmlToDocx.ts` builds
      the file on the server. Images become `[Image: <url>]` links; the server never fetches them.
 
-**Dates are in-game.** FreestyleRP is set 36 years back. `gameTime()` in `src/lib/freestyle.ts`
+**Dates are in-game.** The game is set 36 years back. `gameTime()` in `src/lib/gameTime.ts`
 gives every date and time the app shows or fills in. `FormView` passes the real `new Date()` as
 its `now`; Today, Auto, date prefills and the case-number year turn it into game time. Courthouses,
 court names and the case-number shape live in `src/lib/courts.ts`.
@@ -322,7 +322,7 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
   - **The J.A.P.** is at version 2 (LP-99): its only step wraps the bare portfolio.
   - **Cases** are at version 1 (LP-4): with nothing saved, the step turns the old per-character
     dockets (`lawapp_dockets_<id>`, bare or in the LP-99 envelope) into cases and removes those
-    keys. Dockets saved before LP-69 keep their GTAW court names and GJ case numbers as filed.
+    keys. Dockets saved before LP-69 keep the reference forms' court names and GJ case numbers as filed.
   - **To change a store's shape**, bump its `version` and add a step whose `up` turns the old shape
     into the new one, with a test from the old version.
 - **Cases belong to the firm** (`src/lib/cases.ts`, LP-4). A `Case` is the docket fields plus a
@@ -441,7 +441,7 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
   storage is full. They're in the full backup but not synced, like drafts.
 - **Startup migrations** (`src/lib/migrations.ts`) run once per load, from `AppLoader` after App's
   code has loaded and before it first renders, never during render: each store's `migrate()`, then
-  dropping the pre-FreestyleRP `server` field and `lawapp_server` key (LP-71).
+  dropping the old `server` field and `lawapp_server` key (LP-71).
 
 ## Server
 

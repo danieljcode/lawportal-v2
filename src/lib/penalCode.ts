@@ -1,4 +1,4 @@
-// The FreestyleRP penal code in the Law Library (LP-17). The charges live in
+// The penal code in the Law Library (LP-17). The charges live in
 // one data file, src/data/penal-code.json, written by `npm run penal-code`
 // from the server's sheet (see scripts/import-penal-code.mjs); it records the
 // date it was last updated. Search, the sentencing text and the citation

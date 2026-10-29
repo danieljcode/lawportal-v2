@@ -3,12 +3,10 @@
 //
 // - Drops repeated entries. A merge commit's message holds its PR's title, which release-please reads
 //   as one more commit, so a PR's title shows up next to the same commit from its branch.
-// - Links every "[LP-n]" to its Jira issue; release-please only links GitHub issues.
 //
 // Usage: node scripts/tidy-changelog.mjs <file>
 import { readFileSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
-import { JIRA_BROWSE } from "./release-notes.mjs";
 
 /** Within each version ("## …"), keep the first of entries that differ only in their commit link. */
 export function dropRepeats(markdown) {
@@ -26,15 +24,10 @@ export function dropRepeats(markdown) {
     .join("\n");
 }
 
-/** `[LP-64]` → `[LP-64](…/browse/LP-64)`; a key that's already a link is left alone. */
-export function linkJiraKeys(markdown) {
-  return markdown.replace(/\[(LP-\d+)\](?!\()/g, (_, key) => `[${key}](${JIRA_BROWSE}${key})`);
-}
-
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const file = process.argv[2];
   if (!file) {
     console.error("Usage: node scripts/tidy-changelog.mjs <file>");
     process.exitCode = 2;
-  } else writeFileSync(file, linkJiraKeys(dropRepeats(readFileSync(file, "utf8"))));
+  } else writeFileSync(file, dropRepeats(readFileSync(file, "utf8")));
 }

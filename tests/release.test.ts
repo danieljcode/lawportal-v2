@@ -5,8 +5,8 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { CHANGELOG, type ChangelogEntry } from "@/data/changelog";
 import { APP_VERSION } from "@/lib/version";
-import { buildNotes, issueKeys, JIRA_BROWSE } from "../scripts/release-notes.mjs";
-import { dropRepeats, linkJiraKeys } from "../scripts/tidy-changelog.mjs";
+import { buildNotes, issueKeys } from "../scripts/release-notes.mjs";
+import { dropRepeats } from "../scripts/tidy-changelog.mjs";
 
 const pkg = JSON.parse(readFileSync(path.resolve(process.cwd(), "package.json"), "utf8")) as { version: string };
 const SEMVER = /^\d+\.\d+\.\d+$/;
@@ -36,7 +36,7 @@ describe("release notes", () => {
   const log: ChangelogEntry[] = [
     {
       date: "2026-11-01",
-      title: "Stable and FreestyleRP",
+      title: "Stable and focused",
       version: "0.2.0",
       items: [
         { type: "fix", text: "A fix." },
@@ -62,7 +62,7 @@ describe("release notes", () => {
   it("are the version's What's new entry, grouped like the dialog, then its Jira issues", () => {
     expect(buildNotes("0.2.0", log, ["LP-63", "LP-64"])).toBe(
       [
-        "## v0.2.0: Stable and FreestyleRP (2026-11-01)",
+        "## v0.2.0: Stable and focused (2026-11-01)",
         "",
         "### New",
         "",
@@ -78,8 +78,8 @@ describe("release notes", () => {
         "",
         "### Jira issues",
         "",
-        `- [LP-63](${JIRA_BROWSE}LP-63)`,
-        `- [LP-64](${JIRA_BROWSE}LP-64)`,
+        "- LP-63",
+        "- LP-64",
         "",
       ].join("\n"),
     );
@@ -91,16 +91,6 @@ describe("release notes", () => {
 });
 
 describe("tidying release-please's changelog (LP-116)", () => {
-  it("link every [LP-n], and leave a linked one alone", () => {
-    const md = "* **e2e:** screenshot tests [LP-117] ([8f9c76a](https://github.com/x))\n* [LP-118] and [LP-7]";
-    const linked = linkJiraKeys(md);
-    expect(linked).toBe(
-      `* **e2e:** screenshot tests [LP-117](${JIRA_BROWSE}LP-117) ([8f9c76a](https://github.com/x))\n` +
-        `* [LP-118](${JIRA_BROWSE}LP-118) and [LP-7](${JIRA_BROWSE}LP-7)`,
-    );
-    expect(linkJiraKeys(linked)).toBe(linked);
-  });
-
   it("drop an entry repeated in the same version (a merge commit holds its PR's title)", () => {
     const md = [
       "## [0.3.0](https://github.com/x) (2026-10-28)",

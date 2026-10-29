@@ -67,13 +67,13 @@ describe("character file", () => {
     const s = stores();
     const text = JSON.stringify({
       characters: [
-        { id: "abc123", name: "Gee Taw", title: "Attorney at Law", server: "gtaw" },
-        { id: "def456", name: "Sam Style", server: "freestyle" },
+        { id: "abc123", name: "Gee Tee", title: "Attorney at Law", server: "other" },
+        { id: "def456", name: "Sam Style", server: "other" },
       ],
     });
     importText(text, s);
     const [a, b] = s.characters.list();
-    expect(a).toMatchObject({ name: "Gee Taw", title: "Attorney at Law" });
+    expect(a).toMatchObject({ name: "Gee Tee", title: "Attorney at Law" });
     expect(b.name).toBe("Sam Style");
     for (const c of [a, b]) expect(c).not.toHaveProperty("server");
     expect(JSON.parse(exportText(s)).characters[0]).not.toHaveProperty("server");

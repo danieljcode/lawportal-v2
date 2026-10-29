@@ -330,7 +330,7 @@ describe("dockets ↔ form", () => {
     expect(filled).toBe(6);
   });
 
-  it("docketToForm names our courthouse from the case number, and leaves an old GTAW one as filed (LP-68)", () => {
+  it("docketToForm names our courthouse from the case number, and leaves an old one from the reference forms as filed (LP-68)", () => {
     const entries = entriesOf("criminal-case-schedule");
     const ours = docketToForm(entries, state(), docket({ caseNumber: "90SCCR00147" })).state;
     expect(ours.values).toMatchObject({ "Case number": "90SCCR00147", Courthouse: "SUPERIOR COURT" });
@@ -376,7 +376,7 @@ describe("dockets ↔ form", () => {
     expect("patch" in p && p.patch.court).toBe("San Andreas Appellate Court");
   });
 
-  it("reads a docket's division from a FreestyleRP court name or one saved before LP-69", () => {
+  it("reads a docket's division from one of our court names or one saved before LP-69", () => {
     expect(divisionFor({ court: "San Andreas Civil Court" })).toBe("CIVIL DIVISION");
     expect(divisionFor({ court: "San Andreas Small Claims Court" })).toBe("SMALL CLAIMS DIVISION");
     expect(divisionFor({ court: "Superior Court of San Andreas - Traffic Division" })).toBe("TRAFFIC DIVISION");

@@ -95,7 +95,9 @@ describe("reading a chosen file", () => {
 
   it("recognises older characters-only exports, including ones with a server field", () => {
     expect(
-      parseFile(JSON.stringify({ app: "jsa-form-generator", version: 1, characters: [{ name: "A", server: "gtaw" }] })),
+      parseFile(
+        JSON.stringify({ app: "jsa-form-generator", version: 1, characters: [{ name: "A", server: "other" }] }),
+      ),
     ).toEqual({
       kind: "characters",
     });

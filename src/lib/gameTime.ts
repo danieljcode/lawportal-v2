@@ -1,5 +1,5 @@
-// FreestyleRP settings (LP-70). The app is FreestyleRP-only: there's no server
-// choice. Court names, courthouses and the case-number pattern are in courts.ts.
+// The game's clock (LP-70). Court names, courthouses and the case-number
+// pattern are in courts.ts.
 //
 // Game time (LP-135) is New York time on every computer, with the year 36 back:
 // real Sun 25 Oct 2026, 10 pm in New York, is Sun 25 Oct 1990, 22:00. The day,
