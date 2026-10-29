@@ -19,6 +19,7 @@
 // to /api/ in the Authorization header. Client only: nothing runs at import.
 import { caseStore, casesFromDockets, cleanCase, unifyCases } from "./cases";
 import { characterStore } from "./characters";
+import { cleanContact, contactStore, type Contact } from "./contacts";
 import { cleanCheck, conflictLog, type ConflictCheck } from "./conflicts";
 import { cleanFiling, filingStore, type Filing } from "./filings";
 import { cleanPrecedent, precedentStore, type Precedent } from "./precedents";
@@ -70,6 +71,8 @@ export interface SyncState {
   lostCases: number;
   /** The same for precedents (LP-132). */
   lostPrecedents: number;
+  /** The same for contacts (LP-30). */
+  lostContacts: number;
 }
 
 /** The sync document: the export shape, with the J.A.P. inside each character, and the firm's cases (LP-4). */
@@ -82,6 +85,8 @@ export interface SyncDoc {
   conflictChecks?: ConflictCheck[];
   /** The Law Library's precedents (LP-16); absent in copies from before it. */
   precedents?: Precedent[];
+  /** The Rolodex (LP-30); absent in copies from before it. */
+  contacts?: Contact[];
 }
 
 interface ApiBody {
@@ -103,6 +108,7 @@ const INITIAL: SyncState = Object.freeze({
   lost: 0,
   lostCases: 0,
   lostPrecedents: 0,
+  lostContacts: 0,
 });
 
 let state: SyncState = INITIAL;
@@ -164,8 +170,8 @@ function set(status: SyncStatus, message = "", updated?: string): void {
   notify();
 }
 
-function setLost(lost: number, lostCases: number, lostPrecedents: number): void {
-  state = Object.freeze({ ...state, lost, lostCases, lostPrecedents });
+function setLost(lost: number, lostCases: number, lostPrecedents: number, lostContacts: number): void {
+  state = Object.freeze({ ...state, lost, lostCases, lostPrecedents, lostContacts });
   notify();
 }
 
@@ -230,6 +236,7 @@ export function snapshot(): SyncDoc {
     filings: filingStore().list(),
     conflictChecks: conflictLog().list(),
     precedents: precedentStore().list(),
+    contacts: contactStore().list(),
   };
 }
 
@@ -240,7 +247,8 @@ function listOf<T>(doc: unknown, key: string, clean: (x: unknown) => T | null): 
   return raw.map((x) => clean(x)).filter((x): x is T => !!x);
 }
 
-/** Null for a copy from before LP-16, LP-10 and LP-15 respectively. */
+/** Null for a copy from before LP-30, LP-16, LP-10 and LP-15 respectively. */
+const contactsOf = (doc: unknown) => listOf<Contact>(doc, "contacts", cleanContact);
 const precedentsOf = (doc: unknown) => listOf<Precedent>(doc, "precedents", cleanPrecedent);
 const checksOf = (doc: unknown) => listOf<ConflictCheck>(doc, "conflictChecks", cleanCheck);
 const filingsOf = (doc: unknown) => listOf<Filing>(doc, "filings", cleanFiling);
@@ -301,6 +309,8 @@ function apply(doc: unknown): number {
     if (checks) conflictLog().replaceAll(checks);
     const precedents = precedentsOf(doc);
     if (precedents) precedentStore().replaceAll(precedents);
+    const contacts = contactsOf(doc);
+    if (contacts) contactStore().replaceAll(contacts);
   } finally {
     applying = false;
   }
@@ -319,12 +329,15 @@ export function merge(serverDoc: unknown): SyncDoc {
   const haveCheck = new Set(serverChecks.map((c) => c.id));
   const serverPrecedents = precedentsOf(serverDoc) || [];
   const havePrecedent = new Set(serverPrecedents.map((p) => p.id));
+  const serverContacts = contactsOf(serverDoc) || [];
+  const haveContact = new Set(serverContacts.map((c) => c.id));
   const out: SyncDoc = {
     characters: list.slice(),
     cases: unifyCases(casesOf(serverDoc), casesOf(local)),
     filings: [...serverFilings, ...(local.filings || []).filter((f) => !haveFiling.has(f.id))],
     conflictChecks: [...serverChecks, ...(local.conflictChecks || []).filter((c) => !haveCheck.has(c.id))],
     precedents: [...serverPrecedents, ...(local.precedents || []).filter((p) => !havePrecedent.has(p.id))],
+    contacts: [...serverContacts, ...(local.contacts || []).filter((c) => !haveContact.has(c.id))],
   };
   const have = new Set(out.characters.map((c) => c.id));
   for (const c of local.characters) if (!have.has(c.id)) out.characters.push(c);
@@ -361,6 +374,7 @@ function saveBase(doc: unknown): void {
   for (const f of filingsOf(doc) || []) o["filing:" + f.id] = f.at;
   for (const c of checksOf(doc) || []) o["conflict:" + c.id] = c.at;
   for (const p of precedentsOf(doc) || []) o["precedent:" + p.id] = p.updated;
+  for (const c of contactsOf(doc) || []) o["contact:" + c.id] = c.updated;
   lsSet(BASE_KEY, JSON.stringify(o));
 }
 
@@ -372,6 +386,8 @@ export interface Resolved {
   lostCases: Case[];
   /** The same for precedents (LP-132). */
   lostPrecedents: Precedent[];
+  /** The same for contacts (LP-30). */
+  lostContacts: Contact[];
   /** True when the result holds anything of this browser's, so it must be pushed. */
   keptLocal: boolean;
 }
@@ -408,6 +424,8 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
     "precedent:",
     (p) => p.updated,
   );
+  // Contacts (LP-30): the same, by each contact's `updated`.
+  const contacts = mergeOptional(contactsOf(serverDoc), contactStore().list(), base, "contact:", (c) => c.updated);
   return {
     // Two devices can make the same case number separately: they become one case.
     doc: {
@@ -416,11 +434,19 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
       filings: filings.out,
       conflictChecks: checks.out,
       precedents: precedents.out,
+      contacts: contacts.out,
     },
     lost: chars.lost,
     lostCases: cases.lost,
     lostPrecedents: precedents.lost,
-    keptLocal: chars.keptLocal || cases.keptLocal || filings.keptLocal || checks.keptLocal || precedents.keptLocal,
+    lostContacts: contacts.lost,
+    keptLocal:
+      chars.keptLocal ||
+      cases.keptLocal ||
+      filings.keptLocal ||
+      checks.keptLocal ||
+      precedents.keptLocal ||
+      contacts.keptLocal,
   };
 }
 
@@ -489,7 +515,7 @@ function mergeOptional<T extends { id: string }>(
 }
 
 /** The versions kept aside by earlier merges (LOST_KEY), read once. */
-function readLostDoc(): { characters: Doc[]; cases: Case[]; precedents: Precedent[] } {
+function readLostDoc(): { characters: Doc[]; cases: Case[]; precedents: Precedent[]; contacts: Contact[] } {
   try {
     const o: unknown = JSON.parse(lsGet(LOST_KEY) || "null");
     const cases = o && typeof o === "object" ? (o as { cases?: unknown }).cases : undefined;
@@ -497,9 +523,10 @@ function readLostDoc(): { characters: Doc[]; cases: Case[]; precedents: Preceden
       characters: charactersOf(o),
       cases: Array.isArray(cases) ? casesOf({ cases }) : [],
       precedents: precedentsOf(o) || [],
+      contacts: contactsOf(o) || [],
     };
   } catch {
-    return { characters: [], cases: [], precedents: [] };
+    return { characters: [], cases: [], precedents: [], contacts: [] };
   }
 }
 
@@ -541,6 +568,14 @@ export function restoreLost(): number {
       console.warn("[sync] couldn't restore a precedent", err);
     }
   }
+  for (const c of kept.contacts) {
+    try {
+      contactStore().save(c); // a fresh `updated` too
+      restored++;
+    } catch (err) {
+      console.warn("[sync] couldn't restore a contact", err);
+    }
+  }
   discardLost();
   return restored;
 }
@@ -548,7 +583,7 @@ export function restoreLost(): number {
 /** Forget the kept-aside versions. */
 export function discardLost(): void {
   lsSet(LOST_KEY, null);
-  setLost(0, 0, 0);
+  setLost(0, 0, 0, 0);
 }
 
 /** Set `status` after applying a server copy, unless some characters failed to store. */
@@ -573,20 +608,27 @@ function takeServer(b: ApiBody, dirty: boolean): boolean {
     setAfterApply(failed, "synced", "Updated from the server.", b.updated);
     return false;
   }
-  const { doc, lost, lostCases, lostPrecedents, keptLocal } = resolve(b.data);
+  const { doc, lost, lostCases, lostPrecedents, lostContacts, keptLocal } = resolve(b.data);
   saveBase(b.data);
-  const anyLost = lost.length + lostCases.length + lostPrecedents.length > 0;
+  const anyLost = lost.length + lostCases.length + lostPrecedents.length + lostContacts.length > 0;
   if (anyLost) {
     // Add to anything not yet restored; a newer copy of the same item replaces the older one.
     const kept = readLostDoc();
     const all = replaceById(kept.characters, lost);
     const allCases = replaceById(kept.cases, lostCases);
     const allPrecedents = replaceById(kept.precedents, lostPrecedents);
+    const allContacts = replaceById(kept.contacts, lostContacts);
     lsSet(
       LOST_KEY,
-      JSON.stringify({ at: new Date().toISOString(), characters: all, cases: allCases, precedents: allPrecedents }),
+      JSON.stringify({
+        at: new Date().toISOString(),
+        characters: all,
+        cases: allCases,
+        precedents: allPrecedents,
+        contacts: allContacts,
+      }),
     );
-    setLost(all.length, allCases.length, allPrecedents.length);
+    setLost(all.length, allCases.length, allPrecedents.length, allContacts.length);
   }
   const failed = apply(doc);
   lsSet(DIRTY_KEY, keptLocal ? "1" : null);
@@ -594,7 +636,7 @@ function takeServer(b: ApiBody, dirty: boolean): boolean {
     failed,
     anyLost ? "conflict" : "synced",
     anyLost
-      ? S_SYNC_LOST(lost.length, lostCases.length, lostPrecedents.length)
+      ? S_SYNC_LOST(lost.length, lostCases.length, lostPrecedents.length, lostContacts.length)
       : keptLocal
         ? S_SYNC_MERGED
         : "Updated from the server.",
@@ -774,6 +816,7 @@ export function init(): Promise<void> {
     filingStore().subscribe(changed),
     conflictLog().subscribe(changed),
     precedentStore().subscribe(changed),
+    contactStore().subscribe(changed),
     portfolioStore().subscribe(changed),
   ];
   const onVisible = () => {
@@ -790,8 +833,8 @@ export function init(): Promise<void> {
     () => window.removeEventListener("online", onOnline),
   ];
   const kept = readLostDoc();
-  if (kept.characters.length || kept.cases.length || kept.precedents.length) {
-    setLost(kept.characters.length, kept.cases.length, kept.precedents.length);
+  if (kept.characters.length || kept.cases.length || kept.precedents.length || kept.contacts.length) {
+    setLost(kept.characters.length, kept.cases.length, kept.precedents.length, kept.contacts.length);
   }
   initPromise = (async () => {
     if (code()) {

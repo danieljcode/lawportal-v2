@@ -2,7 +2,7 @@
 // program is open and where in it, the last place reopened on boot,
 // back/forward, the page title, and going home. Routes are prefixed by
 // program: #filings/<formId>, #cases/<caseId>, #cases/upcoming,
-// #clients/intake, #clients/conflicts, #library/penal-code,
+// #clients/intake, #clients/conflicts, #clients/rolodex, #library/penal-code,
 // #library/precedents, #jap, #control. The old flat hashes (#cases, #upcoming,
 // #intake, #conflicts, #library, #jap, #<formId>) still open the same place
 // and are rewritten to the new ones.
@@ -16,7 +16,7 @@ import { defaultKV } from "@/lib/storage";
 import type { FormInfo } from "@/lib/types";
 
 export type ProgramId = "filings" | "cases" | "clients" | "library" | "jap" | "control";
-export type ClientsPage = "intake" | "conflicts";
+export type ClientsPage = "intake" | "conflicts" | "rolodex";
 export type LibraryPage = "penal-code" | "precedents";
 
 export type Route =
@@ -35,6 +35,7 @@ export const CASES_TITLE = "Case File";
 export const UPCOMING_TITLE = "Upcoming";
 export const INTAKE_TITLE = "New client intake";
 export const CONFLICTS_TITLE = "Conflict check";
+export const ROLODEX_TITLE = "Rolodex";
 export const LIBRARY_TITLE = "Law Library";
 /** Settings (LP-109) is the Control Panel in the Classic layout. */
 export const SETTINGS_TITLE = "Settings";
@@ -90,7 +91,7 @@ export function parseHash(hash: string): Route {
       if (rest === "upcoming") return { program: "cases", caseId: null, upcoming: true };
       return { program: "cases", caseId: CASE_ID.test(rest) ? rest : null };
     case "clients":
-      return { program: "clients", page: rest === "conflicts" ? "conflicts" : "intake" };
+      return { program: "clients", page: rest === "conflicts" || rest === "rolodex" ? rest : "intake" };
     case "library": {
       // A penal code chapter (LP-108): #library/penal-code/<chapter slug>.
       const [page, chapter] = rest.split("/");
@@ -125,7 +126,7 @@ export function pageTitle(r: Route, form: FormInfo | null): string | null {
     case "cases":
       return r.upcoming ? UPCOMING_TITLE : CASES_TITLE;
     case "clients":
-      return r.page === "conflicts" ? CONFLICTS_TITLE : INTAKE_TITLE;
+      return r.page === "conflicts" ? CONFLICTS_TITLE : r.page === "rolodex" ? ROLODEX_TITLE : INTAKE_TITLE;
     case "library":
       return LIBRARY_TITLE;
     case "jap":

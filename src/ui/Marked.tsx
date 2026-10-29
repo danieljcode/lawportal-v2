@@ -1,4 +1,4 @@
-// Text with the search words marked (the Law Library's highlighting, LP-16/LP-17).
+// Text with the search words marked (the Law Library and the Rolodex, LP-16/LP-17/LP-30).
 // React renders every piece as text, so nothing typed or imported becomes markup.
 
 import { highlightParts } from "@/lib/precedents";

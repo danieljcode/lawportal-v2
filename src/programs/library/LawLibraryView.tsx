@@ -19,7 +19,7 @@ import {
   searchTerms,
   type Precedent,
 } from "@/lib/precedents";
-import Marked from "./Marked";
+import Marked from "@/ui/Marked";
 import PenalCodeSearch from "./PenalCodeSearch";
 import GameDateInput from "@/ui/GameDateInput";
 import { usePrecedentVersion } from "@/ui/useStore";
