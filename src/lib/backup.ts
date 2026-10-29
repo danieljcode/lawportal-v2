@@ -11,6 +11,7 @@
 // was. Old characters-only exports are still accepted, and are imported the
 // usual way (merged by id) instead.
 
+import { CHARS_KEY } from "./characters";
 import { APP_VERSION } from "./version";
 import { SAVE_FAILED, type KV } from "./storage";
 import { unwrap } from "./store";
@@ -235,7 +236,8 @@ export function daysSinceBackup(kv: KV, now: Date = new Date()): number | null {
 /** The gentle reminder: sync is off, there's something to lose, and no backup in 30 days. */
 export function needsBackupReminder(kv: KV, now: Date = new Date()): boolean {
   if (kv.get("lawapp_sync_code")) return false;
-  if (countsOf(currentData(kv)).characters === 0) return false;
+  // Just the characters' key: this runs on every render of the Characters dialog (LP-152).
+  if (arrayLength(kv.get(CHARS_KEY) ?? undefined) === 0) return false;
   const days = daysSinceBackup(kv, now);
   return days === null || days >= REMIND_AFTER_DAYS;
 }

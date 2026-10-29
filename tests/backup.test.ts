@@ -200,4 +200,13 @@ describe("the 30-day reminder", () => {
     expect(needsBackupReminder(memoryKV(), NOW)).toBe(false);
     expect(daysSinceBackup(memoryKV(), NOW)).toBeNull();
   });
+
+  it("reads only the sync code, the characters and the last backup (LP-152)", () => {
+    const kv = withChars();
+    kv.set("lawapp_cases", "[]");
+    const read: string[] = [];
+    const spy = { ...kv, get: (key: string) => (read.push(key), kv.get(key)), keys: undefined };
+    expect(needsBackupReminder(spy, NOW)).toBe(true);
+    expect(read).toEqual(["lawapp_sync_code", "lawapp_chars", LAST_BACKUP_KEY]);
+  });
 });
