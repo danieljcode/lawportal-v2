@@ -411,8 +411,7 @@ export default function FormView({
     const all = filterCases(caseStore().list(), {});
     return { mine: all.filter((c) => isMember(c, judge.id)), others: all.filter((c) => !isMember(c, judge.id)) };
   }, [showDocket, judge, caseVersion]);
-  const caseNumber = typeof state.values["Case number"] === "string" ? (state.values["Case number"] as string) : "";
-  const currentDocket = showDocket && caseNumber ? caseStore().byNumber(caseNumber) : null;
+  const currentDocket = showDocket ? linkedCase : null;
 
   const loadDocket = (caseId: string) => {
     if (!judge) return;
