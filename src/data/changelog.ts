@@ -25,6 +25,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "new",
         text: "Firm letters open with the firm's letterhead: its name, address, phone and email. Set them once in Settings → Letterhead. Court forms never carry it.",
       },
+      {
+        type: "fix",
+        text: "New client intake empties itself once Open case has made the case, so pressing Open case again, or coming back to the intake later, no longer makes a second case for the same client.",
+      },
     ],
   },
   {

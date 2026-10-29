@@ -171,6 +171,17 @@ describe("the intake program (LP-19)", () => {
     expect(location.hash).toBe("#cases/" + c.id);
   });
 
+  it("empties the form after Open case, so pressing it twice makes one case (LP-149)", () => {
+    setValue("#intake-clientName", "Cy Ng");
+    setValue("#intake-summary", "Unpaid invoice.");
+    submit("#intake-form");
+    submit("#intake-form");
+    expect(caseStore().list()).toHaveLength(1);
+    expect(must<HTMLInputElement>("#intake-clientName").value).toBe("");
+    expect(must<HTMLTextAreaElement>("#intake-summary").value).toBe("");
+    expect(must<HTMLSelectElement>("#intake-lead").value).toBe("alice001");
+  });
+
   it("refuses a case number the firm already has", () => {
     caseStore().save({ caseNumber: "90SCCC00042", lead: "alice001" });
     setValue("#intake-clientName", "Cy Ng");
