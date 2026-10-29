@@ -48,6 +48,24 @@ npm start
 
 Both `dev` and `start` bind to `127.0.0.1`, so only this computer can reach the app.
 
+## App data
+
+The court forms, their index and the penal code are the server's own material, so they aren't in
+this repo (LP-165). They live in `app-data/` of the private `danieljcode/lawportal-reference`, and
+`scripts/app-data.mjs` copies them into `src/data/` (gitignored) on `npm install` and before every
+`dev`, `build` and `test`. It takes them from, in order:
+
+1. CI's checkout of that repo, `.agents/reference/jsa/app-data/`;
+2. GitHub, with `APP_DATA_TOKEN`, or on your own computer the token `gh auth token` prints (so
+   being signed in to the GitHub CLI with access is enough);
+3. what's already in `src/data/`, if it came from one of those;
+4. the made-up sample in `src/data/sample/`, so anyone can build and try the public code.
+
+With the sample, `npm test` leaves out the suites that test the real forms (`tests/real-data.ts`)
+and says so. `APP_DATA=sample` forces the sample, to try the code as a stranger would. On Vercel the
+build fails without the real data instead of shipping the sample, so the live app keeps its last
+good deploy. `npm run app-data` runs the step on its own.
+
 ## Code style and editor set-up
 
 Formatting is Prettier's job and ESLint checks for mistakes (LP-86); CI runs both.
@@ -84,7 +102,7 @@ npm run build && npm run start:lan
 ## Hosted on Vercel
 
 The hosted app is a normal Next.js deploy: Vercel runs `npm run build` and serves the page and the
-three API routes as functions. Two things differ from running it yourself:
+three API routes as functions. Three things differ from running it yourself:
 
 - **Sync is stored in Upstash Redis**, because Vercel's file system doesn't keep writes. Set
   `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`, or add Vercel's Upstash integration,
@@ -93,6 +111,9 @@ three API routes as functions. Two things differ from running it yourself:
   sync writes would be lost between requests.
 - **`LAWAPP_ALLOW_LAN=1` must be set**, or every API route answers `421`: the host check only
   accepts `localhost` otherwise.
+- **`APP_DATA_TOKEN` must be set** (Production and Preview): a fine-grained GitHub token with
+  read-only Contents access to `danieljcode/lawportal-reference` only. Without it the build fails
+  (see [App data](#app-data)).
 
 The in-memory rate limits are kept per function instance on Vercel, so they're weaker there (see
 [Sync](sync.md#server-storage) and LP-137).
@@ -134,18 +155,21 @@ Authentication). They run the real app, with these differences:
 
 ## Environment variables
 
-| Variable                     | Used by            | Effect                                                                              |
-| ---------------------------- | ------------------ | ----------------------------------------------------------------------------------- |
-| `LAWAPP_ALLOW_LAN=1`         | API routes         | Answer requests from any host, not only `localhost`. The `:lan` scripts set it.     |
-| `LAWAPP_SYNC_DIR`            | Sync API           | Where sync files go (default `data/sync/`).                                         |
-| `UPSTASH_REDIS_REST_URL`     | Sync API           | With `UPSTASH_REDIS_REST_TOKEN`: keep sync in Upstash Redis instead of files.       |
-| `UPSTASH_REDIS_REST_TOKEN`   | Sync API           | The Upstash database's REST token.                                                  |
-| `KV_REST_API_URL`            | Sync API           | The same pair as set by Vercel's Upstash integration (used when the above are not). |
-| `KV_REST_API_TOKEN`          | Sync API           | The integration's REST token.                                                       |
-| `VERCEL_ENV=preview`         | Sync API           | Set by Vercel on previews: the sync routes answer `503` (see Previews above).       |
-| `LAWAPP_REQUIRE_REFERENCE=1` | Tests              | Fail instead of skipping when the reference data is missing. CI sets it.            |
-| `PLAYWRIGHT_CHANNEL`         | Playwright scripts | Use an installed browser, e.g. `msedge`.                                            |
-| `BASE_URL`                   | Playwright scripts | The app's address, instead of passing it as an argument.                            |
+| Variable                     | Used by              | Effect                                                                              |
+| ---------------------------- | -------------------- | ----------------------------------------------------------------------------------- |
+| `LAWAPP_ALLOW_LAN=1`         | API routes           | Answer requests from any host, not only `localhost`. The `:lan` scripts set it.     |
+| `LAWAPP_SYNC_DIR`            | Sync API             | Where sync files go (default `data/sync/`).                                         |
+| `UPSTASH_REDIS_REST_URL`     | Sync API             | With `UPSTASH_REDIS_REST_TOKEN`: keep sync in Upstash Redis instead of files.       |
+| `UPSTASH_REDIS_REST_TOKEN`   | Sync API             | The Upstash database's REST token.                                                  |
+| `KV_REST_API_URL`            | Sync API             | The same pair as set by Vercel's Upstash integration (used when the above are not). |
+| `KV_REST_API_TOKEN`          | Sync API             | The integration's REST token.                                                       |
+| `VERCEL_ENV=preview`         | Sync API             | Set by Vercel on previews: the sync routes answer `503` (see Previews above).       |
+| `LAWAPP_REQUIRE_REFERENCE=1` | Tests                | Fail instead of skipping when the reference data is missing. CI sets it.            |
+| `APP_DATA_TOKEN`             | `app-data.mjs`       | Read-only token for the private app data ([App data](#app-data)). Set on Vercel.    |
+| `APP_DATA=sample`            | `app-data.mjs`       | Use the sample data even with access.                                               |
+| `PENAL_CODE_SHEET`           | `npm run penal-code` | The penal code sheet's address (in the private repo's README).                      |
+| `PLAYWRIGHT_CHANNEL`         | Playwright scripts   | Use an installed browser, e.g. `msedge`.                                            |
+| `BASE_URL`                   | Playwright scripts   | The app's address, instead of passing it as an argument.                            |
 
 ## Feature flags
 

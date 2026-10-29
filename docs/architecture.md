@@ -144,8 +144,9 @@ src/
                   rest of the app imports it only through its index.ts. filings/fields/ holds the
                   form editor inputs
   ui/             shared by the shell and programs: Dialog, ErrorBoundary, useStore, Filing history
-  data/           forms.json (39 court forms, generated), extra-forms.ts (13 templates), form-index.json
-                  (their ids and titles, for the shell), changelog.ts
+  data/           forms.json (39 court forms), form-index.json (their ids and titles, for the shell) and
+                  penal-code.json, all private and copied in by scripts/app-data.mjs (LP-165; sample/
+                  holds the public stand-ins); extra-forms.ts (13 templates), changelog.ts
   lib/            the logic: template engine, converters, stores, sync, settings (see below)
   lib/template/   the template engine: parse, prefill, render, escape, plain (template.ts re-exports)
   lib/discord/    HTML → Discord markdown: model, escape, serialize, dom, builder, tables, convert

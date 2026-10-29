@@ -1,0 +1,20 @@
+[
+  {
+    "id": "criminal-sample-motion",
+    "court": "San Andreas Criminal Court",
+    "section": "Sample Forms",
+    "title": "Sample Motion"
+  },
+  {
+    "id": "civil-sample-complaint",
+    "court": "San Andreas Civil Court",
+    "section": "Sample Forms",
+    "title": "Sample Complaint"
+  },
+  {
+    "id": "misc-sample-notice",
+    "court": "San Andreas Court",
+    "section": "Sample Forms",
+    "title": "Sample Notice"
+  }
+]

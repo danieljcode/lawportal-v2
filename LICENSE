@@ -6,8 +6,7 @@ written permission from the copyright holder.
 
 Third-party material, not covered by the above:
 
-- The court form templates in src/data/forms.json are adapted from the San
-  Andreas court forms published in the GTA World forum's court petitions
-  directory, as collected by the JSA Form Generator by Awucard. They remain
-  the work of their authors.
+- The court form templates are not in this repository: the app loads them
+  from private data at build time. They are adapted from third-party forms
+  and remain the work of their authors.
 - The dependencies listed in package.json are used under their own licences.

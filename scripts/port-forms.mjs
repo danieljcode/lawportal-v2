@@ -4,7 +4,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { checkTemplateHtml } from "./template-safety.mjs";
-import { unwrapBlockedLinks } from "./scrub-links.mjs";
+import { blockList, unwrapBlockedLinks } from "./scrub-links.mjs";
 import { toCourtWording } from "./court-wording.mjs";
 import { requiredFields } from "./required-fields.mjs";
 
@@ -12,6 +12,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const source = path.join(root, ".agents", "reference", "jsa", "js_forms.data.js");
 const target = path.join(root, "src", "data", "forms.json");
 const EXPECTED = 39;
+const blocked = blockList();
 const KEYS = ["id", "court", "section", "title", "html"];
 
 function fail(msg) {
@@ -27,6 +28,7 @@ if (!existsSync(source)) {
       "  See docs/templates-and-forms.md, Reference data.",
   );
 }
+if (!blocked.hosts.length) fail("blocked-hosts.json is missing from the reference data (LP-165)");
 
 let text;
 try {
@@ -58,7 +60,7 @@ forms.forEach((form, i) => {
   if (ids.has(form.id)) fail(`duplicate form id "${form.id}"`);
   ids.add(form.id);
   // Drop links to the old forum hosts (the link text stays), then our court wording (LP-69).
-  form.html = unwrapBlockedLinks(form.html);
+  form.html = unwrapBlockedLinks(form.html, blocked);
   Object.assign(form, toCourtWording(form));
 });
 
