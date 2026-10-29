@@ -84,7 +84,8 @@ browser.
   Help, plus each program's own File items), and the taskbar (`Taskbar.tsx`: Start returns to the
   Program Manager, the open program's icon and name, and the tray with the active character and
   the sync status, the same in every program). The programs are one registry,
-  `src/shell/registry.ts` (id, title, icon, where it opens, who can see it, whether it has a
+  `src/shell/registry.ts` (id, title, icon, where it opens, who can see it, the feature flag that
+  keeps it unlisted while unfinished (LP-120, `src/lib/flags.ts`), whether it has a
   navigation pane, its component); each gets the shell's state and actions as `Shell`
   (`src/shell/program.ts`). Court Filings has the court forms (only, since LP-105) as its navigation
   pane (a drawer at phone width) and owns the open form's output. Its **Form** menu (LP-105) holds

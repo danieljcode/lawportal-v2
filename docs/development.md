@@ -133,6 +133,16 @@ The in-memory rate limits are kept per function instance on Vercel, so they're w
 | `PLAYWRIGHT_CHANNEL`         | Playwright scripts | Use an installed browser, e.g. `msedge`.                                            |
 | `BASE_URL`                   | Playwright scripts | The app's address, instead of passing it as an argument.                            |
 
+## Feature flags
+
+Unfinished work merges switched off (LP-120), so `main` can always be released. Each flag is in
+`src/lib/flags.ts` with the Jira issue it belongs to; check it with `flagOn("ledger")`, or give a
+program `flag: "ledger"` in `src/shell/registry.ts` to leave it out of the Program Manager, Home
+and the jump box (a link still opens it). A flag is on only while the address names it, such as
+`http://localhost:3000/?flags=ledger,find#filings`; nothing saves it. Tests turn one on with
+`history.replaceState(null, "", "/?flags=ledger")` (see `tests/flags.test.ts`). Delete the flag
+when its feature ships.
+
 ## Where things are saved
 
 - **In the browser:** local storage keys starting `lawapp_` (see

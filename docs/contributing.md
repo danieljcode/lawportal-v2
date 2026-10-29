@@ -105,6 +105,7 @@ Release PR does the tag and the GitHub Release.
 - [ ] README/docs updated if setup or behaviour changed
 - [ ] Branch starts with the issue key; commits and PR title end with `[LP-<n>]`; PR description
       links the Jira issue
+- [ ] Flagged work (LP-120): when the feature ships, its flag and every check of it are deleted
 
 Before calling a change done, run `npm test`, `npm run lint`, `npm run format:check` and `npm run build`. The parity tests also need the
 reference data (see [Templates and forms](templates-and-forms.md#reference-data)).
