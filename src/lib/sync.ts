@@ -570,7 +570,7 @@ export function restoreLost(): number {
   }
   for (const c of kept.contacts) {
     try {
-      contactStore().save(c); // a fresh `updated` too
+      contactStore().save({ ...c, cases: c.cases ?? [] }); // exactly this version, with a fresh `updated`
       restored++;
     } catch (err) {
       console.warn("[sync] couldn't restore a contact", err);

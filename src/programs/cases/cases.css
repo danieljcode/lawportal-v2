@@ -300,3 +300,28 @@
     font-size: 12pt;
   }
 }
+
+/* ---------- contacts (LP-30) ---------- */
+.case-contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 4px 0;
+  padding: 0;
+  list-style: none;
+}
+.case-contact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 6px;
+  border: 1px solid var(--shadow);
+  border-left: 3px solid var(--accent);
+  background: var(--field);
+  overflow-wrap: anywhere;
+}
+.case-contact-add select {
+  flex: 1 1 160px;
+  min-width: 0;
+}

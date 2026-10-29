@@ -2,6 +2,8 @@
 // user's own characters: clients, judges, officers, attorneys, witnesses and
 // businesses. One list under lawapp_contacts on the store base; it syncs
 // (merged per contact by `updated`, like precedents) and is in the full backup.
+// A contact keeps its own links to Case File cases, each with its role there,
+// so the links sync with it and the cases store never changes.
 
 import { searchTerms } from "./precedents";
 import { defaultKV, isId, ISO_TIME_RE, newId, text, uniqueById, type KV } from "./storage";
@@ -10,6 +12,8 @@ import { createStore } from "./store";
 export const CONTACTS_KEY = "lawapp_contacts";
 export const CONTACTS_VERSION = 1;
 export const MAX_CONTACTS = 2000;
+/** Most cases one contact can be linked to. */
+export const MAX_CASE_LINKS = 100;
 
 export const CONTACT_TYPES = ["client", "judge", "officer", "attorney", "witness", "business"] as const;
 export type ContactType = (typeof CONTACT_TYPES)[number];
@@ -23,6 +27,26 @@ export const CONTACT_TYPE_LABELS: Record<ContactType, string> = {
   business: "Business",
 };
 
+export const CASE_ROLES = ["client", "opposing-party", "opposing-counsel", "witness", "judge", "officer", "other"] as const;
+export type CaseRole = (typeof CASE_ROLES)[number];
+
+export const CASE_ROLE_LABELS: Record<CaseRole, string> = {
+  client: "Client",
+  "opposing-party": "Opposing party",
+  "opposing-counsel": "Opposing counsel",
+  witness: "Witness",
+  judge: "Judge",
+  officer: "Officer",
+  other: "Other",
+};
+
+/** A contact's part in one case. */
+export interface CaseLink {
+  /** The case's id. */
+  id: string;
+  role: CaseRole;
+}
+
 export interface Contact {
   id: string;
   /** A person's name, or a business's. */
@@ -32,12 +56,27 @@ export interface Contact {
   address?: string;
   organisation?: string;
   notes?: string;
+  /** The cases it's on (LP-30); absent when none. */
+  cases?: CaseLink[];
   /** Real time, ISO: the newer copy wins a sync merge. */
   created: string;
   updated: string;
 }
 
 const isType = (v: unknown): v is ContactType => (CONTACT_TYPES as readonly unknown[]).includes(v);
+const isRole = (v: unknown): v is CaseRole => (CASE_ROLES as readonly unknown[]).includes(v);
+
+/** Untrusted links → one per case, each with a known role. */
+function cleanLinks(raw: unknown): CaseLink[] {
+  if (!Array.isArray(raw)) return [];
+  const out: CaseLink[] = [];
+  for (const l of raw) {
+    if (!l || typeof l !== "object") continue;
+    const { id, role } = l as Record<string, unknown>;
+    if (isId(id) && !out.some((x) => x.id === id)) out.push({ id, role: isRole(role) ? role : "other" });
+  }
+  return out.slice(0, MAX_CASE_LINKS);
+}
 
 /** Normalise an untrusted contact (form, sync, backup); null without a name. */
 export function cleanContact(input: unknown, now: string = new Date().toISOString()): Contact | null {
@@ -52,11 +91,13 @@ export function cleanContact(input: unknown, now: string = new Date().toISOStrin
     notes: text(o.notes, 2000),
   };
   const created = typeof o.created === "string" && ISO_TIME_RE.test(o.created) ? o.created : now;
+  const cases = cleanLinks(o.cases);
   return {
     id: isId(o.id) ? o.id : newId(),
     name,
     type: isType(o.type) ? o.type : "client",
     ...(Object.fromEntries(Object.entries(fields).filter(([, v]) => v)) as Partial<Contact>),
+    ...(cases.length ? { cases } : {}),
     created,
     updated: typeof o.updated === "string" && ISO_TIME_RE.test(o.updated) ? o.updated : created,
   };
@@ -87,13 +128,25 @@ export function filterContacts(list: readonly Contact[], f: { q?: string; type?:
   });
 }
 
+/** The contacts on a case, with their role there, A–Z. */
+export function contactsForCase(list: readonly Contact[], caseId: string): Array<{ contact: Contact; role: CaseRole }> {
+  return list.flatMap((contact) => {
+    const link = contact.cases?.find((l) => l.id === caseId);
+    return link ? [{ contact, role: link.role }] : [];
+  });
+}
+
 export interface ContactStore {
   /** A–Z by name. */
   list(): Contact[];
   get(id: string): Contact | null;
-  /** Add or update a contact; returns it as saved. Throws when it has no name. */
+  /** Add or update a contact; returns it as saved. Keeps its case links unless `cases` is given. Throws when it has no name. */
   save(input: Partial<Contact> & { name: string }): Contact;
   remove(id: string): void;
+  /** Put a contact on a case in a role (or change its role there). */
+  link(contactId: string, caseId: string, role: CaseRole): void;
+  /** Take a contact off a case. */
+  unlink(contactId: string, caseId: string): void;
   /** Replace every contact (sync). */
   replaceAll(items: unknown): void;
   subscribe(fn: () => void): () => void;
@@ -114,7 +167,8 @@ export function createContactStore(kv: KV): ContactStore {
       const list = store.get();
       const before = input.id ? list.find((c) => c.id === input.id) : undefined;
       const now = new Date().toISOString();
-      const c = cleanContact({ ...input, created: before?.created || now, updated: now }, now);
+      // An edit without `cases` (the Rolodex form) keeps the contact's case links.
+      const c = cleanContact({ cases: before?.cases, ...input, created: before?.created || now, updated: now }, now);
       if (!c) throw new Error("Give the contact a name.");
       if (!before && list.length >= MAX_CONTACTS) {
         throw new Error("The Rolodex can hold up to " + MAX_CONTACTS + " contacts.");
@@ -124,6 +178,17 @@ export function createContactStore(kv: KV): ContactStore {
     },
     remove(id) {
       store.set(store.get().filter((c) => c.id !== id));
+    },
+    link(contactId, caseId, role) {
+      const c = this.get(contactId);
+      if (!c) throw new Error("That contact is no longer in the Rolodex.");
+      const others = (c.cases || []).filter((l) => l.id !== caseId);
+      if (others.length >= MAX_CASE_LINKS) throw new Error("A contact can be on up to " + MAX_CASE_LINKS + " cases.");
+      this.save({ ...c, cases: [...others, { id: caseId, role }] });
+    },
+    unlink(contactId, caseId) {
+      const c = this.get(contactId);
+      if (c?.cases?.some((l) => l.id === caseId)) this.save({ ...c, cases: c.cases.filter((l) => l.id !== caseId) });
     },
     replaceAll(items) {
       store.set(validList(items));
