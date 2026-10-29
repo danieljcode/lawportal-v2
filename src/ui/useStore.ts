@@ -35,43 +35,28 @@ export function useCharacterVersion(): string {
   return useSyncExternalStore(subscribeCharacters, characterSnapshot, characterSnapshot);
 }
 
-const subscribeDockets = (fn: () => void) => docketStore().subscribe(fn);
-const docketSnapshot = () => docketStore().version();
-
-export function useDocketVersion(): number {
-  return useSyncExternalStore(subscribeDockets, docketSnapshot, docketSnapshot);
+/** The version hook for a store made on first use; its functions are made once, so React never re-subscribes. */
+function versionHook(store: () => { subscribe(fn: () => void): () => void; version(): number }): () => number {
+  const subscribe = (fn: () => void) => store().subscribe(fn);
+  const snapshot = () => store().version();
+  return function useVersion() {
+    return useSyncExternalStore(subscribe, snapshot, snapshot);
+  };
 }
 
-const subscribeCases = (fn: () => void) => caseStore().subscribe(fn);
-const caseSnapshot = () => caseStore().version();
-
+/** The docket view of the case store: bumps with it. */
+export const useDocketVersion = versionHook(docketStore);
 /** Bumps on every change to the firm's cases (LP-101). */
-export function useCaseVersion(): number {
-  return useSyncExternalStore(subscribeCases, caseSnapshot, caseSnapshot);
-}
-
-const subscribeFilings = (fn: () => void) => filingStore().subscribe(fn);
-const filingSnapshot = () => filingStore().version();
-
+export const useCaseVersion = versionHook(caseStore);
 /** Bumps on every change to the filing history (LP-15). */
-export function useFilingVersion(): number {
-  return useSyncExternalStore(subscribeFilings, filingSnapshot, filingSnapshot);
-}
-
-const subscribeConflicts = (fn: () => void) => conflictLog().subscribe(fn);
-const conflictSnapshot = () => conflictLog().version();
-
+export const useFilingVersion = versionHook(filingStore);
 /** Bumps on every change to the conflict check log (LP-10). */
-export function useConflictLogVersion(): number {
-  return useSyncExternalStore(subscribeConflicts, conflictSnapshot, conflictSnapshot);
-}
-
-const subscribePortfolio = (fn: () => void) => portfolioStore().subscribe(fn);
-const portfolioSnapshot = () => portfolioStore().version();
-
-export function usePortfolioVersion(): number {
-  return useSyncExternalStore(subscribePortfolio, portfolioSnapshot, portfolioSnapshot);
-}
+export const useConflictLogVersion = versionHook(conflictLog);
+export const usePortfolioVersion = versionHook(portfolioStore);
+/** Bumps on every change to the Law Library's precedents (LP-16). */
+export const usePrecedentVersion = versionHook(precedentStore);
+/** Bumps when the letterhead is edited in Settings (LP-23). */
+export const useLetterheadVersion = versionHook(letterheadStore);
 
 /** Counts values set aside as unreadable since the page loaded (0: none). */
 export function useSetAsideVersion(): number {
@@ -83,20 +68,4 @@ const subscribeSync = (fn: () => void) => sync.onChange(() => fn());
 /** The sync client's state (a new object on every change). */
 export function useSyncState(): sync.SyncState {
   return useSyncExternalStore(subscribeSync, sync.getState, sync.getState);
-}
-
-const subscribePrecedents = (fn: () => void) => precedentStore().subscribe(fn);
-const precedentSnapshot = () => precedentStore().version();
-
-/** Bumps on every change to the Law Library's precedents (LP-16). */
-export function usePrecedentVersion(): number {
-  return useSyncExternalStore(subscribePrecedents, precedentSnapshot, precedentSnapshot);
-}
-
-const subscribeLetterhead = (fn: () => void) => letterheadStore().subscribe(fn);
-const letterheadSnapshot = () => letterheadStore().version();
-
-/** Bumps when the letterhead is edited in Settings (LP-23). */
-export function useLetterheadVersion(): number {
-  return useSyncExternalStore(subscribeLetterhead, letterheadSnapshot, letterheadSnapshot);
 }
