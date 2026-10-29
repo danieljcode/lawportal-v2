@@ -8,6 +8,7 @@ import { docketStore, FIELDS, MAX_TEXT, STATUSES } from "@/lib/dockets";
 import { formatDate } from "@/lib/template";
 import type { Docket } from "@/lib/types";
 import Dialog from "@/ui/Dialog";
+import GameDateInput from "@/ui/GameDateInput";
 import { useDocketVersion } from "@/ui/useStore";
 
 export interface DocketsDialogProps {
@@ -208,6 +209,16 @@ function DocketsBody({ charId, canUse, onUse, onClose }: DocketsDialogProps & { 
                         </option>
                       ))}
                     </select>
+                  );
+                } else if (f.type === "date") {
+                  input = (
+                    <GameDateInput
+                      id={fid}
+                      aria-label={f.label}
+                      aria-describedby={describedBy}
+                      value={value}
+                      onChange={(v) => setField(f.key, v)}
+                    />
                   );
                 } else if (f.multiline) {
                   input = (

@@ -23,6 +23,7 @@ import {
   type CustodyEntry,
 } from "@/lib/custody";
 import type { Character, Exhibit } from "@/lib/types";
+import GameDateInput from "@/ui/GameDateInput";
 
 export interface ExhibitCustodyProps {
   exhibit: Exhibit;
@@ -102,13 +103,7 @@ export default function ExhibitCustody({ exhibit, letter, characters, active, on
         <p className="small muted custody-empty">No one has logged handling this exhibit yet.</p>
       )}
       <form className="custody-form" noValidate onSubmit={add} aria-label={"Add a custody entry for Exhibit " + letter}>
-        <input
-          type="datetime-local"
-          className="custody-at-input"
-          aria-label="When (in-game)"
-          value={at}
-          onChange={(e) => setAt(e.target.value)}
-        />
+        <GameDateInput withTime aria-label="When (in-game)" value={at} onChange={setAt} />
         <select
           className="custody-action-input"
           aria-label="Action"

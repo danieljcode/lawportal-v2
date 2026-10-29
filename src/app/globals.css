@@ -460,7 +460,7 @@ dialog {
     input[type="text"],
     input[type="url"],
     input[type="search"],
-    input[type="date"],
+    input[type="time"],
     input:not([type]),
     select,
     textarea
@@ -574,7 +574,7 @@ summary:focus-visible {
     input[type="text"],
     input[type="url"],
     input[type="search"],
-    input[type="date"],
+    input[type="time"],
     input:not([type]),
     select,
     textarea
@@ -2387,6 +2387,89 @@ dialog.changelog {
   margin: 3px 2px;
   border-top: 1px solid var(--shadow);
   border-bottom: 1px solid var(--hilite);
+}
+
+/* ---------- game date picker (LP-159) ---------- */
+.game-date {
+  position: relative;
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+}
+.game-date .game-date-text {
+  flex: 1;
+  min-width: 0;
+}
+.game-date-open {
+  flex: none;
+  width: var(--control-height);
+  min-height: var(--control-height);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--field) var(--select-img) no-repeat center;
+  box-shadow: var(--bevel-raised);
+  cursor: pointer;
+}
+.game-date-time {
+  flex: none;
+}
+.game-date-pop {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  z-index: 60;
+  padding: 6px;
+  background: var(--face);
+  color: var(--text);
+  border: 1px solid var(--text);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-menu);
+}
+.game-date-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.game-date-pop table {
+  border-collapse: collapse;
+}
+.game-date-pop th {
+  padding: 2px;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: normal;
+  text-align: center;
+}
+.game-date-pop td {
+  padding: 1px;
+}
+.game-date-pop td button {
+  width: 30px;
+  height: 28px;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.game-date-pop td button:hover {
+  background: var(--light);
+}
+.game-date-pop td button[aria-current="date"] {
+  box-shadow: inset 0 0 0 1px var(--focus);
+  font-weight: 600;
+}
+.game-date-pop td[aria-selected="true"] button {
+  background: var(--select-bg);
+  color: var(--select-text);
+}
+.game-date-pop td button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
 }
 
 /* The tray, with the active character in it, in every program. */

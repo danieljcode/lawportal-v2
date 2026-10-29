@@ -3,7 +3,7 @@
 // zones: one ahead of New York by a few hours, one by more than half a day.
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { gameNow } from "@/lib/custody";
-import { formatDay, gameToday } from "@/lib/deadlines";
+import { addMonths, formatDay, gameToday, monthWeeks, parseGameDate } from "@/lib/deadlines";
 import { snapshotTime } from "@/lib/draftHistory";
 import { todayDate } from "@/lib/formState";
 import { caseNumberPattern, compile, fields, prefillValue } from "@/lib/template";
@@ -39,6 +39,12 @@ describe.each(["Europe/London", "Asia/Tokyo"])("with the machine on %s", (zone) 
     expect(s.values["Filing date"]).toBe("1990-10-25");
     expect(gameNow(at)).toBe("1990-10-25T22:00");
     expect(snapshotTime(at.toISOString())).toBe("Sun 25 Oct 1990, 22:00");
+  });
+
+  it("draws the date picker's October 1990 with the 1st on Thursday, as in 2026 (LP-159)", () => {
+    expect(monthWeeks(1990, 10)[0]).toEqual([null, null, null, 1, 2, 3, 4]);
+    expect(parseGameDate("29 Oct 1990")).toBe("1990-10-29");
+    expect(addMonths("1990-01-31", 1)).toBe("1990-02-28");
   });
 
   it("Sat 24 Oct 2026, 11:30 pm New York, is 24 Oct 1990", () => {

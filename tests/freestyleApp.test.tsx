@@ -135,7 +135,7 @@ describe("FormView", () => {
 
   it("fills dates in the in-game year (the today prefill)", () => {
     mountForm("criminal-case-schedule");
-    expect(must<HTMLInputElement>("#f-filing-date").value.slice(0, 4)).toBe(gameYear());
+    expect(must<HTMLInputElement>("#f-filing-date").value.slice(-4)).toBe(gameYear());
   });
 
   it("builds a traffic (TC) case number the same way", () => {
@@ -182,7 +182,7 @@ describe("App without a server choice (LP-70)", () => {
     mountApp();
     go("#criminal-case-schedule");
     expect(must<HTMLInputElement>("#f-case-number").placeholder).toBe(gameYY() + "SCCR00XXX");
-    expect(must<HTMLInputElement>("#f-filing-date").value.slice(0, 4)).toBe(gameYear());
+    expect(must<HTMLInputElement>("#f-filing-date").value.slice(-4)).toBe(gameYear());
   });
 
   it("a character saved with server: 'gtaw' before LP-70 still gets in-game dates and FreestyleRP courts", () => {

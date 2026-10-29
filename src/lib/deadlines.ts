@@ -97,6 +97,50 @@ export function formatDay(iso: string): string {
   return `${DAYS[t.getUTCDay()]} ${d} ${MONTH_NAMES[m - 1].slice(0, 3)} ${y}`;
 }
 
+/** The weekdays Monday first, as the date picker's columns (LP-159). */
+export const WEEKDAYS = [...DAYS.slice(1), DAYS[0]];
+
+/**
+ * A game month as Monday-first weeks of day numbers, with null padding the first and last week.
+ * The weekdays are the real year's (game year + 36), as formatDay's are.
+ */
+export function monthWeeks(year: number, month: number): (number | null)[][] {
+  const real = year - YEAR_OFFSET;
+  const lead = (new Date(Date.UTC(real, month - 1, 1)).getUTCDay() + 6) % 7;
+  const days = new Date(Date.UTC(real, month, 0)).getUTCDate();
+  const cells: (number | null)[] = [...Array<null>(lead).fill(null), ...Array.from({ length: days }, (_, i) => i + 1)];
+  while (cells.length % 7) cells.push(null);
+  return Array.from({ length: cells.length / 7 }, (_, w) => cells.slice(w * 7, w * 7 + 7));
+}
+
+/** The same day `n` months on, kept inside that month: 31 Jan plus one month is the end of February. */
+export function addMonths(iso: string, n: number): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  const first = new Date(Date.UTC(y - YEAR_OFFSET, m - 1 + n, 1));
+  const last = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0)).getUTCDate();
+  return `${first.getUTCFullYear() + YEAR_OFFSET}-${pad(first.getUTCMonth() + 1)}-${pad(Math.min(d, last))}`;
+}
+
+/**
+ * A typed game date as YYYY-MM-DD, or "" when it isn't one. Takes "1990-10-29", "29/10/1990",
+ * "29 Oct 1990" and "Thu 29 October 1990" (the weekday is ignored).
+ */
+export function parseGameDate(text: string): string {
+  const s = text.trim();
+  let y = 0;
+  let m = 0;
+  let d = 0;
+  let r: RegExpExecArray | null;
+  if ((r = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s))) [y, m, d] = [+r[1], +r[2], +r[3]];
+  else if ((r = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s))) [d, m, y] = [+r[1], +r[2], +r[3]];
+  else if ((r = /^(?:[a-z]+,?\s+)?(\d{1,2})\s+([a-z]{3,})\.?,?\s+(\d{4})$/i.exec(s))) {
+    const word = r[2].toLowerCase();
+    [d, m, y] = [+r[1], MONTH_NAMES.findIndex((name) => name.toLowerCase().startsWith(word)) + 1, +r[3]];
+  }
+  const iso = `${y}-${pad(m)}-${pad(d)}`;
+  return y >= 1000 && m && d && addDays(iso, 0) === iso ? iso : "";
+}
+
 /** "today", "tomorrow", "in 3 days", "yesterday", "2 days ago". */
 export function relativeDay(iso: string, today: string): string {
   const diff = Math.round((Date.parse(iso + "T00:00:00Z") - Date.parse(today + "T00:00:00Z")) / 86_400_000);

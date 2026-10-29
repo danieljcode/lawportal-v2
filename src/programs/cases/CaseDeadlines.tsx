@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 import { caseStore } from "@/lib/cases";
 import { cleanDeadline, formatDay, gameToday, relativeDay, sortDeadlines } from "@/lib/deadlines";
 import type { Case, Deadline } from "@/lib/types";
+import GameDateInput from "@/ui/GameDateInput";
 
 export default function CaseDeadlines({ c }: { c: Case }) {
   const today = gameToday();
@@ -79,13 +80,7 @@ export default function CaseDeadlines({ c }: { c: Case }) {
         </p>
       )}
       <form className="deadline-add" id="deadline-add" noValidate onSubmit={add} aria-label="Add a deadline">
-        <input
-          type="date"
-          id="deadline-date"
-          aria-label="Date (in-game)"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
+        <GameDateInput id="deadline-date" aria-label="Date (in-game)" value={date} onChange={setDate} />
         <input
           type="text"
           id="deadline-label"
