@@ -97,6 +97,19 @@ three API routes as functions. Two things differ from running it yourself:
 The in-memory rate limits are kept per function instance on Vercel, so they're weaker there (see
 [Sync](sync.md#server-storage) and LP-137).
 
+### Previews
+
+Every pull request gets its own preview deploy (LP-119). Vercel's bot comments the link on the PR
+and updates it on every push. Previews are free on the Hobby plan, sent with
+`X-Robots-Tag: noindex`, and open only to people signed in to the Vercel team (Vercel
+Authentication). They run the real app, with these differences:
+
+- **Sync is off.** Vercel sets `VERCEL_ENV=preview`, and the sync routes then answer `503` "Sync
+  isn't available in previews" (`checkSync` in `src/lib/server/guard.ts`), so a PR never reads or
+  writes real sync data. Keep the Upstash variables scoped to Production in the Vercel project too.
+- **`.docx` downloads work** if `LAWAPP_ALLOW_LAN=1` is also set for Preview; it stores nothing.
+- A preview stays reachable after its PR closes; Vercel keeps old deploys.
+
 ## Scripts
 
 | Command                      | What it does                                                                                                                               |
@@ -129,6 +142,7 @@ The in-memory rate limits are kept per function instance on Vercel, so they're w
 | `UPSTASH_REDIS_REST_TOKEN`   | Sync API           | The Upstash database's REST token.                                                  |
 | `KV_REST_API_URL`            | Sync API           | The same pair as set by Vercel's Upstash integration (used when the above are not). |
 | `KV_REST_API_TOKEN`          | Sync API           | The integration's REST token.                                                       |
+| `VERCEL_ENV=preview`         | Sync API           | Set by Vercel on previews: the sync routes answer `503` (see Previews above).       |
 | `LAWAPP_REQUIRE_REFERENCE=1` | Tests              | Fail instead of skipping when the reference data is missing. CI sets it.            |
 | `PLAYWRIGHT_CHANNEL`         | Playwright scripts | Use an installed browser, e.g. `msedge`.                                            |
 | `BASE_URL`                   | Playwright scripts | The app's address, instead of passing it as an argument.                            |

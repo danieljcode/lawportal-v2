@@ -1,6 +1,6 @@
 // GET /api/data: the server copy. PUT /api/data: replace it (optimistic, by rev).
 // Design §Sync server route table; checks run in the table's order after the host check (D7).
-import { checkHost } from "@/lib/server/guard";
+import { checkSync } from "@/lib/server/guard";
 import { parseBearer } from "@/lib/server/code";
 import { readCapped } from "@/lib/server/body";
 import { limitLookup, lookupFailed } from "@/lib/server/rateLimit";
@@ -42,7 +42,7 @@ function parseDoc(body: unknown): { rev: number; data: SyncRecord["data"] } | nu
 }
 
 export async function GET(req: Request): Promise<Response> {
-  const refused = checkHost(req);
+  const refused = checkSync(req);
   if (refused) return refused;
   const limited = limitLookup(req);
   if (limited) return limited;
@@ -65,7 +65,7 @@ export async function GET(req: Request): Promise<Response> {
 }
 
 export async function PUT(req: Request): Promise<Response> {
-  const refused = checkHost(req);
+  const refused = checkSync(req);
   if (refused) return refused;
   const limited = limitLookup(req);
   if (limited) return limited;

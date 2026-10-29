@@ -50,6 +50,10 @@ add Vercel's Upstash integration, which sets `KV_REST_API_URL` and `KV_REST_API_
 `LAWAPP_ALLOW_LAN=1` so the API answers on the site's own address, not only `localhost`. See
 [Development](docs/development.md#hosted-on-vercel).
 
+Every pull request gets a preview deploy: Vercel comments its link on the PR. Previews run the real
+app with sync switched off, so they never touch real sync data. See
+[Previews](docs/development.md#previews).
+
 ### npm scripts
 
 | Script                       | What it does                                                                                  |
