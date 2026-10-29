@@ -9,6 +9,7 @@ import { errCode, isJson, json } from "@/lib/server/http";
 import { MAX_CASES } from "@/lib/cases";
 import { MAX_CHARACTERS } from "@/lib/characters";
 import { MAX_PRECEDENTS } from "@/lib/precedents";
+import { isObject } from "@/lib/storage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,8 +26,6 @@ const LISTS = {
   conflictChecks: 500,
   precedents: MAX_PRECEDENTS,
 };
-
-const isObject = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && !Array.isArray(v);
 
 /** `{rev, data:{characters, …}}`: an integer rev ≥ 0 and each list (LISTS) an array of at most its limit of objects, else null. */
 function parseDoc(body: unknown): { rev: number; data: SyncRecord["data"] } | null {

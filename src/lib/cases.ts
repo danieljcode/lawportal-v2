@@ -11,7 +11,7 @@
 import { cleanDeadlines, unionDeadlines } from "./deadlines";
 import { cleanExhibits, unionExhibits } from "./exhibits";
 import { clean as cleanDocket, DOCKETS_PREFIX } from "./docketFields";
-import { defaultKV, isId, ISO_TIME_RE, newId, setAside, type KV } from "./storage";
+import { defaultKV, isId, isObject, ISO_TIME_RE, newId, setAside, uniqueById, type KV } from "./storage";
 import { createStore, unwrap, type Migration } from "./store";
 import type { Case, Docket } from "./types";
 
@@ -60,17 +60,11 @@ export function cleanCase(input: unknown): Case {
 }
 
 function validList(raw: unknown): Case[] {
-  if (!Array.isArray(raw)) return [];
-  const seen = new Set<string>();
-  const out: Case[] = [];
-  for (const item of raw) {
-    if (!item || typeof item !== "object") continue;
+  return uniqueById(raw, (item) => {
+    if (!isObject(item)) return null;
     const c = cleanCase(item);
-    if (!c.caseNumber || seen.has(c.id)) continue;
-    seen.add(c.id);
-    out.push(c);
-  }
-  return out;
+    return c.caseNumber ? c : null;
+  });
 }
 
 /** Fields from `newer`, gaps filled from `older`; differing notes kept together. */

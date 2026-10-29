@@ -25,7 +25,7 @@ import { cleanPrecedent, precedentStore, type Precedent } from "./precedents";
 import { docketStore } from "./dockets";
 import { portfolioStore } from "./portfolio";
 import { deleteCharacter } from "./services/characters";
-import { defaultKV } from "./storage";
+import { defaultKV, replaceById } from "./storage";
 import type { Case } from "./types";
 import { S_SYNC_APPLY_FAIL, S_SYNC_LOST, S_SYNC_MERGED } from "./strings";
 
@@ -579,12 +579,9 @@ function takeServer(b: ApiBody, dirty: boolean): boolean {
   if (anyLost) {
     // Add to anything not yet restored; a newer copy of the same item replaces the older one.
     const kept = readLostDoc();
-    const ids = new Set(lost.map((c) => c.id));
-    const all = [...kept.characters.filter((c) => !ids.has(c.id)), ...lost];
-    const caseIds = new Set(lostCases.map((c) => c.id));
-    const allCases = [...kept.cases.filter((c) => !caseIds.has(c.id)), ...lostCases];
-    const precedentIds = new Set(lostPrecedents.map((p) => p.id));
-    const allPrecedents = [...kept.precedents.filter((p) => !precedentIds.has(p.id)), ...lostPrecedents];
+    const all = replaceById(kept.characters, lost);
+    const allCases = replaceById(kept.cases, lostCases);
+    const allPrecedents = replaceById(kept.precedents, lostPrecedents);
     lsSet(
       LOST_KEY,
       JSON.stringify({ at: new Date().toISOString(), characters: all, cases: allCases, precedents: allPrecedents }),

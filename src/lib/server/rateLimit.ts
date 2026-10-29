@@ -1,4 +1,4 @@
-// In-memory rate limits for the sync API (LP-8).
+// In-memory rate limits for the sync API (LP-8) and the .docx download (LP-160).
 //
 // Mainly for LAN mode, where anyone on the network can reach the server. The
 // counts live in this process, so a restart clears them and each process (each
@@ -69,6 +69,8 @@ export const createPerIp = new Limiter(CODES_PER_HOUR, HOUR);
 export const createOverall = new Limiter(CODES_PER_HOUR, HOUR);
 /** Requests with a malformed or unknown sync code per IP: 30 a minute. */
 export const failedLookups = new Limiter(30, MINUTE);
+/** .docx conversions per IP, in this process: 30 a minute (LP-160). */
+export const docxPerIp = new Limiter(30, MINUTE);
 
 const OVERALL = "*";
 
@@ -100,6 +102,15 @@ export function limitLookup(req: Request): Response | null {
   return wait ? tooMany("Too many attempts with an unknown sync code. Try again in a minute.", wait) : null;
 }
 
+/** Counts a POST /api/docx, or returns the 429 when this IP has asked for too many this minute. */
+export function limitDocx(req: Request): Response | null {
+  const ip = clientIp(req);
+  const wait = docxPerIp.retryAfter(ip);
+  if (wait) return tooMany("Too many documents at once. Try again in a minute.", wait);
+  docxPerIp.record(ip);
+  return null;
+}
+
 /** Counts a malformed or unknown sync code against this IP. */
 export function lookupFailed(req: Request): void {
   failedLookups.record(clientIp(req));
@@ -110,4 +121,5 @@ export function resetLimits(): void {
   createPerIp.clear();
   createOverall.clear();
   failedLookups.clear();
+  docxPerIp.clear();
 }

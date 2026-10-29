@@ -13,7 +13,7 @@
 
 import { CHARS_KEY } from "./characters";
 import { APP_VERSION } from "./version";
-import { SAVE_FAILED, type KV } from "./storage";
+import { isObject, SAVE_FAILED, type KV } from "./storage";
 import { unwrap } from "./store";
 
 export const BACKUP_APP = "jsa-form-generator";
@@ -99,7 +99,7 @@ export function parseFile(text: string): ParsedFile {
   } catch {
     throw new Error("That file isn't valid JSON.");
   }
-  const o = data && typeof data === "object" && !Array.isArray(data) ? (data as Record<string, unknown>) : null;
+  const o = isObject(data) ? data : null;
   if (o && o.kind === BACKUP_KIND) {
     if (o.version !== BACKUP_VERSION) {
       throw new Error("That backup was made by a newer version of the app. Update the app, then restore it.");

@@ -8,14 +8,12 @@
 
 import type { Entry, Values } from "./types";
 import { gameTime, YEAR_OFFSET } from "./freestyle";
-import { isId, ISO_DATE_RE, newId } from "./storage";
+import { isId, ISO_DATE_RE, newId, text, uniqueById } from "./storage";
 import type { Case, Deadline } from "./types";
 
 export const MAX_DEADLINES = 100;
 export const UPCOMING_DAYS = 14;
 export const SOON_DAYS = 2;
-
-const text = (v: unknown, max: number) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : undefined);
 
 /** Normalise an untrusted deadline; null when it has no valid date or label. */
 export function cleanDeadline(input: unknown): Deadline | null {
@@ -34,16 +32,7 @@ export function cleanDeadline(input: unknown): Deadline | null {
 
 /** A case's deadlines, cleaned, without repeated ids, soonest first. */
 export function cleanDeadlines(input: unknown): Deadline[] {
-  if (!Array.isArray(input)) return [];
-  const seen = new Set<string>();
-  const out: Deadline[] = [];
-  for (const item of input) {
-    const d = cleanDeadline(item);
-    if (!d || seen.has(d.id)) continue;
-    seen.add(d.id);
-    out.push(d);
-  }
-  return sortDeadlines(out).slice(0, MAX_DEADLINES);
+  return sortDeadlines(uniqueById(input, cleanDeadline)).slice(0, MAX_DEADLINES);
 }
 
 export function sortDeadlines(list: Deadline[]): Deadline[] {

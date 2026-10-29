@@ -7,7 +7,7 @@
 
 import { APPELLATE_COURT, DIVISION_COURTS, SUPREME_COURT } from "./courts";
 import { safeLink } from "./exhibits";
-import { defaultKV, isId, ISO_DATE_RE, ISO_TIME_RE, newId, type KV } from "./storage";
+import { defaultKV, isId, ISO_DATE_RE, ISO_TIME_RE, newId, text, uniqueById, type KV } from "./storage";
 import { createStore } from "./store";
 
 export const PRECEDENTS_KEY = "lawapp_precedents";
@@ -37,8 +37,6 @@ export interface Precedent {
 
 /** Courts offered as suggestions (any court can be typed). */
 export const COURT_SUGGESTIONS: readonly string[] = [...Object.values(DIVISION_COURTS), APPELLATE_COURT, SUPREME_COURT];
-
-const text = (v: unknown, max: number) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : undefined);
 
 /** "Search and Seizure, contracts ,, Contracts" → ["search and seizure", "contracts"]. */
 export function cleanTags(input: unknown): string[] {
@@ -87,16 +85,7 @@ function order(list: Precedent[]): Precedent[] {
 }
 
 function validList(raw: unknown): Precedent[] {
-  if (!Array.isArray(raw)) return [];
-  const seen = new Set<string>();
-  const out: Precedent[] = [];
-  for (const item of raw) {
-    const p = cleanPrecedent(item);
-    if (!p || seen.has(p.id)) continue;
-    seen.add(p.id);
-    out.push(p);
-  }
-  return order(out).slice(0, MAX_PRECEDENTS);
+  return order(uniqueById(raw, cleanPrecedent)).slice(0, MAX_PRECEDENTS);
 }
 
 /* ---------- search ---------- */

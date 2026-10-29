@@ -1,7 +1,8 @@
 // .docx converter and route (AC 21 unit parts, design §Testing docx cases, R5).
 import { BorderStyle } from "docx";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { POST } from "@/app/api/docx/route";
+import { resetLimits } from "@/lib/server/rateLimit";
 import { ALL_FORMS, getForm } from "@/data";
 import { borderColor, cellBorders, htmlToDocx, parseStyle, pxToHalfPoints, toDocxColor } from "@/lib/docx/htmlToDocx";
 import { compile, fields, render } from "@/lib/template";
@@ -192,6 +193,17 @@ describe("POST /api/docx", () => {
   const URL = "http://localhost:3000/api/docx";
   const post = (body: unknown, headers: Record<string, string> = { "Content-Type": "application/json" }, url = URL) =>
     POST(new Request(url, { method: "POST", headers, body: typeof body === "string" ? body : JSON.stringify(body) }));
+
+  beforeEach(() => resetLimits());
+
+  it("answers 429 after 30 requests a minute from one IP, and counts each IP apart", async () => {
+    const from = (ip: string) => ({ "Content-Type": "application/json", "X-Forwarded-For": ip });
+    for (let i = 0; i < 30; i++) expect((await post({}, from("10.0.0.1"))).status).toBe(400);
+    const res = await post({ html: "<p>x</p>" }, from("10.0.0.1"));
+    expect(res.status).toBe(429);
+    expect(Number(res.headers.get("retry-after"))).toBeGreaterThan(0);
+    expect((await post({ html: "<p>x</p>" }, from("10.0.0.2"))).status).toBe(200);
+  });
 
   it("returns the document with download headers", async () => {
     const res = await post({ html: finalHtml("civil-complaint"), title: "Civil Complaint", id: "civil-complaint" });

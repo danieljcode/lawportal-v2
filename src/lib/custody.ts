@@ -7,7 +7,7 @@
 
 import { formatDay } from "./deadlines";
 import { gameTime } from "./freestyle";
-import { isId, newId } from "./storage";
+import { isId, newId, text, uniqueById } from "./storage";
 import { compile, render } from "./template";
 import type { SafeHtml } from "./safeHtml";
 
@@ -37,8 +37,6 @@ export interface CustodyEntry {
 export const MAX_CUSTODY = 300;
 
 const AT_RE = /^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})$/;
-
-const text = (v: unknown, max: number) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : undefined);
 
 /** Now in the game (1990), New York time, to the minute. */
 export function gameNow(now: Date = new Date()): string {
@@ -88,16 +86,7 @@ function byTime(list: CustodyEntry[]): CustodyEntry[] {
 
 /** An exhibit's log, cleaned, in time order, without repeated ids (the newest MAX_CUSTODY). */
 export function cleanCustody(input: unknown): CustodyEntry[] {
-  if (!Array.isArray(input)) return [];
-  const seen = new Set<string>();
-  const out: CustodyEntry[] = [];
-  for (const item of input) {
-    const e = cleanCustodyEntry(item);
-    if (!e || seen.has(e.id)) continue;
-    seen.add(e.id);
-    out.push(e);
-  }
-  return byTime(out).slice(-MAX_CUSTODY);
+  return byTime(uniqueById(input, cleanCustodyEntry)).slice(-MAX_CUSTODY);
 }
 
 /** Add an entry: the log stays in time order, and nothing already in it changes. */
