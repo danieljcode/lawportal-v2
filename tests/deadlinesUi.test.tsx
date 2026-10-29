@@ -174,6 +174,19 @@ describe("dates from a form (LP-18)", () => {
     expect(must("#docket-status").textContent).toBe("Those dates are already on 90SCCR00147.");
   });
 
+  it("doesn't re-read the firm's cases on each keystroke (LP-143)", () => {
+    writeDraft(defaultKV(), "criminal-case-schedule", {
+      ...EMPTY_STATE,
+      values: { "Case number": "90SCCR00147" },
+    });
+    mount("#criminal-case-schedule");
+    expect(must<HTMLAnchorElement>("#docket-open-case").getAttribute("href")).toBe("#cases/case0001");
+    const getItem = vi.spyOn(Storage.prototype, "getItem");
+    setValue("#f-case-number", "90SCCR00147 ");
+    expect(getItem.mock.calls.filter(([key]) => key === "lawapp_cases")).toEqual([]);
+    expect(must<HTMLAnchorElement>("#docket-open-case").getAttribute("href")).toBe("#cases/case0001");
+  });
+
   it("isn't offered when the form's case number isn't a firm case", () => {
     writeDraft(defaultKV(), "criminal-case-schedule", {
       ...EMPTY_STATE,
