@@ -3,19 +3,29 @@
 // The approved screenshots are in e2e/screenshots/. They're taken in CI's Playwright Linux image, so
 // fonts and anti-aliasing match; elsewhere these tests skip. `npm run screenshots:accept` copies the
 // screenshots of the branch's last failed CI run over the approved ones (docs/testing.md).
-import { expect, test } from "@playwright/test";
+//
+// The court forms and the penal code are private (LP-165), and the approved screenshots are public, so
+// the parts that show them are painted over (LP-168): the form list, and the Law Library's chapters
+// and charges. The layout around them is still compared.
+import { expect, test, type Page } from "@playwright/test";
 import { LAYOUTS, THEMES, VIEWS, openView } from "./views";
 
 test.skip(process.platform !== "linux", "screenshots are compared in CI's Playwright Linux image");
 // The phone's fractional pixel ratio (Pixel 7, 2.625) smooths text differently from run to run.
 test.use({ deviceScaleFactor: 1 });
 
+/** What each view must not picture. */
+const PRIVATE = ["#form-list", "#library-nav .tree", "#code-section"];
+const mask = (page: Page) => PRIVATE.map((sel) => page.locator(sel));
+
 for (const layout of LAYOUTS) {
   for (const theme of THEMES) {
     for (const [view, url] of VIEWS) {
       test(`${view}, ${layout}, ${theme}`, async ({ page }, testInfo) => {
         await openView(page, url, layout, theme);
-        await expect(page).toHaveScreenshot(`${testInfo.project.name}-${layout}-${theme}-${view}.png`);
+        await expect(page).toHaveScreenshot(`${testInfo.project.name}-${layout}-${theme}-${view}.png`, {
+          mask: mask(page),
+        });
       });
     }
   }
