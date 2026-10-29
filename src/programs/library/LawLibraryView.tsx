@@ -310,7 +310,12 @@ function PrecedentForm({ editing, onDone }: { editing: Precedent | null; onDone(
         </div>
         <div className="field">
           <label htmlFor="precedent-date">Date of ruling (in-game)</label>
-          <GameDateInput id="precedent-date" value={draft.date} onChange={(v) => setDraft({ ...draft, date: v })} />
+          <GameDateInput
+            id="precedent-date"
+            aria-label="Date of ruling (in-game)"
+            value={draft.date}
+            onChange={(v) => setDraft({ ...draft, date: v })}
+          />
         </div>
         <div className="field">
           <label htmlFor="precedent-judge">Judge</label>

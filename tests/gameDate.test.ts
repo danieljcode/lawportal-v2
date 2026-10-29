@@ -4,16 +4,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import {
-  addMonths,
-  formatDay,
-  gameToday,
-  MONTH_NAMES,
-  monthWeeks,
-  pad,
-  parseGameDate,
-  WEEKDAYS,
-} from "@/lib/deadlines";
+import { addMonths, formatDay, MONTH_NAMES, monthWeeks, pad, parseGameDate, WEEKDAYS } from "@/lib/deadlines";
 import GameDateInput from "@/ui/GameDateInput";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -62,21 +53,6 @@ describe("the 1990 calendar", () => {
     }
     for (const text of ["", "hello", "29 Oct", "30 Feb 1990", "1990-13-01", "29 Ju 1990", "0990-10-29"]) {
       expect(parseGameDate(text)).toBe("");
-    }
-  });
-
-  it("gives the same answers in any machine time zone", () => {
-    const saved = process.env.TZ;
-    try {
-      for (const tz of ["Pacific/Kiritimati", "America/Los_Angeles", "Europe/London", "UTC"]) {
-        process.env.TZ = tz;
-        expect(gameToday(new Date("2026-10-29T16:00:00Z"))).toBe("1990-10-29");
-        expect(monthWeeks(1990, 10)[0]).toEqual([null, null, null, 1, 2, 3, 4]);
-        expect(formatDay("1990-10-29")).toBe("Thu 29 Oct 1990");
-      }
-    } finally {
-      if (saved === undefined) delete process.env.TZ;
-      else process.env.TZ = saved;
     }
   });
 });

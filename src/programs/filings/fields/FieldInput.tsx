@@ -166,7 +166,7 @@ export default function FieldInput({
         </label>
       );
     case "date":
-      input = <GameDateInput id={id} value={value} aria-label={inline ? f.label : undefined} onChange={change} />;
+      input = <GameDateInput id={id} value={value} aria-label={f.label} onChange={change} />;
       break;
     default:
       input = (

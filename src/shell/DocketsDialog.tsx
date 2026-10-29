@@ -214,6 +214,7 @@ function DocketsBody({ charId, canUse, onUse, onClose }: DocketsDialogProps & { 
                   input = (
                     <GameDateInput
                       id={fid}
+                      aria-label={f.label}
                       aria-describedby={describedBy}
                       value={value}
                       onChange={(v) => setField(f.key, v)}

@@ -384,7 +384,7 @@ function CaseEditor({ initial, characters, saved, onSaved, onCancel }: CaseEdito
               </select>
             );
           } else if (f.type === "date") {
-            input = <GameDateInput id={fid} value={value} onChange={(v) => set(f.key, v)} />;
+            input = <GameDateInput id={fid} aria-label={f.label} value={value} onChange={(v) => set(f.key, v)} />;
           } else if (f.multiline) {
             input = (
               <textarea

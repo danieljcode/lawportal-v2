@@ -159,7 +159,7 @@ export default function GameDateInput({ id, value, onChange, withTime, required,
         ref={opener}
         type="button"
         className="game-date-open"
-        aria-label={"Choose " + (aria["aria-label"] || "date").toLowerCase()}
+        aria-label={"Calendar for " + (aria["aria-label"] || "date")}
         aria-haspopup="dialog"
         aria-expanded={!!focus}
         onClick={() => (focus ? close() : open())}
