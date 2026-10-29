@@ -172,6 +172,10 @@ function submit(sel: string): void {
 }
 
 const click = (el: Element) => act(() => (el as HTMLElement).click());
+
+// The custody log's date and time boxes (LP-159).
+const AT_DATE = ".custody-form .game-date-text";
+const AT_TIME = ".custody-form .game-date-time";
 const custodyButton = () =>
   [...document.querySelectorAll(".exhibit button")].find((b) => b.textContent!.startsWith("Custody"))!;
 const lines = () => [...document.querySelectorAll(".custody-list li")].map((li) => li.textContent);
@@ -214,7 +218,8 @@ describe("the custody log on a case (LP-14)", () => {
 
   it("adds entries at the in-game time by the active character, and can't change them", () => {
     expect(must(".custody-empty").textContent).toContain("No one has logged");
-    expect(must<HTMLInputElement>(".custody-at-input").value).toBe("1990-10-20T14:05");
+    expect(must<HTMLInputElement>(AT_DATE).value).toBe("Tue 20 Oct 1990");
+    expect(must<HTMLInputElement>(AT_TIME).value).toBe("14:05");
     expect(must<HTMLSelectElement>(".custody-who-input").value).toBe("alice001");
     setValue(".custody-note-input", "Sealed in bag 14");
     submit(".custody-form");
@@ -228,7 +233,7 @@ describe("the custody log on a case (LP-14)", () => {
     expect(document.querySelector(".custody-list button, .custody-list input")).toBeNull();
 
     // A correction is a new entry, by someone else, earlier in the day: it goes in time order.
-    setValue(".custody-at-input", "1990-10-20T09:00");
+    setValue(AT_TIME, "09:00");
     setValue(".custody-action-input", "copied");
     setValue(".custody-who-input", "bob00001");
     setValue(".custody-note-input", "Correction: copied before it was bagged");
@@ -241,10 +246,11 @@ describe("the custody log on a case (LP-14)", () => {
     submit(".custody-form");
     expect(document.querySelector('.custody [role="status"]')!.textContent).toBe("Say who handled the exhibit.");
     setValue(".custody-name-input", "Officer Day");
-    setValue(".custody-at-input", "");
+    setValue(AT_DATE, "");
     submit(".custody-form");
     expect(document.querySelector('.custody [role="status"]')!.textContent).toContain("date and time");
-    setValue(".custody-at-input", "1990-10-19T22:15");
+    setValue(AT_DATE, "19 Oct 1990");
+    setValue(AT_TIME, "22:15");
     submit(".custody-form");
     expect(saved()).toMatchObject([{ by: "Officer Day", at: "1990-10-19T22:15" }]);
     expect(saved()[0].byId).toBeUndefined();

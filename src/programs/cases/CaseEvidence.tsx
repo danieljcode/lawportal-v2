@@ -9,6 +9,7 @@ import { caseStore } from "@/lib/cases";
 import { formatDay } from "@/lib/deadlines";
 import { cleanExhibit, exhibitLetter, MAX_EXHIBITS, moveExhibit, safeLink } from "@/lib/exhibits";
 import type { Case, Character, Exhibit } from "@/lib/types";
+import GameDateInput from "@/ui/GameDateInput";
 import ExhibitCustody from "./ExhibitCustody";
 
 interface Draft {
@@ -113,12 +114,11 @@ export default function CaseEvidence({ c, characters = [], active = null }: Case
         value={draft.link}
         onChange={(e) => setDraft({ ...draft, link: e.target.value })}
       />
-      <input
-        type="date"
+      <GameDateInput
         id="exhibit-obtained"
         aria-label="Date obtained (in-game)"
         value={draft.obtained}
-        onChange={(e) => setDraft({ ...draft, obtained: e.target.value })}
+        onChange={(v) => setDraft({ ...draft, obtained: v })}
       />
       <textarea
         id="exhibit-description"

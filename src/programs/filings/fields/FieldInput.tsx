@@ -6,6 +6,7 @@ import { exhibitMarker } from "@/lib/exhibits";
 import { applyPrefills, autoDate, hasDependents, setValue, todayDate } from "@/lib/formState";
 import { plain } from "@/lib/template";
 import type { Field } from "@/lib/types";
+import GameDateInput from "@/ui/GameDateInput";
 import { slugId, useFormCtx } from "./FormContext";
 import type { ScopeProps } from "./ItemList";
 
@@ -165,15 +166,7 @@ export default function FieldInput({
         </label>
       );
     case "date":
-      input = (
-        <input
-          id={id}
-          type="date"
-          value={value}
-          aria-label={inline ? f.label : undefined}
-          onChange={(e) => change(e.target.value)}
-        />
-      );
+      input = <GameDateInput id={id} value={value} aria-label={inline ? f.label : undefined} onChange={change} />;
       break;
     default:
       input = (

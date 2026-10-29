@@ -21,6 +21,7 @@ import {
 } from "@/lib/precedents";
 import Marked from "./Marked";
 import PenalCodeSearch from "./PenalCodeSearch";
+import GameDateInput from "@/ui/GameDateInput";
 import { usePrecedentVersion } from "@/ui/useStore";
 
 export type LibraryTab = "code" | "precedents";
@@ -309,7 +310,7 @@ function PrecedentForm({ editing, onDone }: { editing: Precedent | null; onDone(
         </div>
         <div className="field">
           <label htmlFor="precedent-date">Date of ruling (in-game)</label>
-          <input id="precedent-date" type="date" value={draft.date} onChange={set("date")} />
+          <GameDateInput id="precedent-date" value={draft.date} onChange={(v) => setDraft({ ...draft, date: v })} />
         </div>
         <div className="field">
           <label htmlFor="precedent-judge">Judge</label>
