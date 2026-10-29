@@ -11,7 +11,7 @@
 //   deleted when nobody is left on it.
 // - A deleted character (removeAll) is taken off every case, which stay.
 
-import { caseStore, createCaseStore, isMember, members, type CaseStore } from "./cases";
+import { caseStore, createCaseStore, isMember, type CaseStore } from "./cases";
 import { clean, compare, FIELDS } from "./docketFields";
 import { isId, type KV } from "./storage";
 import type { Case, Docket } from "./types";
@@ -157,10 +157,4 @@ let instance: DocketStore | null = null;
 export function docketStore(): DocketStore {
   if (!instance) instance = createDocketStore(caseStore());
   return instance;
-}
-
-/** Everyone on a docket entry's case: for "shared with" notes until LP-101. */
-export function caseMembers(id: string): string[] {
-  const c = caseStore().get(id);
-  return c ? members(c) : [];
 }

@@ -10,8 +10,6 @@
 
 import { MARKERS, serializeLine, type DiscordDoc, type DLine, type Mark, type Run } from "./discord";
 
-export type DiscordLimit = 2000 | 4000;
-
 export interface SplitOptions {
   limit: number;
   /** Append `-# Part i/n` to each part when there is more than one. */
