@@ -135,8 +135,8 @@ called the Control Panel.
 
 ## Your data and sync
 
-- **Everything is saved in this browser's local storage.** Nothing leaves the computer unless you
-  turn on sync.
+- **Everything is saved in this browser** (IndexedDB). Nothing leaves the computer unless you turn
+  on sync.
 - **Back up everything** (in Characters) saves one file with your characters, cases, filings,
   drafts and settings, and **Restore backup** puts it back after showing what will change. Damaged
   data is set aside, never deleted, and can be downloaded.
