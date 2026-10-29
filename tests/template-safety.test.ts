@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { ALL_FORMS } from "@/data";
 import { hasRefForms, paritySuite, REF_FORMS } from "./oracle";
 import { toCourtWording } from "../scripts/court-wording.mjs";
-import { unwrapBlockedLinks } from "../scripts/scrub-links.mjs";
+import { blockList, unwrapBlockedLinks } from "../scripts/scrub-links.mjs";
 import { checkTemplateHtml } from "../scripts/template-safety.mjs";
 
 describe("checkTemplateHtml", () => {
@@ -32,28 +32,40 @@ describe("checkTemplateHtml", () => {
   });
 });
 
+// A made-up list for the scrubber's own tests; the real one is private (blockList()).
+const TEST_LIST = {
+  hosts: ["old-forum.example"],
+  text: [["banking.old-forum.example", "online banking"]] as Array<[string, string]>,
+};
+const BLOCKED = blockList();
+
 describe("unwrapBlockedLinks", () => {
-  it("unwraps links to the old forum hosts and keeps the text", () => {
-    expect(unwrapBlockedLinks('<p>See <a href="https://forum.gta.world/x?a=1&amp;b=2">the <b>form</b></a>.</p>')).toBe(
-      "<p>See the <b>form</b>.</p>",
+  it("unwraps links to the blocked hosts and keeps the text", () => {
+    expect(
+      unwrapBlockedLinks(
+        '<p>See <a href="https://forum.old-forum.example/x?a=1&amp;b=2">the <b>form</b></a>.</p>',
+        TEST_LIST,
+      ),
+    ).toBe("<p>See the <b>form</b>.</p>");
+    expect(unwrapBlockedLinks("<a href='https://lssd.old-forum.example/t'>CSB</a>", TEST_LIST)).toBe("CSB");
+    expect(unwrapBlockedLinks("(( Screenshot from banking.old-forum.example ))", TEST_LIST)).toBe(
+      "(( Screenshot from online banking ))",
     );
-    expect(unwrapBlockedLinks("<a href='https://lssd.gta.world/t'>CSB</a>")).toBe("CSB");
-    expect(unwrapBlockedLinks("(( Screenshot from banking.gta.world ))")).toBe("(( Screenshot from online banking ))");
   });
 
   it("leaves other links alone", () => {
     for (const html of [
       '<a href="https://example.com/">x</a>',
-      '<a href="https://notgta.world.example/">x</a>',
+      '<a href="https://notold-forum.example.org/">x</a>',
       "<a>x</a>",
     ]) {
-      expect(unwrapBlockedLinks(html)).toBe(html);
+      expect(unwrapBlockedLinks(html, TEST_LIST)).toBe(html);
     }
   });
 
-  it.each(ALL_FORMS.map((f) => [f.id, f.html]))("%s has no old forum hosts", (_id, html) => {
-    expect(html).not.toMatch(/gta\.?world/i);
-    expect(unwrapBlockedLinks(html)).toBe(html);
+  it.each(ALL_FORMS.map((f) => [f.id, f.html]))("%s has no blocked hosts", (_id, html) => {
+    for (const h of BLOCKED.hosts) expect(html.toLowerCase()).not.toContain(h);
+    expect(unwrapBlockedLinks(html, BLOCKED)).toBe(html);
   });
 
   // forms.json must be exactly what port-forms writes: scrubbed links, then our court wording
@@ -63,7 +75,7 @@ describe("unwrapBlockedLinks", () => {
     const ref = JSON.parse(text.slice(text.indexOf("["), text.lastIndexOf("]") + 1)) as Array<Record<string, string>>;
     expect(ALL_FORMS.filter((f) => ref.some((r) => r.id === f.id)).map((f) => [f.id, f.court, f.html])).toEqual(
       ref.map((r) => {
-        const out = toCourtWording({ ...r, html: unwrapBlockedLinks(r.html) });
+        const out = toCourtWording({ ...r, html: unwrapBlockedLinks(r.html, BLOCKED) });
         return [r.id, out.court, out.html];
       }),
     );

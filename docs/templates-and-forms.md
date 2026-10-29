@@ -186,11 +186,11 @@ those four, rewrite it with `npx vitest run -u tests/form-index.test.ts`; that t
 
 ## Reference data
 
-`port-forms` and the parity tests use three files from the
-[JSA Form Generator](https://forum.gta.world/en/topic/93922-court-petitions-directory/) by Awucard:
-`js_template.js`, `js_bbcode.js` and `js_forms.data.js`. They have no licence, so they're kept apart
-from this code, in the private repo `danieljcode/lawportal-reference` (files at its root). With
-access:
+`port-forms` and the parity tests use three files from a third-party form generator (credited in
+the private repo's README): `js_template.js`, `js_bbcode.js` and `js_forms.data.js`. They have no
+licence, so they're kept apart from this code, in the private repo `danieljcode/lawportal-reference`
+(files at its root), with `blocked-hosts.json`, the old forum hosts `scripts/scrub-links.mjs`
+unwraps. With access:
 
 ```bash
 git clone https://github.com/danieljcode/lawportal-reference.git .agents/reference/jsa
@@ -198,3 +198,8 @@ git clone https://github.com/danieljcode/lawportal-reference.git .agents/referen
 
 `.agents/` is gitignored, so they're never committed here. Without them, `port-forms` stops with a
 message saying where to get them, and the parity suites are skipped (see [Testing](testing.md)).
+
+**The app's own data is private too (LP-165).** `forms.json`, `form-index.json` and `penal-code.json`
+live in that repo's `app-data/`, not here (see [Development](development.md#app-data)). After
+`npm run port-forms`, `npm run penal-code` or a `form-index` snapshot update, copy the changed file
+to `app-data/` there and commit it.

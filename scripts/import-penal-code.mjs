@@ -1,8 +1,11 @@
 // Import the penal code (LP-17) into src/data/penal-code.json, the
 // one data file the Law Library reads. Run it when the server changes laws:
 //
-//   npm run penal-code                 fetch the "Penal Code" tab of the sheet
+//   npm run penal-code                 fetch the "Penal Code" tab of the sheet in PENAL_CODE_SHEET
 //   npm run penal-code -- file.csv     use a CSV saved from that tab instead
+//
+// The sheet's address is kept private (LP-165): it's in the lawportal-reference README. The
+// output is private data too: copy it to lawportal-reference's app-data/ and commit it there.
 //
 // The sheet's chapter rows ("Offenses Involving Theft") group the charges that
 // follow; a charge row starts "PC <number>". Change notes and previous values
@@ -12,7 +15,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
-const SHEET = "https://docs.google.com/spreadsheets/d/144cGVpsx3BPC7cBbHqnUnHJIolLh9-cyEif_qjZNpcY";
+const SHEET = process.env.PENAL_CODE_SHEET || "";
 const TAB = "Penal Code";
 const OUT = path.resolve(import.meta.dirname, "../src/data/penal-code.json");
 
@@ -101,6 +104,7 @@ async function main() {
   if (file) {
     csv = readFileSync(file, "utf8");
   } else {
+    if (!SHEET) throw new Error("Set PENAL_CODE_SHEET to the sheet's address, or pass a CSV file.");
     const url = SHEET + "/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent(TAB);
     const res = await fetch(url);
     if (!res.ok || !/csv/.test(res.headers.get("content-type") || "")) {

@@ -1,0 +1,44 @@
+{
+  "title": "Sample penal code",
+  "note": "Invented sample data: the real code is private (LP-165).",
+  "source": "",
+  "updated": "2026-10-20",
+  "charges": [
+    {
+      "section": "PC 101",
+      "chapter": "Sample Chapter One",
+      "title": "Sample Offence A",
+      "class": "Misdemeanor",
+      "jail": 5,
+      "min": 3,
+      "max": 8,
+      "fine": 100,
+      "description": "An invented charge, for the sample data only.",
+      "status": "unchanged"
+    },
+    {
+      "section": "PC 102",
+      "chapter": "Sample Chapter One",
+      "title": "Sample Offence B",
+      "class": "Felony",
+      "jail": 30,
+      "min": 20,
+      "max": 40,
+      "fine": 1000,
+      "description": "Another invented charge, for the sample data only.",
+      "status": "unchanged"
+    },
+    {
+      "section": "PC 201",
+      "chapter": "Sample Chapter Two",
+      "title": "Sample Infraction",
+      "class": "Infraction",
+      "jail": 0,
+      "min": 0,
+      "max": 0,
+      "fine": 50,
+      "description": "An invented infraction, for the sample data only.",
+      "status": "unchanged"
+    }
+  ]
+}
