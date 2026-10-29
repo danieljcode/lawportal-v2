@@ -12,6 +12,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { generateCode } from "./code";
+import { errCode } from "./http";
 import { CODES_PER_HOUR } from "./rateLimit";
 import { redisConfigured, redisCreate, redisRead, redisRemove, redisWrite, secondsToNextHour } from "./syncRedis";
 
@@ -65,10 +66,6 @@ export function withLock<T>(hash: string, fn: () => Promise<T>): Promise<T> {
 
 const RETRY_CODES = new Set(["EPERM", "EACCES", "EBUSY"]);
 const RETRY_DELAYS = [20, 40, 80, 160, 320];
-
-function errCode(err: unknown): string | undefined {
-  return (err as NodeJS.ErrnoException | null)?.code;
-}
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 

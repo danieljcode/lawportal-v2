@@ -5,23 +5,10 @@ import { parseBearer } from "@/lib/server/code";
 import { clientIp, limitCreate, limitLookup, lookupFailed, TOO_MANY_CODES, tooMany } from "@/lib/server/rateLimit";
 import { redisConfigured } from "@/lib/server/syncRedis";
 import { codeHash, create, remove } from "@/lib/server/syncStore";
+import { errCode, isJson, json, NO_STORE } from "@/lib/server/http";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-const NO_STORE = { "Cache-Control": "no-store" };
-
-function json(body: unknown, status: number): Response {
-  return Response.json(body, { status, headers: NO_STORE });
-}
-
-function isJson(req: Request): boolean {
-  return (req.headers.get("content-type") ?? "").toLowerCase().startsWith("application/json");
-}
-
-function errCode(err: unknown): string | undefined {
-  return (err as NodeJS.ErrnoException | null)?.code;
-}
 
 export async function POST(req: Request): Promise<Response> {
   const refused = checkHost(req);

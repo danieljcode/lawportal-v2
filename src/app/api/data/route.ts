@@ -5,6 +5,7 @@ import { parseBearer } from "@/lib/server/code";
 import { readCapped } from "@/lib/server/body";
 import { limitLookup, lookupFailed } from "@/lib/server/rateLimit";
 import { codeHash, read, write, type SyncRecord } from "@/lib/server/syncStore";
+import { errCode, isJson, json } from "@/lib/server/http";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,15 +17,6 @@ const MAX_CASES = 2000;
 const MAX_FILINGS = 500;
 const MAX_CONFLICT_CHECKS = 500;
 const MAX_PRECEDENTS = 1000;
-const NO_STORE = { "Cache-Control": "no-store" };
-
-function json(body: unknown, status: number): Response {
-  return Response.json(body, { status, headers: NO_STORE });
-}
-
-function errCode(err: unknown): string | undefined {
-  return (err as NodeJS.ErrnoException | null)?.code;
-}
 
 const isObject = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && !Array.isArray(v);
 
@@ -87,9 +79,7 @@ export async function PUT(req: Request): Promise<Response> {
     lookupFailed(req);
     return json({ error: "Missing or invalid sync code." }, 401);
   }
-  if (!(req.headers.get("content-type") ?? "").toLowerCase().startsWith("application/json")) {
-    return json({ error: "Expected application/json." }, 415);
-  }
+  if (!isJson(req)) return json({ error: "Expected application/json." }, 415);
   const text = await readCapped(req, MAX_BODY);
   if (text === "too-large") return json({ error: "Sync data is too large (max 4 MB)." }, 413);
   let body: unknown;
