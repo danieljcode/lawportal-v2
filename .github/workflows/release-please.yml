@@ -28,7 +28,7 @@ jobs:
         if: steps.release.outputs.pr
         uses: actions/checkout@v7
         with:
-          ref: ${{ fromJSON(steps.release.outputs.pr).headBranchName }}
+          ref: ${{ fromJSON(steps.release.outputs.pr || '{}').headBranchName }}
           # The commit's parent too: in a one-commit clone it has none, and the amend would drop its history.
           fetch-depth: 2
       - name: Tidy CHANGELOG.md
@@ -47,7 +47,8 @@ jobs:
         if: steps.release.outputs.pr
         env:
           GH_TOKEN: ${{ github.token }}
-          PR: ${{ fromJSON(steps.release.outputs.pr).number }}
+          # A step's env is worked out even when its `if` is false, and `pr` is empty with no Release PR (LP-161).
+          PR: ${{ fromJSON(steps.release.outputs.pr || '{}').number }}
         run: |
           gh pr view "$PR" --json body --jq .body > body.md
           node scripts/tidy-changelog.mjs body.md
