@@ -11,6 +11,7 @@ import type { Case, Character } from "@/lib/types";
 import CaseDeadlines from "./CaseDeadlines";
 import CaseEvidence from "./CaseEvidence";
 import { FilingList } from "@/ui/FilingsDialog";
+import GameDateInput from "@/ui/GameDateInput";
 import { useCaseVersion, useFilingVersion } from "@/ui/useStore";
 
 export interface CaseFileViewProps {
@@ -382,6 +383,8 @@ function CaseEditor({ initial, characters, saved, onSaved, onCancel }: CaseEdito
                 ))}
               </select>
             );
+          } else if (f.type === "date") {
+            input = <GameDateInput id={fid} aria-label={f.label} value={value} onChange={(v) => set(f.key, v)} />;
           } else if (f.multiline) {
             input = (
               <textarea
@@ -396,7 +399,7 @@ function CaseEditor({ initial, characters, saved, onSaved, onCancel }: CaseEdito
             input = (
               <input
                 id={fid}
-                type={f.type === "date" ? "date" : f.type === "url" ? "url" : "text"}
+                type={f.type === "url" ? "url" : "text"}
                 maxLength={MAX_TEXT}
                 value={value}
                 required={f.required}

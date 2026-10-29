@@ -245,6 +245,11 @@ court names and the case-number shape live in `src/lib/courts.ts`.
   call it. `formatDay` takes the weekday from the real date the game date maps to. A real Feb 29
   needs no special case: 36 is a multiple of 4. Nothing reads the computer's own time zone, and
   `tests/gameTimeZones.test.ts` runs the rule under London and Tokyo time to keep it that way.
+- **Date boxes (LP-159):** every in-game date is a `GameDateInput` (`src/ui/GameDateInput.tsx`),
+  not the browser's date input, which would draw 1990's real calendar. It shows `formatDay`'s
+  text, reads typed dates (`parseGameDate`), and draws the real month (`monthWeeks`: game year
+  - 36) under a 1990 heading, opening on `gameToday()`. Values stay `YYYY-MM-DD`, or
+    `YYYY-MM-DDTHH:MM` with `withTime` (custody).
 - **Before LP-135:** forms read the date in UTC (`todayUTC` in `src/lib/template/prefill.ts`),
   while the Case File, deadlines, intake, the conflict memo, custody times and draft history read
   the computer's local time (`gameToday`, `gameNow`, `snapshotTime`). Near midnight the two could

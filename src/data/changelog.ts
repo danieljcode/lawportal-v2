@@ -33,6 +33,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "fix",
         text: "Case notes stop at 4,000 characters as you type, with a count once you're close, instead of losing the end when you save. The intake summary stops at 3,000, so all of it reaches the new case's notes.",
       },
+      {
+        type: "fix",
+        text: "Date boxes show dates the app's way (Thu 29 Oct 1990), take a typed date, and open a calendar on today's game date. Its weekdays now match the rest of the app: 29 Oct 1990 sits under Thursday, as 29 Oct 2026 does.",
+      },
     ],
   },
   {
