@@ -44,7 +44,7 @@ export function docketToForm(entries: Entry[], s: FormState, d: Docket): { state
   for (const l of PLAINTIFF_LABELS) put(l, d.plaintiff);
   for (const l of DEFENDANT_LABELS) put(l, d.defendant);
 
-  // Only our courthouses; an old GTAW number (26GJ…) leaves the field alone.
+  // Only our courthouses; an old number from the reference forms (26GJ…) leaves the field alone.
   put("Courthouse", courthouseFor(d.caseNumber)?.name);
   const div = divisionFor(d);
   put("Division", div);

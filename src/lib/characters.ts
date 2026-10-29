@@ -27,7 +27,7 @@ import { createStore, type Migration } from "./store";
 export const CHARS_KEY = "lawapp_chars";
 export const ACTIVE_KEY = "lawapp_active_char";
 export const LEGACY_KEY = "lawapp.characters.v1";
-/** The default server saved before LP-70 (GTAW / FreestyleRP); deleted by migrateServerField. */
+/** The default server saved before LP-70, when there was a server choice; deleted by migrateServerField. */
 export const LEGACY_SERVER_KEY = "lawapp_server";
 export const MAX_CHARACTERS = 200;
 /** The saved list's schema version (LP-2). */

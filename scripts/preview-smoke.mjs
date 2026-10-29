@@ -60,7 +60,7 @@ const CHAR_A = { id: "smokechara1", name: "Dan Tester", title: "Attorney at Law"
 const CHAR_B = { id: "smokecharb1", name: "Other Person", title: "Attorney at Law" };
 const CASE = "90SCCC00147";
 
-/** The 2-digit in-game year a case number starts with (FreestyleRP is 36 years back). */
+/** The 2-digit in-game year a case number starts with (the game is 36 years back). */
 const GAME_YY = String(new Date().getUTCFullYear() - 36).slice(-2);
 
 /* ---------- init scripts (run in the page before any app script) ---------- */
@@ -409,31 +409,31 @@ async function phaseSidebar(browser, theme, mode, ctx) {
   await context.close();
 }
 
-/* ---------- FreestyleRP only (LP-68, LP-69, LP-70) ---------- */
+/* ---------- court wording and case numbers (LP-68, LP-69, LP-70) ---------- */
 
-async function phaseFreestyle(browser, theme, mode, ctx) {
+async function phaseCourtWording(browser, theme, mode, ctx) {
   const errors = [];
   const context = await newContext(browser, theme, mode, { chars: [CHAR_A], dockets: [], draft: null });
   const page = await newPage(context, errors);
 
-  // civil-complaint: FreestyleRP court wording and an in-game SC case number, no GTAW.
+  // civil-complaint: our court wording and an in-game SC case number, none of the reference forms'.
   await page.goto(base + "/#civil-complaint");
   await firstDisplay(
     page,
     ctx,
-    "freestyle civil-complaint",
+    "wording civil-complaint",
     ["SAN ANDREAS COURT", GAME_YY + "SCCC"],
     ["SUPERIOR COURT OF THE STATE", "GJCC"],
   );
   checks++;
-  if (await page.$("#active-server")) failures.push(`${ctx} freestyle: the server toggle is still in the toolbar`);
+  if (await page.$("#active-server")) failures.push(`${ctx} wording: the server toggle is still in the toolbar`);
 
   // criminal-case-schedule: a today prefill and an SC criminal case number.
   await resetProbe(page);
   await page.click(`#sidebar a[href="#filings/criminal-case-schedule"]`);
-  await firstDisplay(page, ctx, "freestyle criminal-case-schedule", [GAME_YY + "SCCR"], ["GJCR"]);
+  await firstDisplay(page, ctx, "wording criminal-case-schedule", [GAME_YY + "SCCR"], ["GJCR"]);
 
-  flushErrors(ctx, "freestyle", errors);
+  flushErrors(ctx, "wording", errors);
   await context.close();
 }
 
@@ -450,7 +450,7 @@ try {
       await phaseNav(browser, theme, mode, ctx);
       await phaseSeeded(browser, theme, mode, ctx);
       await phaseSidebar(browser, theme, mode, ctx);
-      await phaseFreestyle(browser, theme, mode, ctx);
+      await phaseCourtWording(browser, theme, mode, ctx);
       console.log(`${ctx}: ${failures.length - before} failure(s)`);
     }
   }

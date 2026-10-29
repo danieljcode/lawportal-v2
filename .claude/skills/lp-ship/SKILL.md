@@ -79,7 +79,7 @@ Before committing, confirm each, and fix or ask about any that aren't met:
 - Description, following `.github/pull_request_template.md`:
 
   ```markdown
-  Jira: [LP-128](https://freestylelawportal.atlassian.net/browse/LP-128)
+  Jira: LP-128
 
   ## What changed
 

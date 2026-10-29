@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-// The app is FreestyleRP-only (LP-70): no server toggle or character Server
-// field, in-game dates and case numbers everywhere, and FreestyleRP court names
+// The app serves one server (LP-70): no server toggle or character Server
+// field, in-game dates and case numbers everywhere, and our court names
 // straight from the form data (LP-69).
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
@@ -78,7 +78,7 @@ const gameYY = () => gameYear().slice(-2);
 /* ---------- Sidebar ---------- */
 
 describe("Sidebar court headings", () => {
-  it("shows FreestyleRP court headings straight from the form data (LP-69)", () => {
+  it("shows our court headings straight from the form data (LP-69)", () => {
     act(() => root.render(createElement(Sidebar, { forms: ALL_FORMS, current: null })));
     const summaries = [...document.querySelectorAll("#form-list summary")].map((s) => s.textContent);
     for (const court of [
@@ -117,7 +117,7 @@ describe("FormView", () => {
     return { getOutput: () => lastOutput };
   }
 
-  it("shows FreestyleRP court wording in the preview and breadcrumb", () => {
+  it("shows our court wording in the preview and breadcrumb", () => {
     const o = mountForm("civil-complaint").getOutput();
     expect(o!.finalHtml).toContain("SAN ANDREAS COURT");
     expect(o!.finalHtml).not.toContain("SUPERIOR COURT OF THE STATE OF SAN ANDREAS");
@@ -178,15 +178,15 @@ describe("App without a server choice (LP-70)", () => {
   });
 
   it("uses the in-game year with no character active, whatever default server was saved before", () => {
-    localStorage.setItem("lawapp_server", "gtaw");
+    localStorage.setItem("lawapp_server", "other");
     mountApp();
     go("#criminal-case-schedule");
     expect(must<HTMLInputElement>("#f-case-number").placeholder).toBe(gameYY() + "SCCR00XXX");
     expect(must<HTMLInputElement>("#f-filing-date").value.slice(-4)).toBe(gameYear());
   });
 
-  it("a character saved with server: 'gtaw' before LP-70 still gets in-game dates and FreestyleRP courts", () => {
-    localStorage.setItem("lawapp_chars", JSON.stringify([{ id: "oldchar1", name: "Old Gtaw", server: "gtaw" }]));
+  it("a character saved with server: 'other' before LP-70 still gets in-game dates and our courts", () => {
+    localStorage.setItem("lawapp_chars", JSON.stringify([{ id: "oldchar1", name: "Old One", server: "other" }]));
     localStorage.setItem("lawapp_active_char", "oldchar1");
     mountApp();
     go("#civil-complaint");
@@ -199,11 +199,11 @@ describe("App without a server choice (LP-70)", () => {
     localStorage.setItem(
       "lawapp_chars",
       JSON.stringify([
-        { id: "oldchar1", name: "Old Gtaw", title: "Judge", server: "gtaw" },
-        { id: "oldchar2", name: "Old Free", server: "freestyle" },
+        { id: "oldchar1", name: "Old One", title: "Judge", server: "other" },
+        { id: "oldchar2", name: "Old Two", server: "other" },
       ]),
     );
-    localStorage.setItem("lawapp_server", "gtaw");
+    localStorage.setItem("lawapp_server", "other");
     // AppLoader runs the start-up migrations before App first renders (LP-2).
     runMigrations();
     mountApp();
@@ -212,12 +212,12 @@ describe("App without a server choice (LP-70)", () => {
     const stored = JSON.parse(localStorage.getItem("lawapp_chars")!) as { v: number; data: unknown };
     expect(stored.v).toBe(2);
     expect(stored.data).toEqual([
-      { id: "oldchar1", name: "Old Gtaw", title: "Judge" },
-      { id: "oldchar2", name: "Old Free" },
+      { id: "oldchar1", name: "Old One", title: "Judge" },
+      { id: "oldchar2", name: "Old Two" },
     ]);
   });
 
-  it("opens a draft saved with GTAW values: the values stay, the form shows the new wording (LP-71)", () => {
+  it("opens a draft saved with the old server's values: the values stay, the form shows the new wording (LP-71)", () => {
     localStorage.setItem(
       "lawapp_draft_criminal-case-schedule",
       JSON.stringify({

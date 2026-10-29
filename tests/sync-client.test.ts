@@ -312,7 +312,9 @@ describe("synced data from before LP-70 (LP-71)", () => {
           rev: 2,
           updated: "u2",
           data: {
-            characters: [{ id: "gtawchar1", name: "Gee Taw", title: "Attorney at Law", server: "gtaw", updatedAt: T0 }],
+            characters: [
+              { id: "oldsrvchar1", name: "Gee Tee", title: "Attorney at Law", server: "other", updatedAt: T0 },
+            ],
           },
         },
       },
@@ -320,12 +322,12 @@ describe("synced data from before LP-70 (LP-71)", () => {
     );
     await sync.pull(true);
     const [c] = characterStore().list();
-    expect(c).toMatchObject({ name: "Gee Taw", title: "Attorney at Law", updatedAt: T0 });
+    expect(c).toMatchObject({ name: "Gee Tee", title: "Attorney at Law", updatedAt: T0 });
     expect(c).not.toHaveProperty("server");
     expect(calls.map((x) => x.method)).toEqual(["GET", "PUT"]);
     const sent = (calls[1].body as { rev: number; data: sync.SyncDoc }).data.characters;
     expect(sent).toHaveLength(1);
-    expect(sent[0]).toMatchObject({ name: "Gee Taw", updatedAt: T0 });
+    expect(sent[0]).toMatchObject({ name: "Gee Tee", updatedAt: T0 });
     expect(sent[0]).not.toHaveProperty("server");
     expect(localStorage.getItem(sync.DIRTY_KEY)).toBeNull();
   });

@@ -1,9 +1,9 @@
-// FreestyleRP settings (LP-70): game time (LP-135), plus courts.ts. Court
-// wording is in the form data (tests/freestyle-wording.test.ts). Pure, no DOM.
+// The game's clock (LP-70): game time (LP-135), plus courts.ts. Court
+// wording is in the form data (tests/court-wording.test.ts). Pure, no DOM.
 // tests/gameTimeZones.test.ts runs the LP-135 cases under other machine time zones.
 import { describe, expect, it } from "vitest";
 import { COURTHOUSES, courthouseFor, DEFAULT_COURTHOUSE } from "@/lib/courts";
-import { gameTime, YEAR_OFFSET } from "@/lib/freestyle";
+import { gameTime, YEAR_OFFSET } from "@/lib/gameTime";
 
 describe("gameTime", () => {
   it("is 36 years back", () => {
@@ -30,13 +30,13 @@ describe("gameTime", () => {
 });
 
 describe("courts (LP-68)", () => {
-  it("has one generic courthouse, Superior Court (SC), and nothing from GTAW", () => {
+  it("has one generic courthouse, Superior Court (SC), and nothing from the reference forms", () => {
     expect(COURTHOUSES).toEqual([{ code: "SC", name: "SUPERIOR COURT" }]);
     expect(DEFAULT_COURTHOUSE.code).toBe("SC");
     expect(JSON.stringify(COURTHOUSES)).not.toMatch(/JOPLIN|DAVIS|"GJ"|"VD"/);
   });
 
-  it("names the courthouse in one of our case numbers, and not in an old GTAW one", () => {
+  it("names the courthouse in one of our case numbers, and not in an old one from the reference forms", () => {
     expect(courthouseFor("90SCCR00147")?.name).toBe("SUPERIOR COURT");
     expect(courthouseFor("90scCR00147")?.name).toBe("SUPERIOR COURT");
     expect(courthouseFor("26GJCR00147")).toBeUndefined();

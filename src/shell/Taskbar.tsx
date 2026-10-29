@@ -3,7 +3,7 @@
 // character (the same in every program), sync status (LP-109) and a clock.
 
 import { useEffect, useState, type MouseEvent } from "react";
-import { gameTime } from "@/lib/freestyle";
+import { gameTime } from "@/lib/gameTime";
 import type { SyncStatus } from "@/lib/sync";
 import type { Character } from "@/lib/types";
 import SyncDot from "./SyncDot";

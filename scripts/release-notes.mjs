@@ -11,7 +11,6 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-export const JIRA_BROWSE = "https://freestylelawportal.atlassian.net/browse/";
 const GROUPS = [
   ["new", "New"],
   ["update", "Updated"],
@@ -38,7 +37,8 @@ export function buildNotes(version, changelog, keys) {
     out.push(`### ${label}`, "", ...items.map((i) => `- ${i.text}`), "");
   }
   out.push("### Jira issues", "");
-  out.push(...(keys.length ? keys.map((k) => `- [${k}](${JIRA_BROWSE}${k})`) : ["- None found in the commits."]), "");
+  // Plain keys: the Jira site is private, so links would lead nowhere for most readers (LP-164).
+  out.push(...(keys.length ? keys.map((k) => `- ${k}`) : ["- None found in the commits."]), "");
   return out.join("\n");
 }
 

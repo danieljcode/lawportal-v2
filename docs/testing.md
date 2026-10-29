@@ -24,7 +24,7 @@ path itself.
 | Wording          | `strings.test.ts` (no outside branding or links in the app's own text)                                             |
 | Outputs          | `bbcode.test.ts`, `discord*.test.ts`, `docx.test.ts`, `preview.test.ts`                                            |
 | Forms and state  | `formState.test.ts`, `formView.test.ts`, `extra-forms.test.ts`, `form-index.test.ts`, `draftWriter.test.ts`        |
-| FreestyleRP      | `freestyle.test.ts`, `freestyle-wording.test.ts`, `freestyleApp.test.tsx`                                          |
+| Game and courts  | `gameTime.test.ts`, `court-wording.test.ts`, `oneServer.test.tsx`                                                  |
 | Stores and files | `stores.test.ts`, `characterFile.test.ts`                                                                          |
 | Sync             | `sync-api.test.ts` (the routes, against a temp directory), `sync-client.test.ts` (stubbed `fetch`), `body.test.ts` |
 | UI               | `dialogs.test.ts`, `discordPanel.test.ts`                                                                          |
@@ -150,7 +150,7 @@ an argument (default `http://127.0.0.1:3000`).
 
 - **`npm run smoke:preview`**: opens every form in light and dark themes, at normal and throttled
   speed, and checks the preview renders on load, reload, restore, back/forward, search and with
-  seeded characters and dockets, plus the FreestyleRP wording and case numbers. Prints
+  seeded characters and dockets, plus the court wording and case numbers. Prints
   `OK: <n> preview checks … passed.` or lists the failures.
 - **`npm run screenshots`**: saves home, form, Settings, Discord-tab and Classic home screenshots
   in light and dark, with one character and one case, to `.agents/screenshots/`. The README's screenshots are copied from there into `docs/screenshots/`.

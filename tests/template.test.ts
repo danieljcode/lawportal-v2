@@ -141,7 +141,7 @@ describe("caseNumberPattern", () => {
     expect(caseNumberPattern(f, NOW)).toBe("90SCCR00XXX");
   });
 
-  it("tracks the year across the New York New Year (freestyle = year − 36)", () => {
+  it("tracks the year across the New York New Year (game year = year − 36)", () => {
     const f = field("{{Case number=YYSCCR00XXX}}");
     // 10 pm on 31 Dec in New York is already 1 Jan in UTC.
     expect(caseNumberPattern(f, new Date("2027-01-01T03:00:00Z"))).toBe("90SCCR00XXX");

@@ -10,7 +10,7 @@
 
 import { toFormState, type FormState } from "./formState";
 import { formatDay } from "./deadlines";
-import { gameTime } from "./freestyle";
+import { gameTime } from "./gameTime";
 import { defaultKV, ISO_TIME_RE, type KV } from "./storage";
 import { createKeyedStore } from "./store";
 import type { Values } from "./types";

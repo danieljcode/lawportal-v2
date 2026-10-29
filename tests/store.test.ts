@@ -210,8 +210,8 @@ describe("characters on the store (LP-2)", () => {
 describe("runMigrations", () => {
   it("upgrades this browser's characters once and drops the old server default", () => {
     localStorage.clear();
-    localStorage.setItem(CHARS_KEY, JSON.stringify([{ id: "char0001", name: "Ann Lee", server: "gtaw" }]));
-    localStorage.setItem("lawapp_server", "gtaw");
+    localStorage.setItem(CHARS_KEY, JSON.stringify([{ id: "char0001", name: "Ann Lee", server: "other" }]));
+    localStorage.setItem("lawapp_server", "other");
     runMigrations();
     expect(JSON.parse(localStorage.getItem(CHARS_KEY)!)).toEqual({ v: 2, data: [{ id: "char0001", name: "Ann Lee" }] });
     expect(localStorage.getItem("lawapp_server")).toBeNull();

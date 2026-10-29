@@ -1,9 +1,9 @@
-// FreestyleRP's courthouses and case-number shape, in one place (LP-68).
+// The courthouses and case-number shape, in one place (LP-68).
 //
-// FreestyleRP has no official court details yet, so these are generic: one
+// There are no official court details yet, so these are generic: one
 // courthouse, Superior Court (SC). Real values go here, and nowhere else; then
 // run `npm run port-forms`, which writes them into the forms' Courthouse
-// dropdowns and case-number patterns (scripts/freestyle-wording.mjs).
+// dropdowns and case-number patterns (scripts/court-wording.mjs).
 // Division codes (CR, CC, TC, SM…) stay in dockets.ts DIVISION_CODES.
 //
 // A case number is: 2-digit in-game year + courthouse code + division code +
@@ -36,7 +36,7 @@ export const GENERAL_COURT = "San Andreas Court";
 
 /**
  * The courthouse named by a case number, from the two letters after the year;
- * undefined when they aren't one of ours (old GTAW numbers such as 26GJCR00147
+ * undefined when they aren't one of ours (old numbers from the reference forms such as 26GJCR00147
  * are left as filed).
  */
 export function courthouseFor(caseNumber: string | undefined): Courthouse | undefined {

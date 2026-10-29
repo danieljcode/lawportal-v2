@@ -18,7 +18,7 @@ given, says which form.
 - **One of the 39 court forms** (Criminal, Civil, Traffic, Small Claims, Appellate, Supreme, general): they live in
   `src/data/forms.json`, which is **generated. Never edit it by hand.** Change the generator instead and re-run
   `npm run port-forms`:
-  - wording and court names: `scripts/freestyle-wording.mjs`
+  - wording and court names: `scripts/court-wording.mjs`
   - court names, courthouses, case-number shape: `src/lib/courts.ts`
   - required fields: the rule in `scripts/required-fields.mjs`
   - old forum links: `scripts/scrub-links.mjs`
@@ -42,9 +42,9 @@ given, says which form.
 3. **The template HTML passes the safety check** (`scripts/template-safety.mjs`): no `script`, `iframe`, `style`,
    `form`, `input`, `button`, `svg` or other dangerous tags, no `on…=` attributes, and every `href`/`src` is
    `http(s)` (or an image `data:` URL). Fallbacks count too.
-4. **FreestyleRP wording.** Use FreestyleRP court names (for example "San Andreas Court"), not the old forum's. The
+4. **Court wording.** Use our court names (for example "San Andreas Court"), not the old forum's. The
    world is set in 1990: dates come from prefills such as `=today` or `=today+21`, which the app shifts by
-   `YEAR_OFFSET` (`src/lib/freestyle.ts`). Never write a real year into a template.
+   `YEAR_OFFSET` (`src/lib/gameTime.ts`). Never write a real year into a template.
 5. **British English** in help text, comments and the "What's new" entry. The legal wording inside a form follows the
    court style the other forms use.
 

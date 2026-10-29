@@ -111,7 +111,7 @@ edits. Instead of replacing local data, `resolve()` merges **one character at a 
 
 ### Old data (LP-71)
 
-Characters saved before the app went FreestyleRP-only carried a `server` field. A pull that finds it
+Characters saved before the app went single-server carried a `server` field. A pull that finds it
 in the server copy pushes a clean copy back, so every device ends up clean.
 
 ## Full backup and restore (LP-1)
