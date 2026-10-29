@@ -2,6 +2,7 @@
 import { checkHost } from "@/lib/server/guard";
 import { readCapped } from "@/lib/server/body";
 import { htmlToDocx } from "@/lib/docx/htmlToDocx";
+import { isJson, json, NO_STORE } from "@/lib/server/http";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,11 +12,6 @@ const MAX_HTML = 1_500_000;
 const MAX_TITLE = 200;
 const ID_RE = /^[a-z0-9-]{1,80}$/;
 const DOCX_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-const NO_STORE = { "Cache-Control": "no-store" };
-
-function json(body: unknown, status: number): Response {
-  return Response.json(body, { status, headers: NO_STORE });
-}
 
 /** Lowercase, runs of anything but a-z0-9 become "-", trimmed; falls back to "document". */
 function slug(title: string): string {
@@ -30,9 +26,7 @@ function slug(title: string): string {
 export async function POST(req: Request): Promise<Response> {
   const refused = checkHost(req);
   if (refused) return refused;
-  if (!(req.headers.get("content-type") ?? "").toLowerCase().startsWith("application/json")) {
-    return json({ error: "Expected application/json." }, 415);
-  }
+  if (!isJson(req)) return json({ error: "Expected application/json." }, 415);
   const text = await readCapped(req, MAX_BODY);
   if (text === "too-large") return json({ error: "That document is too large to convert (max 2 MB)." }, 413);
   let body: unknown;
