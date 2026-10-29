@@ -26,3 +26,10 @@ export function checkHost(req: Request): Response | null {
   if (LOCAL_HOST.test(host)) return null;
   return json({ error: HOST_REFUSED }, 421);
 }
+
+export const SYNC_IN_PREVIEW = "Sync isn't available in previews. Use the main app to sync.";
+
+/** checkHost, then a 503 on a Vercel preview deploy (LP-119), so a pull request never reads or writes real sync data. */
+export function checkSync(req: Request): Response | null {
+  return checkHost(req) ?? (process.env.VERCEL_ENV === "preview" ? json({ error: SYNC_IN_PREVIEW }, 503) : null);
+}
