@@ -568,7 +568,16 @@ describe("conflicts keep unsent edits (LP-64)", () => {
           updated: "u2",
           data: {
             characters: [],
-            contacts: [{ id: "cont0001", name: "Theirs", type: "judge", created: T0, updated: T1 }],
+            contacts: [
+              {
+                id: "cont0001",
+                name: "Theirs",
+                type: "judge",
+                cases: [{ id: "case0001", role: "judge" }],
+                created: T0,
+                updated: T1,
+              },
+            ],
           },
         },
       },
@@ -584,6 +593,8 @@ describe("conflicts keep unsent edits (LP-64)", () => {
 
     expect(sync.restoreLost()).toBe(1);
     expect(contactStore().get("cont0001")).toMatchObject({ name: "Mine", type: "judge" });
+    // Restored exactly: the kept version had no case links, so the server's are gone too.
+    expect(contactStore().get("cont0001")).not.toHaveProperty("cases");
     expect(contactStore().get("cont0001")!.updated > T1).toBe(true);
     expect(sync.getState().lostContacts).toBe(0);
   });

@@ -1,6 +1,14 @@
 // The Rolodex's store (LP-30): cleaning, saving, order, search and the route.
 import { describe, expect, it } from "vitest";
-import { cleanContact, createContactStore, filterContacts, CONTACTS_KEY, MAX_CONTACTS } from "@/lib/contacts";
+import {
+  cleanContact,
+  contactsForCase,
+  createContactStore,
+  filterContacts,
+  CONTACTS_KEY,
+  MAX_CASE_LINKS,
+  MAX_CONTACTS,
+} from "@/lib/contacts";
 import { isBackedUp } from "@/lib/backup";
 import { memoryKV } from "@/lib/storage";
 import { parseHash, hashFor, pageTitle } from "@/shell/useRoute";
@@ -46,6 +54,50 @@ describe("contacts (LP-30)", () => {
     expect(filterContacts(all, { q: "mission", type: "judge" }).map((c) => c.name)).toEqual(["Judy Bench"]);
     expect(filterContacts(all, { q: "officer" }).map((c) => c.name)).toEqual(["Bob Badge"]);
     expect(filterContacts(all, {})).toHaveLength(2);
+  });
+
+  it("cleans case links: one per case, valid ids, unknown roles become other, capped", () => {
+    const c = cleanContact({
+      name: "A",
+      cases: [
+        { id: "case0001", role: "witness" },
+        { id: "case0001", role: "judge" },
+        { id: "BAD ID", role: "client" },
+        { id: "case0002", role: "wizard" },
+        "nope",
+      ],
+    })!;
+    expect(c.cases).toEqual([
+      { id: "case0001", role: "witness" },
+      { id: "case0002", role: "other" },
+    ]);
+    expect(cleanContact({ name: "A", cases: [] })).not.toHaveProperty("cases");
+    const many = Array.from({ length: MAX_CASE_LINKS + 5 }, (_, i) => ({
+      id: "case" + String(i).padStart(4, "0"),
+      role: "client",
+    }));
+    expect(cleanContact({ name: "A", cases: many })!.cases).toHaveLength(MAX_CASE_LINKS);
+  });
+
+  it("links and unlinks a contact, keeps links when the form saves, and lists a case's contacts", () => {
+    const store = createContactStore(memoryKV());
+    const bob = store.save({ name: "Bob Badge", type: "officer" });
+    const amy = store.save({ name: "Amy Adams", type: "witness" });
+    store.link(bob.id, "case0001", "officer");
+    store.link(amy.id, "case0001", "witness");
+    store.link(amy.id, "case0001", "client"); // a new role replaces the old
+    expect(store.get(amy.id)?.cases).toEqual([{ id: "case0001", role: "client" }]);
+    // The Rolodex form saves without `cases`: the links stay.
+    store.save({ id: bob.id, name: "Bob Badge", type: "officer", phone: "555" });
+    expect(store.get(bob.id)?.cases).toEqual([{ id: "case0001", role: "officer" }]);
+    expect(contactsForCase(store.list(), "case0001").map((x) => [x.contact.name, x.role])).toEqual([
+      ["Amy Adams", "client"],
+      ["Bob Badge", "officer"],
+    ]);
+    store.unlink(bob.id, "case0001");
+    expect(store.get(bob.id)).not.toHaveProperty("cases");
+    expect(contactsForCase(store.list(), "case0002")).toEqual([]);
+    expect(() => store.link("gone0001", "case0001", "client")).toThrow(/no longer/);
   });
 
   it("is in the full backup", () => {

@@ -27,7 +27,15 @@ export const CONTACT_TYPE_LABELS: Record<ContactType, string> = {
   business: "Business",
 };
 
-export const CASE_ROLES = ["client", "opposing-party", "opposing-counsel", "witness", "judge", "officer", "other"] as const;
+export const CASE_ROLES = [
+  "client",
+  "opposing-party",
+  "opposing-counsel",
+  "witness",
+  "judge",
+  "officer",
+  "other",
+] as const;
 export type CaseRole = (typeof CASE_ROLES)[number];
 
 export const CASE_ROLE_LABELS: Record<CaseRole, string> = {

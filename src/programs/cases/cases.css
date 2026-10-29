@@ -302,6 +302,9 @@
 }
 
 /* ---------- contacts (LP-30) ---------- */
+.case-links #case-contacts {
+  grid-column: 1 / -1;
+}
 .case-contact-list {
   display: flex;
   flex-direction: column;
@@ -309,6 +312,9 @@
   margin: 4px 0;
   padding: 0;
   list-style: none;
+}
+.case-contact > span {
+  min-width: 0;
 }
 .case-contact {
   display: flex;
