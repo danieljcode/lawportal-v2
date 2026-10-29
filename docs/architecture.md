@@ -8,8 +8,8 @@ It's a Next.js 16 app (React 19, TypeScript, built with Turbopack) that runs alm
 browser.
 
 - **One page, client only.** `src/app/page.tsx` renders `AppLoader`, which loads `App` with
-  `ssr: false`. The app reads local storage on its first render, so it never renders on the server
-  (no hydration mismatches).
+  `ssr: false`. The app reads the browser's storage on its first render, so it never renders on the server
+  (no hydration mismatches). `AppLoader` opens IndexedDB (`initStorage`) while `App`'s code loads.
 - **Branding** (`src/branding.ts`, LP-22). One config holds the firm's name ("Friedman &
   Associates"), short name ("F&A"), the product name ("Court Filing System"), logo and colours,
   so another firm could be set up when it's hosted. The app's chrome reads it: the window
@@ -259,7 +259,8 @@ court names and the case-number shape live in `src/lib/courts.ts`.
 
 ## Client data: the stores
 
-Everything a user saves lives in the browser's local storage (keys start `lawapp_`):
+Everything a user saves lives in the browser's IndexedDB (LP-36), one value per key (keys start
+`lawapp_`):
 
 | Store                             | File                                     | Keys                                 |
 | --------------------------------- | ---------------------------------------- | ------------------------------------ |
@@ -273,9 +274,20 @@ Everything a user saves lives in the browser's local storage (keys start `lawapp
 | Rolodex contacts (LP-30)          | `src/lib/contacts.ts`                    | `lawapp_contacts`                    |
 | Sync state                        | `src/lib/sync.ts`                        | `lawapp_sync_*`                      |
 
-- **KV wrapper** (`src/lib/storage.ts`). The stores never touch `localStorage` directly: they go
-  through a small `KV` interface, so tests use `memoryKV()` and a browser that blocks storage falls
-  back to memory. `readJson` sets aside values it can't parse instead of deleting them (see
+- **KV wrapper** (`src/lib/storage.ts`). The stores never touch the browser's storage directly:
+  they go through a small synchronous `KV` interface, so tests use `memoryKV()`.
+- **IndexedDB** (`src/lib/idb.ts`, LP-36). Before the app renders, `initStorage` opens the
+  database and loads every value into memory, so reads stay synchronous. Each write updates memory
+  at once; all the writes made in one task are saved in one transaction, so a multi-key change is
+  saved whole or not at all. A save that fails afterwards shows the save-failed notice and is retried
+  with the next save. Other tabs get each saved change over a `BroadcastChannel`.
+- **Moving from localStorage.** The first open copies every `lawapp_` key from localStorage, reads
+  the copy back, and only then clears the old keys and sets `lawapp_idb`. The keys the theme script
+  and the boot screen read before the app loads stay in localStorage (`LOCAL_KEYS`: theme, look,
+  readable font, boot screen).
+- **Fallbacks.** Without IndexedDB (or if it takes over 10 s to open) the app uses localStorage,
+  then memory if storage is blocked. Once the data has moved (`lawapp_idb`), it falls back to
+  memory only, so an empty localStorage is never saved over the real data. `readJson` sets aside values it can't parse instead of deleting them (see
   [Sync, storage and recovery](sync.md#damaged-data)).
 - **Change channels and React.** Each store has a change channel with a version counter. The hooks
   in `src/ui/useStore.ts` subscribe with `useSyncExternalStore`, so components re-read a

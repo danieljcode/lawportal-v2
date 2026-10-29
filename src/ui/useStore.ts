@@ -14,7 +14,7 @@ import { filingStore } from "@/lib/filings";
 import { docketStore } from "@/lib/dockets";
 import { letterheadStore } from "@/lib/letterhead";
 import { portfolioStore } from "@/lib/portfolio";
-import { setAsideVersion, subscribeSetAside } from "@/lib/storage";
+import { saveFailedVersion, setAsideVersion, subscribeSaveFailed, subscribeSetAside } from "@/lib/storage";
 import * as sync from "@/lib/sync";
 
 function subscribeCharacters(fn: () => void): () => void {
@@ -64,6 +64,11 @@ export const useContactVersion = versionHook(contactStore);
 /** Counts values set aside as unreadable since the page loaded (0: none). */
 export function useSetAsideVersion(): number {
   return useSyncExternalStore(subscribeSetAside, setAsideVersion, setAsideVersion);
+}
+
+/** Counts saves that failed after the change was shown (IndexedDB, LP-36; 0: none). */
+export function useSaveFailedVersion(): number {
+  return useSyncExternalStore(subscribeSaveFailed, saveFailedVersion, saveFailedVersion);
 }
 
 const subscribeSync = (fn: () => void) => sync.onChange(() => fn());

@@ -76,7 +76,7 @@ app runs on your own computer, it lives in files on that computer.
 
 `src/lib/sync.ts`:
 
-- The server copy is the master; local storage is this browser's cache of it.
+- The server copy is the master; this browser's storage is its cache of it.
 - Every data change in the stores is **pushed 700 ms later** (`lawapp_sync_dirty` marks unsent
   edits). The latest copy is **pulled** on start-up and when the tab comes back into view, at most
   every 20 seconds unless forced (**Sync now**).

@@ -9,13 +9,13 @@ export const S_DISCLAIMER_EMPTY = "Personal tool. Always check a filing before p
 export const S_CREDIT = "Made by Dan.";
 
 export const S_STORAGE_LOCAL =
-  "Characters, dockets and J.A.P. portfolios are saved in this browser's local storage on this device. Export them to keep a backup.";
+  "Characters, dockets and J.A.P. portfolios are saved in this browser on this device. Export them to keep a backup.";
 
 export const S_STORAGE_MEMORY =
   "This browser is blocking storage, so characters last only until you close this tab. Use Export to keep them.";
 
 export const S_STORAGE_SYNC =
-  "This browser keeps a copy of your synced characters, dockets and J.A.P. portfolios in local storage, so the app works while the sync server is unreachable.";
+  "This browser keeps a copy of your synced characters, dockets and J.A.P. portfolios, so the app works while the sync server is unreachable.";
 
 export const S_SYNC_OFF =
   "Save your characters, dockets and J.A.P. portfolios to this app's own server (the computer running it), so other browsers and devices that can reach it get the same data. You get a private sync code; there's no account or password. If the app was started with dev:lan/start:lan, anyone on your network who has the code can read or change the data, and traffic is not encrypted.";
@@ -55,6 +55,8 @@ export function S_SYNC_LOST(n: number, cases = 0, rulings = 0, contacts = 0): st
 export const S_SET_ASIDE = "Some saved data couldn't be read and was set aside.";
 export const S_SET_ASIDE_HINT =
   "Use Download damaged data in the Characters dialog to keep a copy you can fix by hand.";
+
+export const S_SAVE_FAILED_HINT = "Your latest changes are kept on screen. Use Export to keep a copy.";
 
 export const S_JAP_OFF = "Portfolios are saved in this browser. Turn on sync to keep them on this app's server too.";
 

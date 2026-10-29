@@ -30,6 +30,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         text: "The Classic (1990) desktop is the firm's navy instead of teal. High Contrast Black stays black.",
       },
       {
+        type: "update",
+        text: "Your work is saved in a bigger part of the browser's storage, so lots of cases, filings and drafts no longer fill it up. It moves over by itself the first time you open the app.",
+      },
+      {
         type: "fix",
         text: "New client intake empties itself once Open case has made the case, so pressing Open case again, or coming back to the intake later, no longer makes a second case for the same client.",
       },
