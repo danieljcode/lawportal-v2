@@ -69,7 +69,8 @@ function DocketsBody({ charId, canUse, onUse, onClose }: DocketsDialogProps & { 
   const items = all.filter((d) => {
     if (status === "active" && d.status === "Closed") return false;
     if (status && status !== "active" && d.status !== status) return false;
-    return !query || JSON.stringify(d).toLowerCase().includes(query);
+    // The values shown, not the stored JSON: "court" mustn't match every docket's field name (LP-150).
+    return !query || FIELDS.some((f) => (d[f.key] || "").toLowerCase().includes(query));
   });
 
   const edit = (d: Docket | null) => {

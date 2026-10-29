@@ -323,6 +323,14 @@ describe("Dockets dialog", () => {
 
     type("#docket-search", "ann smith");
     expect(must("#docket-list").textContent).toContain("90SCCC00147");
+    // Field names and stored stamps aren't searched (LP-150).
+    for (const word of ["court", "plaintiff", "updated"]) {
+      type("#docket-search", word);
+      expect(must("#docket-list").textContent).not.toContain("90SCCC00147");
+    }
+    type("#docket-search", "90sccc00147");
+    expect(must("#docket-list").textContent).toContain("90SCCC00147");
+    type("#docket-search", "ann smith");
     const buttons = () => [...document.querySelectorAll<HTMLButtonElement>("#docket-list button")];
     expect(buttons().map((b) => b.textContent)).toEqual(["Use in form", "Edit", "Close case", "Delete"]);
 
