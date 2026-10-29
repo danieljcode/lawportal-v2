@@ -1,6 +1,7 @@
 // POST /api/docx: convert the final preview HTML to a .docx download (design §.docx route).
 import { checkHost } from "@/lib/server/guard";
 import { readCapped } from "@/lib/server/body";
+import { limitDocx } from "@/lib/server/rateLimit";
 import { htmlToDocx } from "@/lib/docx/htmlToDocx";
 import { isJson, json, NO_STORE } from "@/lib/server/http";
 
@@ -26,6 +27,8 @@ function slug(title: string): string {
 export async function POST(req: Request): Promise<Response> {
   const refused = checkHost(req);
   if (refused) return refused;
+  const limited = limitDocx(req);
+  if (limited) return limited;
   if (!isJson(req)) return json({ error: "Expected application/json." }, 415);
   const text = await readCapped(req, MAX_BODY);
   if (text === "too-large") return json({ error: "That document is too large to convert (max 2 MB)." }, 413);

@@ -6,7 +6,7 @@
 // firm can show it was done.
 
 import { formatDay } from "./deadlines";
-import { defaultKV, isId, ISO_TIME_RE, newId, type KV } from "./storage";
+import { defaultKV, isId, ISO_TIME_RE, newId, uniqueById, type KV } from "./storage";
 import { createStore } from "./store";
 import type { Case } from "./types";
 
@@ -165,16 +165,7 @@ export function cleanCheck(input: unknown): ConflictCheck | null {
 }
 
 function validLog(raw: unknown): ConflictCheck[] {
-  if (!Array.isArray(raw)) return [];
-  const seen = new Set<string>();
-  const out: ConflictCheck[] = [];
-  for (const item of raw) {
-    const c = cleanCheck(item);
-    if (!c || seen.has(c.id)) continue;
-    seen.add(c.id);
-    out.push(c);
-  }
-  return out.sort((a, b) => (a.at < b.at ? -1 : a.at > b.at ? 1 : 0));
+  return uniqueById(raw, cleanCheck).sort((a, b) => (a.at < b.at ? -1 : a.at > b.at ? 1 : 0));
 }
 
 export interface ConflictLog {

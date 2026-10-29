@@ -39,7 +39,7 @@ import {
   type MissingField,
   type Undoable,
 } from "@/lib/formState";
-import { defaultKV, readJson, writeJson } from "@/lib/storage";
+import { defaultKV, isObject, readJson, writeJson } from "@/lib/storage";
 import { S_DISCLAIMER } from "@/lib/strings";
 import { compileForm, render } from "@/lib/template";
 import type { Character, Docket, FormDef } from "@/lib/types";
@@ -118,7 +118,7 @@ function readCollapsed(id: string): Set<string> {
 function saveCollapsed(id: string, names: string[]): void {
   const kv = defaultKV();
   const raw = readJson<Record<string, unknown>>(kv, COLLAPSED_KEY);
-  const all = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+  const all = isObject(raw) ? raw : {};
   try {
     writeJson(kv, COLLAPSED_KEY, { ...all, [id]: names });
   } catch {

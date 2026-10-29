@@ -11,7 +11,7 @@
 // (docket <-> form), layout.ts (sections, checklists) and drafts.ts. This file
 // re-exports them, so imports from "@/lib/formState" keep working.
 
-export { DEFENDANT_LABELS, EMPTY_STATE, FILED_LABELS, PLAINTIFF_LABELS, scopeAt } from "./formState/state";
+export { DEFENDANT_LABELS, EMPTY_STATE, FILED_LABELS, isItem, PLAINTIFF_LABELS, scopeAt } from "./formState/state";
 export type { FormState, ScopePath } from "./formState/state";
 export { addItem, hasDependents, materializeBlocks, moveItem, removeItem, setCond, setValue } from "./formState/update";
 export {

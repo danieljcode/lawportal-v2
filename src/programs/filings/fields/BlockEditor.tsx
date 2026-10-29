@@ -1,13 +1,9 @@
 // A repeatable block (`{{#Name|n}}`): items with ↑ ↓ Remove, then "+ Add" (reference blockInput).
 
-import { addItem, afterAddItem, moveItem, removeItem, singular } from "@/lib/formState";
-import type { BlockEntry, Values } from "@/lib/types";
+import { addItem, afterAddItem, isItem, moveItem, removeItem, singular } from "@/lib/formState";
+import type { BlockEntry } from "@/lib/types";
 import { useFormCtx } from "./FormContext";
 import ItemList, { type ScopeProps } from "./ItemList";
-
-function isItem(v: unknown): v is Values {
-  return !!v && typeof v === "object" && !Array.isArray(v);
-}
 
 export default function BlockEditor({ entry, scope, path, prefix }: ScopeProps & { entry: BlockEntry }) {
   const { entries, character, onState, now } = useFormCtx();
