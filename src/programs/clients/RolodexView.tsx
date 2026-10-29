@@ -1,8 +1,11 @@
 // The Rolodex (LP-30): the firm's contacts, one card each, with a search box,
-// a type filter, and a form to add or edit one. Behind the `rolodex` flag.
+// a type filter, and a form to add or edit one; each card links the cases
+// the contact is on. Behind the `rolodex` flag.
 
 import { useMemo, useState, type FormEvent } from "react";
+import { caseStore } from "@/lib/cases";
 import {
+  CASE_ROLE_LABELS,
   CONTACT_TYPE_LABELS,
   CONTACT_TYPES,
   contactStore,
@@ -12,7 +15,7 @@ import {
 } from "@/lib/contacts";
 import { searchTerms } from "@/lib/precedents";
 import Marked from "@/ui/Marked";
-import { useContactVersion } from "@/ui/useStore";
+import { useCaseVersion, useContactVersion } from "@/ui/useStore";
 
 interface Draft {
   name: string;
@@ -103,6 +106,12 @@ function ContactForm({ editing, onDone }: { editing: Contact | null; onDone(): v
 export default function RolodexView() {
   const version = useContactVersion();
   const all = useMemo(() => (version >= 0 ? contactStore().list() : []), [version]);
+  const caseVersion = useCaseVersion();
+  /** Case id → its number, for the cards' case links. */
+  const caseNumbers = useMemo(
+    () => new Map((caseVersion >= 0 ? caseStore().list() : []).map((k) => [k.id, k.caseNumber])),
+    [caseVersion],
+  );
   const [q, setQ] = useState("");
   const [type, setType] = useState<ContactType | "">("");
   const terms = useMemo(() => searchTerms(q), [q]);
@@ -195,6 +204,18 @@ export default function RolodexView() {
                   {c.notes && (
                     <p className="small muted">
                       <Marked text={c.notes} terms={terms} />
+                    </p>
+                  )}
+                  {c.cases?.some((l) => caseNumbers.has(l.id)) && (
+                    <p className="small contact-cases">
+                      {c.cases
+                        .filter((l) => caseNumbers.has(l.id))
+                        .map((l, i) => (
+                          <span key={l.id}>
+                            {i > 0 && " · "}
+                            <a href={"#cases/" + l.id}>{caseNumbers.get(l.id)}</a> ({CASE_ROLE_LABELS[l.role]})
+                          </span>
+                        ))}
                     </p>
                   )}
                 </li>

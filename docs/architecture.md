@@ -409,6 +409,10 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
   officer, attorney, witness, business), phone, address, organisation and notes. Search
   (`filterContacts`) needs every word somewhere in the contact. Sync merges each contact by
   `updated` (`contact:<id>`), with losing edits kept for Restore my version, as for precedents.
+  A contact keeps its own links to cases (`cases`: case id and role, up to 100), so the links sync
+  with it and the cases store doesn't change; a save without `cases` (the Rolodex form) keeps them.
+  A case's **Contacts** section (`CaseContacts.tsx`) links and unlinks them, and each Rolodex card
+  links its cases.
   In a form, focusing a text, textarea, list or paras field registers it (`FormCtx.onFieldFocus`);
   the **Law Library** dialog's Insert citation puts `citation(p)` at that field's cursor, reading
   the field as it is then. Citations are plain text, so they're escaped like any other value.
