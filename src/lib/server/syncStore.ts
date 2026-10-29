@@ -26,6 +26,7 @@ export interface SyncRecord {
     filings?: unknown[];
     conflictChecks?: unknown[];
     precedents?: unknown[];
+    contacts?: unknown[];
   };
 }
 

@@ -3,6 +3,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { caseStore } from "@/lib/cases";
 import { characterStore } from "@/lib/characters";
+import { contactStore } from "@/lib/contacts";
 import { docketStore } from "@/lib/dockets";
 import { portfolioStore } from "@/lib/portfolio";
 import { precedentStore } from "@/lib/precedents";
@@ -551,6 +552,47 @@ describe("conflicts keep unsent edits (LP-64)", () => {
     ).toEqual(["Mine v. State"]);
     expect(precedentStore().get("prec0001")!.updated > T1).toBe(true);
     expect(sync.getState().lostPrecedents).toBe(0);
+  });
+
+  it("contacts sync like precedents: a losing edit is kept aside and restored (LP-30)", async () => {
+    seed([], { "contact:cont0001": "2025-12-01T00:00:00.000Z" });
+    contactStore().replaceAll([{ id: "cont0001", name: "Mine", type: "judge", created: T0, updated: T0 }]);
+    localStorage.setItem(sync.DIRTY_KEY, "1");
+    stubFetch(
+      {
+        status: 200,
+        body: {
+          rev: 2,
+          updated: "u2",
+          data: {
+            characters: [],
+            contacts: [{ id: "cont0001", name: "Theirs", type: "judge", created: T0, updated: T1 }],
+          },
+        },
+      },
+      { status: 200, body: { rev: 3, updated: "u3" } },
+    );
+    await sync.pull(true);
+    expect(
+      contactStore()
+        .list()
+        .map((c) => c.name),
+    ).toEqual(["Theirs"]);
+    expect(sync.getState()).toMatchObject({ status: "conflict", message: S_SYNC_LOST(0, 0, 0, 1), lostContacts: 1 });
+
+    expect(sync.restoreLost()).toBe(1);
+    expect(contactStore().get("cont0001")).toMatchObject({ name: "Mine", type: "judge" });
+    expect(contactStore().get("cont0001")!.updated > T1).toBe(true);
+    expect(sync.getState().lostContacts).toBe(0);
+  });
+
+  it("a contact added here goes up with the next push (LP-30)", async () => {
+    seed([], {});
+    contactStore().save({ name: "Officer Dibble", type: "officer" });
+    const calls = stubFetch({ status: 200, body: { rev: 2, updated: "u2" } });
+    await sync.push();
+    const sent = calls[0].body as { data: sync.SyncDoc };
+    expect(sent.data.contacts?.map((c) => c.name)).toEqual(["Officer Dibble"]);
   });
 
   it("discardLost forgets the kept copy", () => {

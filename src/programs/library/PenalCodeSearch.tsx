@@ -18,7 +18,7 @@ import {
   type PenalCode,
 } from "@/lib/penalCode";
 import { searchTerms } from "@/lib/precedents";
-import Marked from "./Marked";
+import Marked from "@/ui/Marked";
 
 /** How many results show before "Show more". */
 export const PAGE = 40;

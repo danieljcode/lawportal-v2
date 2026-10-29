@@ -135,3 +135,50 @@
     font-size: 12pt;
   }
 }
+
+/* ---------- rolodex (LP-30) ---------- */
+.rolodex-head {
+  justify-content: space-between;
+  align-items: center;
+}
+.rolodex-filters input[type="search"] {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+.contact-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 8px;
+  margin: 6px 0;
+  padding: 0;
+  list-style: none;
+}
+.contact-card {
+  padding: 6px 8px;
+  border: 1px solid var(--shadow);
+  border-top: 3px solid var(--accent);
+  background: var(--field);
+  color: var(--text);
+}
+.contact-card p {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+.contact-card mark {
+  background: var(--mark);
+  color: inherit;
+}
+.contact-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+.contact-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+.contact-form {
+  margin: 6px 0 10px;
+}
