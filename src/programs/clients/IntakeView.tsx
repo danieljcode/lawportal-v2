@@ -40,6 +40,7 @@ export default function IntakeView({ characters, active, onRunConflicts }: Intak
   };
 
   const pickMatter = (label: string) => setIntake((i) => ({ ...i, matter: label, side: matterFor(label).side }));
+  const clear = () => setIntake(emptyIntake(active ? active.id : ""));
 
   const openCase = (e: FormEvent) => {
     e.preventDefault();
@@ -57,6 +58,8 @@ export default function IntakeView({ characters, active, onRunConflicts }: Intak
     }
     try {
       const saved = store.save(data);
+      // The Clients program stays mounted (LP-126): a filled form would make a second PENDING-n case (LP-149).
+      clear();
       location.hash = "#cases/" + saved.id;
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -90,12 +93,7 @@ export default function IntakeView({ characters, active, onRunConflicts }: Intak
           <button type="button" className="btn" id="intake-print" onClick={() => window.print()}>
             Print client sheet
           </button>
-          <button
-            type="button"
-            className="btn danger-quiet"
-            id="intake-clear"
-            onClick={() => setIntake(emptyIntake(active ? active.id : ""))}
-          >
+          <button type="button" className="btn danger-quiet" id="intake-clear" onClick={clear}>
             Clear
           </button>
         </div>
