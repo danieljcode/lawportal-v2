@@ -13,6 +13,8 @@ import {
   intakeToCase,
   matterFor,
   MATTERS,
+  MAX_DETAIL,
+  MAX_SUMMARY,
   SOURCES,
   URGENCIES,
   type ClientSide,
@@ -77,6 +79,7 @@ export default function IntakeView({ characters, active, onRunConflicts }: Intak
       id={"intake-" + key}
       type="text"
       placeholder={placeholder}
+      maxLength={MAX_DETAIL}
       value={intake[key]}
       onChange={(e) => set(key, e.target.value)}
     />
@@ -173,9 +176,15 @@ export default function IntakeView({ characters, active, onRunConflicts }: Intak
                 <textarea
                   id="intake-summary"
                   rows={5}
+                  maxLength={MAX_SUMMARY}
+                  aria-describedby="intake-summary-help"
                   value={intake.summary}
                   onChange={(e) => set("summary", e.target.value)}
                 />
+                <p className="help" id="intake-summary-help">
+                  Up to {MAX_SUMMARY.toLocaleString("en-GB")} characters, so it fits in the case notes under the
+                  client&rsquo;s details.
+                </p>
               </div>
               {field(
                 "lead",

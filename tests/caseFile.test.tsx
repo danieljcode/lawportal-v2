@@ -144,6 +144,16 @@ describe("the Case File (LP-101)", () => {
     expect(document.querySelector("#case-needs-lead")).toBeNull();
   });
 
+  it("stops Notes at 4,000 characters and counts them near the limit (LP-151)", () => {
+    mount("#cases/case0003");
+    expect(must<HTMLTextAreaElement>("#case-notes").maxLength).toBe(4000);
+    expect(must<HTMLInputElement>("#case-plaintiff").maxLength).toBe(4000);
+    setValue("#case-notes", "n".repeat(3500));
+    expect(document.querySelector("#case-notes-count")).toBeNull();
+    setValue("#case-notes", "n".repeat(3501));
+    expect(must("#case-notes-count").textContent).toBe("3,501 / 4,000");
+  });
+
   it("making someone lead takes them off the others", () => {
     mount("#cases/case0001");
     setValue("#case-lead", "bob00001");

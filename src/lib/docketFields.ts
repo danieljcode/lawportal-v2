@@ -56,7 +56,8 @@ export function divisionFor(d: { caseNumber?: string; court?: string }): string 
   );
 }
 
-const MAX_TEXT = 4000;
+/** The longest a docket or case field can be; the editors' boxes stop there too (LP-151). */
+export const MAX_TEXT = 4000;
 
 /** Normalise an untrusted docket entry (imports and sync are never trusted). */
 export function clean(input: unknown): Docket {

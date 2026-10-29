@@ -6,9 +6,21 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import App from "@/shell/App";
-import { caseStore } from "@/lib/cases";
+import { caseStore, cleanCase } from "@/lib/cases";
 import { characterStore } from "@/lib/characters";
-import { emptyIntake, intakeNotes, intakeProblem, intakeToCase, pendingNumber, type Intake } from "@/lib/intake";
+import {
+  emptyIntake,
+  intakeNotes,
+  intakeProblem,
+  intakeToCase,
+  MATTERS,
+  MAX_DETAIL,
+  MAX_SUMMARY,
+  pendingNumber,
+  SOURCES,
+  URGENCIES,
+  type Intake,
+} from "@/lib/intake";
 import * as sync from "@/lib/sync";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -69,6 +81,24 @@ describe("building the case from an intake", () => {
         "Arrested for jaywalking.",
       ].join("\n"),
     );
+  });
+
+  it("keeps the whole summary in the case notes when every box is full (LP-151)", () => {
+    const full = "x".repeat(MAX_DETAIL);
+    const summary = "s".repeat(MAX_SUMMARY);
+    const longest = (list: readonly string[]) => list.reduce((a, b) => (b.length > a.length ? b : a));
+    const i = intake({
+      clientName: full,
+      phone: full,
+      address: full,
+      opposingParty: full,
+      source: longest(SOURCES),
+      matter: longest(MATTERS.map((m) => m.label)),
+      urgency: longest(URGENCIES),
+      summary,
+    });
+    const notes = cleanCase(intakeToCase(i, [], "1990-10-19", full)).notes || "";
+    expect(notes.endsWith("\n\n" + summary)).toBe(true);
   });
 
   it("needs a client name and a summary", () => {
@@ -180,6 +210,14 @@ describe("the intake program (LP-19)", () => {
     expect(must<HTMLInputElement>("#intake-clientName").value).toBe("");
     expect(must<HTMLTextAreaElement>("#intake-summary").value).toBe("");
     expect(must<HTMLSelectElement>("#intake-lead").value).toBe("alice001");
+  });
+
+  it("stops the summary and the details at their limits (LP-151)", () => {
+    expect(must<HTMLTextAreaElement>("#intake-summary").maxLength).toBe(MAX_SUMMARY);
+    expect(must("#intake-summary-help").textContent).toContain("Up to 3,000 characters");
+    for (const key of ["clientName", "phone", "address", "opposingParty", "caseNumber"]) {
+      expect(must<HTMLInputElement>("#intake-" + key).maxLength).toBe(MAX_DETAIL);
+    }
   });
 
   it("refuses a case number the firm already has", () => {
