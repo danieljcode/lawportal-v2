@@ -233,26 +233,17 @@ export function snapshot(): SyncDoc {
   };
 }
 
-/** A document's precedents, or null for a copy from before LP-16. */
-function precedentsOf(doc: unknown): Precedent[] | null {
-  const raw = doc && typeof doc === "object" ? (doc as { precedents?: unknown }).precedents : undefined;
+/** A document's `key` list, each item cleaned, or null for a copy from before that list was synced. */
+function listOf<T>(doc: unknown, key: string, clean: (x: unknown) => T | null): T[] | null {
+  const raw = doc && typeof doc === "object" ? (doc as Record<string, unknown>)[key] : undefined;
   if (!Array.isArray(raw)) return null;
-  return raw.map((p) => cleanPrecedent(p)).filter((p): p is Precedent => !!p);
+  return raw.map((x) => clean(x)).filter((x): x is T => !!x);
 }
 
-/** A document's filing history, or null for a copy from before LP-15 (which has none to apply). */
-/** A document's conflict check log, or null for a copy from before LP-10. */
-function checksOf(doc: unknown): ConflictCheck[] | null {
-  const raw = doc && typeof doc === "object" ? (doc as { conflictChecks?: unknown }).conflictChecks : undefined;
-  if (!Array.isArray(raw)) return null;
-  return raw.map(cleanCheck).filter((c): c is ConflictCheck => !!c);
-}
-
-function filingsOf(doc: unknown): Filing[] | null {
-  const raw = doc && typeof doc === "object" ? (doc as { filings?: unknown }).filings : undefined;
-  if (!Array.isArray(raw)) return null;
-  return raw.map(cleanFiling).filter((f): f is Filing => !!f);
-}
+/** Null for a copy from before LP-16, LP-10 and LP-15 respectively. */
+const precedentsOf = (doc: unknown) => listOf<Precedent>(doc, "precedents", cleanPrecedent);
+const checksOf = (doc: unknown) => listOf<ConflictCheck>(doc, "conflictChecks", cleanCheck);
+const filingsOf = (doc: unknown) => listOf<Filing>(doc, "filings", cleanFiling);
 
 /** A document's cases; one from before LP-4 has dockets inside its characters instead. */
 function casesOf(doc: unknown): Case[] {
@@ -405,25 +396,18 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
 
   // Cases (LP-4): the same rules, one case at a time, by each case's own `updated`.
   const cases = resolveList(casesOf(serverDoc), caseStore().list(), base, "case:", (c) => c.updated);
-  // Filings (LP-15) likewise, by when each was filed. A copy from before LP-15 has none:
-  // this browser's are kept and sent.
-  const localFilings = filingStore().list();
-  const serverFilings = filingsOf(serverDoc);
-  const filings = serverFilings
-    ? resolveList(serverFilings, localFilings, base, "filing:", (f) => f.at)
-    : { out: localFilings, lost: [], keptLocal: localFilings.length > 0 };
+  // Filings (LP-15) likewise, by when each was filed.
+  const filings = mergeOptional(filingsOf(serverDoc), filingStore().list(), base, "filing:", (f) => f.at);
   // The conflict check log (LP-10), the same way.
-  const localChecks = conflictLog().list();
-  const serverChecks = checksOf(serverDoc);
-  const checks = serverChecks
-    ? resolveList(serverChecks, localChecks, base, "conflict:", (c) => c.at)
-    : { out: localChecks, lost: [], keptLocal: localChecks.length > 0 };
+  const checks = mergeOptional(checksOf(serverDoc), conflictLog().list(), base, "conflict:", (c) => c.at);
   // Precedents (LP-16): edited like cases, so the newer `updated` wins each ruling.
-  const localPrecedents = precedentStore().list();
-  const serverPrecedents = precedentsOf(serverDoc);
-  const precedents = serverPrecedents
-    ? resolveList(serverPrecedents, localPrecedents, base, "precedent:", (p) => p.updated)
-    : { out: localPrecedents, lost: [], keptLocal: localPrecedents.length > 0 };
+  const precedents = mergeOptional(
+    precedentsOf(serverDoc),
+    precedentStore().list(),
+    base,
+    "precedent:",
+    (p) => p.updated,
+  );
   return {
     // Two devices can make the same case number separately: they become one case.
     doc: {
@@ -491,30 +475,31 @@ function resolveList<T extends { id: string }>(
   return { out, lost, keptLocal };
 }
 
-function readLost(): Doc[] {
-  try {
-    const o: unknown = JSON.parse(lsGet(LOST_KEY) || "null");
-    return o && typeof o === "object" ? charactersOf(o) : [];
-  } catch {
-    return [];
-  }
+/** resolveList for a list a server copy from before it was synced doesn't have: this browser's are kept and sent. */
+function mergeOptional<T extends { id: string }>(
+  server: T[] | null,
+  local: T[],
+  base: Map<string, string> | null,
+  prefix: string,
+  stamp: (x: T) => string,
+): { out: T[]; lost: T[]; keptLocal: boolean } {
+  return server
+    ? resolveList(server, local, base, prefix, stamp)
+    : { out: local, lost: [], keptLocal: local.length > 0 };
 }
 
-function readLostCases(): Case[] {
+/** The versions kept aside by earlier merges (LOST_KEY), read once. */
+function readLostDoc(): { characters: Doc[]; cases: Case[]; precedents: Precedent[] } {
   try {
     const o: unknown = JSON.parse(lsGet(LOST_KEY) || "null");
-    const raw = o && typeof o === "object" ? (o as { cases?: unknown }).cases : undefined;
-    return Array.isArray(raw) ? casesOf({ cases: raw }) : [];
+    const cases = o && typeof o === "object" ? (o as { cases?: unknown }).cases : undefined;
+    return {
+      characters: charactersOf(o),
+      cases: Array.isArray(cases) ? casesOf({ cases }) : [],
+      precedents: precedentsOf(o) || [],
+    };
   } catch {
-    return [];
-  }
-}
-
-function readLostPrecedents(): Precedent[] {
-  try {
-    return precedentsOf(JSON.parse(lsGet(LOST_KEY) || "null")) || [];
-  } catch {
-    return [];
+    return { characters: [], cases: [], precedents: [] };
   }
 }
 
@@ -528,7 +513,8 @@ export function restoreLost(): number {
   const dockets = docketStore();
   const portfolio = portfolioStore();
   let restored = 0;
-  for (const c of readLost()) {
+  const kept = readLostDoc();
+  for (const c of kept.characters) {
     try {
       const saved = chars.save(c);
       // A version kept aside before LP-4 still has its docket inside.
@@ -539,7 +525,7 @@ export function restoreLost(): number {
       console.warn("[sync] couldn't restore a character", err);
     }
   }
-  for (const c of readLostCases()) {
+  for (const c of kept.cases) {
     try {
       caseStore().save(c); // a fresh `updated`, so it wins the next merge
       restored++;
@@ -547,7 +533,7 @@ export function restoreLost(): number {
       console.warn("[sync] couldn't restore a case", err);
     }
   }
-  for (const p of readLostPrecedents()) {
+  for (const p of kept.precedents) {
     try {
       precedentStore().save(p); // a fresh `updated` too
       restored++;
@@ -592,12 +578,13 @@ function takeServer(b: ApiBody, dirty: boolean): boolean {
   const anyLost = lost.length + lostCases.length + lostPrecedents.length > 0;
   if (anyLost) {
     // Add to anything not yet restored; a newer copy of the same item replaces the older one.
+    const kept = readLostDoc();
     const ids = new Set(lost.map((c) => c.id));
-    const all = [...readLost().filter((c) => !ids.has(c.id)), ...lost];
+    const all = [...kept.characters.filter((c) => !ids.has(c.id)), ...lost];
     const caseIds = new Set(lostCases.map((c) => c.id));
-    const allCases = [...readLostCases().filter((c) => !caseIds.has(c.id)), ...lostCases];
+    const allCases = [...kept.cases.filter((c) => !caseIds.has(c.id)), ...lostCases];
     const precedentIds = new Set(lostPrecedents.map((p) => p.id));
-    const allPrecedents = [...readLostPrecedents().filter((p) => !precedentIds.has(p.id)), ...lostPrecedents];
+    const allPrecedents = [...kept.precedents.filter((p) => !precedentIds.has(p.id)), ...lostPrecedents];
     lsSet(
       LOST_KEY,
       JSON.stringify({ at: new Date().toISOString(), characters: all, cases: allCases, precedents: allPrecedents }),
@@ -805,10 +792,10 @@ export function init(): Promise<void> {
     () => document.removeEventListener("visibilitychange", onVisible),
     () => window.removeEventListener("online", onOnline),
   ];
-  const lost = readLost().length;
-  const lostCases = readLostCases().length;
-  const lostPrecedents = readLostPrecedents().length;
-  if (lost || lostCases || lostPrecedents) setLost(lost, lostCases, lostPrecedents);
+  const kept = readLostDoc();
+  if (kept.characters.length || kept.cases.length || kept.precedents.length) {
+    setLost(kept.characters.length, kept.cases.length, kept.precedents.length);
+  }
   initPromise = (async () => {
     if (code()) {
       set("loading", "Loading from the server…");
