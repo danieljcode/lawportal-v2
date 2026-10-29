@@ -9,6 +9,8 @@
 // casual abuse, and the overall cap on new codes is what keeps sync storage
 // from filling up (with the 7-day cleanup in syncStore.ts).
 
+import { NO_STORE } from "./http";
+
 /** Requests from one key within a sliding window. */
 export class Limiter {
   private hits = new Map<string, number[]>();
@@ -79,10 +81,7 @@ export function clientIp(req: Request): string {
 export const TOO_MANY_CODES = "Too many new sync codes. Try again later.";
 
 export function tooMany(error: string, seconds: number): Response {
-  return Response.json(
-    { error },
-    { status: 429, headers: { "Cache-Control": "no-store", "Retry-After": String(seconds) } },
-  );
+  return Response.json({ error }, { status: 429, headers: { ...NO_STORE, "Retry-After": String(seconds) } });
 }
 
 /** Counts a POST /api/account, or returns the 429 when this IP or the server has made too many codes. */

@@ -5,6 +5,8 @@
 // That blocks DNS-rebinding pages, which would otherwise reach 127.0.0.1
 // same-origin under their own hostname.
 
+import { json } from "./http";
+
 const LOCAL_HOST = /^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/i;
 
 export const HOST_REFUSED =
@@ -22,5 +24,5 @@ export function checkHost(req: Request): Response | null {
     }
   }
   if (LOCAL_HOST.test(host)) return null;
-  return Response.json({ error: HOST_REFUSED }, { status: 421, headers: { "Cache-Control": "no-store" } });
+  return json({ error: HOST_REFUSED }, 421);
 }
