@@ -141,6 +141,12 @@ Playwright's image; on Windows and macOS they skip. To change the approved scree
 3. `npm run screenshots:accept` (needs the GitHub CLI, `gh`) copies them from the branch's latest
    failed run into `e2e/screenshots/`; pass a run id to pick another run. Commit them.
 
+**Nothing private is pictured (LP-168).** The approved screenshots are public, but the court forms
+and penal code aren't (LP-165), so `visual.spec.ts` masks the form list and the Law Library's
+chapters and charges (`PRIVATE`). Mask anything new that shows them. The README's screenshots
+(`npm run screenshots`) are taken on the sample data: `APP_DATA=sample npm run build`, then
+`npm start`.
+
 ## Playwright scripts
 
 These drive a real browser against a running app, so they aren't part of `npm test`. They need

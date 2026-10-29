@@ -6,6 +6,10 @@
 // dark, with one character and one case, to .agents/screenshots/<shot>-<theme>.png.
 //
 // Usage: node scripts/screenshots.mjs [baseUrl]   (default http://127.0.0.1:3000)
+//
+// For the README, run the app on the sample data (APP_DATA=sample npm run build) so no private form
+// or charge is pictured (LP-168).
+import { readFileSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -16,11 +20,16 @@ const outDir = path.join(root, ".agents", "screenshots");
 const base = (process.argv[2] || process.env.BASE_URL || "http://127.0.0.1:3000").replace(/\/+$/, "");
 const channel = process.env.PLAYWRIGHT_CHANNEL || undefined;
 
+/** The first civil form in the data the app was built with (the real complaint, or the sample's). */
+const FORM = JSON.parse(readFileSync(path.join(root, "src/data/form-index.json"), "utf8")).find((f) =>
+  f.id.startsWith("civil-"),
+).id;
+
 const SHOTS = [
   { name: "home", hash: "" },
-  { name: "form", hash: "#filings/civil-complaint", form: true },
+  { name: "form", hash: "#filings/" + FORM, form: true },
   { name: "settings", hash: "#control" },
-  { name: "discord", hash: "#filings/civil-complaint", form: true, click: "#tab-discord" },
+  { name: "discord", hash: "#filings/" + FORM, form: true, click: "#tab-discord" },
   { name: "classic-home", hash: "", classic: true },
 ];
 
