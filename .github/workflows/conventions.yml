@@ -6,6 +6,10 @@ on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
 
+# Read-only: it only reads the commits and the title (LP-166).
+permissions:
+  contents: read
+
 jobs:
   commit-format:
     runs-on: ubuntu-latest
