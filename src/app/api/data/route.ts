@@ -6,43 +6,39 @@ import { readCapped } from "@/lib/server/body";
 import { limitLookup, lookupFailed } from "@/lib/server/rateLimit";
 import { codeHash, read, write, type SyncRecord } from "@/lib/server/syncStore";
 import { errCode, isJson, json } from "@/lib/server/http";
+import { MAX_CASES } from "@/lib/cases";
+import { MAX_CHARACTERS } from "@/lib/characters";
+import { MAX_PRECEDENTS } from "@/lib/precedents";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 // Under Vercel's 4.5 MB request body limit and Upstash's 10 MB request limit (LP-138).
 const MAX_BODY = 4_000_000;
-const MAX_CHARACTERS = 200;
-const MAX_CASES = 2000;
-const MAX_FILINGS = 500;
-const MAX_CONFLICT_CHECKS = 500;
-const MAX_PRECEDENTS = 1000;
+
+/** Each synced list and how many items it may hold. Only `characters` is required. */
+const LISTS = {
+  characters: MAX_CHARACTERS,
+  cases: MAX_CASES,
+  // Above the client's caps (150 filings, 300 checks), so a copy from a device that kept more still syncs.
+  filings: 500,
+  conflictChecks: 500,
+  precedents: MAX_PRECEDENTS,
+};
 
 const isObject = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && !Array.isArray(v);
 
-/** `{rev, data:{characters, cases?}}`: an integer rev ≥ 0, at most 200 character objects and 2,000 case objects (LP-4), else null. */
+/** `{rev, data:{characters, …}}`: an integer rev ≥ 0 and each list (LISTS) an array of at most its limit of objects, else null. */
 function parseDoc(body: unknown): { rev: number; data: SyncRecord["data"] } | null {
   if (!isObject(body)) return null;
   const { rev, data } = body;
   if (typeof rev !== "number" || !Number.isInteger(rev) || rev < 0) return null;
   if (!isObject(data) || !Array.isArray(data.characters)) return null;
-  if (data.characters.length > MAX_CHARACTERS || !data.characters.every(isObject)) return null;
-  if (data.cases !== undefined && (!Array.isArray(data.cases) || data.cases.length > MAX_CASES || !data.cases.every(isObject)))
-    return null;
-  if (
-    data.filings !== undefined &&
-    (!Array.isArray(data.filings) || data.filings.length > MAX_FILINGS || !data.filings.every(isObject))
-  )
-    return null;
-  const checks = data.conflictChecks;
-  if (checks !== undefined && (!Array.isArray(checks) || checks.length > MAX_CONFLICT_CHECKS || !checks.every(isObject)))
-    return null;
-  const precedents = data.precedents;
-  if (
-    precedents !== undefined &&
-    (!Array.isArray(precedents) || precedents.length > MAX_PRECEDENTS || !precedents.every(isObject))
-  )
-    return null;
+  for (const [key, max] of Object.entries(LISTS)) {
+    const list = data[key];
+    if (list === undefined) continue;
+    if (!Array.isArray(list) || list.length > max || !list.every(isObject)) return null;
+  }
   return { rev, data: data as SyncRecord["data"] };
 }
 
