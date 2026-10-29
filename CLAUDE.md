@@ -36,6 +36,9 @@ Routes are prefixed by program (`src/shell/useRoute.ts`); an empty hash is home.
 
 Home is `src/shell/ModernHome.tsx` in Modern and `src/shell/ProgramManager.tsx` in Classic.
 
+Unfinished work can merge behind a feature flag (`src/lib/flags.ts`, on with `?flags=<name>`; docs/development.md).
+Flagged work is done only when its feature ships and the flag, with every check of it, is deleted.
+
 ## Themes
 
 - `html[data-look]` (`modern` or `classic`) and `html[data-theme]` (`light`, `dark`, or absent for system) are

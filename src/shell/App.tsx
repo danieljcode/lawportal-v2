@@ -36,7 +36,7 @@ import MenuBar, { type Menu, type MenuItem } from "./MenuBar";
 import ModernFrame from "./ModernFrame";
 import ModernHome from "./ModernHome";
 import ProgramManager from "./ProgramManager";
-import { PROGRAMS, programFor, titleIn } from "./registry";
+import { PROGRAMS, programFor, shown, titleIn } from "./registry";
 import type { Shell } from "./program";
 import Taskbar from "./Taskbar";
 import { S_SET_ASIDE, S_SET_ASIDE_HINT } from "@/lib/strings";
@@ -267,14 +267,14 @@ export default function App() {
 
   // The jump box's entries (LP-128): the programs the character can see (back to where each was
   // left), their sections, then every court form.
-  const visiblePrograms = PROGRAMS.filter((p) => p.visible({ commissioner }));
+  const visiblePrograms = PROGRAMS.filter((p) => shown(p, { commissioner }));
 
   // Once the browser is idle, fetch the code of every program this character can open, so opening
   // one is instant (LP-122). A failed fetch is retried when the program is opened.
   useEffect(() => {
     const idle = window.requestIdleCallback ?? ((f: () => void) => window.setTimeout(f, 200));
     const id = idle(() => {
-      for (const p of PROGRAMS) if (p.visible({ commissioner })) p.load().catch(() => {});
+      for (const p of PROGRAMS) if (shown(p, { commissioner })) p.load().catch(() => {});
     });
     return () => (window.cancelIdleCallback ?? window.clearTimeout)(id);
   }, [commissioner]);

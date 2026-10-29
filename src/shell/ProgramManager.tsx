@@ -6,7 +6,7 @@
 // come later (LP-28).
 
 import type { KeyboardEvent, ReactNode } from "react";
-import { GROUPS, PROGRAMS, titleIn, type ProgramDef, type ProgramGroup } from "./registry";
+import { GROUPS, PROGRAMS, shown, titleIn, type ProgramDef, type ProgramGroup } from "./registry";
 
 export interface ProgramManagerProps {
   commissioner: boolean;
@@ -71,7 +71,7 @@ export default function ProgramManager({
 
   const groups: Array<[ProgramGroup, ReactNode[]]> = (Object.keys(GROUPS) as ProgramGroup[]).map((g) => [
     g,
-    PROGRAMS.filter((p) => p.group === g && p.visible({ commissioner })).map((p) => {
+    PROGRAMS.filter((p) => p.group === g && shown(p, { commissioner })).map((p) => {
       const due = p.id === "cases" && casesDue > 0;
       return (
         <li key={p.id}>
