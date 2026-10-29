@@ -1,5 +1,5 @@
-// The firm this copy is set up for (LP-22): one place for its name, logo,
-// colours and wallpaper, so another firm could be set up when it's hosted.
+// The firm this copy is set up for (LP-22): one place for its name, logo
+// and colours, so another firm could be set up when it's hosted.
 // The app's own chrome reads it (window and tab titles, the toolbar, the boot
 // screen, the favicon, Help → About). Court forms and the forum preview never
 // do: anything posted to the forum must look official, not firm-branded.
@@ -14,13 +14,11 @@ export interface Branding {
   /** A square image for the favicon and About box (a path under public/ or a data: URL); null until one exists. */
   logo: string | null;
   colours: {
-    /** Title bars and the favicon tile. */
+    /** Title bars, the favicon tile and the Classic desktop (LP-24, set in globals.css). */
     primary: string;
     /** The favicon's scales. */
     accent: string;
   };
-  /** The desktop wallpaper (LP-24); null until one exists. */
-  wallpaper: string | null;
 }
 
 export const BRANDING: Branding = {
@@ -29,7 +27,6 @@ export const BRANDING: Branding = {
   productName: "Court Filing System",
   logo: null,
   colours: { primary: "#000080", accent: "#ffff00" },
-  wallpaper: null,
 };
 
 /** "Friedman & Associates: Court Filing System": the window title and the browser tab. */

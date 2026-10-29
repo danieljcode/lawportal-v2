@@ -25,7 +25,6 @@ const OTHER: Branding = {
   productName: "Case System",
   logo: null,
   colours: { primary: "#800000", accent: "#ffffff" },
-  wallpaper: null,
 };
 
 describe("the branding config", () => {
