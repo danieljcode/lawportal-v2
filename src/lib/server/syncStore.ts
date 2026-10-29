@@ -12,7 +12,8 @@ import { createHash, randomBytes } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { generateCode } from "./code";
-import { redisConfigured, redisCreate, redisRead, redisRemove, redisWrite } from "./syncRedis";
+import { CODES_PER_HOUR } from "./rateLimit";
+import { redisConfigured, redisCreate, redisRead, redisRemove, redisWrite, secondsToNextHour } from "./syncRedis";
 
 export interface SyncRecord {
   rev: number;
@@ -137,9 +138,13 @@ export async function sweepUnused(now = Date.now()): Promise<number> {
   return left;
 }
 
-/** A new sync code with an empty record, or "full" when the directory holds MAX_FILES records. */
-export async function create(): Promise<{ code: string } | "full"> {
-  if (redisConfigured()) return createRedis();
+/**
+ * A new sync code with an empty record, or "full" when the directory holds MAX_FILES records. On
+ * Redis, `{ retryAfter }` (seconds) when the server or `ip` has made too many codes this hour; the
+ * file store leaves that to the in-memory limits in rateLimit.ts.
+ */
+export async function create(ip = "unknown"): Promise<{ code: string } | "full" | { retryAfter: number }> {
+  if (redisConfigured()) return createRedis(ip);
   const dir = syncDir();
   await fs.mkdir(dir, { recursive: true });
   const existing = await sweepUnused();
@@ -157,11 +162,17 @@ export async function create(): Promise<{ code: string } | "full"> {
   }
 }
 
-async function createRedis(): Promise<{ code: string } | "full"> {
+async function createRedis(ip: string): Promise<{ code: string } | "full" | { retryAfter: number }> {
   const record: SyncRecord = { rev: 0, updated: new Date().toISOString(), data: { characters: [] } };
+  // Hashed so no IP is stored in clear.
+  const ipHash = createHash("sha256").update(ip).digest("hex");
   for (let attempt = 1; ; attempt++) {
     const code = generateCode();
-    const result = await redisCreate(codeHash(code), record, MAX_FILES, UNUSED_TTL_MS);
+    const result = await redisCreate(codeHash(code), record, MAX_FILES, UNUSED_TTL_MS, ipHash, {
+      overall: CODES_PER_HOUR,
+      perIp: CODES_PER_HOUR,
+    });
+    if (result === "limited") return { retryAfter: secondsToNextHour() };
     if (result === "full") return "full";
     if (result === "ok") return { code };
     if (attempt >= 3) throw Object.assign(new Error("Sync code collision"), { code: "EEXIST" });

@@ -6,10 +6,14 @@
 // runs atomically on the server and no in-process lock is needed. A code that
 // was never written expires after UNUSED_TTL_MS; the sorted set lp:sync:index
 // counts live codes for MAX_FILES, scored by expiry time (+inf once written).
+// New codes are counted per clock hour in lp:sync:created:<hour> and
+// lp:sync:created:ip:<sha256 of IP>:<hour>, so every instance shares the limits (LP-137).
 import type { SyncRecord, WriteResult } from "./syncStore";
 
 const PREFIX = "lp:sync:";
 const INDEX = PREFIX + "index";
+const CREATED = PREFIX + "created:";
+const HOUR = 60 * 60 * 1000;
 
 /** Vercel's Upstash integration sets KV_REST_API_*; a direct Upstash database gives UPSTASH_REDIS_REST_*. */
 function config(): { url: string; token: string } | null {
@@ -39,25 +43,50 @@ const evalScript = (script: string, keys: string[], args: (string | number)[]) =
   command(["EVAL", script, keys.length, ...keys, ...args]);
 
 const CREATE = `
+if tonumber(redis.call('GET', KEYS[3]) or 0) >= tonumber(ARGV[8])
+  or tonumber(redis.call('GET', KEYS[4]) or 0) >= tonumber(ARGV[9]) then
+  return 'limited'
+end
 redis.call('ZREMRANGEBYSCORE', KEYS[1], '-inf', ARGV[1])
 if redis.call('ZCARD', KEYS[1]) >= tonumber(ARGV[2]) then return 'full' end
 if redis.call('EXISTS', KEYS[2]) == 1 then return 'taken' end
 redis.call('HSET', KEYS[2], 'rev', 0, 'updated', ARGV[4], 'data', ARGV[5])
 redis.call('PEXPIRE', KEYS[2], ARGV[3])
 redis.call('ZADD', KEYS[1], ARGV[6], ARGV[7])
+for i = 3, 4 do
+  redis.call('INCR', KEYS[i])
+  redis.call('PEXPIRE', KEYS[i], ARGV[10])
+end
 return 'ok'`;
 
-/** "ok", "taken" (hash already in use) or "full". */
+/** New codes allowed per clock hour: across the server, and from one IP. */
+export interface HourlyLimits {
+  overall: number;
+  perIp: number;
+}
+
+/**
+ * "ok", "taken" (hash already in use), "full", or "limited" when the server or this IP
+ * (`ipHash`) has made its `limits` of codes this clock hour.
+ */
 export async function redisCreate(
   hash: string,
   record: SyncRecord,
   maxCodes: number,
   ttlMs: number,
+  ipHash: string,
+  limits: HourlyLimits,
   now = Date.now(),
-): Promise<"ok" | "taken" | "full"> {
-  const args = [now, maxCodes, ttlMs, record.updated, JSON.stringify(record.data), now + ttlMs, hash];
-  return (await evalScript(CREATE, [INDEX, PREFIX + hash], args)) as "ok" | "taken" | "full";
+): Promise<"ok" | "taken" | "full" | "limited"> {
+  const bucket = Math.floor(now / HOUR);
+  const keys = [INDEX, PREFIX + hash, `${CREATED}${bucket}`, `${CREATED}ip:${ipHash}:${bucket}`];
+  const data = JSON.stringify(record.data);
+  const args = [now, maxCodes, ttlMs, record.updated, data, now + ttlMs, hash, limits.overall, limits.perIp, HOUR];
+  return (await evalScript(CREATE, keys, args)) as "ok" | "taken" | "full" | "limited";
 }
+
+/** Seconds until the clock hour that `now` is in ends, for Retry-After. */
+export const secondsToNextHour = (now = Date.now()): number => Math.max(1, Math.ceil((HOUR - (now % HOUR)) / 1000));
 
 export async function redisRead(hash: string): Promise<SyncRecord | null> {
   const [rev, updated, data] = (await command(["HMGET", PREFIX + hash, "rev", "updated", "data"])) as (string | null)[];
