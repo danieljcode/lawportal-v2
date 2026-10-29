@@ -142,7 +142,7 @@ Add a `FormDef` to `src/data/extra-forms.ts`:
 }
 ```
 
-Use FreestyleRP court names. Then run `npm test`: the template-safety, engine, BBCode, Discord and
+Use our court names. Then run `npm test`: the template-safety, engine, BBCode, Discord and
 `.docx` suites cover every form, and the Discord snapshots will need updating
 (`npx vitest run -u tests/discord.test.ts`) and reviewing.
 
@@ -155,7 +155,7 @@ Use FreestyleRP court names. Then run `npm test`: the template-safety, engine, B
 - **The case-number shape:** 2-digit in-game year + courthouse + division + number, for example
   `90SCCR00147`. Division codes (`CR`, `CC`, `TC`, `SM`) are in `DIVISION_CODES` in `dockets.ts`.
 
-FreestyleRP has no official court details yet, so these are generic. To change them, edit
+There are no official court details yet, so these are generic. To change them, edit
 `courts.ts` and **re-run `npm run port-forms`**, because the court forms have them written in.
 
 ## Regenerating the court forms
@@ -169,7 +169,7 @@ writes `src/data/forms.json`:
 
 1. Parses the forms as JSON (never evaluates them) and checks there are 39 with the right fields.
 2. Unwraps links to the old forum hosts; the link text stays (`scripts/scrub-links.mjs`).
-3. Applies FreestyleRP wording (`scripts/freestyle-wording.mjs`): court names and phrases (for
+3. Applies our court wording (`scripts/court-wording.mjs`): court names and phrases (for
    example "Superior Court of the State of San Andreas" → "San Andreas Court"), and the reference
    forms' courthouses and case-number code → the values in `courts.ts`.
 4. Works out each form's required fields (`scripts/required-fields.mjs`, see

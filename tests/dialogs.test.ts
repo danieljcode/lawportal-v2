@@ -172,7 +172,7 @@ describe("Characters dialog", () => {
     click("#menu-file");
     click("#menu-characters");
     const input = must<HTMLInputElement>("#restore-file");
-    const old = JSON.stringify({ characters: [{ id: "oldone01", name: "Old Export", server: "gtaw" }] });
+    const old = JSON.stringify({ characters: [{ id: "oldone01", name: "Old Export", server: "other" }] });
     Object.defineProperty(input, "files", { configurable: true, value: [new File([old], "lawapp-characters.json")] });
     await act(async () => {
       input.dispatchEvent(new Event("change", { bubbles: true }));

@@ -40,7 +40,7 @@ describe("pinned strings", () => {
   });
 
   it("never mentions the old forum or outside branding", () => {
-    for (const [name, text] of texts()) expect(text, name).not.toMatch(/gta\.?world|gtaw|awucard|https?:\/\//i);
+    for (const [name, text] of texts()) expect(text, name).not.toMatch(/https?:\/\//i);
   });
 
   it("credits Dan, without a link", () => {

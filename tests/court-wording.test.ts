@@ -1,16 +1,16 @@
-// FreestyleRP wording baked into the forms by port-forms (LP-69): court names,
-// court phrases and courthouses, and no GTAW wording left in the form data.
+// Our court wording baked into the forms by port-forms (LP-69): court names,
+// court phrases and courthouses, and none of the reference forms' wording left in the form data.
 import { describe, expect, it } from "vitest";
 import { ALL_FORMS } from "@/data";
 import { COURTS } from "@/data/form-index";
 import { APPELLATE_COURT, DIVISION_COURTS, GENERAL_COURT, SUPREME_COURT } from "@/lib/courts";
 import { compile, render } from "@/lib/template";
-import { COURT_NAMES, toFreestyle } from "../scripts/freestyle-wording.mjs";
+import { COURT_NAMES, toCourtWording } from "../scripts/court-wording.mjs";
 
-const html = (h: string) => toFreestyle({ id: "x", court: "Miscellaneous", section: "", title: "", html: h }).html;
+const html = (h: string) => toCourtWording({ id: "x", court: "Miscellaneous", section: "", title: "", html: h }).html;
 
 describe("court names", () => {
-  it("maps every reference court to its FreestyleRP name from courts.ts", () => {
+  it("maps every reference court to our name for it from courts.ts", () => {
     expect(COURT_NAMES).toEqual({
       "Superior Court of San Andreas - Criminal Division": "San Andreas Criminal Court",
       "Superior Court of San Andreas - Civil Division": "San Andreas Civil Court",
@@ -23,12 +23,12 @@ describe("court names", () => {
   });
 
   it("leaves a court it doesn't know unchanged", () => {
-    expect(toFreestyle({ id: "x", court: "Additional Templates", section: "", title: "", html: "" }).court).toBe(
+    expect(toCourtWording({ id: "x", court: "Additional Templates", section: "", title: "", html: "" }).court).toBe(
       "Additional Templates",
     );
   });
 
-  it("the forms' courts are all FreestyleRP names", () => {
+  it("the forms' courts are all our names", () => {
     const allowed = new Set([
       ...Object.values(DIVISION_COURTS),
       APPELLATE_COURT,
@@ -103,13 +103,16 @@ describe("courthouses (from courts.ts)", () => {
 });
 
 describe("the forms as shipped", () => {
-  it.each(ALL_FORMS.map((f) => [f.id, f.html]))("%s has no GTAW court or courthouse wording", (_id, h) => {
-    expect(h).not.toMatch(/JOPLIN|SHROEDER|VINCENT|(?:YY|##|--|\d\d)GJ/i);
-    expect(h).not.toMatch(/SUPERIOR(?:&nbsp;|\s)+COURT OF (?:THE STATE OF )?SAN ANDREAS/i);
-    expect(h).not.toMatch(/(?:APPELLATE|SUPREME) COURT OF SAN ANDREAS/i);
-  });
+  it.each(ALL_FORMS.map((f) => [f.id, f.html]))(
+    "%s has no court or courthouse wording from the reference forms",
+    (_id, h) => {
+      expect(h).not.toMatch(/JOPLIN|SHROEDER|VINCENT|(?:YY|##|--|\d\d)GJ/i);
+      expect(h).not.toMatch(/SUPERIOR(?:&nbsp;|\s)+COURT OF (?:THE STATE OF )?SAN ANDREAS/i);
+      expect(h).not.toMatch(/(?:APPELLATE|SUPREME) COURT OF SAN ANDREAS/i);
+    },
+  );
 
-  it("renders FreestyleRP wording with no translation step", () => {
+  it("renders our court wording with no translation step", () => {
     const out = render(compile(ALL_FORMS.find((f) => f.id === "criminal-arraignment")!.html), {});
     expect(out).toContain("SAN ANDREAS COURT");
     expect(out).not.toMatch(/SUPERIOR\s*(?:&nbsp;)?COURT OF/i);

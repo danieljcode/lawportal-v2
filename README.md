@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/danieljcode/lawportal-v2/actions/workflows/ci.yml/badge.svg)](https://github.com/danieljcode/lawportal-v2/actions/workflows/ci.yml)
 
-A web app for writing San Andreas court filings on the **FreestyleRP** roleplay server, growing into
+A web app for writing San Andreas court filings on a roleplay server, growing into
 the office system of the in-game law firm **Friedman & Associates**. Pick a court form, fill it in,
 and copy the finished filing straight into the forum editor (as formatted text or BBCode), into
 Discord, or download it as a Word `.docx`. Alongside the forms are the firm's own tools: a Case File
@@ -11,7 +11,7 @@ code and the firm's precedents.
 
 It's for Daniel, his friends and the firm's members. It's hosted on Vercel, and it also runs on your
 own computer. The firm's name and colours come from one file, `src/branding.ts`; **court forms never carry
-firm branding**, so anything posted to the forum looks official. FreestyleRP is set in 1990, so every
+firm branding**, so anything posted to the forum looks official. The game is set in 1990, so every
 date the app fills in is 36 years before today's real date.
 
 > These are roleplay court forms, not legal documents. Always check a filing before posting it.
@@ -69,7 +69,7 @@ app with sync switched off, so they never touch real sync data. See
 | `npm run format`             | Formats every file with Prettier.                                                             |
 | `npm run format:check`       | Checks formatting without changing anything.                                                  |
 | `npm run port-forms`         | Regenerates `src/data/forms.json` from the reference data (needs access to its private repo). |
-| `npm run penal-code`         | Updates `src/data/penal-code.json` from the FreestyleRP penal code sheet.                     |
+| `npm run penal-code`         | Updates `src/data/penal-code.json` from the server's penal code sheet.                        |
 | `npm run screenshots`        | Takes screenshots of the running app into `.agents/screenshots/`.                             |
 | `npm run screenshots:accept` | Takes the new approved screenshots from the branch's last failed CI run (`docs/testing.md`).  |
 | `npm run smoke:preview`      | Checks every form's preview in a browser against the running app.                             |
@@ -89,7 +89,7 @@ in, your searches and where you'd scrolled to are still there when you come back
 
 ![The home screen: a tile for each program, and what needs your attention](docs/screenshots/home-light.png)
 
-- **Court Filings.** 39 FreestyleRP court forms grouped by court (Criminal, Civil, Traffic, Small
+- **Court Filings.** 39 court forms grouped by court (Criminal, Civil, Traffic, Small
   Claims, Appellate, Supreme, general), plus 13 of the firm's own templates: General Petition,
   Petition for Name Change, General Motion, Interrogatories, Subpoena, Service Agreement, four firm
   letters (Engagement, Retainer, Demand, Representation) and three for judges (Ruling on Motion,
@@ -110,7 +110,7 @@ in, your searches and where you'd scrolled to are still there when you come back
 - **Clients.** **New client intake** opens a case from one form and prints a client sheet; the
   **Conflict check** looks for a name on either side of every firm case, gives a clear verdict and a
   memo, and keeps a log.
-- **Law Library.** The FreestyleRP **penal code**, browsed by chapter or by title and searched by
+- **Law Library.** The server's **penal code**, browsed by chapter or by title and searched by
   section number, keyword or title, with each charge's class, sentence and fine. The firm's
   **precedents**: rulings with the court, judge, key holding, summary, forum link and topics. Copy a
   citation ("PC 1001 Assault") or insert it into a form.
@@ -177,7 +177,7 @@ budget only on purpose, in the same pull request as the change that needs it.
 
 ## Contributing
 
-Work is planned in Jira, project **LP**: [freestylelawportal.atlassian.net](https://freestylelawportal.atlassian.net/jira/software/projects/LP/boards/1).
+Work is planned in a private Jira project, **LP**.
 
 - **One issue at a time,** from the top of the board, on its own branch named after it:
   `LP-64-merge-sync-conflicts`.
@@ -198,9 +198,9 @@ publishes the GitHub Release), release the Jira version, then check What's new m
 
 ## Roadmap
 
-Releases are tracked in [Jira](https://freestylelawportal.atlassian.net/projects/LP?selectedItem=com.atlassian.jira.jira-projects-plugin%3Arelease-page).
+Releases are tracked in Jira versions.
 
-- **v0.2, Stable & FreestyleRP** (released 19 Oct 2026): tested, FreestyleRP only, nothing lost.
+- **v0.2, Stable & focused** (released 19 Oct 2026): tested, one server only, nothing lost.
 - **v0.3, Firm tools** (in progress): the Case File, deadlines, intake, conflict checks, evidence,
   the Law Library and the firm's branding, and the app split into programs.
 - **v0.4, Office tools:** a Rolodex, Help, Find, the Ledger, and sturdier storage and export.

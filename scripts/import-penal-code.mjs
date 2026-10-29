@@ -1,4 +1,4 @@
-// Import the FreestyleRP penal code (LP-17) into src/data/penal-code.json, the
+// Import the penal code (LP-17) into src/data/penal-code.json, the
 // one data file the Law Library reads. Run it when the server changes laws:
 //
 //   npm run penal-code                 fetch the "Penal Code" tab of the sheet
@@ -117,7 +117,7 @@ async function main() {
   }
   const data = {
     title: "State of San Andreas Penal Code",
-    note: "Revised draft: subject to change until FreestyleRP staff sign it off.",
+    note: "Revised draft: subject to change until the server's staff sign it off.",
     source: SHEET,
     updated: new Date().toISOString().slice(0, 10),
     charges,

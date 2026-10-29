@@ -59,15 +59,15 @@ export function AboutContent() {
         Licensed to <strong>{BRANDING.firmName}</strong>
       </p>
       <p className="small">
-        Court filings for the FreestyleRP server: forms, the firm&apos;s cases and evidence, and the Law Library.
-        Filings posted to the forum carry no firm branding.
+        Court filings for a roleplay server: forms, the firm&apos;s cases and evidence, and the Law Library. Filings
+        posted to the forum carry no firm branding.
       </p>
       <hr />
       <ul className="small about-credits" id="about-credits">
         <li>{S_CREDIT} All rights reserved.</li>
         <li>Court forms: adapted from third-party templates (see LICENSE).</li>
         {/* Not read from the penal code, so its 115 KB loads with the Law Library only (LP-122). */}
-        <li>State of San Andreas Penal Code: FreestyleRP.</li>
+        <li>State of San Andreas Penal Code: the server&apos;s own.</li>
       </ul>
     </>
   );

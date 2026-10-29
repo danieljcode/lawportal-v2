@@ -21,7 +21,7 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
-      # Tidy what release-please writes (scripts/tidy-changelog.mjs: repeats dropped, Jira keys linked):
+      # Tidy what release-please writes (scripts/tidy-changelog.mjs: repeats dropped):
       # in the Release PR's CHANGELOG.md, folded into its one commit (release-please replaces it on its
       # next run anyway)…
       - name: Check out the Release PR

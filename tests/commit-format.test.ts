@@ -16,7 +16,7 @@ describe("checkHeader", () => {
       "fix(sync): merge conflicts per character [LP-64]",
       "fix(data): set aside unreadable saved data [LP-65]",
       "ci(forms): fetch reference data for parity tests [LP-66]",
-      "feat(forms): build case numbers from one FreestyleRP courthouse [LP-68]",
+      "feat(forms): build case numbers from one courthouse [LP-68]",
       "refactor(core): remove the server profiles and toggle [LP-70]",
       "docs(docs): add developer documentation in docs/ [LP-83]",
       EXAMPLE,

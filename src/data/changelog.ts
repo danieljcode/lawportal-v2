@@ -308,7 +308,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "new",
-        text: "The Law Library now has the FreestyleRP penal code: every charge with its class, sentence, fine and description, and when the code was last updated. It's the revised draft, so it may still change.",
+        text: "The Law Library now has the server's penal code: every charge with its class, sentence, fine and description, and when the code was last updated. It's the revised draft, so it may still change.",
       },
       {
         type: "new",
@@ -570,22 +570,22 @@ export const CHANGELOG: ChangelogEntry[] = [
       },
     ],
   },
-  { date: "2026-10-19", title: "Stable & FreestyleRP", version: "0.2.0", items: [
-    { type: "update", text: "The app is now just for FreestyleRP: FreestyleRP court names in every form, the Superior Court in case numbers (for example 90SCCR00XXX), in-game 1990 dates throughout, and no more Server switch." },
+  { date: "2026-10-19", title: "Stable & focused", version: "0.2.0", items: [
+    { type: "update", text: "The app now serves one server: its court names in every form, the Superior Court in case numbers (for example 90SCCR00XXX), in-game 1990 dates throughout, and no more Server switch." },
     { type: "fix", text: "When two devices change things before syncing, your unsent edits are no longer lost: the newest copy of each character wins, and your version is kept so you can use Restore my version." },
     { type: "fix", text: "Saved data that can't be read is set aside instead of deleted, and Download damaged data in the Characters dialog gives you a copy to fix by hand." },
     { type: "new", text: "What's new shows which version of the app you're using." },
   ]},
-  { date: "2026-10-16", title: "FreestyleRP only", items: [
-    { type: "update", text: "The app is now just for FreestyleRP: the Server switch is gone from the toolbar and from characters, and every form uses the in-game year (1990)." },
-    { type: "fix", text: "J.A.P. case-number examples now use the Superior Court format (XXSCCR00000) instead of the old GTAW one." },
+  { date: "2026-10-16", title: "One server", items: [
+    { type: "update", text: "The app now serves one server: the Server switch is gone from the toolbar and from characters, and every form uses the in-game year (1990)." },
+    { type: "fix", text: "J.A.P. case-number examples now use the Superior Court format (XXSCCR00000) instead of the old one." },
   ]},
-  { date: "2026-10-16", title: "FreestyleRP forms", items: [
-    { type: "update", text: "Every court form is now written in FreestyleRP's court names, so what you see in the editor is exactly what gets posted." },
+  { date: "2026-10-16", title: "Court wording", items: [
+    { type: "update", text: "Every court form is now written in the server's court names, so what you see in the editor is exactly what gets posted." },
     { type: "update", text: "The Courthouse box offers Superior Court, and the Greg E. Joplin courthouse is gone from every form." },
   ]},
-  { date: "2026-10-16", title: "FreestyleRP case numbers", items: [
-    { type: "update", text: "Case numbers now name the Superior Court, for example 90SCCR00XXX, instead of the old GTAW courthouses. Case numbers already on your dockets stay as they were filed." },
+  { date: "2026-10-16", title: "Case numbers", items: [
+    { type: "update", text: "Case numbers now name the Superior Court, for example 90SCCR00XXX, instead of the old courthouses. Case numbers already on your dockets stay as they were filed." },
     { type: "update", text: "Loading a case from a docket fills in Superior Court as the courthouse." },
   ]},
   { date: "2026-10-16", title: "Version number", items: [
@@ -599,7 +599,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     { type: "new", text: "If another device's newer copy replaces one of your edits, your version is kept and the sync panel offers Restore my version." },
   ]},
   { date: "2026-10-08", title: "Case-number placeholders", items: [
-    { type: "new", text: "Case number inputs now start empty and show the server-aware pattern as a greyed-out placeholder; GTAW keeps GJ, FreestyleRP drops it." },
+    { type: "new", text: "Case number inputs now start empty and show the server-aware pattern as a greyed-out placeholder." },
     { type: "update", text: "Leaving a case number blank still renders the correct pattern in all outputs (forum preview, BBCode, Discord, .docx)." },
   ]},
   { date: "2026-10-07", title: "Discord output", items: [

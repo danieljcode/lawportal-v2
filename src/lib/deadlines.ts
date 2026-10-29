@@ -7,7 +7,7 @@
 // due within 48 hours (or overdue). Pure: no storage.
 
 import type { Entry, Values } from "./types";
-import { gameTime, YEAR_OFFSET } from "./freestyle";
+import { gameTime, YEAR_OFFSET } from "./gameTime";
 import { isId, ISO_DATE_RE, newId, text, uniqueById } from "./storage";
 import type { Case, Deadline } from "./types";
 

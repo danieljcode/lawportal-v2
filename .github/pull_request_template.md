@@ -1,4 +1,4 @@
-Jira: [LP-n](https://freestylelawportal.atlassian.net/browse/LP-n)
+Jira: LP-n
 
 <!-- Title: <type>(<area>): <summary> [LP-<n>], e.g. fix(sync): merge conflicts per character [LP-64] -->
 
