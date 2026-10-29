@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+# Read-only: it tests and builds, and writes nothing back to the repository (LP-166).
+permissions:
+  contents: read
+
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
