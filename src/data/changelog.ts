@@ -29,6 +29,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "fix",
         text: "New client intake empties itself once Open case has made the case, so pressing Open case again, or coming back to the intake later, no longer makes a second case for the same client.",
       },
+      {
+        type: "fix",
+        text: "Case notes stop at 4,000 characters as you type, with a count once you're close, instead of losing the end when you save. The intake summary stops at 3,000, so all of it reaches the new case's notes.",
+      },
     ],
   },
   {

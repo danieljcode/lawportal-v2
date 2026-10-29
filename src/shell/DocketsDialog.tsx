@@ -4,7 +4,7 @@
 import { useState, type FormEvent } from "react";
 import { COURTS } from "@/data/form-index";
 import { characterStore } from "@/lib/characters";
-import { docketStore, FIELDS, STATUSES } from "@/lib/dockets";
+import { docketStore, FIELDS, MAX_TEXT, STATUSES } from "@/lib/dockets";
 import { formatDate } from "@/lib/template";
 import type { Docket } from "@/lib/types";
 import Dialog from "@/ui/Dialog";
@@ -211,7 +211,13 @@ function DocketsBody({ charId, canUse, onUse, onClose }: DocketsDialogProps & { 
                   );
                 } else if (f.multiline) {
                   input = (
-                    <textarea id={fid} rows={3} value={value} onChange={(e) => setField(f.key, e.target.value)} />
+                    <textarea
+                      id={fid}
+                      rows={3}
+                      maxLength={MAX_TEXT}
+                      value={value}
+                      onChange={(e) => setField(f.key, e.target.value)}
+                    />
                   );
                 } else {
                   input = (
@@ -222,6 +228,7 @@ function DocketsBody({ charId, canUse, onUse, onClose }: DocketsDialogProps & { 
                       aria-required={f.required || undefined}
                       aria-describedby={describedBy}
                       list={f.key === "court" ? "court-names" : undefined}
+                      maxLength={MAX_TEXT}
                       value={value}
                       onChange={(e) => setField(f.key, e.target.value)}
                     />

@@ -24,6 +24,10 @@ export const MATTERS: readonly Matter[] = [
   { label: "Other", court: GENERAL_COURT, side: "plaintiff" },
 ];
 
+// The summary and the details above it in the case notes must fit the case's MAX_TEXT (LP-151).
+export const MAX_SUMMARY = 3000;
+export const MAX_DETAIL = 100;
+
 export const SOURCES = ["Referral", "Forum", "Word of mouth", "Returning client", "Walk-in", "Other"] as const;
 export const URGENCIES = ["Routine", "Soon", "Urgent"] as const;
 
