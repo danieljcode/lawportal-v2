@@ -1,14 +1,20 @@
 // The Ledger program (LP-32): billable time logged against Case File cases, with
 // a form to log or edit an entry, filters by case, character and date range,
-// and the filtered total. Behind the `ledger` flag.
+// and the filtered total. Each entry is worth its hours at the case's rate, else
+// the character's own. A timer logs an entry when it stops.
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { caseStore } from "@/lib/cases";
 import { formatDay, gameToday } from "@/lib/deadlines";
 import {
   ACTIVITIES,
   ACTIVITY_LABELS,
+  entryValue,
   filterEntries,
+  formatMoney,
+  parseRate,
+  timerMinutes,
+  timerStore,
   timeStore,
   totalHours,
   type Activity,
@@ -18,7 +24,7 @@ import {
 import type { Case } from "@/lib/types";
 import ErrorBoundary from "@/ui/ErrorBoundary";
 import GameDateInput from "@/ui/GameDateInput";
-import { useCaseVersion, useTimeVersion } from "@/ui/useStore";
+import { useCaseVersion, useTimerVersion, useTimeVersion } from "@/ui/useStore";
 import type { ProgramProps } from "@/shell/program";
 
 /** "90SCCR00147 Smith v. Jones". */
@@ -138,6 +144,150 @@ function EntryForm({
   );
 }
 
+/** "1 h 05 min" for 65 minutes. */
+const elapsedText = (min: number) =>
+  (min >= 60 ? Math.floor(min / 60) + " h " + String(min % 60).padStart(2, "0") : min) + " min";
+
+/** Start timing a case, or the running timer with Stop and log. */
+function TimerPanel({
+  cases,
+  characters,
+  start,
+  nameOf,
+}: {
+  cases: readonly Case[];
+  characters: ProgramProps["shell"]["characters"];
+  start: { caseId: string; character: string };
+  nameOf(id: string): string;
+}) {
+  const version = useTimerVersion();
+  const running = useMemo(() => (version >= 0 ? timerStore().get() : null), [version]);
+  const [pick, setPick] = useState(start);
+  const [error, setError] = useState("");
+  // Tick the elapsed time while it runs.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!running) return;
+    const id = setInterval(() => setNow(Date.now()), 15_000);
+    return () => clearInterval(id);
+  }, [running]);
+
+  if (running) {
+    const c = cases.find((x) => x.id === running.caseId);
+    return (
+      <div className="row ledger-timer" id="timer">
+        <span id="timer-status">
+          {"Timing " + (c ? c.caseNumber : "a deleted case") + " for " + nameOf(running.character) + ": "}
+          <strong>{elapsedText(timerMinutes(running, now))}</strong>
+        </span>
+        <button
+          type="button"
+          className="btn primary"
+          id="timer-stop"
+          onClick={() => {
+            try {
+              timerStore().stop(gameToday());
+            } catch (err) {
+              setError(err instanceof Error ? err.message : String(err));
+            }
+          }}
+        >
+          Stop and log
+        </button>
+        <button
+          type="button"
+          className="btn"
+          id="timer-discard"
+          onClick={() => confirm("Discard this timer without logging its time?") && timerStore().discard()}
+        >
+          Discard
+        </button>
+        <span className="error" role="alert">
+          {error}
+        </span>
+      </div>
+    );
+  }
+  const begin = () => {
+    if (!pick.caseId || !pick.character) {
+      setError("Pick a case and a character to time.");
+      return;
+    }
+    setError("");
+    timerStore().start({ ...pick, activity: "research" });
+  };
+  return (
+    <div className="row ledger-timer" id="timer">
+      <select
+        id="timer-case"
+        aria-label="Case to time"
+        value={pick.caseId}
+        onChange={(e) => setPick({ ...pick, caseId: e.target.value })}
+      >
+        <option value="">Case to time…</option>
+        {cases.map((c) => (
+          <option key={c.id} value={c.id}>
+            {caseLabel(c)}
+          </option>
+        ))}
+      </select>
+      <select
+        id="timer-character"
+        aria-label="Character to time"
+        value={pick.character}
+        onChange={(e) => setPick({ ...pick, character: e.target.value })}
+      >
+        <option value="">Character…</option>
+        {characters.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name}
+          </option>
+        ))}
+      </select>
+      <button type="button" className="btn" id="timer-start" onClick={begin}>
+        Start timer
+      </button>
+      <span className="error" role="alert" id="timer-error">
+        {error}
+      </span>
+    </div>
+  );
+}
+
+/** The case's own hourly rate, over each character's; blank to use theirs. */
+function CaseRate({ c }: { c: Case }) {
+  const [value, setValue] = useState(c.rate ? String(c.rate) : "");
+  const [error, setError] = useState("");
+  const save = (ev: FormEvent) => {
+    ev.preventDefault();
+    const rate = parseRate(value);
+    if (value.trim() && rate === null) {
+      setError("Give a rate in dollars, e.g. 150.");
+      return;
+    }
+    setError("");
+    caseStore().save({ ...c, rate: rate ?? undefined });
+  };
+  return (
+    <form className="row ledger-rate" id="case-rate-form" noValidate onSubmit={save}>
+      <label htmlFor="case-rate">Hourly rate on {c.caseNumber} ($)</label>
+      <input
+        id="case-rate"
+        inputMode="decimal"
+        placeholder="Each character's own"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />
+      <button type="submit" className="btn" id="case-rate-save">
+        Set rate
+      </button>
+      <span className="error" role="alert" id="case-rate-error">
+        {error}
+      </span>
+    </form>
+  );
+}
+
 function LedgerView({ shell }: ProgramProps) {
   const version = useTimeVersion();
   const all = useMemo(() => (version >= 0 ? timeStore().list() : []), [version]);
@@ -148,8 +298,14 @@ function LedgerView({ shell }: ProgramProps) {
   );
   const caseById = useMemo(() => new Map(cases.map((c) => [c.id, c])), [cases]);
   const nameOf = (id: string) => shell.characters.find((c) => c.id === id)?.name || "Deleted character";
+  /** What an entry is worth: its hours at the case's rate, else the character's; null with neither. */
+  const valueOf = (e: TimeEntry) =>
+    entryValue(e, caseById.get(e.caseId)?.rate ?? parseRate(shell.characters.find((c) => c.id === e.character)?.rate));
   const [filter, setFilter] = useState<TimeFilter>({});
   const shown = useMemo(() => filterEntries(all, filter), [all, filter]);
+  const values = shown.map(valueOf);
+  const unpriced = values.filter((v) => v === null).length;
+  const filteredCase = filter.caseId ? caseById.get(filter.caseId) : undefined;
   /** The entry being edited, "new" for the log form, or null. */
   const [editing, setEditing] = useState<TimeEntry | "new" | null>(null);
   const setF = (k: keyof TimeFilter) => (v: string) => setFilter({ ...filter, [k]: v || undefined });
@@ -182,6 +338,14 @@ function LedgerView({ shell }: ProgramProps) {
         <p className="small" id="ledger-no-characters">
           Time is logged by one of your characters. Add one in the Characters dialog first.
         </p>
+      )}
+      {cases.length > 0 && shell.characters.length > 0 && (
+        <TimerPanel
+          cases={cases}
+          characters={shell.characters}
+          start={{ caseId: filter.caseId || "", character: filter.character || shell.active?.id || "" }}
+          nameOf={nameOf}
+        />
       )}
       {editing && (
         <EntryForm
@@ -230,7 +394,11 @@ function LedgerView({ shell }: ProgramProps) {
             {shown.length === all.length
               ? " in " + all.length + (all.length === 1 ? " entry" : " entries")
               : " in " + shown.length + " of " + all.length + " entries"}
+            {", worth "}
+            <strong>{formatMoney(values.reduce<number>((n, v) => n + (v ?? 0), 0))}</strong>
+            {unpriced > 0 && " (" + unpriced + " with no rate)"}
           </p>
+          {filteredCase && <CaseRate key={filteredCase.id + (filteredCase.rate ?? "")} c={filteredCase} />}
           {shown.length > 0 && (
             <div className="ledger-scroll">
               <table className="ledger-table" id="ledger-list">
@@ -243,6 +411,9 @@ function LedgerView({ shell }: ProgramProps) {
                     <th scope="col" className="num">
                       Hours
                     </th>
+                    <th scope="col" className="num">
+                      Value
+                    </th>
                     <th scope="col">Note</th>
                     <th scope="col">
                       <span className="sr-only">Actions</span>
@@ -250,7 +421,7 @@ function LedgerView({ shell }: ProgramProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {shown.map((e) => {
+                  {shown.map((e, i) => {
                     const c = caseById.get(e.caseId);
                     return (
                       <tr key={e.id}>
@@ -259,6 +430,7 @@ function LedgerView({ shell }: ProgramProps) {
                         <td>{nameOf(e.character)}</td>
                         <td>{ACTIVITY_LABELS[e.activity]}</td>
                         <td className="num">{e.hours.toFixed(1)}</td>
+                        <td className="num">{values[i] === null ? "—" : formatMoney(values[i]!)}</td>
                         <td>{e.note}</td>
                         <td className="ledger-actions">
                           <button type="button" className="mini" onClick={() => setEditing(e)}>

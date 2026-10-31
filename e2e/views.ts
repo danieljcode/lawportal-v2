@@ -33,6 +33,7 @@ export const VIEWS = [
   ["cases", "/#cases"],
   ["clients", "/#clients/intake"],
   ["library", "/#library/penal-code"],
+  ["ledger", "/#ledger"],
   ["jap", "/#jap"],
   ["settings", "/#control"],
 ] as const;

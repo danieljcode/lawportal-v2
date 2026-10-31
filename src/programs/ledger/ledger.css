@@ -38,6 +38,25 @@
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
+.ledger-timer {
+  align-items: center;
+  margin: 4px 0 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--shadow);
+  background: var(--field);
+  color: var(--text);
+}
+.ledger-timer select {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+.ledger-rate {
+  align-items: center;
+  margin: 4px 0 6px;
+}
+.ledger-rate input {
+  width: 10em;
+}
 .ledger-actions {
   white-space: nowrap;
 }

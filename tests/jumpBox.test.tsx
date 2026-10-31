@@ -137,6 +137,7 @@ describe("the jump box (LP-128)", () => {
       "Case File",
       "Clients",
       "Law Library",
+      "Ledger",
       "Settings",
       "All cases",
       "Upcoming",

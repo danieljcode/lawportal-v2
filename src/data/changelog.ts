@@ -19,7 +19,7 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-31",
-    title: "Rolodex",
+    title: "Rolodex and Ledger",
     items: [
       {
         type: "new",
@@ -32,6 +32,18 @@ export const CHANGELOG: ChangelogEntry[] = [
       {
         type: "new",
         text: "Party names in a filing have Pick from Rolodex, which fills in the name, and the address and phone where the form asks for them.",
+      },
+      {
+        type: "new",
+        text: "The Ledger: log the time each character spends on a case, by date and activity, with a note. Filter it by case, character and dates to see the hours and what they're worth.",
+      },
+      {
+        type: "new",
+        text: "Give each character an hourly rate in the Characters dialog, or set one rate for a whole case in the Ledger. Each entry shows its value.",
+      },
+      {
+        type: "new",
+        text: "Start a timer on a case in the Ledger; Stop and log saves the time it ran.",
       },
     ],
   },

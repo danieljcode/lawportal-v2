@@ -88,7 +88,7 @@ describe("the modern shell (LP-125)", () => {
     expect(title()).toBe("Home");
     expect(must("#home")).toBeTruthy();
     expect(document.querySelector("#program-manager")).toBeNull();
-    expect(railNames()).toEqual(["Home", "Court Filings", "Case File", "Clients", "Law Library", "Settings"]);
+    expect(railNames()).toEqual(["Home", "Court Filings", "Case File", "Clients", "Law Library", "Ledger", "Settings"]);
     expect(must("#rail-home").getAttribute("aria-current")).toBe("page");
   });
 

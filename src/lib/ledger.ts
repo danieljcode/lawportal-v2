@@ -49,6 +49,27 @@ export function parseHours(v: unknown): number | null {
   return tenths >= 0.1 && tenths <= MAX_HOURS ? tenths : null;
 }
 
+/** Most an hourly rate can be, in dollars. */
+export const MAX_RATE = 100_000;
+
+/** A rate as typed ("150", "$1,200.5") → dollars to the cent, or null when it isn't one from 0.01 to MAX_RATE. */
+export function parseRate(v: unknown): number | null {
+  const n = typeof v === "number" ? v : typeof v === "string" && v.trim() ? Number(v.replace(/[$,s]/g, "")) : NaN;
+  if (!Number.isFinite(n)) return null;
+  const cents = Math.round(n * 100) / 100;
+  return cents >= 0.01 && cents <= MAX_RATE ? cents : null;
+}
+
+/** An entry's worth at an hourly rate, to the cent; null without a rate. */
+export function entryValue(e: Pick<TimeEntry, "hours">, rate: number | null): number | null {
+  return rate === null ? null : Math.round(e.hours * rate * 100) / 100;
+}
+
+/** "$1,234.50". */
+export function formatMoney(n: number): string {
+  return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 /** Normalise an untrusted entry (form, sync, backup); null without a case, character, date or hours. */
 export function cleanEntry(input: unknown, now: string = new Date().toISOString()): TimeEntry | null {
   if (!input || typeof input !== "object") return null;
@@ -160,4 +181,96 @@ let instance: TimeStore | null = null;
 export function timeStore(): TimeStore {
   if (!instance) instance = createTimeStore(defaultKV());
   return instance;
+}
+
+/* ------------------------------------------------------------ timer */
+
+export const TIMER_KEY = "lawapp_timer";
+
+/** A running timer: whose time on which case, and when it started (real time). */
+export interface Timer {
+  caseId: string;
+  character: string;
+  activity: Activity;
+  /** Real time, ISO. */
+  started: string;
+}
+
+function cleanTimer(raw: unknown): Timer | null {
+  if (!raw || typeof raw !== "object") return null;
+  const o = raw as Record<string, unknown>;
+  if (!isId(o.caseId) || !isId(o.character) || typeof o.started !== "string" || !ISO_TIME_RE.test(o.started)) {
+    return null;
+  }
+  return {
+    caseId: o.caseId,
+    character: o.character,
+    activity: isActivity(o.activity) ? o.activity : "research",
+    started: o.started,
+  };
+}
+
+/** Whole minutes since the timer started (0 if its clock is ahead). */
+export function timerMinutes(t: Pick<Timer, "started">, now: number = Date.now()): number {
+  return Math.max(0, Math.floor((now - Date.parse(t.started)) / 60_000));
+}
+
+/** The hours a timer logs: to a tenth, at least 0.1, at most MAX_HOURS. */
+export function timerHours(t: Pick<Timer, "started">, now: number = Date.now()): number {
+  return Math.min(MAX_HOURS, Math.max(0.1, Math.round(timerMinutes(t, now) / 6) / 10));
+}
+
+export interface TimerStore {
+  /** The running timer, or null. */
+  get(): Timer | null;
+  /** Start timing (replaces a running timer). */
+  start(t: Omit<Timer, "started">): void;
+  /** Stop: log its time on game date `date` and return the entry. */
+  stop(date: string): TimeEntry;
+  /** Stop without logging. */
+  discard(): void;
+  subscribe(fn: () => void): () => void;
+  version(): number;
+}
+
+/** One timer per browser: it doesn't sync (the entry it logs does). */
+export function createTimerStore(kv: KV, times: TimeStore): TimerStore {
+  const store = createStore<Timer | null>(kv, {
+    key: TIMER_KEY,
+    version: 1,
+    validate: cleanTimer,
+    isEmpty: (t) => t === null,
+  });
+  return {
+    get: () => store.get(),
+    start(t) {
+      store.set(cleanTimer({ ...t, started: new Date().toISOString() }));
+    },
+    stop(date) {
+      const t = store.get();
+      if (!t) throw new Error("No timer is running.");
+      const entry = times.save({
+        caseId: t.caseId,
+        character: t.character,
+        activity: t.activity,
+        date,
+        hours: timerHours(t),
+      });
+      store.set(null);
+      return entry;
+    },
+    discard() {
+      store.set(null);
+    },
+    subscribe: store.subscribe,
+    version: store.version,
+  };
+}
+
+let timer: TimerStore | null = null;
+
+/** This browser's Ledger timer (created on first use; client only). */
+export function timerStore(): TimerStore {
+  if (!timer) timer = createTimerStore(defaultKV(), timeStore());
+  return timer;
 }
