@@ -107,6 +107,16 @@ export const PROGRAMS: readonly ProgramDef[] = [
     ...lazyProgram(() => import("@/programs/library")),
   },
   {
+    id: "ledger",
+    title: "Ledger",
+    icon: "$",
+    group: "main",
+    start: "#ledger",
+    visible: everyone,
+    flag: "ledger",
+    ...lazyProgram(() => import("@/programs/ledger")),
+  },
+  {
     id: "jap",
     title: "J.A.P.",
     icon: "★",

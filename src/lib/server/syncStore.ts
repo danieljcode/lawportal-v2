@@ -27,6 +27,7 @@ export interface SyncRecord {
     conflictChecks?: unknown[];
     precedents?: unknown[];
     contacts?: unknown[];
+    time?: unknown[];
   };
 }
 

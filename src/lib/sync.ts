@@ -10,8 +10,8 @@
 // updatedAt wins, and the J.A.P. goes with its character. Since LP-4 the firm's
 // cases sync alongside, merged one case at a time by their own `updated`; a
 // copy from before LP-4 (dockets inside each character) is read as cases. The
-// filing history (LP-15) and the conflict check log (LP-10) sync the same way,
-// one entry at a time. This
+// filing history (LP-15), the conflict check log (LP-10) and the Ledger's time
+// entries (LP-32) sync the same way, one entry at a time. This
 // browser's versions that lose are kept under lawapp_sync_lost so the user can
 // restore them.
 //
@@ -22,6 +22,7 @@ import { characterStore } from "./characters";
 import { cleanContact, contactStore, type Contact } from "./contacts";
 import { cleanCheck, conflictLog, type ConflictCheck } from "./conflicts";
 import { cleanFiling, filingStore, type Filing } from "./filings";
+import { cleanEntry, timeStore, type TimeEntry } from "./ledger";
 import { cleanPrecedent, precedentStore, type Precedent } from "./precedents";
 import { docketStore } from "./dockets";
 import { portfolioStore } from "./portfolio";
@@ -87,6 +88,8 @@ export interface SyncDoc {
   precedents?: Precedent[];
   /** The Rolodex (LP-30); absent in copies from before it. */
   contacts?: Contact[];
+  /** The Ledger's time entries (LP-32); absent in copies from before it. */
+  time?: TimeEntry[];
 }
 
 interface ApiBody {
@@ -237,6 +240,7 @@ export function snapshot(): SyncDoc {
     conflictChecks: conflictLog().list(),
     precedents: precedentStore().list(),
     contacts: contactStore().list(),
+    time: timeStore().list(),
   };
 }
 
@@ -247,7 +251,8 @@ function listOf<T>(doc: unknown, key: string, clean: (x: unknown) => T | null): 
   return raw.map((x) => clean(x)).filter((x): x is T => !!x);
 }
 
-/** Null for a copy from before LP-30, LP-16, LP-10 and LP-15 respectively. */
+/** Null for a copy from before LP-32, LP-30, LP-16, LP-10 and LP-15 respectively. */
+const timeOf = (doc: unknown) => listOf<TimeEntry>(doc, "time", cleanEntry);
 const contactsOf = (doc: unknown) => listOf<Contact>(doc, "contacts", cleanContact);
 const precedentsOf = (doc: unknown) => listOf<Precedent>(doc, "precedents", cleanPrecedent);
 const checksOf = (doc: unknown) => listOf<ConflictCheck>(doc, "conflictChecks", cleanCheck);
@@ -311,6 +316,8 @@ function apply(doc: unknown): number {
     if (precedents) precedentStore().replaceAll(precedents);
     const contacts = contactsOf(doc);
     if (contacts) contactStore().replaceAll(contacts);
+    const time = timeOf(doc);
+    if (time) timeStore().replaceAll(time);
   } finally {
     applying = false;
   }
@@ -331,6 +338,8 @@ export function merge(serverDoc: unknown): SyncDoc {
   const havePrecedent = new Set(serverPrecedents.map((p) => p.id));
   const serverContacts = contactsOf(serverDoc) || [];
   const haveContact = new Set(serverContacts.map((c) => c.id));
+  const serverTime = timeOf(serverDoc) || [];
+  const haveTime = new Set(serverTime.map((e) => e.id));
   const out: SyncDoc = {
     characters: list.slice(),
     cases: unifyCases(casesOf(serverDoc), casesOf(local)),
@@ -338,6 +347,7 @@ export function merge(serverDoc: unknown): SyncDoc {
     conflictChecks: [...serverChecks, ...(local.conflictChecks || []).filter((c) => !haveCheck.has(c.id))],
     precedents: [...serverPrecedents, ...(local.precedents || []).filter((p) => !havePrecedent.has(p.id))],
     contacts: [...serverContacts, ...(local.contacts || []).filter((c) => !haveContact.has(c.id))],
+    time: [...serverTime, ...(local.time || []).filter((e) => !haveTime.has(e.id))],
   };
   const have = new Set(out.characters.map((c) => c.id));
   for (const c of local.characters) if (!have.has(c.id)) out.characters.push(c);
@@ -375,6 +385,7 @@ function saveBase(doc: unknown): void {
   for (const c of checksOf(doc) || []) o["conflict:" + c.id] = c.at;
   for (const p of precedentsOf(doc) || []) o["precedent:" + p.id] = p.updated;
   for (const c of contactsOf(doc) || []) o["contact:" + c.id] = c.updated;
+  for (const e of timeOf(doc) || []) o["time:" + e.id] = e.updated;
   lsSet(BASE_KEY, JSON.stringify(o));
 }
 
@@ -426,6 +437,8 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
   );
   // Contacts (LP-30): the same, by each contact's `updated`.
   const contacts = mergeOptional(contactsOf(serverDoc), contactStore().list(), base, "contact:", (c) => c.updated);
+  // Time entries (LP-32): by `updated`, and like filings a losing edit isn't kept.
+  const time = mergeOptional(timeOf(serverDoc), timeStore().list(), base, "time:", (e) => e.updated);
   return {
     // Two devices can make the same case number separately: they become one case.
     doc: {
@@ -435,6 +448,7 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
       conflictChecks: checks.out,
       precedents: precedents.out,
       contacts: contacts.out,
+      time: time.out,
     },
     lost: chars.lost,
     lostCases: cases.lost,
@@ -446,7 +460,8 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
       filings.keptLocal ||
       checks.keptLocal ||
       precedents.keptLocal ||
-      contacts.keptLocal,
+      contacts.keptLocal ||
+      time.keptLocal,
   };
 }
 
@@ -817,6 +832,7 @@ export function init(): Promise<void> {
     conflictLog().subscribe(changed),
     precedentStore().subscribe(changed),
     contactStore().subscribe(changed),
+    timeStore().subscribe(changed),
     portfolioStore().subscribe(changed),
   ];
   const onVisible = () => {

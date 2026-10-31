@@ -44,6 +44,7 @@ describe("program stylesheets (LP-110)", () => {
       "cases.css",
       "clients.css",
       "filings.css",
+      "ledger.css",
       "library.css",
     ]);
   });

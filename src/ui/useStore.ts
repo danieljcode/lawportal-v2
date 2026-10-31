@@ -9,6 +9,7 @@ import { caseStore } from "@/lib/cases";
 import { characterStore } from "@/lib/characters";
 import { conflictLog } from "@/lib/conflicts";
 import { contactStore } from "@/lib/contacts";
+import { timeStore } from "@/lib/ledger";
 import { precedentStore } from "@/lib/precedents";
 import { filingStore } from "@/lib/filings";
 import { docketStore } from "@/lib/dockets";
@@ -60,6 +61,8 @@ export const usePrecedentVersion = versionHook(precedentStore);
 export const useLetterheadVersion = versionHook(letterheadStore);
 /** Bumps on every change to the Rolodex (LP-30). */
 export const useContactVersion = versionHook(contactStore);
+/** Bumps on every change to the Ledger's time entries (LP-32). */
+export const useTimeVersion = versionHook(timeStore);
 
 /** Counts values set aside as unreadable since the page loaded (0: none). */
 export function useSetAsideVersion(): number {

@@ -1,0 +1,46 @@
+/* The Ledger (LP-32). Variables only (tests/stylesheets.test.ts). */
+.ledger-head {
+  justify-content: space-between;
+  align-items: center;
+}
+.ledger-form {
+  margin: 6px 0 10px;
+}
+.ledger-filters select {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+/* The table scrolls sideways on a phone instead of squeezing the columns. */
+.ledger-scroll {
+  overflow-x: auto;
+  margin: 6px 0;
+}
+.ledger-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--field);
+  color: var(--text);
+}
+.ledger-table th,
+.ledger-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--shadow);
+  text-align: left;
+  vertical-align: top;
+}
+.ledger-table th {
+  white-space: nowrap;
+}
+.ledger-table td:first-child {
+  white-space: nowrap;
+}
+.ledger-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.ledger-actions {
+  white-space: nowrap;
+}
+.ledger-actions .mini + .mini {
+  margin-left: 4px;
+}

@@ -50,7 +50,7 @@ describe("lazy programs (LP-122)", () => {
     expect(document.querySelector(".booting")).toBeNull();
   });
 
-  it("fetches the programs this character can open once the browser is idle, not the J.A.P.", async () => {
+  it("fetches the programs this character can open once the browser is idle, not the J.A.P. or a flagged one", async () => {
     let idle: () => void = () => {};
     vi.stubGlobal("requestIdleCallback", (f: () => void) => ((idle = f), 1));
     const { PROGRAMS } = await mountApp("", false);
@@ -58,7 +58,7 @@ describe("lazy programs (LP-122)", () => {
     expect(loads.every((l) => l.mock.calls.length === 0)).toBe(true);
     idle();
     expect(PROGRAMS.filter((_, i) => loads[i].mock.calls.length).map((p) => p.id)).toEqual(
-      PROGRAMS.filter((p) => p.id !== "jap").map((p) => p.id),
+      PROGRAMS.filter((p) => p.id !== "jap" && !p.flag).map((p) => p.id),
     );
   });
 });

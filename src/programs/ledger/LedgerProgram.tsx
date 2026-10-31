@@ -1,0 +1,294 @@
+// The Ledger program (LP-32): billable time logged against Case File cases, with
+// a form to log or edit an entry, filters by case, character and date range,
+// and the filtered total. Behind the `ledger` flag.
+
+import { useMemo, useState, type FormEvent } from "react";
+import { caseStore } from "@/lib/cases";
+import { formatDay, gameToday } from "@/lib/deadlines";
+import {
+  ACTIVITIES,
+  ACTIVITY_LABELS,
+  filterEntries,
+  timeStore,
+  totalHours,
+  type Activity,
+  type TimeEntry,
+  type TimeFilter,
+} from "@/lib/ledger";
+import type { Case } from "@/lib/types";
+import ErrorBoundary from "@/ui/ErrorBoundary";
+import GameDateInput from "@/ui/GameDateInput";
+import { useCaseVersion, useTimeVersion } from "@/ui/useStore";
+import type { ProgramProps } from "@/shell/program";
+
+/** "90SCCR00147 Smith v. Jones". */
+const caseLabel = (c: Case) => [c.caseNumber, [c.plaintiff, c.defendant].filter(Boolean).join(" v. ")].join(" ").trim();
+
+const hoursText = (h: number) => h.toFixed(1) + (h === 1 ? " hour" : " hours");
+
+interface Draft {
+  caseId: string;
+  character: string;
+  date: string;
+  hours: string;
+  activity: Activity;
+  note: string;
+}
+
+/** Log or edit one entry. */
+function EntryForm({
+  editing,
+  cases,
+  characters,
+  start,
+  onDone,
+}: {
+  editing: TimeEntry | null;
+  cases: readonly Case[];
+  characters: ProgramProps["shell"]["characters"];
+  /** A new entry's case and character. */
+  start: Pick<Draft, "caseId" | "character">;
+  onDone(): void;
+}) {
+  const [draft, setDraft] = useState<Draft>(() =>
+    editing
+      ? { ...editing, hours: String(editing.hours), note: editing.note || "" }
+      : { ...start, date: gameToday(), hours: "", activity: "research", note: "" },
+  );
+  const [error, setError] = useState("");
+  const set = (k: keyof Draft) => (e: { target: { value: string } }) => setDraft({ ...draft, [k]: e.target.value });
+
+  const submit = (ev: FormEvent) => {
+    ev.preventDefault();
+    try {
+      timeStore().save({ ...(editing ? { id: editing.id } : {}), ...draft, hours: Number(draft.hours) });
+      onDone();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
+  return (
+    <form className="case-form ledger-form" id="time-form" noValidate onSubmit={submit}>
+      <h4>{editing ? "Edit time" : "Log time"}</h4>
+      <div className="case-fields">
+        <div className="field">
+          <label htmlFor="time-case">Case</label>
+          <select id="time-case" value={draft.caseId} onChange={set("caseId")}>
+            <option value="">Pick a case…</option>
+            {cases.map((c) => (
+              <option key={c.id} value={c.id}>
+                {caseLabel(c)}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="field">
+          <label htmlFor="time-character">Character</label>
+          <select id="time-character" value={draft.character} onChange={set("character")}>
+            <option value="">Pick a character…</option>
+            {characters.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="field">
+          <label htmlFor="time-date">Date</label>
+          <GameDateInput id="time-date" value={draft.date} onChange={(date) => setDraft({ ...draft, date })} />
+        </div>
+        <div className="field">
+          <label htmlFor="time-hours">Hours</label>
+          <input
+            id="time-hours"
+            inputMode="decimal"
+            placeholder="e.g. 1.5"
+            value={draft.hours}
+            onChange={set("hours")}
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="time-activity">Activity</label>
+          <select id="time-activity" value={draft.activity} onChange={set("activity")}>
+            {ACTIVITIES.map((a) => (
+              <option key={a} value={a}>
+                {ACTIVITY_LABELS[a]}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <div className="field wide">
+        <label htmlFor="time-note">Note</label>
+        <input id="time-note" value={draft.note} onChange={set("note")} />
+      </div>
+      <p className="error" role="alert" id="time-error">
+        {error}
+      </p>
+      <div className="row">
+        <button type="submit" className="btn primary" id="time-save">
+          {editing ? "Save time" : "Log time"}
+        </button>
+        <button type="button" className="btn" onClick={onDone}>
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function LedgerView({ shell }: ProgramProps) {
+  const version = useTimeVersion();
+  const all = useMemo(() => (version >= 0 ? timeStore().list() : []), [version]);
+  const caseVersion = useCaseVersion();
+  const cases = useMemo(
+    () => [...(caseVersion >= 0 ? caseStore().list() : [])].sort((a, b) => a.caseNumber.localeCompare(b.caseNumber)),
+    [caseVersion],
+  );
+  const caseById = useMemo(() => new Map(cases.map((c) => [c.id, c])), [cases]);
+  const nameOf = (id: string) => shell.characters.find((c) => c.id === id)?.name || "Deleted character";
+  const [filter, setFilter] = useState<TimeFilter>({});
+  const shown = useMemo(() => filterEntries(all, filter), [all, filter]);
+  /** The entry being edited, "new" for the log form, or null. */
+  const [editing, setEditing] = useState<TimeEntry | "new" | null>(null);
+  const setF = (k: keyof TimeFilter) => (v: string) => setFilter({ ...filter, [k]: v || undefined });
+
+  const remove = (e: TimeEntry) => {
+    if (confirm("Delete " + hoursText(e.hours) + " on " + formatDay(e.date) + "?")) timeStore().remove(e.id);
+  };
+
+  return (
+    <section id="ledger" className="form-view ledger">
+      <div className="form-head">
+        <div>
+          <h2 id="ledger-title">Ledger</h2>
+        </div>
+      </div>
+      <div className="row ledger-head">
+        <p className="small muted">Billable time, logged against the firm&apos;s cases.</p>
+        {!editing && cases.length > 0 && shell.characters.length > 0 && (
+          <button type="button" className="btn" id="time-new" onClick={() => setEditing("new")}>
+            Log time
+          </button>
+        )}
+      </div>
+      {!cases.length && (
+        <p className="small" id="ledger-no-cases">
+          Time is logged against a case. Open one in the <a href="#cases">Case File</a> first.
+        </p>
+      )}
+      {!shell.characters.length && (
+        <p className="small" id="ledger-no-characters">
+          Time is logged by one of your characters. Add one in the Characters dialog first.
+        </p>
+      )}
+      {editing && (
+        <EntryForm
+          key={editing === "new" ? "new" : editing.id}
+          editing={editing === "new" ? null : editing}
+          cases={cases}
+          characters={shell.characters}
+          start={{ caseId: filter.caseId || "", character: filter.character || shell.active?.id || "" }}
+          onDone={() => setEditing(null)}
+        />
+      )}
+      {all.length > 0 && (
+        <>
+          <div className="row ledger-filters">
+            <select
+              id="ledger-case"
+              aria-label="Case"
+              value={filter.caseId || ""}
+              onChange={(e) => setF("caseId")(e.target.value)}
+            >
+              <option value="">All cases</option>
+              {cases.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {caseLabel(c)}
+                </option>
+              ))}
+            </select>
+            <select
+              id="ledger-character"
+              aria-label="Character"
+              value={filter.character || ""}
+              onChange={(e) => setF("character")(e.target.value)}
+            >
+              <option value="">All characters</option>
+              {shell.characters.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+            <GameDateInput id="ledger-from" aria-label="From" value={filter.from || ""} onChange={setF("from")} />
+            <GameDateInput id="ledger-to" aria-label="To" value={filter.to || ""} onChange={setF("to")} />
+          </div>
+          <p className="small" id="ledger-total">
+            <strong>{hoursText(totalHours(shown))}</strong>
+            {shown.length === all.length
+              ? " in " + all.length + (all.length === 1 ? " entry" : " entries")
+              : " in " + shown.length + " of " + all.length + " entries"}
+          </p>
+          {shown.length > 0 && (
+            <div className="ledger-scroll">
+              <table className="ledger-table" id="ledger-list">
+                <thead>
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Case</th>
+                    <th scope="col">Character</th>
+                    <th scope="col">Activity</th>
+                    <th scope="col" className="num">
+                      Hours
+                    </th>
+                    <th scope="col">Note</th>
+                    <th scope="col">
+                      <span className="sr-only">Actions</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {shown.map((e) => {
+                    const c = caseById.get(e.caseId);
+                    return (
+                      <tr key={e.id}>
+                        <td>{formatDay(e.date)}</td>
+                        <td>{c ? <a href={"#cases/" + c.id}>{c.caseNumber}</a> : "Deleted case"}</td>
+                        <td>{nameOf(e.character)}</td>
+                        <td>{ACTIVITY_LABELS[e.activity]}</td>
+                        <td className="num">{e.hours.toFixed(1)}</td>
+                        <td>{e.note}</td>
+                        <td className="ledger-actions">
+                          <button type="button" className="mini" onClick={() => setEditing(e)}>
+                            Edit
+                          </button>
+                          <button type="button" className="mini danger-quiet" onClick={() => remove(e)}>
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
+      )}
+    </section>
+  );
+}
+
+export default function LedgerProgram(props: ProgramProps) {
+  return (
+    <div className="layout no-nav">
+      <main className="editor" id={props.shell.visible ? "editor" : undefined}>
+        <ErrorBoundary where="the Ledger" resetKey="ledger">
+          <LedgerView {...props} />
+        </ErrorBoundary>
+      </main>
+    </div>
+  );
+}
