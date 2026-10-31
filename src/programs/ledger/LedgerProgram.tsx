@@ -27,6 +27,7 @@ import GameDateInput from "@/ui/GameDateInput";
 import { useCaseVersion, useTimerVersion, useTimeVersion } from "@/ui/useStore";
 import type { ProgramProps } from "@/shell/program";
 import Invoices from "./Invoices";
+import Retainers from "./Retainers";
 
 /** "90SCCR00147 Smith v. Jones". */
 const caseLabel = (c: Case) => [c.caseNumber, [c.plaintiff, c.defendant].filter(Boolean).join(" v. ")].join(" ").trim();
@@ -452,6 +453,7 @@ function LedgerView({ shell }: ProgramProps) {
         </>
       )}
       <Invoices cases={cases} entries={all} filter={filter} rateOf={rateOf} nameOf={nameOf} />
+      <Retainers />
     </section>
   );
 }

@@ -1,15 +1,9 @@
 // The Ledger's invoices (LP-33): bill the filtered case's time as a numbered
-// invoice, then record payments and print, copy or download it. The sheet is
-// one render (invoiceHtml), shown here and used for every output.
+// invoice, then record payments and print, copy or download it (Sheet).
 
 import { useMemo, useState, type FormEvent } from "react";
-import { flushSync } from "react-dom";
-import { fromHtml } from "@/lib/bbcode";
-import { copyRich, copyText } from "@/lib/clipboard";
+import { contactsForCase, contactStore } from "@/lib/contacts";
 import { gameToday, formatDay } from "@/lib/deadlines";
-import { toDiscord } from "@/lib/discord";
-import { docxRequestBody } from "@/lib/docx/request";
-import { download } from "@/lib/download";
 import {
   invoiceBalance,
   invoiceDue,
@@ -25,51 +19,46 @@ import {
 } from "@/lib/invoices";
 import { filterEntries, formatMoney, type TimeEntry, type TimeFilter } from "@/lib/ledger";
 import { letterheadStore } from "@/lib/letterhead";
+import { retainerBalance, retainerStore } from "@/lib/retainers";
 import type { Case } from "@/lib/types";
 import GameDateInput from "@/ui/GameDateInput";
-import { useInvoiceVersion } from "@/ui/useStore";
+import { useContactVersion, useInvoiceVersion } from "@/ui/useStore";
+import Sheet from "./Sheet";
 
 /** One invoice: the sheet, its payments, and print, copy and download. */
 function InvoiceView({ inv, onClose }: { inv: Invoice; onClose(): void }) {
   const html = useMemo(() => invoiceHtml(inv, letterheadStore().get()), [inv]);
   const [status, setStatus] = useState<{ text: string; bad: boolean } | null>(null);
-  const [printing, setPrinting] = useState(false);
   const [date, setDate] = useState(gameToday);
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [method, setMethod] = useState<PaymentMethod>("cash");
   const say = (text: string, bad = false) => setStatus({ text, bad });
-
-  // The id exists only while the print dialog is open, so printing shows just the invoice.
-  const print = () => {
-    flushSync(() => setPrinting(true));
-    window.print();
-    setPrinting(false);
-  };
+  // From retainer (LP-93) draws on the case's client, as linked in its Contacts section.
+  const contactVersion = useContactVersion();
+  const client = useMemo(
+    () =>
+      contactVersion >= 0
+        ? contactsForCase(contactStore().list(), inv.caseId).find((l) => l.role === "client")?.contact
+        : undefined,
+    [contactVersion, inv.caseId],
+  );
+  const methods = PAYMENT_METHODS.filter((m) => m !== "retainer" || client);
 
   const pay = (ev: FormEvent) => {
     ev.preventDefault();
     try {
-      invoiceStore().addPayment(inv.id, { date, amount: Number(amount.replace(/[$,\s]/g, "")), method, note });
+      const value = Number(amount.replace(/[$,\s]/g, ""));
+      if (method === "retainer" && client) {
+        const left = retainerBalance(client.id, retainerStore().list(), invoiceStore().list());
+        if (value > left) throw new Error(client.name + "'s retainer has only " + formatMoney(left) + ".");
+      }
+      invoiceStore().addPayment(inv.id, { date, amount: value, method, contactId: client?.id, note });
       setAmount("");
       setNote("");
       say("Payment recorded.");
     } catch (err) {
       say(err instanceof Error ? err.message : String(err), true);
-    }
-  };
-
-  const docx = async () => {
-    try {
-      const res = await fetch("/api/docx", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: docxRequestBody(html, "Invoice " + inv.number, ""),
-      });
-      if (!res.ok) return say("Couldn't build the .docx (" + res.status + ").", true);
-      download(await res.blob(), "invoice-" + inv.number + ".docx");
-    } catch {
-      say("Couldn't build the .docx (server unreachable).", true);
     }
   };
 
@@ -82,50 +71,14 @@ function InvoiceView({ inv, onClose }: { inv: Invoice; onClose(): void }) {
 
   return (
     <div className="invoice" id="invoice">
-      <div className="row invoice-actions">
-        <button type="button" className="btn" id="invoice-print" onClick={print}>
-          Print
-        </button>
-        <button
-          type="button"
-          className="btn"
-          id="invoice-copy"
-          onClick={async () => {
-            const ok = await copyRich(html, fromHtml(html));
-            say(ok ? "Copied. Paste it into the forum editor." : "Copy failed.", !ok);
-          }}
-        >
-          Copy for forum
-        </button>
-        <button
-          type="button"
-          className="btn"
-          id="invoice-discord"
-          onClick={async () => {
-            const ok = await copyText(toDiscord(html));
-            say(ok ? "Copied for Discord." : "Copy failed.", !ok);
-          }}
-        >
-          Copy for Discord
-        </button>
-        <button type="button" className="btn" id="invoice-docx" onClick={() => void docx()}>
-          Download .docx
-        </button>
+      <Sheet html={html} title={"Invoice " + inv.number} filename={"invoice-" + inv.number} prefix="invoice">
         <button type="button" className="btn danger-quiet" id="invoice-delete" onClick={remove}>
           Delete
         </button>
         <button type="button" className="btn" id="invoice-close" onClick={onClose}>
           Close
         </button>
-      </div>
-      <p className={"small" + (status?.bad ? " bad" : " good")} role="status" id="invoice-status">
-        {status?.text || ""}
-      </p>
-      <div
-        className="invoice-sheet"
-        id={printing ? "invoice-print-sheet" : undefined}
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
+      </Sheet>
       <h4>Payments</h4>
       {inv.payments.length > 0 && (
         <ul className="invoice-payments" id="invoice-payments">
@@ -164,7 +117,7 @@ function InvoiceView({ inv, onClose }: { inv: Invoice; onClose(): void }) {
           value={method}
           onChange={(e) => setMethod(e.target.value as PaymentMethod)}
         >
-          {PAYMENT_METHODS.map((m) => (
+          {methods.map((m) => (
             <option key={m} value={m}>
               {METHOD_LABELS[m]}
             </option>
@@ -181,6 +134,9 @@ function InvoiceView({ inv, onClose }: { inv: Invoice; onClose(): void }) {
           Record payment
         </button>
       </form>
+      <p className={"small" + (status?.bad ? " bad" : " good")} role="status" id="payment-status">
+        {status?.text || ""}
+      </p>
     </div>
   );
 }

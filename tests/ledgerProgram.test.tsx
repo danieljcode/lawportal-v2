@@ -4,7 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { caseStore } from "@/lib/cases";
+import { contactStore } from "@/lib/contacts";
 import { invoiceStore } from "@/lib/invoices";
+import { retainerStore } from "@/lib/retainers";
 import { timerStore, timeStore } from "@/lib/ledger";
 import LedgerProgram from "@/programs/ledger";
 import type { ProgramProps } from "@/shell/program";
@@ -56,6 +58,8 @@ beforeEach(() => {
   timeStore().replaceAll([]);
   timerStore().discard();
   invoiceStore().replaceAll([]);
+  retainerStore().replaceAll([]);
+  contactStore().replaceAll([]);
   caseStore().replaceAll([]);
 });
 
@@ -159,5 +163,34 @@ describe("the Ledger page (LP-32)", () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
     click(must("#invoice-delete"));
     expect(invoiceStore().list()).toEqual([]);
+  });
+
+  it("keeps a client's retainer: deposit, pay an invoice from it, warn and write the top-up letter (LP-93)", () => {
+    caseStore().save({ id: "case0001", caseNumber: "90SCCR00147", lead: "alice001" });
+    const judy = contactStore().save({ name: "Judy Reyes", type: "client" });
+    contactStore().link(judy.id, "case0001", "client");
+    timeStore().save({ caseId: "case0001", character: "alice001", date: "1990-10-02", hours: 3, activity: "court" });
+    mount();
+
+    click(must("#retainer-list button"));
+    setValue("#deposit-amount", "500");
+    click(must("#deposit-add"));
+    expect(must("#retainer-title").textContent).toBe("Judy Reyes: $500.00");
+    setValue("#retainer-floor", "250");
+    click(must("#floor-save"));
+
+    setValue("#ledger-case", "case0001");
+    click(must("#invoice-new"));
+    setValue("#payment-method", "retainer");
+    setValue("#payment-amount", "900");
+    click(must("#payment-add"));
+    expect(must("#payment-status").textContent).toBe("Judy Reyes's retainer has only $500.00.");
+    setValue("#payment-amount", "300");
+    click(must("#payment-add"));
+    expect(must("#retainer-title").textContent).toBe("Judy Reyes: $200.00");
+    expect(must("#retainer-history").textContent).toContain("Invoice FA-1990-0001");
+
+    click(must("#topup-open"));
+    expect(must("#retainer .invoice-sheet").textContent).toContain("at least $50.00");
   });
 });

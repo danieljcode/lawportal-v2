@@ -29,6 +29,7 @@ export interface SyncRecord {
     contacts?: unknown[];
     time?: unknown[];
     invoices?: unknown[];
+    retainers?: unknown[];
   };
 }
 
