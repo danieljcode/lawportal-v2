@@ -415,7 +415,7 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
   character's `rate` (Characters dialog); `parseRate` takes "$1,200.50", `entryValue` rounds to the
   cent. The timer (`timerStore`, `lawapp_timer`) is one per browser and doesn't sync; Stop and log
   saves an entry for the minutes it ran (`timerHours`: to a tenth, 0.1 to 24) on today's game date.
-  **Invoices** (`src/lib/invoices.ts`, `Invoices.tsx`, LP-33; behind the `invoices` flag): the
+  **Invoices** (`src/lib/invoices.ts`, `Invoices.tsx`, LP-33): the
   filtered case's time over the filtered dates, frozen into lines at each entry's rate (an entry
   with no rate stops it), numbered `FA-<game year>-0001` (`nextInvoiceNumber`, per year, from
   `BRANDING.shortName`) and dated today in game time; payments give Unpaid / Part paid / Paid.

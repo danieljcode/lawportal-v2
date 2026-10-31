@@ -1,7 +1,6 @@
 // The Ledger's invoices (LP-33): bill the filtered case's time as a numbered
 // invoice, then record payments and print, copy or download it. The sheet is
-// one render (invoiceHtml), shown here and used for every output. Behind the
-// `invoices` flag.
+// one render (invoiceHtml), shown here and used for every output.
 
 import { useMemo, useState, type FormEvent } from "react";
 import { flushSync } from "react-dom";

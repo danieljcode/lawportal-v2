@@ -6,7 +6,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { caseStore } from "@/lib/cases";
 import { formatDay, gameToday } from "@/lib/deadlines";
-import { flagOn } from "@/lib/flags";
 import {
   ACTIVITIES,
   ACTIVITY_LABELS,
@@ -452,7 +451,7 @@ function LedgerView({ shell }: ProgramProps) {
           )}
         </>
       )}
-      {flagOn("invoices") && <Invoices cases={cases} entries={all} filter={filter} rateOf={rateOf} nameOf={nameOf} />}
+      <Invoices cases={cases} entries={all} filter={filter} rateOf={rateOf} nameOf={nameOf} />
     </section>
   );
 }

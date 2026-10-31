@@ -140,8 +140,7 @@ describe("the Ledger page (LP-32)", () => {
     expect(timeStore().list()).toMatchObject([{ caseId: "case0001", character: "alice001", hours: 0.1 }]);
   });
 
-  it("invoices a case's time, records a payment and deletes it (LP-33, flagged)", () => {
-    history.replaceState(null, "", "/?flags=invoices");
+  it("invoices a case's time, records a payment and deletes it (LP-33)", () => {
     caseStore().save({ id: "case0001", caseNumber: "90SCCR00147", lead: "alice001" });
     timeStore().save({ caseId: "case0001", character: "alice001", date: "1990-10-02", hours: 2, activity: "court" });
     mount();
@@ -159,6 +158,5 @@ describe("the Ledger page (LP-32)", () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
     click(must("#invoice-delete"));
     expect(invoiceStore().list()).toEqual([]);
-    history.replaceState(null, "", "/");
   });
 });
