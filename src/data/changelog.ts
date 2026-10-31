@@ -19,12 +19,9 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-31",
-    title: "Rolodex, Ledger and invoices",
+    title: "Office tools: Rolodex, Ledger, Find and Help",
+    version: "0.4.0",
     items: [
-      {
-        type: "fix",
-        text: "Easier to read: search highlights in Classic's dark theme, and the error icon in Modern's dark theme. In Classic, screen readers now find the window's title and menus as one area.",
-      },
       {
         type: "new",
         text: "The Rolodex, in Clients: one card for every client, judge, officer, attorney, witness and business the firm deals with, with their phone, address and notes. It syncs and is in your backups.",
@@ -70,10 +67,6 @@ export const CHANGELOG: ChangelogEntry[] = [
         text: "Download PDF beside Download .docx: your browser's print dialog opens with just the filing, as the forum shows it, named after the form. Pick Save as PDF. Invoices and letters in the Ledger print the same way.",
       },
       {
-        type: "update",
-        text: "Download .docx builds the file in your browser now, so it works offline and never waits on the server.",
-      },
-      {
         type: "new",
         text: "Help: guides for every program and the main tasks, with Contents, Search and Back. Each program's Help menu has Help on that program. In Classic it looks like Windows 3.0 Help.",
       },
@@ -81,11 +74,24 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "new",
         text: "Find: one search box for everything, from the Find program or Ctrl+Shift+F. It searches cases, contacts, filings, exhibits, invoices and time as you type, groups what it finds, and opens each in its program. Case numbers match with or without dashes.",
       },
+      {
+        type: "update",
+        text: "Download .docx builds the file in your browser now, so it works offline and never waits on the server.",
+      },
+      {
+        type: "update",
+        text: "Your work is saved in a bigger part of the browser's storage, so lots of cases, filings and drafts no longer fill it up. It moves over by itself the first time you open the app.",
+      },
+      {
+        type: "fix",
+        text: "Easier to read: search highlights in Classic's dark theme, and the error icon in Modern's dark theme. In Classic, screen readers now find the window's title and menus as one area.",
+      },
     ],
   },
   {
     date: "2026-10-29",
     title: "Letterhead",
+    version: "0.3.0",
     items: [
       {
         type: "new",
@@ -94,10 +100,6 @@ export const CHANGELOG: ChangelogEntry[] = [
       {
         type: "update",
         text: "The Classic (1990) desktop is the firm's navy instead of teal. High Contrast Black stays black.",
-      },
-      {
-        type: "update",
-        text: "Your work is saved in a bigger part of the browser's storage, so lots of cases, filings and drafts no longer fill it up. It moves over by itself the first time you open the app.",
       },
       {
         type: "fix",
