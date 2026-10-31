@@ -9,7 +9,7 @@ import { caseStore } from "@/lib/cases";
 import { characterStore } from "@/lib/characters";
 import { conflictLog } from "@/lib/conflicts";
 import { contactStore } from "@/lib/contacts";
-import { timeStore } from "@/lib/ledger";
+import { timeStore, timerStore } from "@/lib/ledger";
 import { precedentStore } from "@/lib/precedents";
 import { filingStore } from "@/lib/filings";
 import { docketStore } from "@/lib/dockets";
@@ -63,6 +63,8 @@ export const useLetterheadVersion = versionHook(letterheadStore);
 export const useContactVersion = versionHook(contactStore);
 /** Bumps on every change to the Ledger's time entries (LP-32). */
 export const useTimeVersion = versionHook(timeStore);
+/** Bumps when the Ledger's timer starts or stops (LP-32). */
+export const useTimerVersion = versionHook(timerStore);
 
 /** Counts values set aside as unreadable since the page loaded (0: none). */
 export function useSetAsideVersion(): number {

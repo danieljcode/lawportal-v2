@@ -1,13 +1,15 @@
 // The Ledger's time entries (LP-32): cleaning, hours, saving, order, filters, totals and the route.
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   cleanEntry,
+  createTimerStore,
   createTimeStore,
   entryValue,
   filterEntries,
   formatMoney,
   parseHours,
   parseRate,
+  timerHours,
   totalHours,
   type TimeEntry,
   type TimeStore,
@@ -118,6 +120,41 @@ describe("rates and values", () => {
     const c = { caseNumber: "90SCCR00147", updated: "2026-10-29T10:00:00.000Z" };
     expect(cleanCase({ ...c, rate: 200 }).rate).toBe(200);
     expect(cleanCase({ ...c, rate: -5 })).not.toHaveProperty("rate");
+  });
+});
+
+describe("the timer", () => {
+  afterEach(() => vi.useRealTimers());
+
+  it("logs the elapsed time, to a tenth, when stopped", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-31T10:00:00.000Z"));
+    const kv = memoryKV();
+    const times = createTimeStore(kv);
+    const timer = createTimerStore(kv, times);
+    timer.start({ caseId: "case0001", character: "char0001", activity: "court" });
+    expect(createTimerStore(kv, times).get()).toMatchObject({ caseId: "case0001", activity: "court" });
+    vi.setSystemTime(new Date("2026-10-31T11:20:00.000Z"));
+    const entry = timer.stop("1990-10-31");
+    expect(entry).toMatchObject({ caseId: "case0001", character: "char0001", date: "1990-10-31", hours: 1.3 });
+    expect(times.list()).toHaveLength(1);
+    expect(timer.get()).toBeNull();
+    expect(() => timer.stop("1990-10-31")).toThrow(/No timer/);
+  });
+
+  it("logs at least 0.1 and at most 24 hours, and discards without logging", () => {
+    const at = (min: number) => Date.parse("2026-10-31T10:00:00.000Z") + min * 60_000;
+    const t = { started: "2026-10-31T10:00:00.000Z" };
+    expect(timerHours(t, at(1))).toBe(0.1);
+    expect(timerHours(t, at(9))).toBe(0.2);
+    expect(timerHours(t, at(60 * 30))).toBe(24);
+    const kv = memoryKV();
+    const times = createTimeStore(kv);
+    const timer = createTimerStore(kv, times);
+    timer.start({ caseId: "case0001", character: "char0001", activity: "research" });
+    timer.discard();
+    expect(timer.get()).toBeNull();
+    expect(times.list()).toEqual([]);
   });
 });
 

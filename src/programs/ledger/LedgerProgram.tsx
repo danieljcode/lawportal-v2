@@ -1,9 +1,9 @@
 // The Ledger program (LP-32): billable time logged against Case File cases, with
 // a form to log or edit an entry, filters by case, character and date range,
 // and the filtered total. Each entry is worth its hours at the case's rate, else
-// the character's own. Behind the `ledger` flag.
+// the character's own. A timer logs an entry when it stops. Behind the `ledger` flag.
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { caseStore } from "@/lib/cases";
 import { formatDay, gameToday } from "@/lib/deadlines";
 import {
@@ -13,6 +13,8 @@ import {
   filterEntries,
   formatMoney,
   parseRate,
+  timerMinutes,
+  timerStore,
   timeStore,
   totalHours,
   type Activity,
@@ -22,7 +24,7 @@ import {
 import type { Case } from "@/lib/types";
 import ErrorBoundary from "@/ui/ErrorBoundary";
 import GameDateInput from "@/ui/GameDateInput";
-import { useCaseVersion, useTimeVersion } from "@/ui/useStore";
+import { useCaseVersion, useTimerVersion, useTimeVersion } from "@/ui/useStore";
 import type { ProgramProps } from "@/shell/program";
 
 /** "90SCCR00147 Smith v. Jones". */
@@ -142,6 +144,116 @@ function EntryForm({
   );
 }
 
+/** "1 h 05 min" for 65 minutes. */
+const elapsedText = (min: number) => (min >= 60 ? Math.floor(min / 60) + " h " + String(min % 60).padStart(2, "0") : min) + " min";
+
+/** Start timing a case, or the running timer with Stop and log. */
+function TimerPanel({
+  cases,
+  characters,
+  start,
+  nameOf,
+}: {
+  cases: readonly Case[];
+  characters: ProgramProps["shell"]["characters"];
+  start: { caseId: string; character: string };
+  nameOf(id: string): string;
+}) {
+  const version = useTimerVersion();
+  const running = useMemo(() => (version >= 0 ? timerStore().get() : null), [version]);
+  const [pick, setPick] = useState(start);
+  const [error, setError] = useState("");
+  // Tick the elapsed time while it runs.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!running) return;
+    setNow(Date.now());
+    const id = setInterval(() => setNow(Date.now()), 15_000);
+    return () => clearInterval(id);
+  }, [running]);
+
+  if (running) {
+    const c = cases.find((x) => x.id === running.caseId);
+    return (
+      <div className="row ledger-timer" id="timer">
+        <span id="timer-status">
+          {"Timing " + (c ? c.caseNumber : "a deleted case") + " for " + nameOf(running.character) + ": "}
+          <strong>{elapsedText(timerMinutes(running, now))}</strong>
+        </span>
+        <button
+          type="button"
+          className="btn primary"
+          id="timer-stop"
+          onClick={() => {
+            try {
+              timerStore().stop(gameToday());
+            } catch (err) {
+              setError(err instanceof Error ? err.message : String(err));
+            }
+          }}
+        >
+          Stop and log
+        </button>
+        <button
+          type="button"
+          className="btn"
+          id="timer-discard"
+          onClick={() => confirm("Discard this timer without logging its time?") && timerStore().discard()}
+        >
+          Discard
+        </button>
+        <span className="error" role="alert">
+          {error}
+        </span>
+      </div>
+    );
+  }
+  const begin = () => {
+    if (!pick.caseId || !pick.character) {
+      setError("Pick a case and a character to time.");
+      return;
+    }
+    setError("");
+    timerStore().start({ ...pick, activity: "research" });
+  };
+  return (
+    <div className="row ledger-timer" id="timer">
+      <select
+        id="timer-case"
+        aria-label="Case to time"
+        value={pick.caseId}
+        onChange={(e) => setPick({ ...pick, caseId: e.target.value })}
+      >
+        <option value="">Case to time…</option>
+        {cases.map((c) => (
+          <option key={c.id} value={c.id}>
+            {caseLabel(c)}
+          </option>
+        ))}
+      </select>
+      <select
+        id="timer-character"
+        aria-label="Character to time"
+        value={pick.character}
+        onChange={(e) => setPick({ ...pick, character: e.target.value })}
+      >
+        <option value="">Character…</option>
+        {characters.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name}
+          </option>
+        ))}
+      </select>
+      <button type="button" className="btn" id="timer-start" onClick={begin}>
+        Start timer
+      </button>
+      <span className="error" role="alert" id="timer-error">
+        {error}
+      </span>
+    </div>
+  );
+}
+
 /** The case's own hourly rate, over each character's; blank to use theirs. */
 function CaseRate({ c }: { c: Case }) {
   const [value, setValue] = useState(c.rate ? String(c.rate) : "");
@@ -226,6 +338,14 @@ function LedgerView({ shell }: ProgramProps) {
         <p className="small" id="ledger-no-characters">
           Time is logged by one of your characters. Add one in the Characters dialog first.
         </p>
+      )}
+      {cases.length > 0 && shell.characters.length > 0 && (
+        <TimerPanel
+          cases={cases}
+          characters={shell.characters}
+          start={{ caseId: filter.caseId || "", character: filter.character || shell.active?.id || "" }}
+          nameOf={nameOf}
+        />
       )}
       {editing && (
         <EntryForm

@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { caseStore } from "@/lib/cases";
-import { timeStore } from "@/lib/ledger";
+import { timerStore, timeStore } from "@/lib/ledger";
 import LedgerProgram from "@/programs/ledger";
 import type { ProgramProps } from "@/shell/program";
 
@@ -53,6 +53,7 @@ function mount(): void {
 beforeEach(() => {
   localStorage.clear();
   timeStore().replaceAll([]);
+  timerStore().discard();
   caseStore().replaceAll([]);
 });
 
@@ -122,5 +123,18 @@ describe("the Ledger page (LP-32)", () => {
         .list()
         .map((e) => e.caseId),
     ).toEqual(["case0002"]);
+  });
+
+  it("times a case and logs it when stopped", () => {
+    caseStore().save({ id: "case0001", caseNumber: "90SCCR00147", lead: "alice001" });
+    mount();
+    click(must("#timer-start"));
+    expect(must("#timer-error").textContent).toMatch(/case/);
+    setValue("#timer-case", "case0001");
+    click(must("#timer-start"));
+    expect(must("#timer-status").textContent).toBe("Timing 90SCCR00147 for Alice Lawyer: 0 min");
+    click(must("#timer-stop"));
+    expect($("#timer-status")).toBeNull();
+    expect(timeStore().list()).toMatchObject([{ caseId: "case0001", character: "alice001", hours: 0.1 }]);
   });
 });
