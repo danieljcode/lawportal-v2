@@ -159,6 +159,18 @@ export function isJumpKey(e: globalThis.KeyboardEvent): boolean {
   return e.key === "/" && !e.ctrlKey && !e.metaKey && !isTyping(e.target) && !document.querySelector("dialog[open]");
 }
 
+/** Ctrl+Shift+F or Cmd+Shift+F: open Find (LP-95), but not over a dialog. */
+export function isFindKey(e: globalThis.KeyboardEvent): boolean {
+  return (
+    !e.isComposing &&
+    !e.altKey &&
+    (e.ctrlKey || e.metaKey) &&
+    e.shiftKey &&
+    e.key.toLowerCase() === "f" &&
+    !document.querySelector("dialog[open]")
+  );
+}
+
 /** Ctrl+K, or Cmd+K on a Mac, for the menu. */
 export function jumpShortcut(): string {
   return typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.userAgent) ? "⌘K" : "Ctrl+K";

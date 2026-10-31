@@ -115,7 +115,7 @@ browser.
   doubles their ids, and in Settings the File and Help menu items scroll to the section instead.
 - **Hash routing** (`useRoute.ts`). Routes are prefixed by program: `#filings` and
   `#filings/<formId>`, `#cases`, `#cases/<id>` and `#cases/upcoming`, `#clients/intake` and
-  `#clients/conflicts`, `#clients/rolodex`, `#library/penal-code` and `#library/precedents`, `#ledger`, `#jap`, `#control`; an
+  `#clients/conflicts`, `#clients/rolodex`, `#library/penal-code` and `#library/precedents`, `#ledger`, `#find`, `#jap`, `#control`; an
   empty hash is home. `parseHash` also reads the old flat hashes (`#cases`, `#upcoming`,
   `#intake`, `#conflicts`, `#library`, `#jap`, `#<formId>`), and the hook rewrites them to the
   new ones with `replaceState`. The last place is remembered under `lawapp_last_form` as a hash
@@ -443,6 +443,11 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
   entries. `invoiceHtml` renders the sheet once through the template engine (with the letterhead),
   for the preview, Print, Copy for forum and Discord, and Download .docx. The sheet is paper in
   every theme; Classic's is tractor-feed (`--invoice-*` tokens in `globals.css`).
+- **Find** (`src/lib/find.ts`, `src/programs/find/`, LP-95): `findIndex` turns cases, contacts,
+  filings, exhibits, invoices and time entries into searchable text once per store change
+  (lowercase, and again without dashes or spaces, so case numbers match either way); `find`
+  keeps the items holding every search word, grouped by kind, at most 20 listed per group.
+  Results link into their program. Ctrl+Shift+F (`isFindKey`) opens it.
 - **Rolodex** (`src/lib/contacts.ts`, `src/programs/clients/RolodexView.tsx`, LP-30): the Clients program's third page, at `#clients/rolodex`. One list under
   `lawapp_contacts` (store base, v1, up to 2,000 contacts, A–Z): name, type (client, judge,
   officer, attorney, witness, business), phone, address, organisation and notes. Search

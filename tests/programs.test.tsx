@@ -87,6 +87,7 @@ describe("the program registry", () => {
       "Clients",
       "Law Library",
       "Ledger",
+      "Find",
       "J.A.P.",
       "Settings",
     ]);
@@ -94,7 +95,7 @@ describe("the program registry", () => {
     expect(PROGRAMS.find((p) => p.id === "control")?.classicTitle).toBe("Control Panel");
     for (const p of PROGRAMS) expect(programFor(parseHash(p.start))?.id, p.id).toBe(p.id);
     expect(programFor({ program: "home" })).toBeNull();
-    expect(PROGRAMS.filter((p) => p.group === "main").map((p) => p.id)).toEqual(["ledger", "control"]);
+    expect(PROGRAMS.filter((p) => p.group === "main").map((p) => p.id)).toEqual(["ledger", "find", "control"]);
   });
 
   it("shows the J.A.P. only to Court Commissioners", () => {
@@ -305,7 +306,7 @@ describe("the Program Manager (LP-104)", () => {
     mount("");
     expect(groups()).toEqual([
       ["Court Work", ["Court Filings", "Case File", "Clients", "Law Library"]],
-      ["Main", ["Ledger", "Control Panel", "What's new"]],
+      ["Main", ["Ledger", "Find", "Control Panel", "What's new"]],
     ]);
     act(() => characterStore().setActive("carl0001"));
     expect(groups()[0][1]).toContain("J.A.P.");

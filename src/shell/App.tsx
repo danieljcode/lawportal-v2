@@ -30,7 +30,7 @@ import ChangelogDialog from "./ChangelogDialog";
 import CharactersDialog from "./CharactersDialog";
 import DocketsDialog from "./DocketsDialog";
 import ErrorBoundary from "@/ui/ErrorBoundary";
-import JumpBox, { isJumpKey, jumpShortcut } from "./JumpBox";
+import JumpBox, { isFindKey, isJumpKey, jumpShortcut } from "./JumpBox";
 import type { DraftRequest, FormTools } from "@/programs/filings";
 import MenuBar, { type Menu, type MenuItem } from "./MenuBar";
 import ModernFrame from "./ModernFrame";
@@ -181,6 +181,18 @@ export default function App() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [navOpen]);
+
+  // Ctrl+Shift+F (Cmd+Shift+F) opens Find (LP-95) with its box ready to type in.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || !isFindKey(e)) return;
+      e.preventDefault();
+      navigate("#find");
+      setTimeout(() => document.getElementById("find-q")?.focus(), 0);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   // Ctrl+K (Cmd+K) anywhere, or "/" outside a field, opens the jump box (LP-128).
   useEffect(() => {

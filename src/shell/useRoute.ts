@@ -3,7 +3,7 @@
 // back/forward, the page title, and going home. Routes are prefixed by
 // program: #filings/<formId>, #cases/<caseId>, #cases/upcoming,
 // #clients/intake, #clients/conflicts, #clients/rolodex, #library/penal-code,
-// #library/precedents, #ledger, #jap, #control. The old flat hashes (#cases, #upcoming,
+// #library/precedents, #ledger, #find, #jap, #control. The old flat hashes (#cases, #upcoming,
 // #intake, #conflicts, #library, #jap, #<formId>) still open the same place
 // and are rewritten to the new ones.
 
@@ -15,7 +15,7 @@ import { getShell } from "@/lib/shell";
 import { defaultKV } from "@/lib/storage";
 import type { FormInfo } from "@/lib/types";
 
-export type ProgramId = "filings" | "cases" | "clients" | "library" | "ledger" | "jap" | "control";
+export type ProgramId = "filings" | "cases" | "clients" | "library" | "ledger" | "find" | "jap" | "control";
 export type ClientsPage = "intake" | "conflicts" | "rolodex";
 export type LibraryPage = "penal-code" | "precedents";
 
@@ -26,6 +26,7 @@ export type Route =
   | { program: "clients"; page: ClientsPage }
   | { program: "library"; page: LibraryPage; chapter?: string }
   | { program: "ledger" }
+  | { program: "find" }
   | { program: "jap" }
   | { program: "control" };
 
@@ -39,6 +40,7 @@ export const CONFLICTS_TITLE = "Conflict check";
 export const ROLODEX_TITLE = "Rolodex";
 export const LIBRARY_TITLE = "Law Library";
 export const LEDGER_TITLE = "Ledger";
+export const FIND_TITLE = "Find";
 /** Settings (LP-109) is the Control Panel in the Classic layout. */
 export const SETTINGS_TITLE = "Settings";
 export const CONTROL_TITLE = "Control Panel";
@@ -104,6 +106,8 @@ export function parseHash(hash: string): Route {
     }
     case "ledger":
       return { program: "ledger" };
+    case "find":
+      return { program: "find" };
     case "jap":
       return { program: "jap" };
     case "control":
@@ -135,6 +139,8 @@ export function pageTitle(r: Route, form: FormInfo | null): string | null {
       return LIBRARY_TITLE;
     case "ledger":
       return LEDGER_TITLE;
+    case "find":
+      return FIND_TITLE;
     case "jap":
       return JAP_TITLE;
     case "control":

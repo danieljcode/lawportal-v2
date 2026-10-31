@@ -69,6 +69,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "update",
         text: "Download .docx builds the file in your browser now, so it works offline and never waits on the server.",
       },
+      {
+        type: "new",
+        text: "Find: one search box for everything, from the Find program or Ctrl+Shift+F. It searches cases, contacts, filings, exhibits, invoices and time as you type, groups what it finds, and opens each in its program. Case numbers match with or without dashes.",
+      },
     ],
   },
   {
