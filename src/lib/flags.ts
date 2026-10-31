@@ -4,7 +4,7 @@
 
 /** Every flag, with the Jira issue it belongs to. Each is off unless `?flags=` names it. */
 export const FLAGS = {
-  // ledger: { jira: "LP-n" },
+  ledger: { jira: "LP-32" },
   rolodex: { jira: "LP-30" },
 } as const satisfies Record<string, { jira: string }>;
 

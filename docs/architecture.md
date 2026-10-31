@@ -115,7 +115,7 @@ browser.
   doubles their ids, and in Settings the File and Help menu items scroll to the section instead.
 - **Hash routing** (`useRoute.ts`). Routes are prefixed by program: `#filings` and
   `#filings/<formId>`, `#cases`, `#cases/<id>` and `#cases/upcoming`, `#clients/intake` and
-  `#clients/conflicts` (and `#clients/rolodex` behind the `rolodex` flag), `#library/penal-code` and `#library/precedents`, `#jap`, `#control`; an
+  `#clients/conflicts` (and `#clients/rolodex` behind the `rolodex` flag), `#library/penal-code` and `#library/precedents`, `#ledger` (behind the `ledger` flag), `#jap`, `#control`; an
   empty hash is home. `parseHash` also reads the old flat hashes (`#cases`, `#upcoming`,
   `#intake`, `#conflicts`, `#library`, `#jap`, `#<formId>`), and the hook rewrites them to the
   new ones with `replaceState`. The last place is remembered under `lawapp_last_form` as a hash
@@ -273,6 +273,7 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
 | Filing history (LP-15)            | `src/lib/filings.ts`                     | `lawapp_filings`                     |
 | Conflict check log (LP-10)        | `src/lib/conflicts.ts`                   | `lawapp_conflict_log`                |
 | Rolodex contacts (LP-30)          | `src/lib/contacts.ts`                    | `lawapp_contacts`                    |
+| Ledger time entries (LP-32)       | `src/lib/ledger.ts`                      | `lawapp_time`                        |
 | Sync state                        | `src/lib/sync.ts`                        | `lawapp_sync_*`                      |
 
 - **KV wrapper** (`src/lib/storage.ts`). The stores never touch the browser's storage directly:
@@ -403,6 +404,12 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
   link (`safeLink`) and lower-case topic tags. Search (`filterPrecedents`) needs every word
   somewhere in the ruling; `highlightParts` splits text for `<mark>`, rendered by React as text.
   Sync merges each ruling by `updated` (`precedent:<id>`); the server takes up to 1,000.
+- **Ledger** (`src/lib/ledger.ts`, `src/programs/ledger/`, LP-32; behind the `ledger` flag): time
+  entries logged against a Case File case by a character, on a game date, in hours to a tenth (0.1
+  to 24), with an activity (research, drafting, court, meeting) and a note. One list under
+  `lawapp_time` (store base, v1, up to 5,000, newest date first). `filterEntries` narrows by case,
+  character and an inclusive date range; `totalHours` sums in tenths. Sync merges each entry by
+  `updated` (`time:<id>`); like filings, a losing edit isn't kept for Restore my version.
 - **Rolodex** (`src/lib/contacts.ts`, `src/programs/clients/RolodexView.tsx`, LP-30; behind the
   `rolodex` flag): the Clients program's third page, at `#clients/rolodex`. One list under
   `lawapp_contacts` (store base, v1, up to 2,000 contacts, A–Z): name, type (client, judge,

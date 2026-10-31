@@ -5,6 +5,7 @@ import { caseStore } from "@/lib/cases";
 import { characterStore } from "@/lib/characters";
 import { contactStore } from "@/lib/contacts";
 import { docketStore } from "@/lib/dockets";
+import { timeStore } from "@/lib/ledger";
 import { portfolioStore } from "@/lib/portfolio";
 import { precedentStore } from "@/lib/precedents";
 import { S_SYNC_APPLY_FAIL, S_SYNC_LOST } from "@/lib/strings";
@@ -606,6 +607,32 @@ describe("conflicts keep unsent edits (LP-64)", () => {
     await sync.push();
     const sent = calls[0].body as { data: sync.SyncDoc };
     expect(sent.data.contacts?.map((c) => c.name)).toEqual(["Officer Dibble"]);
+  });
+
+  it("time entries merge by `updated`: the newer wins, one added here goes up (LP-32)", async () => {
+    seed([], { "time:time0001": T0 });
+    const entry = { caseId: "case0001", character: "char0001", date: "1990-10-29", activity: "court", created: T0 };
+    timeStore().replaceAll([
+      { ...entry, id: "time0001", hours: 1, updated: T0 },
+      { ...entry, id: "time0002", hours: 2, updated: T0 },
+    ]);
+    localStorage.setItem(sync.DIRTY_KEY, "1");
+    const calls = stubFetch(
+      {
+        status: 200,
+        body: {
+          rev: 2,
+          updated: "u2",
+          data: { characters: [], time: [{ ...entry, id: "time0001", hours: 1.5, updated: T1 }] },
+        },
+      },
+      { status: 200, body: { rev: 3, updated: "u3" } },
+    );
+    await sync.pull(true);
+    expect(timeStore().get("time0001")?.hours).toBe(1.5);
+    expect(timeStore().get("time0002")?.hours).toBe(2);
+    const sent = calls[1].body as { data: sync.SyncDoc };
+    expect(sent.data.time?.map((e) => e.id).sort()).toEqual(["time0001", "time0002"]);
   });
 
   it("discardLost forgets the kept copy", () => {
