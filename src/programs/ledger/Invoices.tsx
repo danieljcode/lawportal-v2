@@ -10,7 +10,19 @@ import { gameToday, formatDay } from "@/lib/deadlines";
 import { toDiscord } from "@/lib/discord";
 import { docxRequestBody } from "@/lib/docx/request";
 import { download } from "@/lib/download";
-import { invoiceBalance, invoiceHtml, invoiceStatus, invoiceStore, invoiceTotal, type Invoice } from "@/lib/invoices";
+import {
+  invoiceBalance,
+  invoiceDue,
+  invoiceHtml,
+  invoiceStatus,
+  invoiceStore,
+  invoiceTotal,
+  METHOD_LABELS,
+  PAYMENT_METHODS,
+  receivables,
+  type Invoice,
+  type PaymentMethod,
+} from "@/lib/invoices";
 import { filterEntries, formatMoney, type TimeEntry, type TimeFilter } from "@/lib/ledger";
 import { letterheadStore } from "@/lib/letterhead";
 import type { Case } from "@/lib/types";
@@ -25,6 +37,7 @@ function InvoiceView({ inv, onClose }: { inv: Invoice; onClose(): void }) {
   const [date, setDate] = useState(gameToday);
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
+  const [method, setMethod] = useState<PaymentMethod>("cash");
   const say = (text: string, bad = false) => setStatus({ text, bad });
 
   // The id exists only while the print dialog is open, so printing shows just the invoice.
@@ -37,7 +50,7 @@ function InvoiceView({ inv, onClose }: { inv: Invoice; onClose(): void }) {
   const pay = (ev: FormEvent) => {
     ev.preventDefault();
     try {
-      invoiceStore().addPayment(inv.id, { date, amount: Number(amount.replace(/[$,\s]/g, "")), note });
+      invoiceStore().addPayment(inv.id, { date, amount: Number(amount.replace(/[$,\s]/g, "")), method, note });
       setAmount("");
       setNote("");
       say("Payment recorded.");
@@ -118,7 +131,12 @@ function InvoiceView({ inv, onClose }: { inv: Invoice; onClose(): void }) {
         <ul className="invoice-payments" id="invoice-payments">
           {inv.payments.map((p) => (
             <li key={p.id}>
-              {formatDay(p.date) + ": " + formatMoney(p.amount) + (p.note ? " (" + p.note + ")" : "")}{" "}
+              {formatDay(p.date) +
+                ": " +
+                formatMoney(p.amount) +
+                ", " +
+                METHOD_LABELS[p.method] +
+                (p.note ? " (" + p.note + ")" : "")}{" "}
               <button
                 type="button"
                 className="mini danger-quiet"
@@ -140,10 +158,22 @@ function InvoiceView({ inv, onClose }: { inv: Invoice; onClose(): void }) {
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
         />
+        <select
+          id="payment-method"
+          aria-label="Method"
+          value={method}
+          onChange={(e) => setMethod(e.target.value as PaymentMethod)}
+        >
+          {PAYMENT_METHODS.map((m) => (
+            <option key={m} value={m}>
+              {METHOD_LABELS[m]}
+            </option>
+          ))}
+        </select>
         <input
           id="payment-note"
           aria-label="Note"
-          placeholder="Note, e.g. cheque"
+          placeholder="Note, e.g. cheque number"
           value={note}
           onChange={(e) => setNote(e.target.value)}
         />
@@ -172,6 +202,7 @@ export default function Invoices({
   const version = useInvoiceVersion();
   const all = useMemo(() => (version >= 0 ? invoiceStore().list() : []), [version]);
   const shown = filter.caseId ? all.filter((i) => i.caseId === filter.caseId) : all;
+  const owed = receivables(shown);
   const [openId, setOpenId] = useState<string | null>(null);
   const open = openId ? all.find((i) => i.id === openId) : undefined;
   const [error, setError] = useState("");
@@ -213,6 +244,49 @@ export default function Invoices({
         {error}
       </p>
       {open && <InvoiceView key={open.id} inv={open} onClose={() => setOpenId(null)} />}
+      {owed.length > 0 && (
+        <>
+          <h4 id="receivables-title">Accounts receivable</h4>
+          <p className="small" id="receivables-total">
+            {formatMoney(owed.reduce((n, inv) => n + Math.round(invoiceBalance(inv) * 100), 0) / 100) +
+              " owed on " +
+              owed.length +
+              (owed.length === 1 ? " invoice" : " invoices") +
+              ", oldest first."}
+          </p>
+          <div className="ledger-scroll">
+            <table className="ledger-table" id="receivables" aria-labelledby="receivables-title">
+              <thead>
+                <tr>
+                  <th scope="col">Number</th>
+                  <th scope="col">Case</th>
+                  <th scope="col">Due</th>
+                  <th scope="col" className="num">
+                    Balance
+                  </th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {owed.map((inv) => (
+                  <tr key={inv.id}>
+                    <td>
+                      <button type="button" className="mini" onClick={() => setOpenId(inv.id)}>
+                        {inv.number}
+                      </button>
+                    </td>
+                    <td>{inv.caseNumber}</td>
+                    <td>{formatDay(invoiceDue(inv))}</td>
+                    <td className="num">{formatMoney(invoiceBalance(inv))}</td>
+                    <td>{invoiceStatus(inv)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <h4>All invoices</h4>
+        </>
+      )}
       {shown.length > 0 && (
         <div className="ledger-scroll">
           <table className="ledger-table" id="invoice-list">

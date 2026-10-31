@@ -154,6 +154,7 @@ describe("the Ledger page (LP-32)", () => {
     click(must("#payment-add"));
     expect(must("#invoice-payments").textContent).toContain("$75.00");
     expect(must("#invoice-list").textContent).toContain("Part paid");
+    expect(must("#receivables").textContent).toContain("$125.00");
 
     vi.spyOn(window, "confirm").mockReturnValue(true);
     click(must("#invoice-delete"));

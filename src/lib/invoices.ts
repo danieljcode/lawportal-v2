@@ -6,7 +6,7 @@
 // all show the same thing.
 
 import { BRANDING } from "@/branding";
-import { formatDay } from "./deadlines";
+import { addDays, formatDay, gameToday } from "./deadlines";
 import { ACTIVITY_LABELS, formatMoney, parseRate, type Activity, type TimeEntry } from "./ledger";
 import type { Letterhead } from "./letterhead";
 import type { SafeHtml } from "./safeHtml";
@@ -39,12 +39,21 @@ export interface InvoiceLine {
   amount: number;
 }
 
+export const PAYMENT_METHODS = ["cash", "cheque", "bank"] as const;
+export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
+export const METHOD_LABELS: Record<PaymentMethod, string> = { cash: "Cash", cheque: "Cheque", bank: "Bank transfer" };
+
+/** Game days from issue until an invoice is due (LP-93). */
+export const INVOICE_TERMS_DAYS = 30;
+
 export interface Payment {
   id: string;
   /** Game date. */
   date: string;
   /** Dollars, to the cent. */
   amount: number;
+  /** How it was paid (LP-93); cash for payments from before methods. */
+  method: PaymentMethod;
   note?: string;
 }
 
@@ -67,7 +76,7 @@ export interface Invoice {
   updated: string;
 }
 
-export type InvoiceStatus = "Unpaid" | "Part paid" | "Paid";
+export type InvoiceStatus = "Unpaid" | "Part paid" | "Paid" | "Overdue";
 
 const isDate = (v: unknown): v is string => typeof v === "string" && ISO_DATE_RE.test(v);
 const isActivity = (v: unknown): v is Activity => typeof v === "string" && v in ACTIVITY_LABELS;
@@ -103,7 +112,8 @@ export function cleanPayment(raw: unknown): Payment | null {
   const amount = n === null || !Number.isFinite(n) ? null : cents(n);
   if (!isDate(o.date) || !amount || amount < 0.01 || amount > MAX_PAYMENT) return null;
   const note = text(o.note, 200);
-  return { id: isId(o.id) ? o.id : newId(), date: o.date, amount, ...(note ? { note } : {}) };
+  const method = (PAYMENT_METHODS as readonly unknown[]).includes(o.method) ? (o.method as PaymentMethod) : "cash";
+  return { id: isId(o.id) ? o.id : newId(), date: o.date, amount, method, ...(note ? { note } : {}) };
 }
 
 /** Normalise an untrusted invoice (sync, backup); null without a number, case, date or a line. */
@@ -134,9 +144,25 @@ export const invoiceTotal = (inv: Pick<Invoice, "lines">) => sum(inv.lines.map((
 export const invoicePaid = (inv: Pick<Invoice, "payments">) => sum(inv.payments.map((p) => p.amount));
 export const invoiceBalance = (inv: Pick<Invoice, "lines" | "payments">) => sum([invoiceTotal(inv), -invoicePaid(inv)]);
 
-export function invoiceStatus(inv: Pick<Invoice, "lines" | "payments">): InvoiceStatus {
+/** The game date an invoice is due: INVOICE_TERMS_DAYS after it was issued. */
+export const invoiceDue = (inv: Pick<Invoice, "date">) => addDays(inv.date, INVOICE_TERMS_DAYS);
+
+/** Paid once paid in full; otherwise Overdue after its due date (game time), else Unpaid or Part paid. */
+export function invoiceStatus(
+  inv: Pick<Invoice, "date" | "lines" | "payments">,
+  today: string = gameToday(),
+): InvoiceStatus {
   const paid = invoicePaid(inv);
-  return paid <= 0 ? "Unpaid" : paid >= invoiceTotal(inv) ? "Paid" : "Part paid";
+  if (paid >= invoiceTotal(inv)) return "Paid";
+  if (today > invoiceDue(inv)) return "Overdue";
+  return paid <= 0 ? "Unpaid" : "Part paid";
+}
+
+/** Accounts receivable: invoices with a balance still due, oldest first. */
+export function receivables(list: readonly Invoice[]): Invoice[] {
+  return list
+    .filter((inv) => invoiceBalance(inv) > 0)
+    .sort((a, b) => (a.date !== b.date ? (a.date < b.date ? -1 : 1) : a.number.localeCompare(b.number)));
 }
 
 /** The firm's letters for invoice numbers: "F&A" → "FA". */
@@ -188,7 +214,7 @@ export function invoiceLines(d: InvoiceDraft): InvoiceLine[] {
 
 const SHEET = compile(
   "{{Letterhead@letterhead|}}" +
-    "<p><strong>INVOICE {{Number}}</strong><br />Date: {{Date}}<br />Case: {{Case}}" +
+    "<p><strong>INVOICE {{Number}}</strong><br />Date: {{Date}}<br />Due: {{Due}}<br />Case: {{Case}}" +
     "{{?Period}}<br />Period: {{Period}}{{/Period}}</p>\n" +
     '<table border="1" cellpadding="4">\n' +
     "<tr><th>Date</th><th>Work</th><th>Hours</th><th>Rate</th><th>Amount</th></tr>\n" +
@@ -207,13 +233,14 @@ export function periodText(from?: string, to?: string): string {
 }
 
 /** The invoice sheet, through the template engine (every value escaped), with the letterhead when given. */
-export function invoiceHtml(inv: Invoice, letterhead?: Letterhead): SafeHtml {
+export function invoiceHtml(inv: Invoice, letterhead?: Letterhead, today: string = gameToday()): SafeHtml {
   const period = periodText(inv.from, inv.to);
   return render(
     SHEET,
     {
       Number: inv.number,
       Date: formatDay(inv.date),
+      Due: formatDay(invoiceDue(inv)),
       Case: inv.caseNumber,
       "?Period": !!period,
       Period: period,
@@ -227,7 +254,7 @@ export function invoiceHtml(inv: Invoice, letterhead?: Letterhead): SafeHtml {
       Subtotal: formatMoney(invoiceTotal(inv)),
       Paid: formatMoney(invoicePaid(inv)),
       Balance: formatMoney(invoiceBalance(inv)),
-      Status: invoiceStatus(inv),
+      Status: invoiceStatus(inv, today),
     },
     letterhead ? { letterhead } : {},
   );
@@ -249,7 +276,7 @@ export interface InvoiceStore {
   /** Number and save a new invoice from a draft; throws when it can't be billed. */
   create(d: InvoiceDraft): Invoice;
   /** Record a payment; throws when it isn't one. */
-  addPayment(invoiceId: string, payment: Omit<Payment, "id">): void;
+  addPayment(invoiceId: string, payment: Omit<Payment, "id" | "method"> & { method?: PaymentMethod }): void;
   removePayment(invoiceId: string, paymentId: string): void;
   remove(id: string): void;
   /** Replace every invoice (sync). */
