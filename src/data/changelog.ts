@@ -65,6 +65,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "new",
         text: "Download PDF beside Download .docx: your browser's print dialog opens with just the filing, as the forum shows it, named after the form. Pick Save as PDF. Invoices and letters in the Ledger print the same way.",
       },
+      {
+        type: "update",
+        text: "Download .docx builds the file in your browser now, so it works offline and never waits on the server.",
+      },
     ],
   },
   {

@@ -1,4 +1,5 @@
-// Final preview HTML → .docx (server only; design §.docx route).
+// Final preview HTML → .docx, built in the browser (LP-37; design §.docx). It's loaded only when
+// someone downloads one (saveDocx.ts), so it never weighs on the first page load.
 //
 // Walks the node-html-parser tree with a paragraph accumulator: inline output
 // (text, styled runs, links, breaks, image links) collects into the current
@@ -423,7 +424,7 @@ class Walker {
 }
 
 /** Convert final preview HTML to a .docx file (1-inch margins, document title `title`). */
-export async function htmlToDocx(html: string, title: string): Promise<Buffer> {
+export async function htmlToDocx(html: string, title: string): Promise<Blob> {
   const root = parse(html, { blockTextElements: { script: false, style: false } });
   const walker = new Walker();
   walker.children(root, { run: {}, boxed: null });
@@ -438,5 +439,5 @@ export async function htmlToDocx(html: string, title: string): Promise<Buffer> {
       },
     ],
   });
-  return Packer.toBuffer(doc);
+  return Packer.toBlob(doc);
 }

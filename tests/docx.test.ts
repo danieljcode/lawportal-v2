@@ -1,10 +1,16 @@
-// .docx converter and route (AC 21 unit parts, design §Testing docx cases, R5).
+// .docx converter (AC 21 unit parts, design §Testing docx cases, R5), built in the browser
+// since LP-37: the same suite, run against the Blob the browser downloads.
 import { BorderStyle } from "docx";
-import { beforeEach, describe, expect, it } from "vitest";
-import { POST } from "@/app/api/docx/route";
-import { resetLimits } from "@/lib/server/rateLimit";
+import { describe, expect, it } from "vitest";
 import { ALL_FORMS, getForm } from "@/data";
-import { borderColor, cellBorders, htmlToDocx, parseStyle, pxToHalfPoints, toDocxColor } from "@/lib/docx/htmlToDocx";
+import {
+  borderColor,
+  cellBorders,
+  htmlToDocx as toBlob,
+  parseStyle,
+  pxToHalfPoints,
+  toDocxColor,
+} from "@/lib/docx/htmlToDocx";
 import { compile, fields, render } from "@/lib/template";
 import { fixture } from "./fixtures";
 import { readZip, readZipText } from "./zip";
@@ -18,6 +24,9 @@ function finalHtml(id: string, variant?: "A"): string {
   const tree = compile(form.html);
   return render(tree, variant ? fixture(fields(tree), variant) : {});
 }
+
+/** The browser's .docx (a Blob) as bytes, to unzip. */
+const htmlToDocx = async (html: string, title: string) => Buffer.from(await (await toBlob(html, title)).arrayBuffer());
 
 async function documentXml(html: string): Promise<string> {
   return readZipText(await htmlToDocx(html, "Test"), "word/document.xml");
@@ -186,78 +195,5 @@ describe("docx pure helpers", () => {
       bottom: red,
       left: red,
     });
-  });
-});
-
-describe("POST /api/docx", () => {
-  const URL = "http://localhost:3000/api/docx";
-  const post = (body: unknown, headers: Record<string, string> = { "Content-Type": "application/json" }, url = URL) =>
-    POST(new Request(url, { method: "POST", headers, body: typeof body === "string" ? body : JSON.stringify(body) }));
-
-  beforeEach(() => resetLimits());
-
-  it("answers 429 after 30 requests a minute from one IP, and counts each IP apart", async () => {
-    const from = (ip: string) => ({ "Content-Type": "application/json", "X-Forwarded-For": ip });
-    for (let i = 0; i < 30; i++) expect((await post({}, from("10.0.0.1"))).status).toBe(400);
-    const res = await post({ html: "<p>x</p>" }, from("10.0.0.1"));
-    expect(res.status).toBe(429);
-    expect(Number(res.headers.get("retry-after"))).toBeGreaterThan(0);
-    expect((await post({ html: "<p>x</p>" }, from("10.0.0.2"))).status).toBe(200);
-  });
-
-  it("returns the document with download headers", async () => {
-    const res = await post({ html: finalHtml("civil-complaint"), title: "Civil Complaint", id: "civil-complaint" });
-    expect(res.status).toBe(200);
-    expect(res.headers.get("content-type")).toBe(
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    );
-    expect(res.headers.get("content-disposition")).toBe('attachment; filename="civil-complaint.docx"');
-    const buf = Buffer.from(await res.arrayBuffer());
-    expect(buf.subarray(0, 4).toString("latin1")).toBe("PK\x03\x04");
-  });
-
-  it("names the file from the title when the id is missing or invalid", async () => {
-    const res = await post({ html: "<p>x</p>", title: "Motion to Dismiss!", id: "../evil" });
-    expect(res.headers.get("content-disposition")).toBe('attachment; filename="motion-to-dismiss.docx"');
-    const res2 = await post({ html: "<p>x</p>", title: "x".repeat(201) });
-    expect(res2.headers.get("content-disposition")).toBe('attachment; filename="document.docx"');
-    const res3 = await post({ html: "<p>x</p>", title: "!!!" });
-    expect(res3.headers.get("content-disposition")).toBe('attachment; filename="document.docx"');
-  });
-
-  it("validates the request in the design's order", async () => {
-    const r415 = await post({ html: "<p>x</p>" }, {});
-    expect(r415.status).toBe(415);
-    expect(await r415.json()).toEqual({ error: "Expected application/json." });
-
-    const r413 = await post({ html: "x".repeat(2_100_000) });
-    expect(r413.status).toBe(413);
-    expect(await r413.json()).toEqual({ error: "That document is too large to convert (max 2 MB)." });
-
-    for (const bad of ["{nope", "[]", "null", "3"]) {
-      const res = await post(bad);
-      expect(res.status).toBe(400);
-      expect(await res.json()).toEqual({ error: "Invalid JSON." });
-    }
-    for (const bad of [{}, { html: "" }, { html: 3 }, { html: "x".repeat(1_500_001) }]) {
-      const res = await post(bad);
-      expect(res.status).toBe(400);
-      expect(await res.json()).toEqual({ error: "Missing html." });
-    }
-  });
-
-  it("refuses foreign hosts with 421", async () => {
-    const prev = process.env.LAWAPP_ALLOW_LAN;
-    delete process.env.LAWAPP_ALLOW_LAN;
-    try {
-      const res = await post(
-        { html: "<p>x</p>" },
-        { "Content-Type": "application/json" },
-        "http://evil.example:3000/api/docx",
-      );
-      expect(res.status).toBe(421);
-    } finally {
-      if (prev !== undefined) process.env.LAWAPP_ALLOW_LAN = prev;
-    }
   });
 });

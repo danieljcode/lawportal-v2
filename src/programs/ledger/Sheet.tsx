@@ -5,8 +5,7 @@ import { useState, type ReactNode } from "react";
 import { fromHtml } from "@/lib/bbcode";
 import { copyRich, copyText } from "@/lib/clipboard";
 import { toDiscord } from "@/lib/discord";
-import { docxRequestBody } from "@/lib/docx/request";
-import { download } from "@/lib/download";
+import { saveDocx } from "@/lib/docx/saveDocx";
 import type { SafeHtml } from "@/lib/safeHtml";
 import { printAs } from "@/ui/printAs";
 
@@ -37,15 +36,10 @@ export default function Sheet({
 
   const docx = async () => {
     try {
-      const res = await fetch("/api/docx", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: docxRequestBody(html, title, ""),
-      });
-      if (!res.ok) return say("Couldn't build the .docx (" + res.status + ").", true);
-      download(await res.blob(), filename + ".docx");
-    } catch {
-      say("Couldn't build the .docx (server unreachable).", true);
+      await saveDocx(html, title, filename);
+    } catch (err) {
+      console.warn("[docx] couldn't build", err);
+      say("Couldn't build the .docx. Try again.", true);
     }
   };
 

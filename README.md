@@ -155,7 +155,7 @@ called the Control Panel.
 
 | Folder            | What's in it                                                                                                                                                                                |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/app/`        | The Next.js page, layout and styles, and the server's API routes (`api/account`, `api/data` for sync, `api/docx`).                                                                          |
+| `src/app/`        | The Next.js page, layout and styles, and the server's API routes (`api/account`, `api/data` for sync).                                                                                      |
 | `src/shell/`      | The app shell: `App.tsx`, the program registry, routing, both frames (modern and Classic), the home screens, the jump box and the shell's dialogs.                                          |
 | `src/programs/`   | One folder per program (`filings`, `cases`, `clients`, `library`, `jap`, `control`), each reached only through its `index.ts`. Court Filings' form inputs are in `filings/fields/`.         |
 | `src/ui/`         | Components and hooks shared by the shell and programs: `Dialog`, `ErrorBoundary`, the store hooks (`useStore.ts`) and Filing history.                                                       |

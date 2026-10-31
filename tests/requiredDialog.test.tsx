@@ -7,6 +7,7 @@ import { createRoot, type Root } from "react-dom/client";
 import App from "@/shell/App";
 import { COLLAPSED_KEY, EMPTY_STATE, writeDraft } from "@/lib/formState";
 import { defaultKV } from "@/lib/storage";
+import * as docx from "@/lib/docx/saveDocx";
 import * as sync from "@/lib/sync";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -124,14 +125,18 @@ describe("required fields (LP-87)", () => {
   });
 
   it("Download .docx asks first too, as Download anyway", () => {
+    // Built in the browser since LP-37: nothing goes to a server.
     const fetchSpy = vi.fn(() => Promise.reject(new Error("offline")));
     vi.stubGlobal("fetch", fetchSpy);
+    const save = vi.spyOn(docx, "saveDocx").mockResolvedValue();
     mount(FORM);
     click("#download-docx");
     expect(dialogOpen()).toBe(true);
     expect(must("#missing-anyway").textContent).toBe("Download anyway");
-    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(save).not.toHaveBeenCalled();
     click("#missing-anyway");
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(save).toHaveBeenCalledTimes(1);
+    expect(save.mock.calls[0][2]).toBe(FORM);
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 });

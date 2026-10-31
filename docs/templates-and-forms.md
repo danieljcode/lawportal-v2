@@ -104,7 +104,7 @@ HTML goes require it:
 - the forum preview (`OutputPaneProps.previewHtml`) and a form's output (`FormOutput`);
 - the Discord preview (`DiscordPanelProps.finalHtml`);
 - the clipboard (`copyRich`);
-- the `.docx` request (`docxRequestBody`).
+- the `.docx` download (`saveDocx`).
 
 So passing a plain string to any of them is a type error, and `npm run build` fails. Anything new
 that shows, copies or exports HTML should take `SafeHtml` too, and get its HTML from a renderer.
