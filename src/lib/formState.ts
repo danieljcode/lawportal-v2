@@ -19,6 +19,8 @@ export {
   applyPrefills,
   autoDate,
   fillFromCharacter,
+  fillFromContact,
+  isPartyName,
   openState,
   swapCaseCode,
   todayDate,

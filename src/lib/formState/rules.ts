@@ -1,10 +1,11 @@
 // Prefills, filling from the character, case-code swaps, Today/Auto, and opening a form.
 
+import type { Contact } from "../contacts";
 import { DIVISION_CODES } from "../dockets";
 import { gameToday } from "../deadlines";
 import { prefillValue } from "../template";
-import type { Character, Entry, Values } from "../types";
-import { cloneValues, eachField, type FormState, type ScopePath, str } from "./state";
+import type { Character, Entry, Field, Values } from "../types";
+import { cloneValues, eachField, type FormState, labelsOf, type ScopePath, str } from "./state";
 import { hasDependents, materializeBlocks, setValue } from "./update";
 
 /* ------------------------------------------------------------ rules */
@@ -64,6 +65,30 @@ export function fillFromCharacter(entries: Entry[], s: FormState, char: Characte
     }
   });
   return changed ? { values, autofilled, derived: s.derived } : s;
+}
+
+const PARTY_NAME = /\bname(\(s\))?$/i;
+
+/** A party's name field (LP-30): typed text ending in "name", not one of the user's own character fields. */
+export function isPartyName(f: Field): boolean {
+  return f.type === "text" && !f.character && PARTY_NAME.test(f.label);
+}
+
+/**
+ * Pick from Rolodex (LP-30): put the contact's name in `label`, and its address and phone in the
+ * fields beside it, when the form has them ("Spouse 1 name" → "Spouse 1 address", "Spouse 1 phone").
+ */
+export function fillFromContact(entries: Entry[], s: FormState, path: ScopePath, label: string, c: Contact): FormState {
+  const base = label.replace(PARTY_NAME, "");
+  const have = labelsOf(entries, s.values);
+  let next = setValue(s, path, label, c.name);
+  for (const [field, v] of [
+    [base + "address", c.address],
+    [base + "phone", c.phone],
+  ] as const) {
+    if (v && have.has(field)) next = setValue(next, path, field, v);
+  }
+  return next;
 }
 
 /**

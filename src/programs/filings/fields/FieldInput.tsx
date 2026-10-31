@@ -2,8 +2,17 @@
 
 import { useRef } from "react";
 import { FIELDS as CHARACTER_FIELDS } from "@/lib/characters";
+import { CONTACT_TYPE_LABELS } from "@/lib/contacts";
 import { exhibitMarker } from "@/lib/exhibits";
-import { applyPrefills, autoDate, hasDependents, setValue, todayDate } from "@/lib/formState";
+import {
+  applyPrefills,
+  autoDate,
+  fillFromContact,
+  hasDependents,
+  isPartyName,
+  setValue,
+  todayDate,
+} from "@/lib/formState";
 import { plain } from "@/lib/template";
 import type { Field } from "@/lib/types";
 import GameDateInput from "@/ui/GameDateInput";
@@ -36,7 +45,7 @@ export default function FieldInput({
   prefix,
   inline,
 }: ScopeProps & { field: Field; inline?: boolean }) {
-  const { entries, onState, now, required, exhibits, onFieldFocus } = useFormCtx();
+  const { entries, onState, now, required, exhibits, contacts, onFieldFocus } = useFormCtx();
   const inputRef = useRef<HTMLInputElement>(null);
   const areaRef = useRef<HTMLTextAreaElement>(null);
   const id = slugId(prefix + f.label);
@@ -219,8 +228,26 @@ export default function FieldInput({
     }
   }
   const help = HELP[f.type];
+  const pickContact = (contactId: string) => {
+    const c = contacts.find((x) => x.id === contactId);
+    if (c) onState((s) => fillFromContact(entries, s, path, f.label, c));
+  };
   const picker =
-    exhibits.length > 0 && TAKES_EXHIBITS.test(f.type) ? (
+    contacts.length > 0 && isPartyName(f) ? (
+      <select
+        className="exhibit-insert"
+        aria-label={"Pick " + f.label + " from the Rolodex"}
+        value=""
+        onChange={(e) => pickContact(e.target.value)}
+      >
+        <option value="">Pick from Rolodex…</option>
+        {contacts.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name + " (" + CONTACT_TYPE_LABELS[c.type] + ")"}
+          </option>
+        ))}
+      </select>
+    ) : exhibits.length > 0 && TAKES_EXHIBITS.test(f.type) ? (
       <select
         className="exhibit-insert"
         aria-label={"Insert exhibit into " + f.label}

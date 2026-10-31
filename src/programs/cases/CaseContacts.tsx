@@ -1,6 +1,6 @@
 // A case's contacts from the Rolodex (LP-30): who's on it and in what role,
 // linked or unlinked here. The links are kept on each contact, so each change
-// saves that contact straight away. Behind the `rolodex` flag.
+// saves that contact straight away.
 
 import { useMemo, useState, type FormEvent } from "react";
 import {

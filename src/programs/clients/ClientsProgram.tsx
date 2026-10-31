@@ -3,10 +3,9 @@
 // Both pages stay mounted, and the one you're not on is hidden, so a half-typed
 // intake survives a trip to the conflict check. Intake's Run conflict check
 // runs the check and opens it here with the names filled in. The Rolodex (LP-30,
-// #clients/rolodex) is the third page, while its flag is on.
+// #clients/rolodex) is the third page.
 
 import { useState } from "react";
-import { flagOn } from "@/lib/flags";
 import { runConflictCheck } from "@/lib/services/conflicts";
 import ConflictCheckView, { type ConflictRequest } from "./ConflictCheckView";
 import ErrorBoundary from "@/ui/ErrorBoundary";
@@ -19,7 +18,7 @@ import type { ProgramProps } from "@/shell/program";
 const PAGES: Array<{ page: ClientsPage; text: string }> = [
   { page: "intake", text: "New client intake" },
   { page: "conflicts", text: "Conflict check" },
-  ...(flagOn("rolodex") ? [{ page: "rolodex" as const, text: "Rolodex" }] : []),
+  { page: "rolodex", text: "Rolodex" },
 ];
 
 export default function ClientsProgram({ shell }: ProgramProps) {
@@ -66,13 +65,11 @@ export default function ClientsProgram({ shell }: ProgramProps) {
             <ConflictCheckView characters={shell.characters} active={shell.active} request={request} />
           </ErrorBoundary>
         </div>
-        {PAGES.some((p) => p.page === "rolodex") && (
-          <div hidden={page !== "rolodex"}>
-            <ErrorBoundary where="the Rolodex" resetKey="rolodex">
-              <RolodexView />
-            </ErrorBoundary>
-          </div>
-        )}
+        <div hidden={page !== "rolodex"}>
+          <ErrorBoundary where="the Rolodex" resetKey="rolodex">
+            <RolodexView />
+          </ErrorBoundary>
+        </div>
       </main>
     </div>
   );

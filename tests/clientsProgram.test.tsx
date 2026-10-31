@@ -73,11 +73,12 @@ describe("the Clients program (LP-107)", () => {
     vi.unstubAllGlobals();
   });
 
-  it("has New client intake and Conflict check in its pane", () => {
+  it("has New client intake, Conflict check and the Rolodex in its pane", () => {
     mount("#clients/intake");
     expect([...document.querySelectorAll("#clients-nav a")].map((a) => a.textContent)).toEqual([
       "New client intake",
       "Conflict check",
+      "Rolodex",
     ]);
     expect(current()).toBe("New client intake");
     expect(shown("#intake-title")).toBe(true);
