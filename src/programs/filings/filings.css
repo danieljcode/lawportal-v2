@@ -164,6 +164,35 @@
   margin: 0 0 4px;
 }
 
+/* Download PDF (LP-35): only the filing prints, as the forum post looks; the sheet exists only
+   while the print dialog is open. */
+@media screen {
+  .pdf-sheet {
+    display: none;
+  }
+}
+@media print {
+  html:has(#pdf-sheet),
+  body:has(#pdf-sheet) {
+    background: #fff;
+  }
+  body:has(#pdf-sheet) * {
+    visibility: hidden;
+  }
+  body:has(#pdf-sheet) #pdf-sheet,
+  body:has(#pdf-sheet) #pdf-sheet * {
+    visibility: visible;
+  }
+  body:has(#pdf-sheet) #pdf-sheet {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    margin: 0;
+    border: 0;
+    box-shadow: none;
+  }
+}
+
 /* Insert exhibit under a form's text boxes (LP-13), and Pick from Rolodex under party names
    (LP-30): only as wide as it needs. */
 .field .exhibit-insert {

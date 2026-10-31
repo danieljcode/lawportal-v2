@@ -2,13 +2,13 @@
 // Copy for forum, Copy for Discord and Download .docx, all from the one render.
 
 import { useState, type ReactNode } from "react";
-import { flushSync } from "react-dom";
 import { fromHtml } from "@/lib/bbcode";
 import { copyRich, copyText } from "@/lib/clipboard";
 import { toDiscord } from "@/lib/discord";
 import { docxRequestBody } from "@/lib/docx/request";
 import { download } from "@/lib/download";
 import type { SafeHtml } from "@/lib/safeHtml";
+import { printAs } from "@/ui/printAs";
 
 export default function Sheet({
   html,
@@ -31,12 +31,9 @@ export default function Sheet({
   const [printing, setPrinting] = useState(false);
   const say = (text: string, bad = false) => setStatus({ text, bad });
 
-  // The id exists only while the print dialog is open, so printing shows just this sheet.
-  const print = () => {
-    flushSync(() => setPrinting(true));
-    window.print();
-    setPrinting(false);
-  };
+  // The id exists only while the print dialog is open, so printing shows just this sheet; Save as PDF
+  // in the dialog names the file after it (LP-35).
+  const print = () => printAs(filename, setPrinting);
 
   const docx = async () => {
     try {
@@ -56,7 +53,7 @@ export default function Sheet({
     <>
       <div className="row invoice-actions">
         <button type="button" className="btn" id={prefix + "-print"} onClick={print}>
-          Print
+          Print / PDF
         </button>
         <button
           type="button"
