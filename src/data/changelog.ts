@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     title: "Rolodex, Ledger and invoices",
     items: [
       {
+        type: "fix",
+        text: "Easier to read: search highlights in Classic's dark theme, and the error icon in Modern's dark theme. In Classic, screen readers now find the window's title and menus as one area.",
+      },
+      {
         type: "new",
         text: "The Rolodex, in Clients: one card for every client, judge, officer, attorney, witness and business the firm deals with, with their phone, address and notes. It syncs and is in your backups.",
       },

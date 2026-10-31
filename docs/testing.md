@@ -124,7 +124,42 @@ Classic, light and dark, at both sizes. It runs everywhere `npm run test:e2e` do
 - A known issue that can't be fixed straight away goes in `ALLOWED` at the top of the spec: the axe
   rule id, with the Jira key of the issue that fixes it.
 
-It's an automatic first pass; the full manual review is LP-29.
+It's an automatic first pass. axe also prints a moderate `skip-link` note on links such as
+`#filings/<form>`: it reads a hash route as a link to an element on the page. That's how the app's
+routing works (`src/shell/useRoute.ts`), so it stays.
+
+### Keyboard, focus, zoom and contrast (LP-29)
+
+- **`e2e/focus.spec.ts`** tabs through the home screen and each program's start page, Modern and
+  Classic, light and dark: every stop must show its focus (an outline, or a ring, background or
+  colour of its own) and have a name with words in it, not only an icon.
+- **`e2e/keyboard.spec.ts`** does the key journeys with the keyboard alone, in both themes: switch
+  programs from home, open a case, fill in a filing and copy it for the forum, Help → Contents from
+  the menus, and change the theme in Settings.
+- **200% zoom** (in `e2e/a11y.spec.ts`): at 640×400, a 1280×800 screen zoomed to 200%, no screen
+  scrolls sideways, nor its top bars.
+- **`tests/contrast.test.ts`** checks the theme colours in `globals.css` in all four skins: text
+  pairs at least 4.5:1 and the focus outline 3:1 (WCAG AA), including pairs axe never sees on screen
+  (search marks, hovers, the error icon). A new colour pair belongs in its `PAIRS`.
+- **Reduced motion**: the only animation is the Classic startup screen, which holds still
+  (`tests/boot.test.tsx`).
+
+### Screen-reader pass (by hand)
+
+Automated tests can't hear what a screen reader says. Before a release that changes the screens,
+go through these with NVDA (Windows, free) or VoiceOver (Mac), in Modern and Classic:
+
+1. Home: each program tile (or Program Manager icon) is announced by name; Case File says when
+   something is due.
+2. Switch programs from the rail, the menus and Ctrl+K; the new program's name is announced.
+3. Court Filings: pick a form, fill in fields (each label read out, required ones said so), Copy for
+   forum, and the "Copied" status is announced.
+4. Case File: open a case, add a deadline with the date picker, add an exhibit.
+5. Settings: change the theme and light or dark; open and close the Characters dialog (the focus
+   goes back to where it was).
+6. Help: search, open a topic, follow a link, Back.
+
+Fix what's wrong, or ticket it in Jira with the `accessibility` label.
 
 ## Screenshot tests (LP-117)
 

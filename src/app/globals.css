@@ -77,7 +77,7 @@
   --select-text: #000;
   --link: #ffff00;
   --help-link: var(--link);
-  --mark: #808000;
+  --mark: #707000; /* white text on it meets AA (LP-29) */
   --focus: #ffff00;
   --muted: #c0c0c0;
   --good: #00ff00;
@@ -114,7 +114,7 @@
     --select-text: #000;
     --link: #ffff00;
     --help-link: var(--link);
-    --mark: #808000;
+    --mark: #707000;
     --focus: #ffff00;
     --muted: #c0c0c0;
     --good: #00ff00;
@@ -266,6 +266,8 @@
   --shadow-menu: 0 8px 24px rgba(22, 25, 30, 0.14), 0 2px 6px rgba(22, 25, 30, 0.08);
   --desktop-text: var(--muted);
   --alert-bg: var(--bad);
+  /* the error icon's "!" in the page colour, so it reads on dark mode's light red too (LP-29) */
+  --alert-text: var(--face);
   --ring: var(--shadow);
   --hover-text: var(--text);
 
@@ -657,6 +659,9 @@ summary:focus-visible {
   flex-direction: column;
   padding: 3px;
   min-width: 0;
+}
+.app-head {
+  flex: none;
 }
 .title-bar {
   display: flex;

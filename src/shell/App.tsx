@@ -491,34 +491,37 @@ export default function App() {
       ) : (
         <>
           <div className={"app-window program-" + (program ? program.id : "home") + (navOpen ? " nav-open" : "")}>
-            <div className="title-bar app-title">
-              <span className="title-bar-icon" aria-hidden="true">
-                {icon}
-              </span>
-              <span className="title-bar-text">{windowTitle}</span>
-              <span className="title-bar-controls" aria-hidden="true">
-                <span>_</span>
-                <span>□</span>
-                <span>✕</span>
-              </span>
-            </div>
-            {/* The menu bar holds the shell's actions (LP-109); ☰ opens the navigation pane on a phone. */}
-            <div className="classic-bar">
-              {program?.nav && (
-                <button
-                  type="button"
-                  className="btn icon-btn only-narrow"
-                  id="toggle-nav"
-                  aria-label={"Show " + program.nav.label}
-                  aria-expanded={navOpen}
-                  aria-controls={program.nav.id}
-                  onClick={() => setNavOpen((o) => !o)}
-                >
-                  ☰
-                </button>
-              )}
-              <MenuBar menus={menus} />
-            </div>
+            {/* The window's title and menu bars, one landmark for screen readers (LP-29). */}
+            <header className="app-head">
+              <div className="title-bar app-title">
+                <span className="title-bar-icon" aria-hidden="true">
+                  {icon}
+                </span>
+                <span className="title-bar-text">{windowTitle}</span>
+                <span className="title-bar-controls" aria-hidden="true">
+                  <span>_</span>
+                  <span>□</span>
+                  <span>✕</span>
+                </span>
+              </div>
+              {/* The menu bar holds the shell's actions (LP-109); ☰ opens the navigation pane on a phone. */}
+              <div className="classic-bar">
+                {program?.nav && (
+                  <button
+                    type="button"
+                    className="btn icon-btn only-narrow"
+                    id="toggle-nav"
+                    aria-label={"Show " + program.nav.label}
+                    aria-expanded={navOpen}
+                    aria-controls={program.nav.id}
+                    onClick={() => setNavOpen((o) => !o)}
+                  >
+                    ☰
+                  </button>
+                )}
+                <MenuBar menus={menus} />
+              </div>
+            </header>
             {notice}
             {content}
           </div>
