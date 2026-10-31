@@ -18,6 +18,24 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-10-31",
+    title: "Rolodex",
+    items: [
+      {
+        type: "new",
+        text: "The Rolodex, in Clients: one card for every client, judge, officer, attorney, witness and business the firm deals with, with their phone, address and notes. It syncs and is in your backups.",
+      },
+      {
+        type: "new",
+        text: "Link contacts to a case in a role (client, opposing party, witness…) from the case's Contacts section.",
+      },
+      {
+        type: "new",
+        text: "Party names in a filing have Pick from Rolodex, which fills in the name, and the address and phone where the form asks for them.",
+      },
+    ],
+  },
+  {
     date: "2026-10-29",
     title: "Letterhead",
     items: [

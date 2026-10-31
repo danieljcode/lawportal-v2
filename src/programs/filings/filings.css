@@ -164,7 +164,8 @@
   margin: 0 0 4px;
 }
 
-/* Insert exhibit under a form's text boxes (LP-13): only as wide as it needs. */
+/* Insert exhibit under a form's text boxes (LP-13), and Pick from Rolodex under party names
+   (LP-30): only as wide as it needs. */
 .field .exhibit-insert {
   width: auto;
   max-width: 100%;

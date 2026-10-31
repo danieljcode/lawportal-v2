@@ -1,6 +1,6 @@
 // The Rolodex (LP-30): the firm's contacts, one card each, with a search box,
 // a type filter, and a form to add or edit one; each card links the cases
-// the contact is on. Behind the `rolodex` flag.
+// the contact is on.
 
 import { useMemo, useState, type FormEvent } from "react";
 import { caseStore } from "@/lib/cases";

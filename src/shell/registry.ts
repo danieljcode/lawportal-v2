@@ -88,7 +88,7 @@ export const PROGRAMS: readonly ProgramDef[] = [
     sections: [
       { label: "New client intake", href: "#clients/intake" },
       { label: "Conflict check", href: "#clients/conflicts" },
-      ...(flagOn("rolodex") ? [{ label: "Rolodex", href: "#clients/rolodex" }] : []),
+      { label: "Rolodex", href: "#clients/rolodex" },
     ],
     ...lazyProgram(() => import("@/programs/clients")),
   },
