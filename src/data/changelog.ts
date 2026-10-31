@@ -53,6 +53,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "new",
         text: "Payments say how they were paid (cash, cheque or bank transfer). An invoice is due 30 days after it's issued and shows Overdue after that, and Accounts receivable in the Ledger lists what's still owed, oldest first.",
       },
+      {
+        type: "new",
+        text: "Retainers: record what each Rolodex client deposits, and pay their invoices From retainer. The Ledger keeps the running balance and history, warns when a client drops below the amount you set, and writes the letter asking them to top it up.",
+      },
     ],
   },
   {

@@ -275,6 +275,7 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
 | Rolodex contacts (LP-30)          | `src/lib/contacts.ts`                    | `lawapp_contacts`                    |
 | Ledger time entries (LP-32)       | `src/lib/ledger.ts`                      | `lawapp_time`                        |
 | Ledger invoices (LP-33)           | `src/lib/invoices.ts`                    | `lawapp_invoices`                    |
+| Client retainer deposits (LP-93)  | `src/lib/retainers.ts`                   | `lawapp_retainers`                   |
 | Sync state                        | `src/lib/sync.ts`                        | `lawapp_sync_*`                      |
 
 - **KV wrapper** (`src/lib/storage.ts`). The stores never touch the browser's storage directly:
@@ -421,7 +422,13 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
   `BRANDING.shortName`) and dated today in game time. Payments have a method (cash, cheque, bank
   transfer; LP-93). An invoice is due `INVOICE_TERMS_DAYS` (30) game days after issue; its status
   is Paid, else Overdue past the due date, else Unpaid or Part paid. `receivables` lists those
-  with a balance, oldest first (Accounts receivable).
+  with a balance, oldest first (Accounts receivable). **Retainers** (`src/lib/retainers.ts`,
+  `Retainers.tsx`, LP-93): deposits per Rolodex client (`lawapp_retainers`, synced per deposit as
+  `deposit:<id>`); a payment with the method "retainer" names the client (`contactId`, the
+  case's client-role contact) and draws on it. `retainerHistory` merges both, oldest first, with
+  the running balance. A contact's `retainerFloor` marks it Low below that, and
+  `topUpLetterHtml` asks for the shortfall. Invoices and the letter share `Sheet.tsx` (print,
+  copy, .docx).
   `lawapp_invoices` (up to 2,000) syncs per invoice by `updated` (`invoice:<id>`), like time
   entries. `invoiceHtml` renders the sheet once through the template engine (with the letterhead),
   for the preview, Print, Copy for forum and Discord, and Download .docx. The sheet is paper in
