@@ -71,6 +71,10 @@ export const CHANGELOG: ChangelogEntry[] = [
       },
       {
         type: "new",
+        text: "Help: guides for every program and the main tasks, with Contents, Search and Back. Each program's Help menu has Help on that program. In Classic it looks like Windows 3.0 Help.",
+      },
+      {
+        type: "new",
         text: "Find: one search box for everything, from the Find program or Ctrl+Shift+F. It searches cases, contacts, filings, exhibits, invoices and time as you type, groups what it finds, and opens each in its program. Case numbers match with or without dashes.",
       },
     ],

@@ -125,6 +125,15 @@ export const PROGRAMS: readonly ProgramDef[] = [
     ...lazyProgram(() => import("@/programs/find")),
   },
   {
+    id: "help",
+    title: "Help",
+    icon: "?",
+    group: "main",
+    start: "#help",
+    visible: everyone,
+    ...lazyProgram(() => import("@/programs/help")),
+  },
+  {
     id: "jap",
     title: "J.A.P.",
     icon: "★",

@@ -103,6 +103,8 @@ Release PR does the tag and the GitHub Release.
 - [ ] Tests added or updated, all passing, CI green
 - [ ] What's new entry (`src/data/changelog.ts`) if users will notice the change
 - [ ] README/docs updated if setup or behaviour changed
+- [ ] Help updated for user-facing changes (LP-94): the topic in `src/programs/help/topics/` that
+      covers it, or a new topic listed in `topics.ts`
 - [ ] Branch starts with the issue key; commits and PR title end with `[LP-<n>]`; PR description
       links the Jira issue
 - [ ] Flagged work (LP-120): when the feature ships, its flag and every check of it are deleted

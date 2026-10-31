@@ -121,6 +121,8 @@ in, your searches and where you'd scrolled to are still there when you come back
 - **Settings.** Characters, sync and backups, the Letterhead on firm letters, Appearance (the theme,
   Modern or Classic, and light, dark or system), What's new and About, on one page. The top bar of every program shows who you're filing
   as, with a quick switch, and the sync status.
+- **Help.** Contents, Search and linked topics with Back for every program and the main tasks, and
+  **Help on** each program in its Help menu. Classic styles it like Windows 3.0 Help.
 - **Jump to anything.** Press **Ctrl+K** (**Cmd+K** on a Mac) or **/**, or choose View → Jump to, and
   type a few letters to go straight to a program, a section such as Upcoming or Precedents, or any
   court form.
@@ -187,7 +189,7 @@ Work is planned in a private Jira project, **LP**.
   enforce this on this plan, so it's up to you.
 - **Definition of Done** for every issue: its acceptance criteria met; tests added or updated, all
   passing and CI green; a What's new entry if users will notice; the README and docs updated if setup
-  or behaviour changed; and the branch, commits and PR named after the issue, with the PR linking it.
+  or behaviour changed; the Help topic updated for user-facing changes; and the branch, commits and PR named after the issue, with the PR linking it.
 
 [Contributing](docs/contributing.md) has the full conventions, and [Releasing](docs/releasing.md) the
 release steps.

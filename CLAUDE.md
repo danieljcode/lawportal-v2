@@ -40,10 +40,15 @@ Routes are prefixed by program (`src/shell/useRoute.ts`); an empty hash is home.
 | Law Library                         | `src/programs/library/` | `#library/penal-code`, `#library/precedents` |
 | Ledger                              | `src/programs/ledger/`  | `#ledger`                                    |
 | Find                                | `src/programs/find/`    | `#find`                                      |
+| Help                                | `src/programs/help/`    | `#help`, `#help/<topic>`                     |
 | J.A.P. (Court Commissioners)        | `src/programs/jap/`     | `#jap`                                       |
 | Settings (Control Panel in Classic) | `src/programs/control/` | `#control`                                   |
 
 Home is `src/shell/ModernHome.tsx` in Modern and `src/shell/ProgramManager.tsx` in Classic.
+
+**Help (LP-94) is part of the Definition of Done:** a user-facing change updates the Help topic that covers it (one
+Markdown file each in `src/programs/help/topics/`), or adds one and lists it in `topics.ts`. A new program needs a
+topic named after its id; `tests/help.test.tsx` checks that, and that every topic link leads somewhere.
 
 Unfinished work can merge behind a feature flag (`src/lib/flags.ts`, on with `?flags=<name>`; docs/development.md).
 Flagged work is done only when its feature ships and the flag, with every check of it, is deleted.

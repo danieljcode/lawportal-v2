@@ -6,6 +6,13 @@ import { REAL_DATA_TESTS, sampleData } from "./tests/real-data";
 const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8")) as { version: string };
 
 export default defineConfig({
+  // Markdown imports as its text, as Turbopack's raw rule does in the app (LP-94).
+  plugins: [
+    {
+      name: "markdown-text",
+      transform: (code: string, id: string) => (id.endsWith(".md") ? "export default " + JSON.stringify(code) : null),
+    },
+  ],
   resolve: {
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },

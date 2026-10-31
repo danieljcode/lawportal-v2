@@ -115,7 +115,7 @@ browser.
   doubles their ids, and in Settings the File and Help menu items scroll to the section instead.
 - **Hash routing** (`useRoute.ts`). Routes are prefixed by program: `#filings` and
   `#filings/<formId>`, `#cases`, `#cases/<id>` and `#cases/upcoming`, `#clients/intake` and
-  `#clients/conflicts`, `#clients/rolodex`, `#library/penal-code` and `#library/precedents`, `#ledger`, `#find`, `#jap`, `#control`; an
+  `#clients/conflicts`, `#clients/rolodex`, `#library/penal-code` and `#library/precedents`, `#ledger`, `#find`, `#help` and `#help/<topic>`, `#jap`, `#control`; an
   empty hash is home. `parseHash` also reads the old flat hashes (`#cases`, `#upcoming`,
   `#intake`, `#conflicts`, `#library`, `#jap`, `#<formId>`), and the hook rewrites them to the
   new ones with `replaceState`. The last place is remembered under `lawapp_last_form` as a hash
@@ -448,6 +448,13 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
   (lowercase, and again without dashes or spaces, so case numbers match either way); `find`
   keeps the items holding every search word, grouped by kind, at most 20 listed per group.
   Results link into their program. Ctrl+Shift+F (`isFindKey`) opens it.
+- **Help** (`src/programs/help/`, LP-94): one Markdown file per topic in `topics/`, imported as
+  text (Turbopack's `raw` rule in `next.config.mjs`, a small plugin in `vitest.config.mts`,
+  types in `src/markdown.d.ts`) and listed in `topics.ts`. `Markdown.tsx` renders the little
+  Markdown they use as React elements, never HTML, and links only to app hashes or https. A topic
+  named after a program is its "Help on" topic, opened from every program's Help menu. Back steps
+  through the topics read in Help, not the browser history. Classic's links are Windows 3.0 Help's
+  green (`--help-link`).
 - **Rolodex** (`src/lib/contacts.ts`, `src/programs/clients/RolodexView.tsx`, LP-30): the Clients program's third page, at `#clients/rolodex`. One list under
   `lawapp_contacts` (store base, v1, up to 2,000 contacts, A–Z): name, type (client, judge,
   officer, attorney, witness, business), phone, address, organisation and notes. Search
