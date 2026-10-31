@@ -8,7 +8,7 @@ import type { FormOutput } from "@/programs/filings/FormView";
 import type { OutputPaneProps } from "@/programs/filings/OutputPane";
 import { copyRich } from "@/lib/clipboard";
 import { renderDiscordHtml } from "@/lib/discordPreview";
-import { docxRequestBody } from "@/lib/docx/request";
+import { saveDocx } from "@/lib/docx/saveDocx";
 import { EMPTY_HTML, type SafeHtml } from "@/lib/safeHtml";
 import { compile, escapeHtml, render } from "@/lib/template";
 
@@ -22,9 +22,9 @@ export function compileTimeChecks(plain: string, safe: SafeHtml): void {
   void copyRich(plain, plain);
   void copyRich(safe, plain);
 
-  // @ts-expect-error a plain string can't be sent for the .docx
-  docxRequestBody(plain, "Title", "id");
-  docxRequestBody(safe, "Title", "id");
+  // @ts-expect-error a plain string can't be made into a .docx
+  void saveDocx(plain, "Title", "id");
+  void saveDocx(safe, "Title", "id");
 
   // @ts-expect-error the preview only shows rendered HTML
   const preview: OutputPaneProps["previewHtml"] = plain;
@@ -48,14 +48,6 @@ describe("SafeHtml sources", () => {
     const discord: SafeHtml = renderDiscordHtml("**<i>**");
     expect(discord).not.toContain("<i>");
     expect(EMPTY_HTML).toBe("");
-  });
-
-  it("the .docx request carries the HTML, title and id", () => {
-    expect(JSON.parse(docxRequestBody(escapeHtml("<a>"), "Civil Complaint", "civil-complaint"))).toEqual({
-      html: "&lt;a&gt;",
-      title: "Civil Complaint",
-      id: "civil-complaint",
-    });
   });
 
   it("only the renderers mark HTML as safe", () => {

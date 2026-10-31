@@ -121,8 +121,8 @@ browser.
   new ones with `replaceState`. The last place is remembered under `lawapp_last_form` as a hash
   without "#" (a bare form id or `jap`/`cases`/`upcoming` from before still reopens).
   `useDialogs` owns the open dialog.
-- **Three small API routes** on the same server, all behind a host check (see [Server](#server)):
-  sync (`/api/account`, `/api/data`) and the `.docx` export (`/api/docx`).
+- **Two small API routes** on the same server, both behind a host check (see [Server](#server)):
+  sync (`/api/account`, `/api/data`). The `.docx` export is built in the browser (LP-37).
 - **Error boundaries** (`src/ui/ErrorBoundary.tsx`, LP-88). One wraps the whole app in `AppLoader`
   (Reload only); inside `App`, each program has one (LP-123), and so do the form, the forum
   preview, the J.A.P. and its output, and each dialog. A render error shows an "Application Error"
@@ -137,7 +137,7 @@ browser.
 
 ```
 src/
-  app/            page.tsx (client-only entry), layout.tsx, globals.css, api/{account,data,docx}
+  app/            page.tsx (client-only entry), layout.tsx, globals.css, api/{account,data}
   shell/          App, registry, program.ts (what every program gets), useRoute, useDialogs, both
                   frames, the home screens, the jump box and the shell's dialogs
   programs/<id>/  one folder per program (filings, cases, clients, library, jap, control); the
@@ -208,7 +208,7 @@ flowchart LR
   H --> P[Forum preview<br/>and Copy for forum]
   H --> B[BBCode<br/>bbcode.ts]
   H --> D[Discord markdown<br/>discord.ts + discordSplit.ts]
-  H --> W[".docx<br/>POST /api/docx → htmlToDocx.ts"]
+  H --> W[".docx<br/>saveDocx.ts → htmlToDocx.ts, in the browser"]
 ```
 
 1. **Template.** Each form (`src/data/forms.json`, `src/data/extra-forms.ts`) is the forum post's
@@ -229,8 +229,10 @@ flowchart LR
    - **BBCode** (`src/lib/bbcode.ts`) for editors that only take plain text.
    - **Discord** (`src/lib/discord/`, `discordSplit.ts`, `discordPreview.ts`): markdown split into
      messages of up to 2,000 characters (4,000 with Nitro), never inside formatting or a link.
-   - **Word:** the browser posts the HTML to `/api/docx`, and `src/lib/docx/htmlToDocx.ts` builds
-     the file on the server. Images become `[Image: <url>]` links; the server never fetches them.
+   - **Word** (LP-37): `saveDocx` (`src/lib/docx/saveDocx.ts`) loads `htmlToDocx.ts` (the `docx`
+     library and `node-html-parser`) on the first download and builds the file in the browser, so
+     it works offline and over plain http on the LAN. Images become `[Image: <url>]` links; nothing
+     fetches them.
    - **PDF** (LP-35): the browser's own. Download PDF mounts the final filing (never the
      highlighted preview) as `.post#pdf-sheet` and prints it with `printAs` (`src/ui/printAs.ts`),
      which titles the page with the form id, so Save as PDF names the file like the .docx; the
@@ -497,22 +499,20 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
 
 ## Server
 
-The only server code is three route handlers and `src/lib/server/`:
+The only server code is two route handlers and `src/lib/server/`:
 
 | Route          | Methods                                                     | What it does  |
 | -------------- | ----------------------------------------------------------- | ------------- |
 | `/api/account` | `POST` creates a sync code; `DELETE` deletes its data       | Sync accounts |
 | `/api/data`    | `GET` the copy; `PUT` replaces it (optimistic, by revision) | Sync data     |
-| `/api/docx`    | `POST` HTML, returns a `.docx`                              | Word export   |
 
 - **Host check** (`guard.ts`). Unless `LAWAPP_ALLOW_LAN=1` is set (by `dev:lan` / `start:lan`, or
   in the hosted app's environment), every API route answers `421` to requests not addressed to
   `localhost` or `127.0.0.1`. That also stops DNS-rebinding pages reaching the local API.
 - **Capped bodies** (`body.ts`). Route handlers have no built-in body limit, so they read through
-  `readCapped`: 4 MB for sync data, 2 MB for `.docx`.
+  `readCapped`: 4 MB for sync data.
 - **Rate limits** (`rateLimit.ts`). The sync routes answer `429` when an IP (or the server overall)
   makes too many codes, or an IP sends too many bad codes: see [Sync](sync.md#server-storage).
-  `/api/docx` answers `429` after 30 documents a minute from one IP (LP-160).
 - **Sync storage** is Upstash Redis on the hosted app (`syncRedis.ts`, used when its environment
   variables are set), or one JSON file per sync code when the app runs on its own: see
   [Sync, storage and recovery](sync.md).

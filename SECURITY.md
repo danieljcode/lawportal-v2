@@ -11,7 +11,7 @@ change or delete other people's sync data.
 
 ## What's in scope
 
-- The web app and its API routes (`src/app/api`): sync codes and sync data, and `.docx` downloads.
+- The web app and its API routes (`src/app/api`): sync codes and sync data. (`.docx` files are built in the browser.)
 - The build and CI scripts in this repository.
 
 The court forms and the penal code the hosted app shows aren't in this repository; they're private

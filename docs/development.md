@@ -128,7 +128,7 @@ Authentication). They run the real app, with these differences:
 - **Sync is off.** Vercel sets `VERCEL_ENV=preview`, and the sync routes then answer `503` "Sync
   isn't available in previews" (`checkSync` in `src/lib/server/guard.ts`), so a PR never reads or
   writes real sync data. Keep the Upstash variables scoped to Production in the Vercel project too.
-- **`.docx` downloads work** if `LAWAPP_ALLOW_LAN=1` is also set for Preview; it stores nothing.
+- **`.docx` downloads work**: the browser builds them (LP-37).
 - A preview stays reachable after its PR closes; Vercel keeps old deploys.
 
 ## Scripts
@@ -195,7 +195,7 @@ when its feature ships.
 | Symptom                                                       | Cause and fix                                                                                                            |
 | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | Another device gets errors, or the API answers `421`          | The app wasn't started in LAN mode. Use `npm run start:lan`.                                                             |
-| On the hosted app, sync or `.docx` answers `421`              | `LAWAPP_ALLOW_LAN=1` isn't set in the Vercel project's environment variables. See [Hosted on Vercel](#hosted-on-vercel). |
+| On the hosted app, sync answers `421`                         | `LAWAPP_ALLOW_LAN=1` isn't set in the Vercel project's environment variables. See [Hosted on Vercel](#hosted-on-vercel). |
 | Copy doesn't work on another device                           | Expected over plain http: the app falls back to a text selection, so paste should still work.                            |
 | `[parity] skipped: reference data not found`                  | Normal without access to the reference data. With access, clone it into `.agents/reference/jsa` (see above).             |
 | `port-forms: the reference forms aren't here`                 | The same: `port-forms` needs the reference data.                                                                         |

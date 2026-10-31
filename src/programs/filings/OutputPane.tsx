@@ -4,8 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { fromHtml } from "@/lib/bbcode";
 import { copyRich, copyText } from "@/lib/clipboard";
-import { docxRequestBody } from "@/lib/docx/request";
-import { download } from "@/lib/download";
+import { saveDocx } from "@/lib/docx/saveDocx";
 import type { FilingVia } from "@/lib/filings";
 import type { MissingField } from "@/lib/formState";
 import type { SafeHtml } from "@/lib/safeHtml";
@@ -94,25 +93,11 @@ export default function OutputPane({
   const downloadDocx = async () => {
     setBuilding(true);
     try {
-      let res: Response;
-      try {
-        res = await fetch("/api/docx", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: docxRequestBody(finalHtml, form.title, form.id),
-        });
-      } catch {
-        flash("Couldn't build the .docx (server unreachable).", true);
-        return;
-      }
-      if (!res.ok) {
-        flash("Couldn't build the .docx (" + res.status + ").", true);
-        return;
-      }
-      download(await res.blob(), form.id + ".docx");
+      await saveDocx(finalHtml, form.title, form.id);
       onFiled?.("docx");
-    } catch {
-      flash("Couldn't build the .docx (server unreachable).", true);
+    } catch (err) {
+      console.warn("[docx] couldn't build", err);
+      flash("Couldn't build the .docx. Try again.", true);
     } finally {
       setBuilding(false);
     }

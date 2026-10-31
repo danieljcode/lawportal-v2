@@ -1,4 +1,4 @@
-// Streaming request body reader with a byte cap (shared by PUT /api/data and POST /api/docx).
+// Streaming request body reader with a byte cap (PUT /api/data).
 //
 // Route handlers have no built-in body limit, and req.text() would buffer a
 // chunked body completely, so the routes read through this instead.
