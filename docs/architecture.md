@@ -99,8 +99,8 @@ browser.
   New client intake and Conflict check, both kept mounted with the other page hidden, so a half-typed intake survives a
   trip to the check. Intake's Run conflict check runs the check (`runConflictCheck`) and hands it
   to the Conflict check page as a request (names, result, `seq`), which fills in the names and
-  shows the result; `navigate()` in `useRoute` moves there at once. The Rolodex (LP-30) will be one
-  more entry in its pane. The Law Library (`LibraryProgram.tsx`, LP-108) has a pane with Penal Code (All charges, then
+  shows the result; `navigate()` in `useRoute` moves there at once. The Rolodex (LP-30) is the third
+  entry in its pane. The Law Library (`LibraryProgram.tsx`, LP-108) has a pane with Penal Code (All charges, then
   each chapter with its count) and Precedents; a chapter has its own address
   (`#library/penal-code/<chapter slug>`, `chapterSlug`/`chapterFromSlug` in `penalCode.ts`), and
   picking one in the chapter list changes it. `PenalCodeSearch` takes the chapter from the program
@@ -115,7 +115,7 @@ browser.
   doubles their ids, and in Settings the File and Help menu items scroll to the section instead.
 - **Hash routing** (`useRoute.ts`). Routes are prefixed by program: `#filings` and
   `#filings/<formId>`, `#cases`, `#cases/<id>` and `#cases/upcoming`, `#clients/intake` and
-  `#clients/conflicts` (and `#clients/rolodex` behind the `rolodex` flag), `#library/penal-code` and `#library/precedents`, `#jap`, `#control`; an
+  `#clients/conflicts`, `#clients/rolodex`, `#library/penal-code` and `#library/precedents`, `#jap`, `#control`; an
   empty hash is home. `parseHash` also reads the old flat hashes (`#cases`, `#upcoming`,
   `#intake`, `#conflicts`, `#library`, `#jap`, `#<formId>`), and the hook rewrites them to the
   new ones with `replaceState`. The last place is remembered under `lawapp_last_form` as a hash
@@ -403,8 +403,7 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
   link (`safeLink`) and lower-case topic tags. Search (`filterPrecedents`) needs every word
   somewhere in the ruling; `highlightParts` splits text for `<mark>`, rendered by React as text.
   Sync merges each ruling by `updated` (`precedent:<id>`); the server takes up to 1,000.
-- **Rolodex** (`src/lib/contacts.ts`, `src/programs/clients/RolodexView.tsx`, LP-30; behind the
-  `rolodex` flag): the Clients program's third page, at `#clients/rolodex`. One list under
+- **Rolodex** (`src/lib/contacts.ts`, `src/programs/clients/RolodexView.tsx`, LP-30): the Clients program's third page, at `#clients/rolodex`. One list under
   `lawapp_contacts` (store base, v1, up to 2,000 contacts, A–Z): name, type (client, judge,
   officer, attorney, witness, business), phone, address, organisation and notes. Search
   (`filterContacts`) needs every word somewhere in the contact. Sync merges each contact by
@@ -412,7 +411,10 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
   A contact keeps its own links to cases (`cases`: case id and role, up to 100), so the links sync
   with it and the cases store doesn't change; a save without `cases` (the Rolodex form) keeps them.
   A case's **Contacts** section (`CaseContacts.tsx`) links and unlinks them, and each Rolodex card
-  links its cases.
+  links its cases. In a form, a party's name field (`isPartyName`: a text field ending in "name",
+  not a character field) offers **Pick from Rolodex**; `fillFromContact` puts in the contact's name,
+  and its address and phone where the form has fields beside it ("Spouse 1 name" → "Spouse 1
+  address").
   In a form, focusing a text, textarea, list or paras field registers it (`FormCtx.onFieldFocus`);
   the **Law Library** dialog's Insert citation puts `citation(p)` at that field's cursor, reading
   the field as it is then. Citations are plain text, so they're escaped like any other value.

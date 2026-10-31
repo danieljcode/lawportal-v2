@@ -7,7 +7,6 @@ import { useMemo, useState, type FormEvent } from "react";
 import { caseProblem, caseStore, filterCases, members, needsLead, NEEDS_LEAD } from "@/lib/cases";
 import { FIELDS, MAX_TEXT, STATUSES } from "@/lib/docketFields";
 import { filingsForCase, filingStore, type Filing } from "@/lib/filings";
-import { flagOn } from "@/lib/flags";
 import type { Case, Character } from "@/lib/types";
 import CaseContacts from "./CaseContacts";
 import CaseDeadlines from "./CaseDeadlines";
@@ -256,12 +255,10 @@ function CaseLinks({
         <h4 id="case-deadlines-title">Deadlines and hearings</h4>
         <CaseDeadlines c={c} />
       </section>
-      {flagOn("rolodex") && (
-        <section className="case-empty" id="case-contacts" aria-labelledby="case-contacts-title">
-          <h4 id="case-contacts-title">Contacts</h4>
-          <CaseContacts c={c} />
-        </section>
-      )}
+      <section className="case-empty" id="case-contacts" aria-labelledby="case-contacts-title">
+        <h4 id="case-contacts-title">Contacts</h4>
+        <CaseContacts c={c} />
+      </section>
       <section className="case-empty" id="case-filings" aria-labelledby="case-filings-title">
         <h4 id="case-filings-title">Filings</h4>
         {filings.length ? (

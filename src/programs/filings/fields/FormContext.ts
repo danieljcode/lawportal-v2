@@ -3,6 +3,7 @@
 
 import { createContext, useContext } from "react";
 import type { FormState } from "@/lib/formState";
+import type { Contact } from "@/lib/contacts";
 import type { ExhibitRef } from "@/lib/exhibits";
 import type { Character, Entry } from "@/lib/types";
 
@@ -28,6 +29,8 @@ export interface FormCtx {
   required: ReadonlySet<string>;
   /** The exhibits of the firm case with this form's case number (LP-13), for Insert exhibit. */
   exhibits: readonly ExhibitRef[];
+  /** The Rolodex, A–Z (LP-30), for Pick from Rolodex on party names. */
+  contacts: readonly Contact[];
   /** A text field was focused: it's where Insert citation goes (LP-16). */
   onFieldFocus(target: FieldTarget): void;
 }
