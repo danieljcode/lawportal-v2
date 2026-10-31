@@ -4,7 +4,7 @@
 
 /** Every flag, with the Jira issue it belongs to. Each is off unless `?flags=` names it. */
 export const FLAGS = {
-  // find: { jira: "LP-95" },
+  invoices: { jira: "LP-33" },
 } as const satisfies Record<string, { jira: string }>;
 
 export type Flag = keyof typeof FLAGS;

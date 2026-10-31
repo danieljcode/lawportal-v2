@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { caseStore } from "@/lib/cases";
+import { invoiceStore } from "@/lib/invoices";
 import { timerStore, timeStore } from "@/lib/ledger";
 import LedgerProgram from "@/programs/ledger";
 import type { ProgramProps } from "@/shell/program";
@@ -54,6 +55,7 @@ beforeEach(() => {
   localStorage.clear();
   timeStore().replaceAll([]);
   timerStore().discard();
+  invoiceStore().replaceAll([]);
   caseStore().replaceAll([]);
 });
 
@@ -136,5 +138,27 @@ describe("the Ledger page (LP-32)", () => {
     click(must("#timer-stop"));
     expect($("#timer-status")).toBeNull();
     expect(timeStore().list()).toMatchObject([{ caseId: "case0001", character: "alice001", hours: 0.1 }]);
+  });
+
+  it("invoices a case's time, records a payment and deletes it (LP-33, flagged)", () => {
+    history.replaceState(null, "", "/?flags=invoices");
+    caseStore().save({ id: "case0001", caseNumber: "90SCCR00147", lead: "alice001" });
+    timeStore().save({ caseId: "case0001", character: "alice001", date: "1990-10-02", hours: 2, activity: "court" });
+    mount();
+    expect($("#invoice-new")).toBeNull();
+    setValue("#ledger-case", "case0001");
+    click(must("#invoice-new"));
+    expect(must(".invoice-sheet").textContent).toContain("INVOICE FA-1990-0001");
+    expect(must(".invoice-sheet").textContent).toContain("Balance due$200.00");
+
+    setValue("#payment-amount", "75");
+    click(must("#payment-add"));
+    expect(must("#invoice-payments").textContent).toContain("$75.00");
+    expect(must("#invoice-list").textContent).toContain("Part paid");
+
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    click(must("#invoice-delete"));
+    expect(invoiceStore().list()).toEqual([]);
+    history.replaceState(null, "", "/");
   });
 });

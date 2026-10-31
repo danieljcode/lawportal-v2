@@ -5,6 +5,7 @@ import { caseStore } from "@/lib/cases";
 import { characterStore } from "@/lib/characters";
 import { contactStore } from "@/lib/contacts";
 import { docketStore } from "@/lib/dockets";
+import { invoiceStore } from "@/lib/invoices";
 import { timeStore } from "@/lib/ledger";
 import { portfolioStore } from "@/lib/portfolio";
 import { precedentStore } from "@/lib/precedents";
@@ -633,6 +634,30 @@ describe("conflicts keep unsent edits (LP-64)", () => {
     expect(timeStore().get("time0002")?.hours).toBe(2);
     const sent = calls[1].body as { data: sync.SyncDoc };
     expect(sent.data.time?.map((e) => e.id).sort()).toEqual(["time0001", "time0002"]);
+  });
+
+  it("an invoice made here goes up with the next push (LP-33)", async () => {
+    seed([], {});
+    invoiceStore().replaceAll([]);
+    const entry = timeStore().save({
+      caseId: "case0001",
+      character: "char0001",
+      date: "1990-10-02",
+      hours: 1,
+      activity: "court",
+    });
+    invoiceStore().create({
+      caseId: "case0001",
+      caseNumber: "90SCCR00147",
+      date: "1990-10-31",
+      entries: [entry],
+      rateOf: () => 100,
+      nameOf: () => "Alice",
+    });
+    const calls = stubFetch({ status: 200, body: { rev: 2, updated: "u2" } });
+    await sync.push();
+    const sent = calls[0].body as { data: sync.SyncDoc };
+    expect(sent.data.invoices?.map((i) => i.number)).toEqual(["FA-1990-0001"]);
   });
 
   it("discardLost forgets the kept copy", () => {
