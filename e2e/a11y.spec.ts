@@ -35,3 +35,21 @@ for (const layout of LAYOUTS) {
     });
   }
 }
+
+// 200% zoom (LP-29): a 1280×800 screen at 200% is a 640×400 viewport. Nothing scrolls sideways (WCAG
+// reflow), the page itself or the bars across the top; the panes scroll up and down as they do anyway.
+for (const layout of LAYOUTS) {
+  for (const [view, url] of VIEWS) {
+    test(`200% zoom, ${view}, ${layout}`, async ({ page }, info) => {
+      test.skip(info.project.name !== "desktop", "the phone size is narrower still");
+      await page.setViewportSize({ width: 640, height: 400 });
+      await openView(page, url, layout, "light");
+      const wide = await page.evaluate(() =>
+        [document.documentElement, ...document.querySelectorAll<HTMLElement>(".m-topbar, .classic-bar, .title-bar")]
+          .filter((el) => el.scrollWidth > el.clientWidth + 1)
+          .map((el) => (el.className || el.tagName) + ": " + el.scrollWidth + " > " + el.clientWidth),
+      );
+      expect(wide).toEqual([]);
+    });
+  }
+}
