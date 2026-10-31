@@ -428,7 +428,11 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
   case's client-role contact) and draws on it. `retainerHistory` merges both, oldest first, with
   the running balance. A contact's `retainerFloor` marks it Low below that, and
   `topUpLetterHtml` asks for the shortfall. Invoices and the letter share `Sheet.tsx` (print,
-  copy, .docx).
+  copy, .docx). **Reports** (`src/lib/reports.ts`, `Reports.tsx`, LP-34): billable hours and
+  value per character, revenue by game month (billed by issue month, received by payment month;
+  the whole firm's) and open cases by status (the character's own when filtered). Each is a plain
+  table (`Report`) shown with bars (`--chart-bar`: solid in Modern, hatched in Classic) and
+  downloaded by `reportCsv`, which defuses cells a spreadsheet would run as formulas.
   `lawapp_invoices` (up to 2,000) syncs per invoice by `updated` (`invoice:<id>`), like time
   entries. `invoiceHtml` renders the sheet once through the template engine (with the letterhead),
   for the preview, Print, Copy for forum and Discord, and Download .docx. The sheet is paper in

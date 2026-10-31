@@ -57,6 +57,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "new",
         text: "Retainers: record what each Rolodex client deposits, and pay their invoices From retainer. The Ledger keeps the running balance and history, warns when a client drops below the amount you set, and writes the letter asking them to top it up.",
       },
+      {
+        type: "new",
+        text: "Reports in the Ledger: billable hours per character, revenue by month and open cases by status, for any dates and character, each with a bar chart and a CSV download.",
+      },
     ],
   },
   {

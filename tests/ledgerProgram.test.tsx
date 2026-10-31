@@ -193,4 +193,16 @@ describe("the Ledger page (LP-32)", () => {
     click(must("#topup-open"));
     expect(must("#retainer .invoice-sheet").textContent).toContain("at least $50.00");
   });
+
+  it("reports hours per character and open cases, filtered by character (LP-34)", () => {
+    caseStore().save({ id: "case0001", caseNumber: "90SCCR00147", lead: "alice001" });
+    timeStore().save({ caseId: "case0001", character: "alice001", date: "1990-10-02", hours: 2, activity: "court" });
+    timeStore().save({ caseId: "case0001", character: "bob00001", date: "1990-10-03", hours: 1, activity: "research" });
+    mount();
+    expect(must("#report-hours tbody").textContent).toContain("Alice Lawyer2.0$200.00");
+    expect(must("#report-cases tbody").textContent).toContain("Open1");
+    setValue("#report-character", "bob00001");
+    expect(must("#report-hours tbody").textContent).toBe("Bob Partner1.0$0.00");
+    expect(must("#report-cases tbody").textContent).toContain("Open0");
+  });
 });
