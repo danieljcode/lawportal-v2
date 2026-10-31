@@ -11,6 +11,7 @@ import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, use
 import { hasDocket } from "@/lib/characters";
 import { caseStore, filterCases, isMember } from "@/lib/cases";
 import { addDeadlines, formatDay, formDates } from "@/lib/deadlines";
+import { contactStore } from "@/lib/contacts";
 import { docketStore } from "@/lib/dockets";
 import { exhibitRefs, refreshExhibitRefs, resolveExhibitRefs, type ExhibitRef } from "@/lib/exhibits";
 import { letterheadStore } from "@/lib/letterhead";
@@ -48,7 +49,7 @@ import Sections from "./fields/Sections";
 import DraftHistoryDialog from "./DraftHistoryDialog";
 import LawLibraryDialog from "./LawLibraryDialog";
 import type { SafeHtml } from "@/lib/safeHtml";
-import { useCaseVersion, useLetterheadVersion } from "@/ui/useStore";
+import { useCaseVersion, useContactVersion, useLetterheadVersion } from "@/ui/useStore";
 
 export interface FormOutput {
   /** Final HTML (no highlight): Copy for forum, BBCode, .docx. Rendered, so SafeHtml (LP-5). */
@@ -344,9 +345,20 @@ export default function FormView({
 
   const onState = useCallback((fn: (s: FormState) => FormState, key?: string) => setState(fn, key ?? null), [setState]);
   const required = useMemo(() => new Set(form.required), [form.required]);
+  const contactVersion = useContactVersion();
+  const contacts = useMemo(() => (contactVersion >= 0 ? contactStore().list() : []), [contactVersion]);
   const ctx: FormCtx = useMemo(
-    () => ({ entries, character: activeCharacter, onState, now, required, exhibits, onFieldFocus: setCiteTarget }),
-    [entries, activeCharacter, onState, now, required, exhibits],
+    () => ({
+      entries,
+      character: activeCharacter,
+      onState,
+      now,
+      required,
+      exhibits,
+      contacts,
+      onFieldFocus: setCiteTarget,
+    }),
+    [entries, activeCharacter, onState, now, required, exhibits, contacts],
   );
 
   const segs = useMemo(() => splitSegments(entries), [entries]);
