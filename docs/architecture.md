@@ -231,6 +231,10 @@ flowchart LR
      messages of up to 2,000 characters (4,000 with Nitro), never inside formatting or a link.
    - **Word:** the browser posts the HTML to `/api/docx`, and `src/lib/docx/htmlToDocx.ts` builds
      the file on the server. Images become `[Image: <url>]` links; the server never fetches them.
+   - **PDF** (LP-35): the browser's own. Download PDF mounts the final filing (never the
+     highlighted preview) as `.post#pdf-sheet` and prints it with `printAs` (`src/ui/printAs.ts`),
+     which titles the page with the form id, so Save as PDF names the file like the .docx; the
+     print rules in `filings.css` hide everything else. The Ledger's sheets print the same way.
 
 **Dates are in-game.** The game is set 36 years back. `gameTime()` in `src/lib/gameTime.ts`
 gives every date and time the app shows or fills in. `FormView` passes the real `new Date()` as

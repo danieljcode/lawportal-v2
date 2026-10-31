@@ -1,5 +1,5 @@
 // The forum preview window (FR7, INV §a aside#output): Preview/BBCode/Discord tabs,
-// Highlight unfilled, Copy for forum, Copy BBCode and Download .docx.
+// Highlight unfilled, Copy for forum, Copy BBCode, Download .docx and Download PDF.
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { fromHtml } from "@/lib/bbcode";
@@ -11,6 +11,7 @@ import type { MissingField } from "@/lib/formState";
 import type { SafeHtml } from "@/lib/safeHtml";
 import type { FormDef } from "@/lib/types";
 import Dialog from "@/ui/Dialog";
+import { printAs } from "@/ui/printAs";
 import DiscordPanel from "./DiscordPanel";
 
 export interface OutputPaneProps {
@@ -49,6 +50,8 @@ export default function OutputPane({
   const [tab, setTab] = useState<Tab>("preview");
   const [status, setStatus] = useState<{ text: string; bad: boolean } | null>(null);
   const [building, setBuilding] = useState(false);
+  /** The PDF sheet exists only while the print dialog is open (LP-35). */
+  const [printing, setPrinting] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** A copy or download waiting on the missing-fields dialog: "Copy anyway" runs it. */
   const [pending, setPending] = useState<{ what: string; run: () => void } | null>(null);
@@ -80,6 +83,12 @@ export default function OutputPane({
     const ok = await copyText(bbcode || fromHtml(finalHtml));
     flash(ok ? "BBCode copied." : "Copy failed: select the text and press Ctrl+C.", !ok);
     if (ok) onFiled?.("bbcode");
+  };
+
+  // The browser makes the PDF: Save as PDF in its print dialog, named after the form like the .docx.
+  const downloadPdf = () => {
+    printAs(form.id, setPrinting);
+    flash('To save it, pick "Save as PDF" as the printer.');
   };
 
   const downloadDocx = async () => {
@@ -202,7 +211,14 @@ export default function OutputPane({
             >
               Download .docx
             </button>
+            <button type="button" className="btn" id="download-pdf" onClick={() => guard("Download", downloadPdf)}>
+              Download PDF
+            </button>
           </div>
+          {printing && (
+            // The final filing, never the highlighted preview, in the forum post's own look.
+            <div className="post pdf-sheet" id="pdf-sheet" dangerouslySetInnerHTML={{ __html: finalHtml }} />
+          )}
           {tab === "preview" ? (
             <div className="post-frame">
               <div

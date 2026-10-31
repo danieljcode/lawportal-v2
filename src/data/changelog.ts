@@ -61,6 +61,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "new",
         text: "Reports in the Ledger: billable hours per character, revenue by month and open cases by status, for any dates and character, each with a bar chart and a CSV download.",
       },
+      {
+        type: "new",
+        text: "Download PDF beside Download .docx: your browser's print dialog opens with just the filing, as the forum shows it, named after the form. Pick Save as PDF. Invoices and letters in the Ledger print the same way.",
+      },
     ],
   },
   {

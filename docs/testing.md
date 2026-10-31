@@ -103,6 +103,7 @@ a real Chromium, at **desktop** (1440×900) and **phone** (Pixel 7) sizes, each 
   - **Settings**: switch to the dark theme;
 - **Copy for forum**: the clipboard holds the filing as HTML;
 - **Download .docx**: a real Word file (a zip) downloads;
+- **Download PDF**: the print dialog shows only the filing, named after the form (Save as PDF);
 - add a character, and it appears in "Filing as";
 - add a case to a judge's docket;
 - the home screen's first load stays within the JavaScript budget (README, "First-load budget").

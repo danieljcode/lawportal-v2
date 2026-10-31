@@ -98,7 +98,7 @@ in, your searches and where you'd scrolled to are still there when you come back
     the 1990 calendar, Fill from character, Undo and Redo, and Draft history. Drafts save as you
     type.
   - **Output:** a live forum preview with Highlight unfilled; **Copy for forum**, **Copy BBCode**,
-    **Download .docx**, and Discord messages split to fit (2,000 characters, or 4,000 with Nitro).
+    **Download .docx**, **Download PDF**, and Discord messages split to fit (2,000 characters, or 4,000 with Nitro).
   - **The Form menu:** pick a firm case to fill the form from, open the form's case, insert a
     citation from the Law Library, Draft history and Filing history. Under a text box, **Insert
     exhibit** adds "Exhibit C (Dashcam footage)", which follows the exhibit if it's moved.

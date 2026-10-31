@@ -70,7 +70,7 @@ template, not in it, so the token syntax, the template-safety check and the pari
 unaffected.
 
 - **In the editor**, an empty required field shows a small **Required** tag by its label.
-- **Copy for forum, Copy BBCode, the Discord copy buttons and Download .docx** check first. If any
+- **Copy for forum, Copy BBCode, the Discord copy buttons, Download .docx and Download PDF** check first. If any
   are empty, a dialog lists them (each links to its field, opening its section) with **Go back** and
   **Copy anyway** (or **Download anyway**).
 - **What counts as empty:** nothing but spaces. Fields in an optional section that's switched off
