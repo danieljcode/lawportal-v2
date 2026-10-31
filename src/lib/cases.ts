@@ -11,6 +11,7 @@
 import { cleanDeadlines, unionDeadlines } from "./deadlines";
 import { cleanExhibits, unionExhibits } from "./exhibits";
 import { clean as cleanDocket, DOCKETS_PREFIX } from "./docketFields";
+import { parseRate } from "./ledger";
 import { defaultKV, isId, isObject, ISO_TIME_RE, newId, setAside, uniqueById, type KV } from "./storage";
 import { createStore, unwrap, type Migration } from "./store";
 import type { Case, Docket } from "./types";
@@ -56,7 +57,16 @@ export function cleanCase(input: unknown): Case {
     ? [...new Set(o.assigned.filter((x): x is string => isId(x) && x !== lead))]
     : [];
   const created = typeof o.created === "string" && ISO_TIME_RE.test(o.created) ? o.created : d.updated;
-  return { ...d, lead, assigned, created, deadlines: cleanDeadlines(o.deadlines), exhibits: cleanExhibits(o.exhibits) };
+  const rate = parseRate(o.rate);
+  return {
+    ...d,
+    lead,
+    assigned,
+    created,
+    deadlines: cleanDeadlines(o.deadlines),
+    exhibits: cleanExhibits(o.exhibits),
+    ...(rate !== null ? { rate } : {}),
+  };
 }
 
 function validList(raw: unknown): Case[] {

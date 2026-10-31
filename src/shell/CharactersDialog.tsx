@@ -18,6 +18,7 @@ import {
 import { checkFileSize, EXPORT_FILENAME, exportText, importedMessage, importText } from "@/lib/characterFile";
 import { deleteCharacter, duplicateCharacter } from "@/lib/services/characters";
 import { characterStore, FIELDS, hasDocket, titleKeepsDocket } from "@/lib/characters";
+import { flagOn } from "@/lib/flags";
 import { docketStore } from "@/lib/dockets";
 import { download } from "@/lib/download";
 import { backend, defaultKV, listSetAside } from "@/lib/storage";
@@ -335,7 +336,8 @@ export function CharactersBody({
               {editing.id ? "Edit " + (store.get(editing.id)?.name || "character") : "New character"}
             </h3>
             <div id="char-fields">
-              {FIELDS.map((f) => {
+              {/* The Ledger's rate (LP-32) shows with the Ledger. */}
+              {FIELDS.filter((f) => f.key !== "rate" || flagOn("ledger")).map((f) => {
                 const fid = "char-" + f.key;
                 const help = f.hint ? (
                   <p className="help" id={fid + "-help"}>

@@ -61,6 +61,7 @@ export const FIELDS: readonly CharacterField[] = [
   { key: "email", label: "Email" },
   { key: "signature", label: "Signature", hint: "Text, or a link to a signature image" },
   { key: "notes", label: "Notes", multiline: true },
+  { key: "rate", label: "Hourly rate ($)", hint: "What the Ledger bills this character's time at, e.g. 150." },
   {
     key: "docket",
     label: "Keeps a docket (judge or lawyer)",

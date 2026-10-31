@@ -38,6 +38,13 @@
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
+.ledger-rate {
+  align-items: center;
+  margin: 4px 0 6px;
+}
+.ledger-rate input {
+  width: 10em;
+}
 .ledger-actions {
   white-space: nowrap;
 }

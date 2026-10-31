@@ -188,7 +188,7 @@ describe("dropping the pre-LP-70 server field (LP-71)", () => {
 });
 
 describe("characters", () => {
-  it("has the 12 fields in order (no Server since LP-70)", () => {
+  it("has the 13 fields in order (no Server since LP-70, a rate since LP-32)", () => {
     expect(FIELDS.map((f) => f.key)).toEqual([
       "name",
       "title",
@@ -201,6 +201,7 @@ describe("characters", () => {
       "email",
       "signature",
       "notes",
+      "rate",
       "docket",
     ]);
   });

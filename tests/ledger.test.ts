@@ -3,12 +3,16 @@ import { beforeEach, describe, expect, it } from "vitest";
 import {
   cleanEntry,
   createTimeStore,
+  entryValue,
   filterEntries,
+  formatMoney,
   parseHours,
+  parseRate,
   totalHours,
   type TimeEntry,
   type TimeStore,
 } from "@/lib/ledger";
+import { cleanCase } from "@/lib/cases";
 import { memoryKV } from "@/lib/storage";
 import { hashFor, pageTitle, parseHash } from "@/shell/useRoute";
 
@@ -91,6 +95,29 @@ describe("filters and totals", () => {
     expect(totalHours(list.slice(0, 2))).toBe(0.3);
     expect(totalHours(list)).toBe(1.7);
     expect(totalHours([])).toBe(0);
+  });
+});
+
+describe("rates and values", () => {
+  it("parse a rate as typed, to the cent", () => {
+    expect(parseRate("150")).toBe(150);
+    expect(parseRate(" $1,200.555 ")).toBe(1200.56);
+    expect(parseRate("0")).toBeNull();
+    expect(parseRate("lots")).toBeNull();
+    expect(parseRate(undefined)).toBeNull();
+  });
+
+  it("value an entry at a rate, and nothing without one", () => {
+    expect(entryValue({ hours: 1.3 }, 150)).toBe(195);
+    expect(entryValue({ hours: 0.1 }, 33.33)).toBe(3.33);
+    expect(entryValue({ hours: 2 }, null)).toBeNull();
+    expect(formatMoney(1234.5)).toBe("$1,234.50");
+  });
+
+  it("keep a case's own rate, and drop a bad one", () => {
+    const c = { caseNumber: "90SCCR00147", updated: "2026-10-29T10:00:00.000Z" };
+    expect(cleanCase({ ...c, rate: 200 }).rate).toBe(200);
+    expect(cleanCase({ ...c, rate: -5 })).not.toHaveProperty("rate");
   });
 });
 

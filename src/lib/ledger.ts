@@ -49,6 +49,27 @@ export function parseHours(v: unknown): number | null {
   return tenths >= 0.1 && tenths <= MAX_HOURS ? tenths : null;
 }
 
+/** Most an hourly rate can be, in dollars. */
+export const MAX_RATE = 100_000;
+
+/** A rate as typed ("150", "$1,200.5") → dollars to the cent, or null when it isn't one from 0.01 to MAX_RATE. */
+export function parseRate(v: unknown): number | null {
+  const n = typeof v === "number" ? v : typeof v === "string" && v.trim() ? Number(v.replace(/[$,s]/g, "")) : NaN;
+  if (!Number.isFinite(n)) return null;
+  const cents = Math.round(n * 100) / 100;
+  return cents >= 0.01 && cents <= MAX_RATE ? cents : null;
+}
+
+/** An entry's worth at an hourly rate, to the cent; null without a rate. */
+export function entryValue(e: Pick<TimeEntry, "hours">, rate: number | null): number | null {
+  return rate === null ? null : Math.round(e.hours * rate * 100) / 100;
+}
+
+/** "$1,234.50". */
+export function formatMoney(n: number): string {
+  return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 /** Normalise an untrusted entry (form, sync, backup); null without a case, character, date or hours. */
 export function cleanEntry(input: unknown, now: string = new Date().toISOString()): TimeEntry | null {
   if (!input || typeof input !== "object") return null;

@@ -1,6 +1,7 @@
 // The Ledger program (LP-32): billable time logged against Case File cases, with
 // a form to log or edit an entry, filters by case, character and date range,
-// and the filtered total. Behind the `ledger` flag.
+// and the filtered total. Each entry is worth its hours at the case's rate, else
+// the character's own. Behind the `ledger` flag.
 
 import { useMemo, useState, type FormEvent } from "react";
 import { caseStore } from "@/lib/cases";
@@ -8,7 +9,10 @@ import { formatDay, gameToday } from "@/lib/deadlines";
 import {
   ACTIVITIES,
   ACTIVITY_LABELS,
+  entryValue,
   filterEntries,
+  formatMoney,
+  parseRate,
   timeStore,
   totalHours,
   type Activity,
@@ -138,6 +142,40 @@ function EntryForm({
   );
 }
 
+/** The case's own hourly rate, over each character's; blank to use theirs. */
+function CaseRate({ c }: { c: Case }) {
+  const [value, setValue] = useState(c.rate ? String(c.rate) : "");
+  const [error, setError] = useState("");
+  const save = (ev: FormEvent) => {
+    ev.preventDefault();
+    const rate = parseRate(value);
+    if (value.trim() && rate === null) {
+      setError("Give a rate in dollars, e.g. 150.");
+      return;
+    }
+    setError("");
+    caseStore().save({ ...c, rate: rate ?? undefined });
+  };
+  return (
+    <form className="row ledger-rate" id="case-rate-form" noValidate onSubmit={save}>
+      <label htmlFor="case-rate">Hourly rate on {c.caseNumber} ($)</label>
+      <input
+        id="case-rate"
+        inputMode="decimal"
+        placeholder="Each character's own"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />
+      <button type="submit" className="btn" id="case-rate-save">
+        Set rate
+      </button>
+      <span className="error" role="alert" id="case-rate-error">
+        {error}
+      </span>
+    </form>
+  );
+}
+
 function LedgerView({ shell }: ProgramProps) {
   const version = useTimeVersion();
   const all = useMemo(() => (version >= 0 ? timeStore().list() : []), [version]);
@@ -148,8 +186,14 @@ function LedgerView({ shell }: ProgramProps) {
   );
   const caseById = useMemo(() => new Map(cases.map((c) => [c.id, c])), [cases]);
   const nameOf = (id: string) => shell.characters.find((c) => c.id === id)?.name || "Deleted character";
+  /** What an entry is worth: its hours at the case's rate, else the character's; null with neither. */
+  const valueOf = (e: TimeEntry) =>
+    entryValue(e, caseById.get(e.caseId)?.rate ?? parseRate(shell.characters.find((c) => c.id === e.character)?.rate));
   const [filter, setFilter] = useState<TimeFilter>({});
   const shown = useMemo(() => filterEntries(all, filter), [all, filter]);
+  const values = shown.map(valueOf);
+  const unpriced = values.filter((v) => v === null).length;
+  const filteredCase = filter.caseId ? caseById.get(filter.caseId) : undefined;
   /** The entry being edited, "new" for the log form, or null. */
   const [editing, setEditing] = useState<TimeEntry | "new" | null>(null);
   const setF = (k: keyof TimeFilter) => (v: string) => setFilter({ ...filter, [k]: v || undefined });
@@ -230,7 +274,11 @@ function LedgerView({ shell }: ProgramProps) {
             {shown.length === all.length
               ? " in " + all.length + (all.length === 1 ? " entry" : " entries")
               : " in " + shown.length + " of " + all.length + " entries"}
+            {", worth "}
+            <strong>{formatMoney(values.reduce<number>((n, v) => n + (v ?? 0), 0))}</strong>
+            {unpriced > 0 && " (" + unpriced + " with no rate)"}
           </p>
+          {filteredCase && <CaseRate key={filteredCase.id + (filteredCase.rate ?? "")} c={filteredCase} />}
           {shown.length > 0 && (
             <div className="ledger-scroll">
               <table className="ledger-table" id="ledger-list">
@@ -243,6 +291,9 @@ function LedgerView({ shell }: ProgramProps) {
                     <th scope="col" className="num">
                       Hours
                     </th>
+                    <th scope="col" className="num">
+                      Value
+                    </th>
                     <th scope="col">Note</th>
                     <th scope="col">
                       <span className="sr-only">Actions</span>
@@ -250,7 +301,7 @@ function LedgerView({ shell }: ProgramProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {shown.map((e) => {
+                  {shown.map((e, i) => {
                     const c = caseById.get(e.caseId);
                     return (
                       <tr key={e.id}>
@@ -259,6 +310,7 @@ function LedgerView({ shell }: ProgramProps) {
                         <td>{nameOf(e.character)}</td>
                         <td>{ACTIVITY_LABELS[e.activity]}</td>
                         <td className="num">{e.hours.toFixed(1)}</td>
+                        <td className="num">{values[i] === null ? "—" : formatMoney(values[i]!)}</td>
                         <td>{e.note}</td>
                         <td className="ledger-actions">
                           <button type="button" className="mini" onClick={() => setEditing(e)}>

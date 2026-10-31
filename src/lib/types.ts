@@ -111,6 +111,8 @@ export interface Character {
   email?: string;
   signature?: string;
   notes?: string;
+  /** Hourly rate in dollars, as typed (the Ledger, LP-32). */
+  rate?: string;
   docket?: boolean;
   /** ISO time of the last change on any device, including its dockets and J.A.P. (sync merges by it). */
   updatedAt?: string;
@@ -152,6 +154,8 @@ export interface Case extends Docket {
   deadlines: Deadline[];
   /** The evidence, in exhibit order (LP-12); an exhibit's letter comes from its place. */
   exhibits: Exhibit[];
+  /** Hourly rate in dollars for everyone's time on this case, over their own (the Ledger, LP-32). */
+  rate?: number;
 }
 
 /** A piece of evidence on a case (LP-12). */

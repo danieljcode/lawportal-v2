@@ -39,7 +39,7 @@ const button = (row: number, text: string) =>
     (b) => b.textContent === text,
   )!;
 
-const ALICE = { id: "alice001", name: "Alice Lawyer" };
+const ALICE = { id: "alice001", name: "Alice Lawyer", rate: "100" };
 const BOB = { id: "bob00001", name: "Bob Partner" };
 
 function mount(): void {
@@ -91,14 +91,23 @@ describe("the Ledger page (LP-32)", () => {
     setValue("#time-character", "bob00001");
     setValue("#time-hours", "2");
     click(must("#time-save"));
-    expect(must("#ledger-total").textContent).toBe("3.3 hours in 2 entries");
+    expect(must("#ledger-total").textContent).toBe("3.3 hours in 2 entries, worth $130.00 (1 with no rate)");
 
     setValue("#ledger-character", "bob00001");
     expect(rows()).toEqual([["90SCCC00200", "Bob Partner", "Research", "2.0"]]);
-    expect(must("#ledger-total").textContent).toBe("2.0 hours in 1 of 2 entries");
+    expect(must("#ledger-total").textContent).toBe("2.0 hours in 1 of 2 entries, worth $0.00 (1 with no rate)");
     setValue("#ledger-character", "");
     setValue("#ledger-case", "case0001");
     expect(rows().map((r) => r[0])).toEqual(["90SCCR00147"]);
+
+    // The case's own rate wins over Alice's $100.
+    setValue("#case-rate", "lots");
+    click(must("#case-rate-save"));
+    expect(must("#case-rate-error").textContent).toMatch(/dollars/);
+    setValue("#case-rate", "200");
+    click(must("#case-rate-save"));
+    expect(caseStore().get("case0001")?.rate).toBe(200);
+    expect(must("#ledger-total").textContent).toBe("1.3 hours in 1 of 2 entries, worth $260.00");
 
     click(button(0, "Edit"));
     expect(must<HTMLInputElement>("#time-note").value).toBe("Motion to dismiss");
