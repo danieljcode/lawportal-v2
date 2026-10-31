@@ -49,6 +49,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "new",
         text: "Invoices: pick a case (and dates) in the Ledger and turn its time into a numbered invoice, with the letterhead. Record payments as they come in, and print it, copy it for the forum or Discord, or download it as a .docx. In Classic it prints on dot-matrix paper.",
       },
+      {
+        type: "new",
+        text: "Payments say how they were paid (cash, cheque or bank transfer). An invoice is due 30 days after it's issued and shows Overdue after that, and Accounts receivable in the Ledger lists what's still owed, oldest first.",
+      },
     ],
   },
   {

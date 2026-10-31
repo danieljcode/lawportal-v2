@@ -418,7 +418,10 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
   **Invoices** (`src/lib/invoices.ts`, `Invoices.tsx`, LP-33): the
   filtered case's time over the filtered dates, frozen into lines at each entry's rate (an entry
   with no rate stops it), numbered `FA-<game year>-0001` (`nextInvoiceNumber`, per year, from
-  `BRANDING.shortName`) and dated today in game time; payments give Unpaid / Part paid / Paid.
+  `BRANDING.shortName`) and dated today in game time. Payments have a method (cash, cheque, bank
+  transfer; LP-93). An invoice is due `INVOICE_TERMS_DAYS` (30) game days after issue; its status
+  is Paid, else Overdue past the due date, else Unpaid or Part paid. `receivables` lists those
+  with a balance, oldest first (Accounts receivable).
   `lawapp_invoices` (up to 2,000) syncs per invoice by `updated` (`invoice:<id>`), like time
   entries. `invoiceHtml` renders the sheet once through the template engine (with the letterhead),
   for the preview, Print, Copy for forum and Discord, and Download .docx. The sheet is paper in
