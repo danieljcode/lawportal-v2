@@ -57,6 +57,65 @@
 .ledger-rate input {
   width: 10em;
 }
+.invoices {
+  margin-top: 16px;
+}
+.invoice {
+  margin: 6px 0 12px;
+}
+.invoice-payments {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+.invoice-pay {
+  align-items: center;
+}
+.invoice-pay input {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+/* The invoice is paper in every theme (like the print sheets); Classic prints it on tractor-feed
+   dot-matrix paper (LP-33). The paper and feed are look tokens in globals.css. */
+.invoice-sheet {
+  max-width: 820px;
+  margin: 6px 0;
+  padding: 16px calc(16px + var(--invoice-feed-width));
+  border: 1px solid var(--shadow);
+  background: var(--invoice-feed), var(--invoice-paper);
+  color: var(--invoice-ink);
+  font-family: var(--invoice-font);
+  overflow-x: auto;
+}
+.invoice-sheet table {
+  border-collapse: collapse;
+}
+.invoice-sheet td,
+.invoice-sheet th {
+  padding: 2px 8px;
+  border: 1px solid var(--invoice-ink);
+}
+/* Print just the invoice: its sheet has the id only while the print dialog is open. */
+@media print {
+  html:has(#invoice-print-sheet),
+  body:has(#invoice-print-sheet) {
+    background: #fff;
+  }
+  body:has(#invoice-print-sheet) * {
+    visibility: hidden;
+  }
+  body:has(#invoice-print-sheet) #invoice-print-sheet,
+  body:has(#invoice-print-sheet) #invoice-print-sheet * {
+    visibility: visible;
+  }
+  body:has(#invoice-print-sheet) #invoice-print-sheet {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    border: 0;
+  }
+}
 .ledger-actions {
   white-space: nowrap;
 }

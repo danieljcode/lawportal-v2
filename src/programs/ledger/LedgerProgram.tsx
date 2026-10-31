@@ -26,6 +26,7 @@ import ErrorBoundary from "@/ui/ErrorBoundary";
 import GameDateInput from "@/ui/GameDateInput";
 import { useCaseVersion, useTimerVersion, useTimeVersion } from "@/ui/useStore";
 import type { ProgramProps } from "@/shell/program";
+import Invoices from "./Invoices";
 
 /** "90SCCR00147 Smith v. Jones". */
 const caseLabel = (c: Case) => [c.caseNumber, [c.plaintiff, c.defendant].filter(Boolean).join(" v. ")].join(" ").trim();
@@ -298,9 +299,10 @@ function LedgerView({ shell }: ProgramProps) {
   );
   const caseById = useMemo(() => new Map(cases.map((c) => [c.id, c])), [cases]);
   const nameOf = (id: string) => shell.characters.find((c) => c.id === id)?.name || "Deleted character";
-  /** What an entry is worth: its hours at the case's rate, else the character's; null with neither. */
-  const valueOf = (e: TimeEntry) =>
-    entryValue(e, caseById.get(e.caseId)?.rate ?? parseRate(shell.characters.find((c) => c.id === e.character)?.rate));
+  /** An entry's hourly rate: the case's, else the character's; null with neither. */
+  const rateOf = (e: TimeEntry) =>
+    caseById.get(e.caseId)?.rate ?? parseRate(shell.characters.find((c) => c.id === e.character)?.rate);
+  const valueOf = (e: TimeEntry) => entryValue(e, rateOf(e));
   const [filter, setFilter] = useState<TimeFilter>({});
   const shown = useMemo(() => filterEntries(all, filter), [all, filter]);
   const values = shown.map(valueOf);
@@ -449,6 +451,7 @@ function LedgerView({ shell }: ProgramProps) {
           )}
         </>
       )}
+      <Invoices cases={cases} entries={all} filter={filter} rateOf={rateOf} nameOf={nameOf} />
     </section>
   );
 }

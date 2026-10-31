@@ -19,7 +19,7 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-31",
-    title: "Rolodex and Ledger",
+    title: "Rolodex, Ledger and invoices",
     items: [
       {
         type: "new",
@@ -44,6 +44,10 @@ export const CHANGELOG: ChangelogEntry[] = [
       {
         type: "new",
         text: "Start a timer on a case in the Ledger; Stop and log saves the time it ran.",
+      },
+      {
+        type: "new",
+        text: "Invoices: pick a case (and dates) in the Ledger and turn its time into a numbered invoice, with the letterhead. Record payments as they come in, and print it, copy it for the forum or Discord, or download it as a .docx. In Classic it prints on dot-matrix paper.",
       },
     ],
   },

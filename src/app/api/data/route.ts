@@ -9,6 +9,7 @@ import { errCode, isJson, json } from "@/lib/server/http";
 import { MAX_CASES } from "@/lib/cases";
 import { MAX_CHARACTERS } from "@/lib/characters";
 import { MAX_CONTACTS } from "@/lib/contacts";
+import { MAX_INVOICES } from "@/lib/invoices";
 import { MAX_TIME_ENTRIES } from "@/lib/ledger";
 import { MAX_PRECEDENTS } from "@/lib/precedents";
 import { isObject } from "@/lib/storage";
@@ -29,6 +30,7 @@ const LISTS = {
   precedents: MAX_PRECEDENTS,
   contacts: MAX_CONTACTS,
   time: MAX_TIME_ENTRIES,
+  invoices: MAX_INVOICES,
 };
 
 /** `{rev, data:{characters, …}}`: an integer rev ≥ 0 and each list (LISTS) an array of at most its limit of objects, else null. */

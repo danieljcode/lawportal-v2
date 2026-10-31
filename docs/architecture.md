@@ -274,6 +274,7 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
 | Conflict check log (LP-10)        | `src/lib/conflicts.ts`                   | `lawapp_conflict_log`                |
 | Rolodex contacts (LP-30)          | `src/lib/contacts.ts`                    | `lawapp_contacts`                    |
 | Ledger time entries (LP-32)       | `src/lib/ledger.ts`                      | `lawapp_time`                        |
+| Ledger invoices (LP-33)           | `src/lib/invoices.ts`                    | `lawapp_invoices`                    |
 | Sync state                        | `src/lib/sync.ts`                        | `lawapp_sync_*`                      |
 
 - **KV wrapper** (`src/lib/storage.ts`). The stores never touch the browser's storage directly:
@@ -414,6 +415,14 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
   character's `rate` (Characters dialog); `parseRate` takes "$1,200.50", `entryValue` rounds to the
   cent. The timer (`timerStore`, `lawapp_timer`) is one per browser and doesn't sync; Stop and log
   saves an entry for the minutes it ran (`timerHours`: to a tenth, 0.1 to 24) on today's game date.
+  **Invoices** (`src/lib/invoices.ts`, `Invoices.tsx`, LP-33): the
+  filtered case's time over the filtered dates, frozen into lines at each entry's rate (an entry
+  with no rate stops it), numbered `FA-<game year>-0001` (`nextInvoiceNumber`, per year, from
+  `BRANDING.shortName`) and dated today in game time; payments give Unpaid / Part paid / Paid.
+  `lawapp_invoices` (up to 2,000) syncs per invoice by `updated` (`invoice:<id>`), like time
+  entries. `invoiceHtml` renders the sheet once through the template engine (with the letterhead),
+  for the preview, Print, Copy for forum and Discord, and Download .docx. The sheet is paper in
+  every theme; Classic's is tractor-feed (`--invoice-*` tokens in `globals.css`).
 - **Rolodex** (`src/lib/contacts.ts`, `src/programs/clients/RolodexView.tsx`, LP-30): the Clients program's third page, at `#clients/rolodex`. One list under
   `lawapp_contacts` (store base, v1, up to 2,000 contacts, A–Z): name, type (client, judge,
   officer, attorney, witness, business), phone, address, organisation and notes. Search

@@ -28,6 +28,7 @@ export interface SyncRecord {
     precedents?: unknown[];
     contacts?: unknown[];
     time?: unknown[];
+    invoices?: unknown[];
   };
 }
 

@@ -98,7 +98,7 @@ edits. Instead of replacing local data, `resolve()` merges **one character at a 
   and so does the conflict check log (LP-10, `conflict:<id>`). The Law Library's precedents (LP-16)
   are edited like cases, so each ruling's newer `updated` wins (`precedent:<id>`), and the same goes
   for the Rolodex's contacts (LP-30, `contact:<id>`) and the Ledger's time entries (LP-32,
-  `time:<id>`; a losing edit isn't kept, as for filings). They all use `resolveList` in
+  `time:<id>`; a losing edit isn't kept, as for filings), and its invoices (LP-33, `invoice:<id>`). They all use `resolveList` in
   `sync.ts`. A copy without one of these lists leaves this browser's alone.
 - **Deletions stand.** `lawapp_sync_base` remembers the last server copy this browser saw, so the
   merge can tell a character added on one side from one deleted on the other. A character deleted
