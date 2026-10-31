@@ -1,5 +1,45 @@
 # Changelog
 
+## [0.4.0](https://github.com/danieljcode/lawportal-v2/compare/v0.3.0...v0.4.0) (2026-10-31)
+
+
+### Features
+
+* **a11y:** keyboard, focus, zoom and contrast checks [LP-29] ([#148](https://github.com/danieljcode/lawportal-v2/issues/148)) ([ca66342](https://github.com/danieljcode/lawportal-v2/commit/ca6634218c46b8e63c2409b263a9dd6a7fd37306))
+* **cases:** link rolodex contacts to cases [LP-30] ([#136](https://github.com/danieljcode/lawportal-v2/issues/136)) ([ed670be](https://github.com/danieljcode/lawportal-v2/commit/ed670be6273be1e4c14cacba1cb78605dffef9e2))
+* **clients:** rolodex contacts behind a flag [LP-30] ([#129](https://github.com/danieljcode/lawportal-v2/issues/129)) ([24e52d9](https://github.com/danieljcode/lawportal-v2/commit/24e52d97b15b435530d2f56b65dc908898667425))
+* **devops:** feature flags so unfinished work can merge hidden [LP-120] ([#122](https://github.com/danieljcode/lawportal-v2/issues/122)) ([e6b2939](https://github.com/danieljcode/lawportal-v2/commit/e6b2939523692c41ba5808fb5ebfab4f20832ad7))
+* **devops:** turn sync off in vercel preview deploys [LP-119] ([#127](https://github.com/danieljcode/lawportal-v2/issues/127)) ([85cc90c](https://github.com/danieljcode/lawportal-v2/commit/85cc90c6d3540e9431db82900724053dbecc70f2))
+* **filings:** build .docx files in the browser [LP-37] ([#145](https://github.com/danieljcode/lawportal-v2/issues/145)) ([261e1c5](https://github.com/danieljcode/lawportal-v2/commit/261e1c59ef5797c1e9aff4a2420b777fbff09558))
+* **filings:** download a filing as pdf [LP-35] ([#144](https://github.com/danieljcode/lawportal-v2/issues/144)) ([85f7080](https://github.com/danieljcode/lawportal-v2/commit/85f70802640bedf45fb89a3f8c49896ac1f2d2ca))
+* **filings:** pick from rolodex, rolodex unflagged [LP-30] ([#137](https://github.com/danieljcode/lawportal-v2/issues/137)) ([01ef97c](https://github.com/danieljcode/lawportal-v2/commit/01ef97c8b342fb641c80176397b6c54f723fe562))
+* **find:** search across the firm's records [LP-95] ([#146](https://github.com/danieljcode/lawportal-v2/issues/146)) ([2e6514f](https://github.com/danieljcode/lawportal-v2/commit/2e6514fbdefe40e1e53706723fce20a55ac8b83e))
+* **help:** a Help program with guides for every feature [LP-94] ([#147](https://github.com/danieljcode/lawportal-v2/issues/147)) ([3f84e9e](https://github.com/danieljcode/lawportal-v2/commit/3f84e9e4ec5ca6f2d7ffca80222e890ee4f45e1b))
+* **ledger:** client retainers with top-up letters [LP-93] ([#142](https://github.com/danieljcode/lawportal-v2/issues/142)) ([b015063](https://github.com/danieljcode/lawportal-v2/commit/b0150635011f64075cccc092732db39fc531579c))
+* **ledger:** log billable time against cases, behind a flag [LP-32] ([#138](https://github.com/danieljcode/lawportal-v2/issues/138)) ([ffc1f3d](https://github.com/danieljcode/lawportal-v2/commit/ffc1f3d64efae10204942c036dcc9eae57194ce2))
+* **ledger:** numbered invoices with payments [LP-33] ([#140](https://github.com/danieljcode/lawportal-v2/issues/140)) ([bc054ed](https://github.com/danieljcode/lawportal-v2/commit/bc054ede5947f9577b16e6843b0ee3f442929137))
+* **ledger:** partner reports with charts and csv [LP-34] ([#143](https://github.com/danieljcode/lawportal-v2/issues/143)) ([2fafe19](https://github.com/danieljcode/lawportal-v2/commit/2fafe19ce027460aa8309888f803dc6b7e758b5a))
+* **ledger:** payment methods, overdue invoices, receivables [LP-93] ([#141](https://github.com/danieljcode/lawportal-v2/issues/141)) ([ae4c059](https://github.com/danieljcode/lawportal-v2/commit/ae4c05946de5a178095a390563753b447e84944b))
+* **ledger:** rates, timer, and ship the ledger [LP-32] ([#139](https://github.com/danieljcode/lawportal-v2/issues/139)) ([efb92c5](https://github.com/danieljcode/lawportal-v2/commit/efb92c5c562fa8be476b5ea7fe0e645a3113e9bc))
+* **storage:** keep saved data in indexeddb [LP-36] ([#128](https://github.com/danieljcode/lawportal-v2/issues/128)) ([6476e8f](https://github.com/danieljcode/lawportal-v2/commit/6476e8fa91f01462a301273f4d65c95725ab0d21))
+
+
+### Fixes
+
+* **release:** pass release please runs that have no release pr [LP-161] ([#124](https://github.com/danieljcode/lawportal-v2/issues/124)) ([1de08d4](https://github.com/danieljcode/lawportal-v2/commit/1de08d4287683eb0025614b77da874f88d2e9d83))
+* **security:** send security headers, read-only ci tokens [LP-166] ([#133](https://github.com/danieljcode/lawportal-v2/issues/133)) ([8588ae5](https://github.com/danieljcode/lawportal-v2/commit/8588ae576732e0c3abd5eaba63a7cf7e686d6b0d))
+
+
+### Docs
+
+* **claude:** read the obsidian vault before searching the code [LP-130] ([#126](https://github.com/danieljcode/lawportal-v2/issues/126)) ([d394cba](https://github.com/danieljcode/lawportal-v2/commit/d394cba71b30ae90e1c565004b2c9a3dd312a979))
+* **security:** say how to report a security problem [LP-167] ([#134](https://github.com/danieljcode/lawportal-v2/issues/134)) ([40b4d5b](https://github.com/danieljcode/lawportal-v2/commit/40b4d5bbe3a26a8960168f6c3172d2e900cea044))
+
+
+### Chores
+
+* **release:** target the next release at 0.4.0 [LP-162] ([#125](https://github.com/danieljcode/lawportal-v2/issues/125)) ([acc57eb](https://github.com/danieljcode/lawportal-v2/commit/acc57eb48d468e6bbd469db5aa8072a52a5910ec))
+
 ## [0.3.0](https://github.com/danieljcode/lawportal-v2/compare/v0.2.0...v0.3.0) (2026-10-29)
 
 
