@@ -11,6 +11,7 @@ import { conflictLog } from "@/lib/conflicts";
 import { contactStore } from "@/lib/contacts";
 import { invoiceStore } from "@/lib/invoices";
 import { timeStore, timerStore } from "@/lib/ledger";
+import { retainerStore } from "@/lib/retainers";
 import { precedentStore } from "@/lib/precedents";
 import { filingStore } from "@/lib/filings";
 import { docketStore } from "@/lib/dockets";
@@ -68,6 +69,8 @@ export const useTimeVersion = versionHook(timeStore);
 export const useTimerVersion = versionHook(timerStore);
 /** Bumps on every change to the Ledger's invoices (LP-33). */
 export const useInvoiceVersion = versionHook(invoiceStore);
+/** Bumps on every change to the client retainer deposits (LP-93). */
+export const useRetainerVersion = versionHook(retainerStore);
 
 /** Counts values set aside as unreadable since the page loaded (0: none). */
 export function useSetAsideVersion(): number {

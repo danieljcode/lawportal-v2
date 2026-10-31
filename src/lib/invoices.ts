@@ -39,9 +39,15 @@ export interface InvoiceLine {
   amount: number;
 }
 
-export const PAYMENT_METHODS = ["cash", "cheque", "bank"] as const;
+/** How a payment was made; "retainer" draws on the client's retainer (LP-93). */
+export const PAYMENT_METHODS = ["cash", "cheque", "bank", "retainer"] as const;
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
-export const METHOD_LABELS: Record<PaymentMethod, string> = { cash: "Cash", cheque: "Cheque", bank: "Bank transfer" };
+export const METHOD_LABELS: Record<PaymentMethod, string> = {
+  cash: "Cash",
+  cheque: "Cheque",
+  bank: "Bank transfer",
+  retainer: "From retainer",
+};
 
 /** Game days from issue until an invoice is due (LP-93). */
 export const INVOICE_TERMS_DAYS = 30;
@@ -54,6 +60,8 @@ export interface Payment {
   amount: number;
   /** How it was paid (LP-93); cash for payments from before methods. */
   method: PaymentMethod;
+  /** From retainer: the client (Rolodex contact) whose retainer paid it. */
+  contactId?: string;
   note?: string;
 }
 
@@ -112,8 +120,17 @@ export function cleanPayment(raw: unknown): Payment | null {
   const amount = n === null || !Number.isFinite(n) ? null : cents(n);
   if (!isDate(o.date) || !amount || amount < 0.01 || amount > MAX_PAYMENT) return null;
   const note = text(o.note, 200);
-  const method = (PAYMENT_METHODS as readonly unknown[]).includes(o.method) ? (o.method as PaymentMethod) : "cash";
-  return { id: isId(o.id) ? o.id : newId(), date: o.date, amount, method, ...(note ? { note } : {}) };
+  const known = (PAYMENT_METHODS as readonly unknown[]).includes(o.method) ? (o.method as PaymentMethod) : "cash";
+  // A retainer payment names its client; without one it can't draw on anything, so it reads as cash.
+  const method = known === "retainer" && !isId(o.contactId) ? "cash" : known;
+  return {
+    id: isId(o.id) ? o.id : newId(),
+    date: o.date,
+    amount,
+    method,
+    ...(method === "retainer" ? { contactId: o.contactId as string } : {}),
+    ...(note ? { note } : {}),
+  };
 }
 
 /** Normalise an untrusted invoice (sync, backup); null without a number, case, date or a line. */
@@ -276,7 +293,10 @@ export interface InvoiceStore {
   /** Number and save a new invoice from a draft; throws when it can't be billed. */
   create(d: InvoiceDraft): Invoice;
   /** Record a payment; throws when it isn't one. */
-  addPayment(invoiceId: string, payment: Omit<Payment, "id" | "method"> & { method?: PaymentMethod }): void;
+  addPayment(
+    invoiceId: string,
+    payment: Omit<Payment, "id" | "method" | "contactId"> & { method?: PaymentMethod; contactId?: string },
+  ): void;
   removePayment(invoiceId: string, paymentId: string): void;
   remove(id: string): void;
   /** Replace every invoice (sync). */

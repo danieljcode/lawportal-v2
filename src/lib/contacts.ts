@@ -5,6 +5,7 @@
 // A contact keeps its own links to Case File cases, each with its role there,
 // so the links sync with it and the cases store never changes.
 
+import { parseRate } from "./ledger";
 import { searchTerms } from "./precedents";
 import { defaultKV, isId, ISO_TIME_RE, newId, text, uniqueById, type KV } from "./storage";
 import { createStore } from "./store";
@@ -66,6 +67,8 @@ export interface Contact {
   notes?: string;
   /** The cases it's on (LP-30); absent when none. */
   cases?: CaseLink[];
+  /** Warn when this client's retainer drops below this many dollars (LP-93). */
+  retainerFloor?: number;
   /** Real time, ISO: the newer copy wins a sync merge. */
   created: string;
   updated: string;
@@ -100,12 +103,14 @@ export function cleanContact(input: unknown, now: string = new Date().toISOStrin
   };
   const created = typeof o.created === "string" && ISO_TIME_RE.test(o.created) ? o.created : now;
   const cases = cleanLinks(o.cases);
+  const retainerFloor = parseRate(o.retainerFloor);
   return {
     id: isId(o.id) ? o.id : newId(),
     name,
     type: isType(o.type) ? o.type : "client",
     ...(Object.fromEntries(Object.entries(fields).filter(([, v]) => v)) as Partial<Contact>),
     ...(cases.length ? { cases } : {}),
+    ...(retainerFloor !== null ? { retainerFloor } : {}),
     created,
     updated: typeof o.updated === "string" && ISO_TIME_RE.test(o.updated) ? o.updated : created,
   };
@@ -175,8 +180,17 @@ export function createContactStore(kv: KV): ContactStore {
       const list = store.get();
       const before = input.id ? list.find((c) => c.id === input.id) : undefined;
       const now = new Date().toISOString();
-      // An edit without `cases` (the Rolodex form) keeps the contact's case links.
-      const c = cleanContact({ cases: before?.cases, ...input, created: before?.created || now, updated: now }, now);
+      // An edit without `cases` or `retainerFloor` (the Rolodex form) keeps them.
+      const c = cleanContact(
+        {
+          cases: before?.cases,
+          retainerFloor: before?.retainerFloor,
+          ...input,
+          created: before?.created || now,
+          updated: now,
+        },
+        now,
+      );
       if (!c) throw new Error("Give the contact a name.");
       if (!before && list.length >= MAX_CONTACTS) {
         throw new Error("The Rolodex can hold up to " + MAX_CONTACTS + " contacts.");
