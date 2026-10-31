@@ -1,7 +1,7 @@
 // The Ledger program (LP-32): billable time logged against Case File cases, with
 // a form to log or edit an entry, filters by case, character and date range,
 // and the filtered total. Each entry is worth its hours at the case's rate, else
-// the character's own. A timer logs an entry when it stops. Behind the `ledger` flag.
+// the character's own. A timer logs an entry when it stops.
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { caseStore } from "@/lib/cases";
@@ -145,7 +145,8 @@ function EntryForm({
 }
 
 /** "1 h 05 min" for 65 minutes. */
-const elapsedText = (min: number) => (min >= 60 ? Math.floor(min / 60) + " h " + String(min % 60).padStart(2, "0") : min) + " min";
+const elapsedText = (min: number) =>
+  (min >= 60 ? Math.floor(min / 60) + " h " + String(min % 60).padStart(2, "0") : min) + " min";
 
 /** Start timing a case, or the running timer with Stop and log. */
 function TimerPanel({
@@ -167,7 +168,6 @@ function TimerPanel({
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     if (!running) return;
-    setNow(Date.now());
     const id = setInterval(() => setNow(Date.now()), 15_000);
     return () => clearInterval(id);
   }, [running]);

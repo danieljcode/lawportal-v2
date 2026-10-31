@@ -113,7 +113,6 @@ export const PROGRAMS: readonly ProgramDef[] = [
     group: "main",
     start: "#ledger",
     visible: everyone,
-    flag: "ledger",
     ...lazyProgram(() => import("@/programs/ledger")),
   },
   {

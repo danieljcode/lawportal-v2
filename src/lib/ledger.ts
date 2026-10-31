@@ -249,7 +249,13 @@ export function createTimerStore(kv: KV, times: TimeStore): TimerStore {
     stop(date) {
       const t = store.get();
       if (!t) throw new Error("No timer is running.");
-      const entry = times.save({ caseId: t.caseId, character: t.character, activity: t.activity, date, hours: timerHours(t) });
+      const entry = times.save({
+        caseId: t.caseId,
+        character: t.character,
+        activity: t.activity,
+        date,
+        hours: timerHours(t),
+      });
       store.set(null);
       return entry;
     },

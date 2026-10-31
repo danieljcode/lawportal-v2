@@ -212,7 +212,7 @@ describe("Characters dialog", () => {
     warn.mockRestore();
   });
 
-  it("has the 12 fields, needs a name, and the docket box follows the title", () => {
+  it("has the 13 fields, needs a name, and the docket box follows the title", () => {
     click("#menu-file");
     click("#menu-characters");
     click("#new-character");
@@ -229,6 +229,7 @@ describe("Characters dialog", () => {
       "char-email",
       "char-signature",
       "char-notes",
+      "char-rate",
       "char-docket",
     ]);
     submit("#char-form");
