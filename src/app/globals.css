@@ -49,6 +49,8 @@
   --invoice-ink: #000;
   --invoice-font: var(--mono);
   --invoice-feed-width: 22px;
+  /* Report bars (LP-34): hatched in Classic, solid in Modern. */
+  --chart-bar: repeating-linear-gradient(45deg, var(--text) 0 2px, transparent 2px 5px);
   --invoice-feed:
     radial-gradient(circle at 11px 12px, #c8c8c8 4px, transparent 5px) left top / 22px 24px repeat-y,
     radial-gradient(circle at 11px 12px, #c8c8c8 4px, transparent 5px) right top / 22px 24px repeat-y,
@@ -216,6 +218,7 @@
   --invoice-font: var(--ui-font);
   --invoice-feed-width: 0px;
   --invoice-feed: none;
+  --chart-bar: var(--accent);
   --desktop: #f3f4f6;
   --face: #ffffff;
   --hilite: #ffffff;

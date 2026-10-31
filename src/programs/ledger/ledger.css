@@ -116,6 +116,19 @@
     border: 0;
   }
 }
+/* Reports (LP-34): a bar beside each row; Classic hatches it like an early spreadsheet. */
+.report-bar-cell {
+  width: 40%;
+  min-width: 80px;
+}
+.report-bar {
+  display: block;
+  height: 12px;
+  background: var(--chart-bar);
+}
+.ledger-table .tag {
+  margin-left: 6px;
+}
 .ledger-actions {
   white-space: nowrap;
 }

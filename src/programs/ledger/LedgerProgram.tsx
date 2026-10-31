@@ -27,6 +27,7 @@ import GameDateInput from "@/ui/GameDateInput";
 import { useCaseVersion, useTimerVersion, useTimeVersion } from "@/ui/useStore";
 import type { ProgramProps } from "@/shell/program";
 import Invoices from "./Invoices";
+import Reports from "./Reports";
 import Retainers from "./Retainers";
 
 /** "90SCCR00147 Smith v. Jones". */
@@ -454,6 +455,7 @@ function LedgerView({ shell }: ProgramProps) {
       )}
       <Invoices cases={cases} entries={all} filter={filter} rateOf={rateOf} nameOf={nameOf} />
       <Retainers />
+      <Reports entries={all} cases={cases} characters={shell.characters} nameOf={nameOf} rateOf={rateOf} />
     </section>
   );
 }
