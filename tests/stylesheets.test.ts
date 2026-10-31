@@ -45,6 +45,7 @@ describe("program stylesheets (LP-110)", () => {
       "clients.css",
       "filings.css",
       "find.css",
+      "help.css",
       "ledger.css",
       "library.css",
     ]);

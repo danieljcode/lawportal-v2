@@ -96,6 +96,7 @@ describe("the modern shell (LP-125)", () => {
       "Law Library",
       "Ledger",
       "Find",
+      "Help",
       "Settings",
     ]);
     expect(must("#rail-home").getAttribute("aria-current")).toBe("page");

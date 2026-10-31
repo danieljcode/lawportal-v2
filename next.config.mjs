@@ -16,6 +16,8 @@ const nextConfig = {
   reactStrictMode: true,
   // Inlined at build time for src/lib/version.ts.
   env: { APP_VERSION: version },
+  // Help's topics (LP-94) import as their text.
+  turbopack: { rules: { "*.md": { type: "raw" } } },
   async headers() {
     return [{ source: "/:path*", headers: SECURITY_HEADERS }];
   },

@@ -390,6 +390,12 @@ export default function App() {
     {
       label: "Help",
       items: [
+        { label: "Contents", id: "menu-help-contents", href: "#help" },
+        // Each program's own topic (LP-94), named after it.
+        ...(program && program.id !== "help"
+          ? [{ label: "Help on " + titleIn(program, layout), id: "menu-help-program", href: "#help/" + program.id }]
+          : []),
+        "-",
         { label: "What's new", id: "menu-changelog", onSelect: showChangelog },
         { label: "About " + BRANDING.productName, id: "menu-about", onSelect: showAbout },
       ],

@@ -23,6 +23,8 @@
   --select-bg: #000080;
   --select-text: #fff;
   --link: #0000ee;
+  /* Help's jumps (LP-94): Windows 3.0 Help's green in Classic light, the link colour elsewhere. */
+  --help-link: #008000;
   --mark: #ffff80;
   --focus: #000;
   --muted: #404040;
@@ -74,6 +76,7 @@
   --select-bg: #00ffff;
   --select-text: #000;
   --link: #ffff00;
+  --help-link: var(--link);
   --mark: #808000;
   --focus: #ffff00;
   --muted: #c0c0c0;
@@ -110,6 +113,7 @@
     --select-bg: #00ffff;
     --select-text: #000;
     --link: #ffff00;
+    --help-link: var(--link);
     --mark: #808000;
     --focus: #ffff00;
     --muted: #c0c0c0;
@@ -236,6 +240,7 @@
   --primary-bg: #2b3442;
   --primary-text: #ffffff;
   --link: #7a5f2b;
+  --help-link: var(--link);
   --mark: #f3e6c4;
   --focus: #9a7b3f;
   --muted: #5d6673;

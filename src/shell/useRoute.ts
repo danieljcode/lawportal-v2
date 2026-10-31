@@ -3,7 +3,7 @@
 // back/forward, the page title, and going home. Routes are prefixed by
 // program: #filings/<formId>, #cases/<caseId>, #cases/upcoming,
 // #clients/intake, #clients/conflicts, #clients/rolodex, #library/penal-code,
-// #library/precedents, #ledger, #find, #jap, #control. The old flat hashes (#cases, #upcoming,
+// #library/precedents, #ledger, #find, #help, #help/<topic>, #jap, #control. The old flat hashes (#cases, #upcoming,
 // #intake, #conflicts, #library, #jap, #<formId>) still open the same place
 // and are rewritten to the new ones.
 
@@ -15,7 +15,7 @@ import { getShell } from "@/lib/shell";
 import { defaultKV } from "@/lib/storage";
 import type { FormInfo } from "@/lib/types";
 
-export type ProgramId = "filings" | "cases" | "clients" | "library" | "ledger" | "find" | "jap" | "control";
+export type ProgramId = "filings" | "cases" | "clients" | "library" | "ledger" | "find" | "help" | "jap" | "control";
 export type ClientsPage = "intake" | "conflicts" | "rolodex";
 export type LibraryPage = "penal-code" | "precedents";
 
@@ -27,6 +27,7 @@ export type Route =
   | { program: "library"; page: LibraryPage; chapter?: string }
   | { program: "ledger" }
   | { program: "find" }
+  | { program: "help"; topic: string | null }
   | { program: "jap" }
   | { program: "control" };
 
@@ -41,6 +42,7 @@ export const ROLODEX_TITLE = "Rolodex";
 export const LIBRARY_TITLE = "Law Library";
 export const LEDGER_TITLE = "Ledger";
 export const FIND_TITLE = "Find";
+export const HELP_TITLE = "Help";
 /** Settings (LP-109) is the Control Panel in the Classic layout. */
 export const SETTINGS_TITLE = "Settings";
 export const CONTROL_TITLE = "Control Panel";
@@ -67,6 +69,8 @@ export function hashFor(r: Route): string {
       return "#clients/" + r.page;
     case "library":
       return "#library/" + r.page + (r.page === "penal-code" && r.chapter ? "/" + r.chapter : "");
+    case "help":
+      return "#help" + (r.topic ? "/" + r.topic : "");
     default:
       return "#" + r.program;
   }
@@ -108,6 +112,8 @@ export function parseHash(hash: string): Route {
       return { program: "ledger" };
     case "find":
       return { program: "find" };
+    case "help":
+      return { program: "help", topic: /^[a-z0-9-]{1,40}$/.test(rest) ? rest : null };
     case "jap":
       return { program: "jap" };
     case "control":
@@ -141,6 +147,8 @@ export function pageTitle(r: Route, form: FormInfo | null): string | null {
       return LEDGER_TITLE;
     case "find":
       return FIND_TITLE;
+    case "help":
+      return HELP_TITLE;
     case "jap":
       return JAP_TITLE;
     case "control":
