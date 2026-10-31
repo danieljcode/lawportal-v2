@@ -39,6 +39,7 @@ Routes are prefixed by program (`src/shell/useRoute.ts`); an empty hash is home.
 | Clients                             | `src/programs/clients/` | `#clients/intake`, `#clients/conflicts`      |
 | Law Library                         | `src/programs/library/` | `#library/penal-code`, `#library/precedents` |
 | Ledger                              | `src/programs/ledger/`  | `#ledger`                                    |
+| Find                                | `src/programs/find/`    | `#find`                                      |
 | J.A.P. (Court Commissioners)        | `src/programs/jap/`     | `#jap`                                       |
 | Settings (Control Panel in Classic) | `src/programs/control/` | `#control`                                   |
 

@@ -1,0 +1,33 @@
+/* Find (LP-95). Variables only (tests/stylesheets.test.ts). */
+.find-box {
+  width: 100%;
+  max-width: 640px;
+}
+.find-group {
+  margin: 12px 0 0;
+}
+.find-list {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.find-list li {
+  border-bottom: 1px solid var(--shadow);
+}
+.find-list a {
+  display: block;
+  padding: 6px 4px;
+  color: var(--text);
+  text-decoration: none;
+}
+.find-list a:hover,
+.find-list a:focus-visible {
+  background: var(--field);
+}
+.find-list .muted {
+  display: block;
+}
+.find-list mark {
+  background: var(--mark);
+  color: inherit;
+}

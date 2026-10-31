@@ -79,6 +79,7 @@ describe("the modern home screen (LP-127)", () => {
       "Clients",
       "Law Library",
       "Ledger",
+      "Find",
       "Settings",
     ]);
     expect(must("#tile-filings").getAttribute("href")).toBe("#filings");
