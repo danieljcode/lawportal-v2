@@ -3,6 +3,7 @@
 // Desktop only (a phone has no keyboard to speak of).
 import { expect, test, type Page } from "@playwright/test";
 import { LAYOUTS, openView } from "./views";
+import { sampleData } from "../tests/real-data";
 
 /** Tab forward until the focus is on `selector`, as a keyboard user would. */
 async function tabTo(page: Page, selector: string): Promise<void> {
@@ -22,6 +23,7 @@ async function jump(page: Page, words: string): Promise<void> {
 
 for (const layout of LAYOUTS) {
   test(`keyboard only, ${layout}`, async ({ page, context }, info) => {
+    test.skip(sampleData(), "needs the private forms");
     test.skip(info.project.name !== "desktop", "keyboard journeys are for the desktop");
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     await openView(page, "/", layout, "light");

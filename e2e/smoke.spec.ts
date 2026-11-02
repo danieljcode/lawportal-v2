@@ -3,6 +3,7 @@
 // Each program's own journey starts from the home screen, in both layouts (LP-111).
 import { expect, test, type Page } from "@playwright/test";
 import { LAYOUTS } from "./views";
+import { sampleData } from "../tests/real-data";
 
 /** Open a program the way a user does: its tile on the Modern home, its icon in Classic's Program Manager. */
 async function openFromHome(page: Page, id: string): Promise<void> {
@@ -67,6 +68,7 @@ for (const layout of LAYOUTS) {
     });
 
     test("Court Filings: open a form, fill it in, and the preview follows", async ({ page }) => {
+      test.skip(sampleData(), "needs the private forms");
       await openForm(page, "civil-complaint");
       const preview = page.locator("#preview");
       await expect(preview).toContainText("SAN ANDREAS COURT");
@@ -137,6 +139,7 @@ for (const layout of LAYOUTS) {
     });
 
     test("Law Library: search the penal code", async ({ page }) => {
+      test.skip(sampleData(), "needs the private forms");
       await openFromHome(page, "library");
       await page.locator("#code-q").fill("assault");
       await expect(page.locator("#code-list")).toContainText("PC 1001");
@@ -154,6 +157,7 @@ for (const layout of LAYOUTS) {
 }
 
 test("Copy for forum puts the filing on the clipboard as HTML", async ({ page, context, browserName }) => {
+  test.skip(sampleData(), "needs the private forms");
   test.skip(browserName !== "chromium", "clipboard permissions are Chromium-only");
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await openForm(page, "civil-complaint");
@@ -172,6 +176,7 @@ test("Copy for forum puts the filing on the clipboard as HTML", async ({ page, c
 });
 
 test("Download .docx gives a Word file", async ({ page }) => {
+  test.skip(sampleData(), "needs the private forms");
   await openForm(page, "civil-complaint");
   // Every required field filled, so it downloads without asking (LP-87).
   await page.locator("#f-plaintiff-name").fill("Ann Lee");
@@ -217,6 +222,7 @@ test("add a case to a judge's docket", async ({ page }) => {
 });
 
 test("Ctrl+K jumps to a form, and Esc closes the box and gives the focus back", async ({ page }) => {
+  test.skip(sampleData(), "needs the private forms");
   await page.goto("/#cases");
   await expect(page.locator("#case-file-title")).toHaveText("Case File");
   const rail = page.locator("#rail-cases");
