@@ -90,11 +90,15 @@ describe("the Clients program (LP-107)", () => {
     expect(shown("#intake-title")).toBe(false);
   });
 
-  it("runs intake's conflict check on the Conflict check page with the names filled in, keeping the intake", () => {
+  it("runs intake's conflict check on the intake; Memo and details shows it on the Conflict check page", () => {
     mount("#clients/intake");
     setValue("#intake-clientName", "Cy Ng");
     setValue("#intake-opposingParty", "Ann Lee");
     act(() => must("#intake-conflicts").click());
+    expect(location.hash).toBe("#clients/intake");
+    expect(must("#intake-conflict-verdict").textContent).toBe("Possible conflict: review before accepting");
+    expect(conflictLog().list()).toHaveLength(1);
+    act(() => must("#intake-conflict-memo").click());
     expect(location.hash).toBe("#clients/conflicts");
     expect(current()).toBe("Conflict check");
     expect(must<HTMLTextAreaElement>("#conflict-names").value).toBe("Cy Ng\nAnn Lee");
@@ -106,25 +110,20 @@ describe("the Clients program (LP-107)", () => {
     // A second run checks again.
     setValue("#intake-opposingParty", "");
     act(() => must("#intake-conflicts").click());
-    expect(must<HTMLTextAreaElement>("#conflict-names").value).toBe("Cy Ng");
-    expect(must("#conflict-verdict").textContent).toBe("No conflicts found");
+    expect(must("#intake-conflict-verdict").textContent).toBe("No conflicts found");
     expect(conflictLog().list()).toHaveLength(2);
   });
 
-  it("opens the new case in the Case File", async () => {
+  it("confirms the new case, and links to it in the Case File", () => {
     mount("#clients/intake");
     setValue("#intake-clientName", "Cy Ng");
     setValue("#intake-summary", "Arrested for jaywalking.");
     act(() => must("#intake-form").dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })));
-    // The intake moves to the case with a hash change, which jsdom fires a moment later.
-    await act(async () => new Promise((r) => setTimeout(r, 0)));
-    expect(location.hash).toMatch(/^#cases\/[a-z0-9]+$/);
-    expect(must("#m-title").textContent).toBe("Case File");
-    expect(must("#case-nav-open").textContent).toBe(
-      caseStore()
-        .list()
-        .find((c) => c.id !== "case0001")!.caseNumber,
-    );
+    const c = caseStore()
+      .list()
+      .find((x) => x.id !== "case0001")!;
+    expect(must("#intake-opened-title").textContent).toBe("Case " + c.caseNumber + " opened");
+    expect(must("#intake-open-case").getAttribute("href")).toBe("#cases/" + c.id);
   });
 
   it("lands the old links in the right place", () => {

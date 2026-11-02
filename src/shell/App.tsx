@@ -249,8 +249,8 @@ export default function App() {
     openCharacters: showCharacters,
     openFilings,
     openFiling,
-    openFormForCase: (formId, caseId) => {
-      loadDocketInForm(caseId, formId);
+    openFormForCase: (formId, caseId, values) => {
+      loadDocketInForm(caseId, formId, values);
       navigate("#filings/" + formId);
     },
     openChangelog: showChangelog,
@@ -575,7 +575,7 @@ export default function App() {
               onClose={closeDialog}
               charId={docketsFor}
               canUse={canUseDocket}
-              onUse={loadDocketInForm}
+              onUse={(id) => loadDocketInForm(id)}
             />
           </Suspense>
         )}

@@ -1,12 +1,12 @@
 // The Clients program (LP-103, LP-107): new client intake (#clients/intake) and
 // the conflict check (#clients/conflicts), side by side in its navigation pane.
 // Both pages stay mounted, and the one you're not on is hidden, so a half-typed
-// intake survives a trip to the conflict check. Intake's Run conflict check
-// runs the check and opens it here with the names filled in. The Rolodex (LP-30,
-// #clients/rolodex) is the third page.
+// intake survives a trip to the conflict check. Intake runs the check itself
+// (LP-172); its Memo and details opens the result here with the names filled in.
+// The Rolodex (LP-30, #clients/rolodex) is the third page.
 
 import { useState } from "react";
-import { runConflictCheck } from "@/lib/services/conflicts";
+import type { ConflictRun } from "@/lib/services/conflicts";
 import ConflictCheckView, { type ConflictRequest } from "./ConflictCheckView";
 import ErrorBoundary from "@/ui/ErrorBoundary";
 import IntakeView from "./IntakeView";
@@ -25,9 +25,8 @@ export default function ClientsProgram({ shell }: ProgramProps) {
   const page: ClientsPage = shell.route.program === "clients" ? shell.route.page : "intake";
   const [request, setRequest] = useState<ConflictRequest | null>(null);
 
-  const checkFromIntake = (names: string[]) => {
-    const run = runConflictCheck(names, shell.active);
-    setRequest((r) => ({ names, run, seq: (r ? r.seq : 0) + 1 }));
+  const showFromIntake = (run: ConflictRun) => {
+    setRequest((r) => ({ names: run.names, run, seq: (r ? r.seq : 0) + 1 }));
     navigate("#clients/conflicts");
   };
 
@@ -57,7 +56,12 @@ export default function ClientsProgram({ shell }: ProgramProps) {
       <main className="editor" id={shell.visible ? "editor" : undefined}>
         <div hidden={page !== "intake"}>
           <ErrorBoundary where="the intake" resetKey="intake">
-            <IntakeView characters={shell.characters} active={shell.active} onRunConflicts={checkFromIntake} />
+            <IntakeView
+              characters={shell.characters}
+              active={shell.active}
+              onShowConflicts={showFromIntake}
+              onStartForm={shell.openFormForCase}
+            />
           </ErrorBoundary>
         </div>
         <div hidden={page !== "conflicts"}>

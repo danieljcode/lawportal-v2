@@ -3,7 +3,7 @@
 // back/forward, the page title, and going home. Routes are prefixed by
 // program: #filings/<formId>, #cases/<caseId>, #cases/upcoming, #cases/docket, #cases/record,
 // #clients/intake, #clients/conflicts, #clients/rolodex, #library/penal-code,
-// #library/precedents, #ledger, #find, #help, #help/<topic>, #jap, #control. The old flat hashes (#cases, #upcoming,
+// #library/precedents, #ledger, #ledger/retainers/<contactId>, #find, #help, #help/<topic>, #jap, #control. The old flat hashes (#cases, #upcoming,
 // #intake, #conflicts, #library, #jap, #<formId>) still open the same place
 // and are rewritten to the new ones.
 
@@ -25,7 +25,7 @@ export type Route =
   | { program: "cases"; caseId: string | null; upcoming?: boolean; docket?: boolean; record?: boolean }
   | { program: "clients"; page: ClientsPage }
   | { program: "library"; page: LibraryPage; chapter?: string }
-  | { program: "ledger" }
+  | { program: "ledger"; retainerFor?: string }
   | { program: "find" }
   | { program: "help"; topic: string | null }
   | { program: "jap" }
@@ -76,6 +76,8 @@ export function hashFor(r: Route): string {
       return "#library/" + r.page + (r.page === "penal-code" && r.chapter ? "/" + r.chapter : "");
     case "help":
       return "#help" + (r.topic ? "/" + r.topic : "");
+    case "ledger":
+      return "#ledger" + (r.retainerFor ? "/retainers/" + r.retainerFor : "");
     default:
       return "#" + r.program;
   }
@@ -115,8 +117,12 @@ export function parseHash(hash: string): Route {
         ? { program: "library", page: "penal-code", chapter }
         : { program: "library", page: "penal-code" };
     }
-    case "ledger":
-      return { program: "ledger" };
+    case "ledger": {
+      const [page, contact] = rest.split("/");
+      return page === "retainers" && CASE_ID.test(contact || "")
+        ? { program: "ledger", retainerFor: contact }
+        : { program: "ledger" };
+    }
     case "find":
       return { program: "find" };
     case "help":

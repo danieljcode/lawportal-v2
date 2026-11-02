@@ -46,7 +46,12 @@ const ALICE = { id: "alice001", name: "Alice Lawyer", rate: "100" };
 const BOB = { id: "bob00001", name: "Bob Partner" };
 
 function mount(): void {
-  const shell = { characters: [ALICE, BOB], active: ALICE, visible: true } as unknown as ProgramProps["shell"];
+  const shell = {
+    route: { program: "ledger" },
+    characters: [ALICE, BOB],
+    active: ALICE,
+    visible: true,
+  } as unknown as ProgramProps["shell"];
   container = document.createElement("div");
   document.body.appendChild(container);
   root = createRoot(container);
