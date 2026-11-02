@@ -23,6 +23,9 @@ export const CHANGELOG: ChangelogEntry[] = [
       {
         type: "new",
         text: "Record how a case ended when you close it: won, lost, settled, dismissed, plea deal or withdrawn, with a note. The Firm Record, in the Case File, adds them up with the win rate for the firm and each lawyer, by matter type and dates, and prints or copies as a summary.",
+      },
+      {
+        type: "new",
         text: "New client intake now carries you through: run the conflict check on the page, with a result that goes out of date if the names change; pick the client from the Rolodex or add them; and after the case opens, go straight to an engagement letter with their details or their retainer. An unfinished intake survives a refresh.",
       },
       {
