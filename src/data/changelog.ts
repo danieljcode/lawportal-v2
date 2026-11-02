@@ -21,6 +21,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     date: "2026-11-02",
     items: [
       {
+        type: "update",
+        text: "A site can now ask for an invite word before turning on sync, so strangers can't use up its sync codes. Codes already in use keep working.",
+      },
+      {
         type: "fix",
         text: "Sync keeps payments recorded on the same invoice on two devices, where before one could vanish. A character that can't be saved from sync no longer removes your copy.",
       },

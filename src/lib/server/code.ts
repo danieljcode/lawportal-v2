@@ -1,5 +1,5 @@
 // Sync codes: JSA- plus 5 groups of 4 symbols (100 bits of entropy).
-import { randomBytes } from "node:crypto";
+import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 
 /** 32 symbols without the look-alikes I, O, 0 and 1. 256 is divisible by 32, so `byte & 31` has no bias. */
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -16,6 +16,15 @@ export function generateCode(): string {
     groups.push(s);
   }
   return "JSA-" + groups.join("-");
+}
+
+const sha256 = (s: string) => createHash("sha256").update(s).digest();
+
+/** Whether a new code may be made: always without LAWAPP_SYNC_INVITE, otherwise only with that word (LP-178). */
+export function inviteAccepted(given: unknown): boolean {
+  const want = process.env.LAWAPP_SYNC_INVITE;
+  if (!want) return true;
+  return typeof given === "string" && timingSafeEqual(sha256(given.trim()), sha256(want.trim()));
 }
 
 /** The sync code from `Authorization: Bearer <code>`, upper-cased, or null when missing or malformed. */

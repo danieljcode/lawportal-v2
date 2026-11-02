@@ -40,6 +40,10 @@ app runs on your own computer, it lives in files on that computer.
   settled, so two requests can't interleave on one file.
 - **Atomic writes.** A write goes to a temp file and is renamed over the real one, retried briefly
   while Windows (antivirus, indexing) holds the target.
+- **Invite word (LP-178).** Set `LAWAPP_SYNC_INVITE` on the server and `POST /api/account` makes a
+  code only with that word (`403` otherwise, and wrong guesses are slowed down). The panel asks for it
+  when the server says so. Existing codes aren't affected. Without the variable, anyone who can reach
+  the server can make codes, and strangers can use up the limits below, so set it on a public site.
 - **Limits.** At most 1,000 sync codes (`POST` answers `503` after that), a 4 MB body, and 200
   characters, 2,000 cases, 500 filings, 500 conflict checks, 1,000 precedents and 2,000 contacts per `PUT`. The app
   keeps the newest 150 filings, so the history fits the list limit. Each filing carries its whole

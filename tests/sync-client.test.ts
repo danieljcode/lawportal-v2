@@ -743,6 +743,15 @@ describe("enable / link / disable / destroy", () => {
     expect(localStorage.getItem(sync.REV_KEY)).toBe("1");
   });
 
+  it("enable sends the invite word, and says when one is needed (LP-178)", async () => {
+    const calls = stubFetch({ status: 403, body: { error: "no" } });
+    await expect(sync.enable()).rejects.toThrow(sync.BAD_INVITE);
+    expect(sync.code()).toBeNull();
+    expect(calls[0].body).toEqual({});
+    await expect(sync.enable("open sesame")).rejects.toThrow(sync.BAD_INVITE);
+    expect(calls[1].body).toEqual({ invite: "open sesame" });
+  });
+
   it("enable throws the server's error", async () => {
     stubFetch({ status: 503, body: { error: "Sync storage is full." } });
     await expect(sync.enable()).rejects.toThrow("Sync storage is full.");

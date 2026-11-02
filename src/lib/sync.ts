@@ -45,6 +45,8 @@ export const LOST_KEY = "lawapp_sync_lost";
 
 /** Same accept rule as the server (src/lib/server/code.ts). */
 export const CODE_RE = /^JSA(-[A-Z0-9]{4}){5}$/;
+/** This server needs an invite word for a new code, and it wasn't given or isn't right (LP-178). */
+export const BAD_INVITE = "This server needs an invite word to turn on sync. Ask whoever runs it, then enter it below.";
 
 export const BAD_CODE = "That doesn't look like a sync code (JSA-XXXX-XXXX-XXXX-XXXX-XXXX).";
 
@@ -830,9 +832,10 @@ function changed(): void {
 /* ---------- turning sync on and off ---------- */
 
 /** Create a new code on the server and upload this browser's data. Resolves with the code. */
-export async function enable(): Promise<string> {
-  const r = await request("POST", "account", {}, false);
+export async function enable(invite = ""): Promise<string> {
+  const r = await request("POST", "account", invite ? { invite } : {}, false);
   const b = r.body || {};
+  if (r.status === 403) throw new Error(BAD_INVITE);
   if (r.status !== 201 || typeof b.code !== "string")
     throw new Error(b.error || "The server refused (" + r.status + ").");
   lsSet(CODE_KEY, b.code);

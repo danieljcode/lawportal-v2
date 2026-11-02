@@ -96,6 +96,38 @@ describe("sync API (AC 15)", () => {
     expect(typeof body.updated).toBe("string");
   });
 
+  describe("with an invite word set (LP-178)", () => {
+    const withInvite = (invite?: string) =>
+      new Request(BASE + "/account", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(invite === undefined ? {} : { invite }),
+      });
+    beforeEach(() => {
+      process.env.LAWAPP_SYNC_INVITE = "open sesame";
+    });
+    afterEach(() => {
+      delete process.env.LAWAPP_SYNC_INVITE;
+    });
+
+    it("refuses a missing or wrong word, without using up the code limit", async () => {
+      for (let i = 0; i < 10; i++) expect((await POST(withInvite(i % 2 ? "nope" : undefined))).status).toBe(403);
+      expect((await POST(withInvite(" open sesame "))).status).toBe(201);
+    });
+
+    it("slows down wrong guesses", async () => {
+      for (let i = 0; i < 30; i++) await POST(withInvite("nope"));
+      expect((await POST(withInvite("nope"))).status).toBe(429);
+    });
+
+    it("keeps existing codes working", async () => {
+      delete process.env.LAWAPP_SYNC_INVITE;
+      const code = await newCode();
+      process.env.LAWAPP_SYNC_INVITE = "open sesame";
+      expect((await GET(new Request(BASE + "/data", { headers: auth(code) }))).status).toBe(200);
+    });
+  });
+
   it("POST without Content-Type: application/json → 415", async () => {
     const res = await POST(new Request(BASE + "/account", { method: "POST", body: "{}" }));
     expect(res.status).toBe(415);

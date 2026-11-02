@@ -47,7 +47,8 @@ app. [Development](docs/development.md) has the details and the other settings.
 The hosted app is a normal Next.js deploy on Vercel. Vercel's file system doesn't keep writes, so
 sync is stored in **Upstash Redis**: set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` (or
 add Vercel's Upstash integration, which sets `KV_REST_API_URL` and `KV_REST_API_TOKEN`), and
-`LAWAPP_ALLOW_LAN=1` so the API answers on the site's own address, not only `localhost`. See
+`LAWAPP_ALLOW_LAN=1` so the API answers on the site's own address, not only `localhost`. Also set
+`LAWAPP_SYNC_INVITE` to a long private word, so strangers can't make sync codes. See
 [Development](docs/development.md#hosted-on-vercel).
 
 Every pull request gets a preview deploy: Vercel comments its link on the PR. Previews run the real
