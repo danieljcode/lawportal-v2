@@ -135,7 +135,8 @@ async function newPage(context, errors) {
   page.on("pageerror", (e) => errors.push("pageerror: " + e.message));
   page.on("console", (m) => {
     // Resource loads (the templates' remote images) aren't app errors; Firefox words them differently.
-    if (m.type() === "error" && !/Failed to load resource|Image corrupt or truncated/.test(m.text()))
+    // Only Vercel serves the analytics script, so it never loads against a local server.
+    if (m.type() === "error" && !/Failed to load resource|Image corrupt or truncated|_vercel\/insights/.test(m.text()))
       errors.push("console: " + m.text());
   });
   return page;
@@ -363,7 +364,8 @@ async function phaseSidebar(browser, theme, mode, ctx) {
     const fail = (why) => failures.push(`${ctx} sidebar ${id}: ${why}`);
     await sidebar(page, id);
     await firstDisplay(page, ctx, `sidebar ${id}`, EXPECT[id] ? [EXPECT[id]] : []);
-    const input = page.locator('#fields input[type="text"]').first();
+    // Not a date field: it only shows real dates, so it would never show the marker.
+    const input = page.locator('#fields input[type="text"]:not(.game-date-text)').first();
     if ((await input.count()) > 0) {
       const marker = "ZZSMOKE" + checks;
       await input.fill(marker);
