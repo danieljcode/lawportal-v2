@@ -24,7 +24,7 @@ import { cleanContact, contactStore, type Contact } from "./contacts";
 import { cleanCheck, conflictLog, type ConflictCheck } from "./conflicts";
 import { cleanFiling, filingStore, type Filing } from "./filings";
 import { cleanEntry, timeStore, type TimeEntry } from "./ledger";
-import { cleanInvoice, invoiceStore, type Invoice } from "./invoices";
+import { cleanInvoice, invoiceStore, renumberClashes, type Invoice } from "./invoices";
 import { cleanDeposit, retainerStore, type Deposit } from "./retainers";
 import { cleanPrecedent, precedentStore, type Precedent } from "./precedents";
 import { docketStore } from "./dockets";
@@ -367,7 +367,7 @@ export function merge(serverDoc: unknown): SyncDoc {
     precedents: [...serverPrecedents, ...(local.precedents || []).filter((p) => !havePrecedent.has(p.id))],
     contacts: [...serverContacts, ...(local.contacts || []).filter((c) => !haveContact.has(c.id))],
     time: [...serverTime, ...(local.time || []).filter((e) => !haveTime.has(e.id))],
-    invoices: [...serverInvoices, ...(local.invoices || []).filter((i) => !haveInvoice.has(i.id))],
+    invoices: renumberClashes([...serverInvoices, ...(local.invoices || []).filter((i) => !haveInvoice.has(i.id))]),
     retainers: [...serverRetainers, ...(local.retainers || []).filter((d) => !haveDeposit.has(d.id))],
   };
   const have = new Set(out.characters.map((c) => c.id));
@@ -465,6 +465,7 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
   // Invoices (LP-33): the same.
   const invoices = mergeOptional(invoicesOf(serverDoc), invoiceStore().list(), base, "invoice:", (i) => i.updated);
   const retainers = mergeOptional(retainersOf(serverDoc), retainerStore().list(), base, "deposit:", (d) => d.updated);
+  const numbered = renumberClashes(invoices.out);
   return {
     // Two devices can make the same case number separately: they become one case.
     doc: {
@@ -475,7 +476,7 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
       precedents: precedents.out,
       contacts: contacts.out,
       time: time.out,
-      invoices: invoices.out,
+      invoices: numbered,
       retainers: retainers.out,
     },
     lost: chars.lost,
@@ -491,6 +492,7 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
       contacts.keptLocal ||
       time.keptLocal ||
       invoices.keptLocal ||
+      numbered.some((inv, i) => inv !== invoices.out[i]) ||
       retainers.keptLocal,
   };
 }

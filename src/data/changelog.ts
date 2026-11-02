@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "fix",
+        text: "Invoice numbers stay unique. A deleted invoice's number isn't used again, and if two devices issue the same number offline, the later invoice takes the next free number when they sync.",
+      },
+      {
+        type: "fix",
         text: "A new invoice no longer bills time that's already on an earlier invoice. An invoice with more than 1,000 entries now asks for shorter dates instead of leaving some out.",
       },
       {
