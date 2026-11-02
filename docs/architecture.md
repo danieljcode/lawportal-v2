@@ -529,6 +529,21 @@ The only server code is two route handlers and `src/lib/server/`:
   variables are set), or one JSON file per sync code when the app runs on its own: see
   [Sync, storage and recovery](sync.md).
 
+### Security headers
+
+- **Fixed headers** (LP-166) are in `next.config.mjs`: no framing, no MIME sniffing, no referrer to
+  other sites, no camera, microphone or location.
+- **The Content-Security-Policy** (LP-169) is built by `src/lib/csp.ts` and sent by `src/proxy.ts`
+  (Next's proxy, formerly middleware) with a fresh nonce on every request. Next puts the nonce on
+  its own scripts, and `src/app/layout.tsx` on the theme and title scripts; anything they load is
+  trusted through `'strict-dynamic'`. Any other inline script is blocked, so a new one needs
+  `nonce={nonce}` the way the layout's have. Because of the nonce, the page renders per request
+  instead of once at build.
+- **To allow a new source** (an image host is already allowed: any `https:`), add it to the
+  directive it needs in `src/lib/csp.ts`, with a comment saying why, and update
+  `tests/csp.test.ts`. The smoke tests fail on any CSP violation the browser reports, in both
+  looks.
+
 ## Related
 
 - [Development](development.md): setting up and running it.
