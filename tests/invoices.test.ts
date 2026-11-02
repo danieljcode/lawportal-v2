@@ -8,6 +8,8 @@ import {
   invoiceStatus,
   receivables,
   nextInvoiceNumber,
+  renumberClashes,
+  type Invoice,
   type InvoiceDraft,
   type InvoiceStore,
 } from "@/lib/invoices";
@@ -48,6 +50,22 @@ describe("invoice numbers", () => {
   });
 });
 
+describe("clashing invoice numbers", () => {
+  const made = (id: string, number: string, created: string) =>
+    ({ id, number, created, updated: created, date: "1990-10-31" }) as Invoice;
+
+  it("keep the number on the first made and give the rest the next free one", () => {
+    const later = made("inv00002", "FA-1990-0007", "2026-01-02T00:00:00.000Z");
+    const first = made("inv00001", "FA-1990-0007", "2026-01-01T00:00:00.000Z");
+    const other = made("inv00003", "FA-1990-0008", "2026-01-03T00:00:00.000Z");
+    const out = renumberClashes([later, first, other], "2026-02-01T00:00:00.000Z");
+    expect(out.map((i) => i.number)).toEqual(["FA-1990-0009", "FA-1990-0007", "FA-1990-0008"]);
+    expect(out[0].updated).toBe("2026-02-01T00:00:00.000Z");
+    expect(out[1]).toBe(first);
+    expect(renumberClashes(out).map((i) => i.number)).toEqual(out.map((i) => i.number));
+  });
+});
+
 describe("the invoice store", () => {
   let store: InvoiceStore;
   beforeEach(() => {
@@ -78,6 +96,13 @@ describe("the invoice store", () => {
     expect(() => store.create(draft([entry("time0001", {}), entry("time0002", {})]))).toThrow(/already on an invoice/);
     store.remove(first.id);
     expect(store.create(draft([entry("time0001", { hours: 2 })])).lines[0].entryId).toBe("time0001");
+  });
+
+  it("doesn't reuse a deleted invoice's number", () => {
+    store.create(draft([entry("time0001", {})]));
+    store.remove(store.create(draft([entry("time0002", {})])).id);
+    expect(store.create(draft([entry("time0003", {})])).number).toBe("FA-1990-0003");
+    expect(store.create(draft([entry("time0004", {})], { date: "1991-01-02" })).number).toBe("FA-1991-0001");
   });
 
   it("refuses more time than an invoice holds, rather than cutting it off", () => {

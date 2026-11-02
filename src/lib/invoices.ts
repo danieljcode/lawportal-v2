@@ -236,6 +236,30 @@ export function nextInvoiceNumber(
   return head + String(last + 1).padStart(4, "0");
 }
 
+/**
+ * Two offline devices can issue the same number (LP-176). After a merge the first made keeps it and the
+ * rest take the next free one, so every device settles on the same numbers.
+ */
+export function renumberClashes(list: readonly Invoice[], now: string = new Date().toISOString()): Invoice[] {
+  const used: Pick<Invoice, "number">[] = [...list];
+  const seen = new Set<string>();
+  const renumbered = new Map<string, Invoice>();
+  const oldestFirst = [...list].sort((a, b) =>
+    a.created !== b.created ? (a.created < b.created ? -1 : 1) : a.id < b.id ? -1 : 1,
+  );
+  for (const inv of oldestFirst) {
+    if (!seen.has(inv.number)) {
+      seen.add(inv.number);
+      continue;
+    }
+    const number = nextInvoiceNumber(used, inv.date);
+    used.push({ number });
+    seen.add(number);
+    renumbered.set(inv.id, { ...inv, number, updated: now });
+  }
+  return renumbered.size ? list.map((inv) => renumbered.get(inv.id) ?? inv) : [...list];
+}
+
 export interface InvoiceDraft {
   caseId: string;
   caseNumber: string;
@@ -347,7 +371,19 @@ export interface InvoiceStore {
   version(): number;
 }
 
+/** The last number issued each game year, so a deleted invoice's number isn't used again. */
+const LAST_NUMBERS_KEY = "lawapp_invoice_last";
+
 export function createInvoiceStore(kv: KV): InvoiceStore {
+  // shortcut: kept per device, so another device can reuse a number deleted here; sync it if that comes up.
+  const lastNumbers = (): Record<string, unknown> => {
+    try {
+      const o: unknown = JSON.parse(kv.get(LAST_NUMBERS_KEY) ?? "{}");
+      return o && typeof o === "object" ? (o as Record<string, unknown>) : {};
+    } catch {
+      return {};
+    }
+  };
   const store = createStore<Invoice[]>(kv, {
     key: INVOICES_KEY,
     version: INVOICES_VERSION,
@@ -371,12 +407,13 @@ export function createInvoiceStore(kv: KV): InvoiceStore {
       const entries = d.entries.filter((e) => !billed.has(e.id));
       if (d.entries.length && !entries.length) throw new Error("All the time in that period is already on an invoice.");
       const now = new Date().toISOString();
-      const inv = cleanInvoice(
-        { ...d, number: nextInvoiceNumber(list, d.date), lines: invoiceLines({ ...d, entries }), created: now },
-        now,
-      );
+      const last = lastNumbers();
+      const issued = Object.values(last).flatMap((number) => (typeof number === "string" ? [{ number }] : []));
+      const number = nextInvoiceNumber([...list, ...issued], d.date);
+      const inv = cleanInvoice({ ...d, number, lines: invoiceLines({ ...d, entries }), created: now }, now);
       if (!inv) throw new Error("Pick a case and the date to issue it on.");
       put(inv);
+      kv.set(LAST_NUMBERS_KEY, JSON.stringify({ ...last, [d.date.slice(0, 4)]: number }));
       return inv;
     },
     addPayment(invoiceId, payment) {
