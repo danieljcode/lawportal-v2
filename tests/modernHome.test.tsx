@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 // The modern home screen (LP-127): a tile for each program the character can
-// see, and what needs attention (deadlines due within 48 hours or overdue,
-// recent filings, recent cases), each one click away, with empty states. The
-// Classic layout keeps the Program Manager.
+// see, and what needs attention (the work list of deadlines, next actions and
+// unpaid invoices, LP-171; recent filings; recent cases), each one click away,
+// with empty states. The Classic layout keeps the Program Manager.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
@@ -10,6 +10,7 @@ import App from "@/shell/App";
 import { caseStore } from "@/lib/cases";
 import { characterStore } from "@/lib/characters";
 import { filingStore, type NewFiling } from "@/lib/filings";
+import { invoiceStore } from "@/lib/invoices";
 import { EMPTY_STATE } from "@/lib/formState";
 import { setShell } from "@/lib/shell";
 import * as sync from "@/lib/sync";
@@ -91,13 +92,13 @@ describe("the modern home screen (LP-127)", () => {
 
   it("says so when there's nothing to show", () => {
     mount();
-    expect(must("#home-due-empty").textContent).toBe("Nothing due in the next 48 hours on Alice Lawyer's cases.");
+    expect(must("#home-work-empty").textContent).toContain("Nothing needs attention in Alice Lawyer's work");
     expect(must("#home-filings-empty").textContent).toContain("No filings yet.");
     expect(must("#home-cases-empty").textContent).toContain("No cases on Alice Lawyer's docket yet.");
     expect(must<HTMLAnchorElement>("#home-cases-empty a").getAttribute("href")).toBe("#clients/intake");
   });
 
-  it("lists deadlines due within 48 hours or overdue on the character's cases, linking to each case", () => {
+  it("lists the next two weeks' deadlines and overdue ones on the character's cases, linking to each case", () => {
     caseStore().save({
       id: "case0001",
       caseNumber: "90SCCR00147",
@@ -118,13 +119,16 @@ describe("the modern home screen (LP-127)", () => {
       deadlines: [{ id: "d5", date: "1990-10-19", label: "Someone else's" }],
     });
     mount();
-    const items = [...document.querySelectorAll("#home-due li")];
-    expect(items.map((li) => li.querySelector("strong")!.textContent)).toEqual(["Response due", "Hearing"]);
+    const items = [...document.querySelectorAll("#home-work li")];
+    expect(items.map((li) => li.querySelector("strong")!.textContent)).toEqual(["Response due", "Hearing", "Trial"]);
     expect(items[0].className).toBe("overdue");
+    expect(items[0].textContent).toContain("Court");
     expect(items[0].textContent).toContain("Sat 17 Oct 1990, overdue, 2 days ago");
     expect(items[0].textContent).toContain("90SCCR00147 · People v. Lee");
     expect(items[0].querySelector("a")!.getAttribute("href")).toBe("#cases/case0001");
     expect(items[1].textContent).toContain("in 2 days");
+    expect(items[1].className).toBe("soon");
+    expect(items[2].className).toBe("");
     expect(must("#tile-cases").getAttribute("aria-label")).toBe("Case File (2 due soon)");
   });
 
@@ -161,7 +165,9 @@ describe("the modern home screen (LP-127)", () => {
     mount();
     expect(texts("#home-cases strong")).toEqual(["90SCCR00003"]);
     expect(must("#home-filings").textContent).toContain("Carl");
-    expect(must("#home-due-empty").textContent).toContain("the firm's cases");
+    expect(must("#home-work-empty").textContent).toContain("for the firm");
+    expect(document.querySelector("#home-scope-mine")).toBeNull();
+    expect(must("#home-work-title").textContent).toBe("All firm work");
   });
 
   it("keeps the Program Manager as the Classic layout's home", () => {
@@ -169,5 +175,105 @@ describe("the modern home screen (LP-127)", () => {
     mount();
     expect(must("#program-manager")).toBeTruthy();
     expect(document.querySelector("#home")).toBeNull();
+  });
+});
+
+describe("the work list on the home screen (LP-171)", () => {
+  const owed = {
+    id: "inv00001",
+    number: "FA-1990-0001",
+    caseId: "case0001",
+    caseNumber: "90SCCR00147",
+    date: "1990-09-01",
+    lines: [{ entryId: "ent00001", date: "1990-09-01", who: "Alice", activity: "court", hours: 2, rate: 150 }],
+    payments: [],
+    created: "2026-09-01T00:00:00.000Z",
+    updated: "2026-09-01T00:00:00.000Z",
+  };
+
+  beforeEach(() => {
+    caseStore().save({
+      id: "case0001",
+      caseNumber: "90SCCR00147",
+      plaintiff: "People",
+      defendant: "Lee",
+      lead: "alice001",
+      deadlines: [{ id: "dl000001", date: "1990-10-21", label: "Hearing" }],
+      actions: [
+        { id: "ac000001", title: "Call the client", owner: "alice001", due: "1990-10-21" },
+        { id: "ac000002", title: "Carl's task", owner: "carl0001", due: "1990-10-20" },
+      ],
+    });
+    invoiceStore().replaceAll([owed]);
+  });
+
+  it("shows My work by default: court dates, actions and bills, each tagged and linked", () => {
+    mount();
+    expect(must("#home-work-title").textContent).toBe("My work: Alice Lawyer");
+    expect(must("#home-scope-mine").getAttribute("aria-pressed")).toBe("true");
+    const items = [...document.querySelectorAll("#home-work li")];
+    expect(items.map((li) => li.querySelector("strong")!.textContent)).toEqual([
+      "Invoice FA-1990-0001 · $300.00 owed",
+      "Hearing",
+      "Call the client",
+    ]);
+    expect(items.map((li) => li.querySelector(".home-kind")!.textContent)).toEqual(["Billing", "Court", "Action"]);
+    expect(items[0].className).toBe("overdue");
+    expect(items[0].textContent).toContain("Due Thu 1 Oct 1990, overdue, 18 days ago");
+    expect(items[0].querySelector("a")!.getAttribute("href")).toBe("#ledger");
+    expect(items[2].querySelector("a")!.getAttribute("href")).toBe("#cases/case0001");
+  });
+
+  it("switches to All firm work, which names who each action is for", () => {
+    mount();
+    act(() => must<HTMLButtonElement>("#home-scope-firm").click());
+    expect(must("#home-work-title").textContent).toBe("All firm work");
+    expect(must("#home-scope-firm").getAttribute("aria-pressed")).toBe("true");
+    expect(texts("#home-work strong")).toContain("Carl's task");
+    expect(must("#home-work").textContent).toContain("Carl Commissioner");
+  });
+
+  it("in All firm work, an action with no owner is Unassigned, and one whose owner isn't here is Unknown", () => {
+    caseStore().save({
+      ...caseStore().get("case0001")!,
+      actions: [
+        { id: "ac000003", title: "Nobody's", due: "1990-10-20" },
+        { id: "ac000004", title: "Elsewhere", owner: "gone0001", due: "1990-10-20" },
+      ],
+    });
+    mount();
+    act(() => must<HTMLButtonElement>("#home-scope-firm").click());
+    const row = (title: string) =>
+      [...document.querySelectorAll("#home-work li")].find((li) => li.textContent!.includes(title))!.textContent;
+    expect(row("Nobody's")).toContain("Unassigned");
+    expect(row("Elsewhere")).toContain("Unknown character");
+  });
+
+  it("ticking an action off saves it and takes it off the list; a payment in full takes the bill off", () => {
+    mount();
+    act(() => must<HTMLInputElement>('[aria-label="Done: Call the client"]').click());
+    expect(
+      caseStore()
+        .get("case0001")!
+        .actions!.find((a) => a.id === "ac000001")!.done,
+    ).toBe(true);
+    expect(texts("#home-work strong")).not.toContain("Call the client");
+    act(() => invoiceStore().addPayment("inv00001", { date: "1990-10-19", amount: 300 }));
+    expect(texts("#home-work strong")).toEqual(["Hearing"]);
+  });
+
+  it("lists only the most urgent ten, and says how many there are", () => {
+    caseStore().save({
+      ...caseStore().get("case0001")!,
+      actions: Array.from({ length: 12 }, (_, i) => ({
+        id: "many" + String(i).padStart(4, "0"),
+        title: "Task " + i,
+        owner: "alice001",
+        due: "1990-10-2" + (i % 9),
+      })),
+    });
+    mount();
+    expect(document.querySelectorAll("#home-work li")).toHaveLength(10);
+    expect(must("#home-work-more").textContent).toBe("The 10 most urgent of 14.");
   });
 });

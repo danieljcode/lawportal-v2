@@ -130,7 +130,7 @@ describe("Upcoming and the toolbar dot (LP-18)", () => {
     });
     expect(must("#tile-cases .pm-badge")).toBeTruthy();
     expect(must("#tile-cases").getAttribute("aria-label")).toBe("Case File (1 due soon)");
-    expect(must("#home-due").textContent).toContain("Hearing");
+    expect(must("#home-work").textContent).toContain("Hearing");
     // The app rail's Case File carries no dot.
     expect(must("#rail-cases").getAttribute("href")).toBe("#cases");
     // The Case File program's File menu leads there too (LP-103).

@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "new",
+        text: "The home screen's work list: court deadlines, next actions and unpaid invoices in one place, overdue first, then the next two weeks. Switch between My work and All firm, and tick actions off right there.",
+      },
+      {
+        type: "new",
         text: "Next actions on a case: the everyday work a court deadline doesn't cover, like Call the client. Give each one to a character (or leave it unassigned) and an optional due date; overdue ones are marked. Tick them off into a Done list, and reopen them from there.",
       },
     ],
