@@ -103,9 +103,31 @@
   }
 }
 
-/* ---------- deadlines (LP-18) ---------- */
+/* ---------- next actions (LP-170) and deadlines (LP-18) ---------- */
+.case-links #case-actions,
 .case-links #case-deadlines {
   grid-column: 1 / -1;
+}
+.action-buttons {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.action-done {
+  margin-top: 8px;
+}
+.action-done > summary {
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+.deadline > .deadline-add {
+  flex: 1;
+  margin-top: 0;
+}
+.deadline-add select {
+  flex: 0 1 180px;
+  width: auto;
+  min-width: 0;
 }
 .deadline {
   display: flex;

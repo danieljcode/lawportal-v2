@@ -8,6 +8,7 @@
 // and the docket bar read and write cases through dockets.ts until the Case
 // File program takes over (LP-101, LP-100).
 
+import { cleanActions, unionActions } from "./actions";
 import { cleanDeadlines, unionDeadlines } from "./deadlines";
 import { cleanExhibits, unionExhibits } from "./exhibits";
 import { clean as cleanDocket, DOCKETS_PREFIX } from "./docketFields";
@@ -58,6 +59,7 @@ export function cleanCase(input: unknown): Case {
     : [];
   const created = typeof o.created === "string" && ISO_TIME_RE.test(o.created) ? o.created : d.updated;
   const rate = parseRate(o.rate);
+  const actions = cleanActions(o.actions);
   return {
     ...d,
     lead,
@@ -65,6 +67,7 @@ export function cleanCase(input: unknown): Case {
     created,
     deadlines: cleanDeadlines(o.deadlines),
     exhibits: cleanExhibits(o.exhibits),
+    ...(actions.length ? { actions } : {}),
     ...(rate !== null ? { rate } : {}),
   };
 }
@@ -94,6 +97,8 @@ function combine(newer: Case, older: Case): Case {
   out.created = newer.created < older.created ? newer.created : older.created;
   out.deadlines = unionDeadlines(newer.deadlines, older.deadlines);
   out.exhibits = unionExhibits(newer.exhibits, older.exhibits);
+  const actions = unionActions(newer.actions || [], older.actions || []);
+  if (actions.length) out.actions = actions;
   return out;
 }
 
