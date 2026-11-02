@@ -299,6 +299,8 @@ function apply(doc: unknown): number {
     for (const item of incoming) {
       try {
         const c = (item && typeof item === "object" ? item : {}) as Record<string, unknown>;
+        // Kept even if the save below fails: a copy that won't store must not delete this device's.
+        if (typeof c.id === "string") keep.add(c.id);
         const saved = chars.save(c, { keepStamp: true });
         keep.add(saved.id);
         order.push(saved.id);
@@ -465,7 +467,8 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
   // Invoices (LP-33): the same.
   const invoices = mergeOptional(invoicesOf(serverDoc), invoiceStore().list(), base, "invoice:", (i) => i.updated);
   const retainers = mergeOptional(retainersOf(serverDoc), retainerStore().list(), base, "deposit:", (d) => d.updated);
-  const numbered = renumberClashes(invoices.out);
+  const paid = keepBothPayments(invoices.out, invoicesOf(serverDoc) || [], invoiceStore().list(), base);
+  const numbered = renumberClashes(paid);
   return {
     // Two devices can make the same case number separately: they become one case.
     doc: {
@@ -495,6 +498,31 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
       numbered.some((inv, i) => inv !== invoices.out[i]) ||
       retainers.keptLocal,
   };
+}
+
+/**
+ * An invoice changed on both devices since the last sync keeps the payments of both (LP-177): the newer
+ * copy wins the rest. A payment removed on one of them comes back, which shows, where a lost one wouldn't.
+ */
+function keepBothPayments(
+  merged: Invoice[],
+  server: Invoice[],
+  local: Invoice[],
+  base: Map<string, string> | null,
+): Invoice[] {
+  const serverById = new Map(server.map((i) => [i.id, i]));
+  const localById = new Map(local.map((i) => [i.id, i]));
+  return merged.map((inv) => {
+    const s = serverById.get(inv.id);
+    const l = localById.get(inv.id);
+    const was = base?.get("invoice:" + inv.id);
+    if (!s || !l || s.updated === was || l.updated === was) return inv;
+    const have = new Set(inv.payments.map((p) => p.id));
+    const missing = [...s.payments, ...l.payments].filter((p) => !have.has(p.id));
+    return missing.length
+      ? { ...inv, payments: [...inv.payments, ...missing], updated: new Date().toISOString() }
+      : inv;
+  });
 }
 
 /**

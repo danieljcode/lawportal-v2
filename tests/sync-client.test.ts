@@ -601,6 +601,68 @@ describe("conflicts keep unsent edits (LP-64)", () => {
     expect(sync.getState().lostContacts).toBe(0);
   });
 
+  describe("an invoice changed on both devices (LP-177)", () => {
+    const invoice = (updated: string, payments: unknown[]) => ({
+      id: "inv00001",
+      number: "FA-1990-0001",
+      caseId: "case0001",
+      caseNumber: "90SCCR00147",
+      date: "1990-10-31",
+      lines: [{ entryId: "time0001", date: "1990-10-02", who: "Alice", activity: "court", hours: 1, rate: 100 }],
+      payments,
+      created: T0,
+      updated,
+    });
+    const pay = (id: string, amount: number) => ({ id, date: "1990-11-01", amount, method: "cash" });
+    const pullWith = async (base: string, mine: unknown, theirs: unknown) => {
+      seed([], { "invoice:inv00001": base });
+      invoiceStore().replaceAll([mine]);
+      localStorage.setItem(sync.DIRTY_KEY, "1");
+      const calls = stubFetch(
+        { status: 200, body: { rev: 2, updated: "u2", data: { characters: [], invoices: [theirs] } } },
+        { status: 200, body: { rev: 3, updated: "u3" } },
+      );
+      await sync.pull(true);
+      return calls;
+    };
+
+    it("keeps both payments, and sends them up", async () => {
+      const calls = await pullWith(
+        "2025-12-01T00:00:00.000Z",
+        invoice(T0, [pay("pay00001", 50)]),
+        invoice(T1, [pay("pay00002", 30)]),
+      );
+      expect(
+        invoiceStore()
+          .get("inv00001")!
+          .payments.map((p) => p.amount),
+      ).toEqual([30, 50]);
+      expect(invoiceStore().get("inv00001")!.updated > T1).toBe(true);
+      const sent = calls.find((c) => c.method === "PUT")!.body as { data: sync.SyncDoc };
+      expect(sent.data.invoices?.[0].payments).toHaveLength(2);
+    });
+
+    it("respects a payment removed on the only device that changed it", async () => {
+      await pullWith(T0, invoice(T0, [pay("pay00001", 50)]), invoice(T1, []));
+      expect(invoiceStore().get("inv00001")!.payments).toEqual([]);
+    });
+  });
+
+  it("a character that won't store keeps this device's copy (LP-177)", async () => {
+    seed([{ id: "char0001", name: "Mine", updatedAt: T0 }], { "char:char0001": T0 });
+    stubFetch({
+      status: 200,
+      body: { rev: 2, updated: "u2", data: { characters: [{ id: "char0001", name: "", updatedAt: T1 }] } },
+    });
+    await sync.pull(true);
+    expect(
+      characterStore()
+        .list()
+        .map((c) => c.name),
+    ).toEqual(["Mine"]);
+    expect(sync.getState().status).toBe("error");
+  });
+
   it("a contact added here goes up with the next push (LP-30)", async () => {
     seed([], {});
     contactStore().save({ name: "Officer Dibble", type: "officer" });
