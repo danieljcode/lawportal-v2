@@ -3,7 +3,7 @@
 // back/forward, the page title, and going home. Routes are prefixed by
 // program: #filings/<formId>, #cases/<caseId>, #cases/upcoming, #cases/docket, #cases/record,
 // #clients/intake, #clients/conflicts, #clients/rolodex, #library/penal-code,
-// #library/precedents, #ledger, #ledger/retainers/<contactId>, #find, #help, #help/<topic>, #jap, #control. The old flat hashes (#cases, #upcoming,
+// #library/precedents, #ledger, #ledger/retainers/<contactId>, #ledger/case/<caseId>[/log|/invoices], #find, #help, #help/<topic>, #jap, #control. The old flat hashes (#cases, #upcoming,
 // #intake, #conflicts, #library, #jap, #<formId>) still open the same place
 // and are rewritten to the new ones.
 
@@ -25,7 +25,7 @@ export type Route =
   | { program: "cases"; caseId: string | null; upcoming?: boolean; docket?: boolean; record?: boolean }
   | { program: "clients"; page: ClientsPage }
   | { program: "library"; page: LibraryPage; chapter?: string }
-  | { program: "ledger"; retainerFor?: string }
+  | { program: "ledger"; retainerFor?: string; caseId?: string; at?: "log" | "invoices" }
   | { program: "find" }
   | { program: "help"; topic: string | null }
   | { program: "jap" }
@@ -77,6 +77,7 @@ export function hashFor(r: Route): string {
     case "help":
       return "#help" + (r.topic ? "/" + r.topic : "");
     case "ledger":
+      if (r.caseId) return "#ledger/case/" + r.caseId + (r.at ? "/" + r.at : "");
       return "#ledger" + (r.retainerFor ? "/retainers/" + r.retainerFor : "");
     default:
       return "#" + r.program;
@@ -118,7 +119,10 @@ export function parseHash(hash: string): Route {
         : { program: "library", page: "penal-code" };
     }
     case "ledger": {
-      const [page, contact] = rest.split("/");
+      const [page, contact, at] = rest.split("/");
+      if (page === "case" && CASE_ID.test(contact || "")) {
+        return { program: "ledger", caseId: contact, ...(at === "log" || at === "invoices" ? { at } : {}) };
+      }
       return page === "retainers" && CASE_ID.test(contact || "")
         ? { program: "ledger", retainerFor: contact }
         : { program: "ledger" };

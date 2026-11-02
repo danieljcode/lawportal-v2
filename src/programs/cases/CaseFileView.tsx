@@ -11,6 +11,7 @@ import { filingsForCase, filingStore, type Filing } from "@/lib/filings";
 import { OUTCOME_LABELS } from "@/lib/outcomes";
 import type { Case, Character, OutcomeResult } from "@/lib/types";
 import CaseActions from "./CaseActions";
+import CaseBilling from "./CaseBilling";
 import CaseContacts from "./CaseContacts";
 import CaseDeadlines from "./CaseDeadlines";
 import CaseEvidence from "./CaseEvidence";
@@ -245,8 +246,8 @@ function detailsStamp(c: Case): string {
 }
 
 /**
- * A case's linked areas: its next actions (LP-170), deadlines (LP-18), contacts (LP-30), filings (LP-15)
- * and evidence (LP-12).
+ * A case's linked areas: its next actions (LP-170), billing (LP-173), deadlines (LP-18), contacts (LP-30),
+ * filings (LP-15) and evidence (LP-12).
  */
 function CaseLinks({
   c,
@@ -267,6 +268,10 @@ function CaseLinks({
       <section className="case-empty" id="case-actions" aria-labelledby="case-actions-title">
         <h4 id="case-actions-title">Next actions</h4>
         <CaseActions c={c} characters={characters} />
+      </section>
+      <section className="case-empty" id="case-billing" aria-labelledby="case-billing-title">
+        <h4 id="case-billing-title">Billing</h4>
+        <CaseBilling c={c} characters={characters} />
       </section>
       <section className="case-empty" id="case-deadlines" aria-labelledby="case-deadlines-title">
         <h4 id="case-deadlines-title">Deadlines and hearings</h4>
@@ -291,9 +296,14 @@ function CaseLinks({
             </p>
           </>
         ) : (
-          <p className="small muted">
-            No filings yet. Filings copied or downloaded with this case number will be listed here.
-          </p>
+          <>
+            <p className="small muted">
+              No filings yet. Filings copied or downloaded with this case number will be listed here.
+            </p>
+            <a className="btn" id="case-filings-start" href="#filings">
+              Start a filing
+            </a>
+          </>
         )}
       </section>
       <section className="case-empty" id="case-evidence" aria-labelledby="case-evidence-title">

@@ -5,6 +5,7 @@
 
 import { ISO_DATE_RE, ISO_TIME_RE, defaultKV, isId, newId, text, uniqueById, type KV } from "./storage";
 import { createStore } from "./store";
+import type { Case, Character } from "./types";
 
 export const TIME_KEY = "lawapp_time";
 export const TIME_VERSION = 1;
@@ -64,6 +65,18 @@ export function parseRate(v: unknown): number | null {
 export function entryValue(e: Pick<TimeEntry, "hours">, rate: number | null): number | null {
   return rate === null ? null : Math.round(e.hours * rate * 100) / 100;
 }
+
+/** Each entry's hourly rate: its case's, else its character's; null with neither. */
+export function rateLookup(
+  cases: readonly Pick<Case, "id" | "rate">[],
+  characters: readonly Pick<Character, "id" | "rate">[],
+): (e: Pick<TimeEntry, "caseId" | "character">) => number | null {
+  const caseRates = new Map(cases.map((c) => [c.id, c.rate]));
+  return (e) => caseRates.get(e.caseId) ?? parseRate(characters.find((c) => c.id === e.character)?.rate);
+}
+
+/** "1.0 hour", "2.5 hours". */
+export const hoursText = (h: number) => h.toFixed(1) + (h === 1 ? " hour" : " hours");
 
 /** "$1,234.50". */
 export function formatMoney(n: number): string {
