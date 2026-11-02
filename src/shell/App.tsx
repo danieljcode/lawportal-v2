@@ -434,7 +434,13 @@ export default function App() {
     <>
       {!program && layout === "modern" && (
         <ErrorBoundary where="the home screen" resetKey="home">
-          <ModernHome programs={visiblePrograms} hrefFor={hrefFor} active={active} onOpenFiling={openFiling} />
+          <ModernHome
+            programs={visiblePrograms}
+            hrefFor={hrefFor}
+            active={active}
+            characters={characters}
+            onOpenFiling={openFiling}
+          />
         </ErrorBoundary>
       )}
       {!program && layout === "classic" && (

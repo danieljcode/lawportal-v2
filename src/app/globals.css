@@ -2900,6 +2900,40 @@ body:has(.m-app) {
 .home-list .soon a {
   border-left-color: var(--dot-conflict);
 }
+/* The work list (LP-171): the whole width, My work or All firm, each item tagged by kind. */
+.home-work {
+  grid-column: 1 / -1;
+}
+.home-work-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.home-scope {
+  display: flex;
+  gap: 4px;
+}
+.home-scope [aria-pressed="true"] {
+  background: var(--light);
+  font-weight: bold;
+}
+.home-kind {
+  font-size: var(--text-xs);
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.home-list .home-action {
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+}
+.home-action > input {
+  margin: 8px 0 0 6px;
+  flex-shrink: 0;
+}
 @media (max-width: 760px) {
   .home-tiles {
     grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
