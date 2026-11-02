@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "new",
+        text: "Record how a case ended when you close it: won, lost, settled, dismissed, plea deal or withdrawn, with a note. The Firm Record, in the Case File, adds them up with the win rate for the firm and each lawyer, by matter type and dates, and prints or copies as a summary.",
+      },
+      {
+        type: "new",
         text: "The Court Docket, in the Case File for judges: the cases before them, soonest next date first, marked Pending, Scheduled, Under advisement or Closed. Start a judge template from a case with its details filled in.",
       },
       {

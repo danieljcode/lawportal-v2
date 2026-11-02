@@ -6,8 +6,10 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { caseProblem, caseStore, filterCases, members, needsLead, NEEDS_LEAD } from "@/lib/cases";
 import { FIELDS, MAX_TEXT, STATUSES } from "@/lib/docketFields";
+import { gameToday } from "@/lib/deadlines";
 import { filingsForCase, filingStore, type Filing } from "@/lib/filings";
-import type { Case, Character } from "@/lib/types";
+import { OUTCOME_LABELS } from "@/lib/outcomes";
+import type { Case, Character, OutcomeResult } from "@/lib/types";
 import CaseActions from "./CaseActions";
 import CaseContacts from "./CaseContacts";
 import CaseDeadlines from "./CaseDeadlines";
@@ -326,6 +328,9 @@ function CaseEditor({ initial, characters, saved, onSaved, onCancel }: CaseEdito
   const [assigned, setAssigned] = useState<string[]>(initial?.assigned || []);
   const [error, setError] = useState("");
   const [edited, setEdited] = useState(false);
+  const [result, setResult] = useState<OutcomeResult | "">(initial?.outcome?.result || "");
+  const [resultDate, setResultDate] = useState(initial?.outcome?.date || gameToday());
+  const [resultNote, setResultNote] = useState(initial?.outcome?.note || "");
 
   // Characters on the case that this browser doesn't have (from another device) still show.
   const known = new Set(characters.map((c) => c.id));
@@ -365,6 +370,11 @@ function CaseEditor({ initial, characters, saved, onSaved, onCancel }: CaseEdito
     for (const f of FIELDS) {
       if (values[f.key]) data[f.key] = values[f.key];
       else delete data[f.key];
+    }
+    // A reopened case keeps its outcome, hidden, for when it closes again.
+    if (values.status === "Closed") {
+      if (result) data.outcome = { result, date: resultDate, note: resultNote };
+      else delete data.outcome;
     }
     try {
       onSaved(store.save(data), !initial);
@@ -442,6 +452,62 @@ function CaseEditor({ initial, characters, saved, onSaved, onCancel }: CaseEdito
           );
         })}
       </div>
+
+      {values.status === "Closed" && (
+        <fieldset className="case-outcome" id="case-outcome">
+          <legend>How did it end?</legend>
+          <div className="case-fields">
+            <div className="field">
+              <label htmlFor="case-result">Outcome</label>
+              <select
+                id="case-result"
+                value={result}
+                onChange={(e) => {
+                  setResult(e.target.value as OutcomeResult | "");
+                  setEdited(true);
+                }}
+              >
+                <option value="">Not recorded yet</option>
+                {Object.entries(OUTCOME_LABELS).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {result && (
+              <>
+                <div className="field">
+                  <label htmlFor="case-result-date">Date</label>
+                  <GameDateInput
+                    id="case-result-date"
+                    aria-label="Date of the outcome"
+                    value={resultDate}
+                    onChange={(v) => {
+                      setResultDate(v);
+                      setEdited(true);
+                    }}
+                  />
+                </div>
+                <div className="field wide">
+                  <label htmlFor="case-result-note">Note (optional)</label>
+                  <input
+                    id="case-result-note"
+                    type="text"
+                    maxLength={1000}
+                    value={resultNote}
+                    onChange={(e) => {
+                      setResultNote(e.target.value);
+                      setEdited(true);
+                    }}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+          <p className="small muted">It counts towards the Firm Record once you save.</p>
+        </fieldset>
+      )}
 
       <fieldset className="case-people">
         <legend>Who&apos;s on it</legend>

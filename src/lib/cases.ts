@@ -11,6 +11,7 @@
 import { cleanActions, unionActions } from "./actions";
 import { cleanDeadlines, unionDeadlines } from "./deadlines";
 import { cleanExhibits, unionExhibits } from "./exhibits";
+import { cleanOutcome } from "./outcomes";
 import { clean as cleanDocket, DOCKETS_PREFIX } from "./docketFields";
 import { parseRate } from "./ledger";
 import { defaultKV, isId, isObject, ISO_TIME_RE, newId, setAside, uniqueById, type KV } from "./storage";
@@ -60,6 +61,7 @@ export function cleanCase(input: unknown): Case {
   const created = typeof o.created === "string" && ISO_TIME_RE.test(o.created) ? o.created : d.updated;
   const rate = parseRate(o.rate);
   const actions = cleanActions(o.actions);
+  const outcome = cleanOutcome(o.outcome);
   return {
     ...d,
     lead,
@@ -68,6 +70,7 @@ export function cleanCase(input: unknown): Case {
     deadlines: cleanDeadlines(o.deadlines),
     exhibits: cleanExhibits(o.exhibits),
     ...(actions.length ? { actions } : {}),
+    ...(outcome ? { outcome } : {}),
     ...(rate !== null ? { rate } : {}),
   };
 }

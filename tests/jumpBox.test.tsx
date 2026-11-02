@@ -143,6 +143,7 @@ describe("the jump box (LP-128)", () => {
       "Settings",
       "All cases",
       "Upcoming",
+      "Firm Record",
       "New client intake",
       "Conflict check",
       "Rolodex",
