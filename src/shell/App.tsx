@@ -28,7 +28,6 @@ import AboutDialog from "./AboutDialog";
 import BootScreen from "./BootScreen";
 import ChangelogDialog from "./ChangelogDialog";
 import CharactersDialog from "./CharactersDialog";
-import DocketsDialog from "./DocketsDialog";
 import ErrorBoundary from "@/ui/ErrorBoundary";
 import JumpBox, { isFindKey, isJumpKey, jumpShortcut } from "./JumpBox";
 import type { DraftRequest, FormTools } from "@/programs/filings";
@@ -57,6 +56,7 @@ import type { Route } from "./useRoute";
 // Filing history renders filings with their templates, so its code and the forms load the first
 // time it opens (LP-133).
 const FilingsDialog = lazy(() => import("@/ui/FilingsDialog"));
+const DocketsDialog = lazy(() => import("./DocketsDialog"));
 
 export default function App() {
   const { route, form, goHome } = useRoute();
@@ -81,6 +81,9 @@ export default function App() {
   /** Filing history has been opened, so it stays mounted (and its open/close works as the other dialogs'). */
   const [filingsUsed, setFilingsUsed] = useState(false);
   if (dialog === "filings" && !filingsUsed) setFilingsUsed(true);
+  /** The same for the Dockets dialog: neither loads until it's first opened (the first-load budget). */
+  const [docketsUsed, setDocketsUsed] = useState(false);
+  if (dialog === "dockets" && !docketsUsed) setDocketsUsed(true);
   /** Filing history's "Use as new draft" for the form already open (LP-15). */
   const [draftRequest, setDraftRequest] = useState<DraftRequest | null>(null);
   /** The open form shows its docket bar (it has a Case number and the active character keeps a docket). */
@@ -246,6 +249,10 @@ export default function App() {
     openCharacters: showCharacters,
     openFilings,
     openFiling,
+    openFormForCase: (formId, caseId) => {
+      loadDocketInForm(caseId, formId);
+      navigate("#filings/" + formId);
+    },
     openChangelog: showChangelog,
     openAbout: showAbout,
     openDockets: (charId) => openDockets(charId),
@@ -561,13 +568,17 @@ export default function App() {
         />
       </ErrorBoundary>
       <ErrorBoundary where="the Dockets dialog" variant="dialog" resetKey={dialog} onDismiss={closeDialog}>
-        <DocketsDialog
-          open={dialog === "dockets"}
-          onClose={closeDialog}
-          charId={docketsFor}
-          canUse={canUseDocket}
-          onUse={loadDocketInForm}
-        />
+        {docketsUsed && (
+          <Suspense fallback={null}>
+            <DocketsDialog
+              open={dialog === "dockets"}
+              onClose={closeDialog}
+              charId={docketsFor}
+              canUse={canUseDocket}
+              onUse={loadDocketInForm}
+            />
+          </Suspense>
+        )}
       </ErrorBoundary>
       <ErrorBoundary where={"What's new"} variant="dialog" resetKey={dialog} onDismiss={closeDialog}>
         <ChangelogDialog open={dialog === "changelog"} onClose={closeDialog} />

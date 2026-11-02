@@ -107,8 +107,13 @@ export interface DraftRequest {
 
 export interface DocketRequest {
   docketId: string;
+  /** The form it's for, when that form isn't open yet; absent for the open form. */
+  formId?: string;
   seq: number;
 }
+
+/** Requests already loaded: a form opened later, or opened again, doesn't load one twice. */
+const handledRequests = new WeakSet<DocketRequest>();
 
 function readCollapsed(id: string): Set<string> {
   const all = readJson<Record<string, unknown>>(defaultKV(), COLLAPSED_KEY);
@@ -417,7 +422,6 @@ export default function FormView({
   const currentDocket = showDocket ? linkedCase : null;
 
   const loadDocket = (caseId: string) => {
-    if (!judge) return;
     const d = caseStore().get(caseId);
     if (!d) return;
     const { state: loaded, filled } = docketToForm(entries, state, d);
@@ -503,10 +507,11 @@ export default function FormView({
   useEffect(() => (onTools ? () => onTools(null) : undefined), [onTools]);
 
   // "Use in form" from the Dockets dialog: load each request once (a request older than this view is skipped).
-  const handledRequest = useRef(docketRequest ? docketRequest.seq : 0);
   useEffect(() => {
-    if (!docketRequest || docketRequest.seq === handledRequest.current) return;
-    handledRequest.current = docketRequest.seq;
+    if (!docketRequest || handledRequests.has(docketRequest)) return;
+    if (docketRequest.formId && docketRequest.formId !== form.id) return;
+    handledRequests.add(docketRequest);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- a request from outside the form, taken once
     loadDocket(docketRequest.docketId);
     // loadDocket reads this render's state; only a new request should trigger it.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- deliberately keyed on the request alone

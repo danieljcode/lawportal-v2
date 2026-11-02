@@ -35,6 +35,8 @@ export interface Shell {
   openFilings(): void;
   /** Open a filing as a new draft of its form. */
   openFiling(f: Filing): void;
+  /** Open a form with a case's details filled in. */
+  openFormForCase(formId: string, caseId: string): void;
   openChangelog(): void;
   openAbout(): void;
   /** The Dockets dialog for a character (Settings' character list, LP-109). */

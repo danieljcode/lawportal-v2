@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "new",
+        text: "The Court Docket, in the Case File for judges: the cases before them, soonest next date first, marked Pending, Scheduled, Under advisement or Closed. Start a judge template from a case with its details filled in.",
+      },
+      {
+        type: "new",
         text: "The home screen's work list: court deadlines, next actions and unpaid invoices in one place, overdue first, then the next two weeks. Switch between My work and All firm, and tick actions off right there.",
       },
       {

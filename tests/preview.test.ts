@@ -243,7 +243,7 @@ describe("forum preview with no frames and no input", () => {
     expectRendered(COURT_LS, "MOTION TITLE");
   });
 
-  it("shows a docket loaded with Use in form", () => {
+  it("shows a docket loaded with Use in form", async () => {
     const id = saveCharacter("John Doe", "Attorney at Law");
     act(() => {
       characterStore().setActive(id);
@@ -253,6 +253,9 @@ describe("forum preview with no frames and no input", () => {
     mount();
     expectRendered(COURT, "John Doe");
     click(must("#open-dockets"));
+    await act(async () => {
+      await vi.dynamicImportSettled();
+    });
     const use = [...document.querySelectorAll<HTMLButtonElement>("#docket-list button")].find(
       (b) => b.textContent === "Use in form",
     );
