@@ -5,6 +5,10 @@
 import { existsSync, readFileSync } from "node:fs";
 
 export const REAL_DATA_TESTS = [
+  "tests/courtDocketUi.test.tsx",
+  "tests/onboarding.test.tsx",
+  "tests/pdf.test.tsx",
+  "tests/pickFromRolodex.test.tsx",
   "tests/court-wording.test.ts",
   "tests/crashScreen.test.tsx",
   "tests/deadlines.test.ts",
