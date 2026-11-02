@@ -8,6 +8,7 @@ import { caseProblem, caseStore, filterCases, members, needsLead, NEEDS_LEAD } f
 import { FIELDS, MAX_TEXT, STATUSES } from "@/lib/docketFields";
 import { filingsForCase, filingStore, type Filing } from "@/lib/filings";
 import type { Case, Character } from "@/lib/types";
+import CaseActions from "./CaseActions";
 import CaseContacts from "./CaseContacts";
 import CaseDeadlines from "./CaseDeadlines";
 import CaseEvidence from "./CaseEvidence";
@@ -228,13 +229,23 @@ export default function CaseFileView({
   );
 }
 
-/** The case's details and who's on it, but not its deadlines, evidence or save times (LP-148). */
+/** The case's details and who's on it, but not its deadlines, actions, evidence or save times (LP-148). */
 function detailsStamp(c: Case): string {
-  const { deadlines: _deadlines, exhibits: _exhibits, updated: _updated, created: _created, ...details } = c;
+  const {
+    deadlines: _deadlines,
+    actions: _actions,
+    exhibits: _exhibits,
+    updated: _updated,
+    created: _created,
+    ...details
+  } = c;
   return JSON.stringify(details);
 }
 
-/** A case's linked areas: its deadlines (LP-18), contacts (LP-30), filings (LP-15) and evidence (LP-12). */
+/**
+ * A case's linked areas: its next actions (LP-170), deadlines (LP-18), contacts (LP-30), filings (LP-15)
+ * and evidence (LP-12).
+ */
 function CaseLinks({
   c,
   filings,
@@ -251,6 +262,10 @@ function CaseLinks({
   const [filingStatus, setFilingStatus] = useState<{ text: string; bad: boolean } | null>(null);
   return (
     <div className="case-links">
+      <section className="case-empty" id="case-actions" aria-labelledby="case-actions-title">
+        <h4 id="case-actions-title">Next actions</h4>
+        <CaseActions c={c} characters={characters} />
+      </section>
       <section className="case-empty" id="case-deadlines" aria-labelledby="case-deadlines-title">
         <h4 id="case-deadlines-title">Deadlines and hearings</h4>
         <CaseDeadlines c={c} />

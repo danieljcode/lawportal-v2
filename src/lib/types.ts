@@ -154,6 +154,8 @@ export interface Case extends Docket {
   deadlines: Deadline[];
   /** The evidence, in exhibit order (LP-12); an exhibit's letter comes from its place. */
   exhibits: Exhibit[];
+  /** Next actions (LP-170), in the order added. Absent when there are none. */
+  actions?: CaseAction[];
   /** Hourly rate in dollars for everyone's time on this case, over their own (the Ledger, LP-32). */
   rate?: number;
 }
@@ -169,6 +171,17 @@ export interface Exhibit {
   obtained?: string;
   /** Chain of custody (LP-14), oldest first; only ever added to. Absent when empty. */
   custody?: CustodyEntry[];
+}
+
+/** A piece of everyday work on a case (LP-170), owned by a character or no one. */
+export interface CaseAction {
+  id: string;
+  title: string;
+  /** The character doing it; absent when unassigned. */
+  owner?: string;
+  /** In-game due date, YYYY-MM-DD (the 1990 calendar). */
+  due?: string;
+  done?: boolean;
 }
 
 /** A dated entry on a case (LP-18): an in-game date, a label and a note. */

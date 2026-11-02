@@ -18,6 +18,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-11-02",
+    items: [
+      {
+        type: "new",
+        text: "Next actions on a case: the everyday work a court deadline doesn't cover, like Call the client. Give each one to a character (or leave it unassigned) and an optional due date; overdue ones are marked. Tick them off into a Done list, and reopen them from there.",
+      },
+    ],
+  },
+  {
     date: "2026-10-31",
     title: "Office tools: Rolodex, Ledger, Find and Help",
     version: "0.4.0",

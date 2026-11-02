@@ -5,6 +5,7 @@ The **Case File** holds every firm case, with its lead and the characters workin
 Each case has:
 
 - its **details**;
+- **next actions**: the everyday work, like _Call the client_, each with who's doing it (or Unassigned) and an optional due date. Overdue ones are marked. Tick one off and it moves to **Done**, where you can reopen it; **Edit** changes it;
 - **deadlines and hearings**;
 - the **filings** made for it;
 - **contacts** from the Rolodex, each in a role such as client or witness;
