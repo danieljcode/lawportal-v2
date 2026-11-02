@@ -233,6 +233,22 @@ describe("the work list on the home screen (LP-171)", () => {
     expect(must("#home-work").textContent).toContain("Carl Commissioner");
   });
 
+  it("in All firm work, an action with no owner is Unassigned, and one whose owner isn't here is Unknown", () => {
+    caseStore().save({
+      ...caseStore().get("case0001")!,
+      actions: [
+        { id: "ac000003", title: "Nobody's", due: "1990-10-20" },
+        { id: "ac000004", title: "Elsewhere", owner: "gone0001", due: "1990-10-20" },
+      ],
+    });
+    mount();
+    act(() => must<HTMLButtonElement>("#home-scope-firm").click());
+    const row = (title: string) =>
+      [...document.querySelectorAll("#home-work li")].find((li) => li.textContent!.includes(title))!.textContent;
+    expect(row("Nobody's")).toContain("Unassigned");
+    expect(row("Elsewhere")).toContain("Unknown character");
+  });
+
   it("ticking an action off saves it and takes it off the list; a payment in full takes the bill off", () => {
     mount();
     act(() => must<HTMLInputElement>('[aria-label="Done: Call the client"]').click());

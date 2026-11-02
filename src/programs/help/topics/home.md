@@ -8,7 +8,7 @@ The **work list** puts everything that's due in one place, most urgent first:
 - **Action**: a case's **next actions** with a due date. Tick one off here and it's done on the case too.
 - **Billing**: invoices that aren't paid in full, with what's owed. Record payments in the [Ledger](#help/ledger).
 
-Overdue items come first, then the next two weeks, soonest first. Dates are in-game.
+Overdue items come first, then the soonest. Court dates and actions show for the next two weeks; unpaid invoices always show. Dates are in-game.
 
 **My work** shows the work of the character you're filing as: court dates on cases they work, actions given to them, and bills on their cases. **All firm** shows everyone's, with who each action is for. With no character chosen, it shows the whole firm.
 

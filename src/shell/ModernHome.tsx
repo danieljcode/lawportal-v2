@@ -141,7 +141,13 @@ export default function ModernHome({ programs, hrefFor, active, characters, onOp
                       key={item.key}
                       item={item}
                       today={today}
-                      ownerName={(id) => (workFor ? "" : characters.find((c) => c.id === id)?.name || "Unassigned")}
+                      ownerName={(id) =>
+                        workFor
+                          ? ""
+                          : id
+                            ? characters.find((c) => c.id === id)?.name || "Unknown character"
+                            : "Unassigned"
+                      }
                     />
                   ))}
                 </ul>
