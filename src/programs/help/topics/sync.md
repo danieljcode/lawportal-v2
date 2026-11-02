@@ -12,7 +12,7 @@ Everything is saved in this browser. Nothing leaves your computer unless you tur
 
 Sync shares your characters, cases, filings, precedents and the rest between browsers and devices.
 
-1. In **Settings**, under **Sync across devices**, choose **Turn on sync**. You get a **sync code**.
+1. In **Settings**, under **Sync across devices**, choose **Turn on sync**. You get a **sync code**. If the site asks for an invite word, get it from whoever runs it.
 2. On the other device, enter the same code to join.
 
 Anyone with the code can read and change that data, so keep it private. The dot in the top bar shows how sync is doing.

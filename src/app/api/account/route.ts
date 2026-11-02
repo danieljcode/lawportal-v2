@@ -1,7 +1,7 @@
 // POST /api/account: create a sync code. DELETE /api/account: delete the server copy.
 // Design §Sync server route table; the host check runs first (D7).
 import { checkSync } from "@/lib/server/guard";
-import { parseBearer } from "@/lib/server/code";
+import { inviteAccepted, parseBearer } from "@/lib/server/code";
 import { clientIp, limitCreate, limitLookup, lookupFailed, TOO_MANY_CODES, tooMany } from "@/lib/server/rateLimit";
 import { redisConfigured } from "@/lib/server/syncRedis";
 import { codeHash, create, remove } from "@/lib/server/syncStore";
@@ -14,6 +14,14 @@ export async function POST(req: Request): Promise<Response> {
   const refused = checkSync(req);
   if (refused) return refused;
   if (!isJson(req)) return json({ error: "Expected application/json." }, 415);
+  // Before the code limits, so strangers can't use them up. Wrong guesses count as failed lookups.
+  const body: unknown = await req.json().catch(() => null);
+  if (!inviteAccepted((body as { invite?: unknown } | null)?.invite)) {
+    const slow = limitLookup(req);
+    if (slow) return slow;
+    lookupFailed(req);
+    return json({ error: "That invite word isn't right." }, 403);
+  }
   // Redis counts new codes itself, across every instance (LP-137).
   const limited = redisConfigured() ? null : limitCreate(req);
   if (limited) return limited;

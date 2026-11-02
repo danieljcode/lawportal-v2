@@ -26,6 +26,8 @@ export default function SyncPanel({ autoEnable = false, onAutoEnableDone }: Sync
   const [busy, setBusy] = useState(false);
   const [copyLabel, setCopyLabel] = useState("Copy");
   const [typed, setTyped] = useState("");
+  const [invite, setInvite] = useState("");
+  const [askInvite, setAskInvite] = useState(false);
   /** A thrown error from enable/link/destroy; replaced by the next sync state. */
   const [error, setError] = useState<{ text: string; warn: boolean } | null>(null);
   const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -45,12 +47,13 @@ export default function SyncPanel({ autoEnable = false, onAutoEnableDone }: Sync
     [],
   );
 
-  const turnOn = async () => {
+  const turnOn = async (word = "") => {
     setBusy(true);
     try {
-      await sync.enable();
+      await sync.enable(word);
       setShown(true);
     } catch (err) {
+      if (err instanceof Error && err.message === sync.BAD_INVITE) setAskInvite(true);
       setError({ text: err instanceof Error ? err.message : String(err), warn: false });
     } finally {
       setBusy(false);
@@ -134,11 +137,28 @@ export default function SyncPanel({ autoEnable = false, onAutoEnableDone }: Sync
       {!on ? (
         <div id="sync-off">
           <p className="small">{S_SYNC_OFF}</p>
-          <div className="row">
-            <button className="btn primary" id="sync-enable" type="button" onClick={turnOn} disabled={busy}>
+          <form
+            className="row"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void turnOn(invite);
+            }}
+          >
+            {askInvite && (
+              <input
+                type="password"
+                id="sync-invite"
+                placeholder="Invite word"
+                aria-label="Invite word"
+                autoComplete="off"
+                value={invite}
+                onChange={(e) => setInvite(e.target.value)}
+              />
+            )}
+            <button className="btn primary" id="sync-enable" type="submit" disabled={busy}>
               Turn on sync
             </button>
-          </div>
+          </form>
           <form className="row sync-link" id="sync-link" onSubmit={submitCode}>
             <input
               type="text"
