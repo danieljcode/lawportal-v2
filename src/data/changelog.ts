@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "fix",
+        text: "Sync keeps payments recorded on the same invoice on two devices, where before one could vanish. A character that can't be saved from sync no longer removes your copy.",
+      },
+      {
+        type: "fix",
         text: "Invoice numbers stay unique. A deleted invoice's number isn't used again, and if two devices issue the same number offline, the later invoice takes the next free number when they sync.",
       },
       {
