@@ -385,6 +385,9 @@ export function createInvoiceStore(kv: KV): InvoiceStore {
       edit(invoiceId, (inv) => {
         if (inv.payments.length >= MAX_PAYMENTS)
           throw new Error("An invoice can hold up to " + MAX_PAYMENTS + " payments.");
+        const owed = invoiceBalance(inv);
+        if (p.amount > owed)
+          throw new Error("Only " + formatMoney(Math.max(owed, 0)) + " is still owed on this invoice.");
         return { ...inv, payments: [...inv.payments, p] };
       });
     },

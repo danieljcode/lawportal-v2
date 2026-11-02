@@ -103,6 +103,14 @@ describe("the invoice store", () => {
     expect(invoiceBalance(store.get(inv.id)!)).toBe(100.1);
   });
 
+  it("refuses a payment above what's owed", () => {
+    const inv = store.create(draft([entry("time0001", { hours: 1 })]));
+    expect(() => store.addPayment(inv.id, { date: "1990-11-01", amount: 150.01 })).toThrow(/Only \$150\.00/);
+    store.addPayment(inv.id, { date: "1990-11-01", amount: 150 });
+    expect(() => store.addPayment(inv.id, { date: "1990-11-02", amount: 1 })).toThrow(/Only \$0\.00/);
+    expect(store.get(inv.id)!.payments).toHaveLength(1);
+  });
+
   it("cleans a synced invoice, recomputing each amount", () => {
     const inv = store.create(draft([entry("time0001", {})]));
     const tampered = { ...inv, lines: [{ ...inv.lines[0], amount: 1 }] };

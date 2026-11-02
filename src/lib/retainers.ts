@@ -104,6 +104,22 @@ export function retainerHistory(
   });
 }
 
+/** Why a deposit can't be removed: part of it has paid invoices. Null when it can. */
+export function depositRemovalProblem(
+  id: string,
+  deposits: readonly Deposit[],
+  invoices: readonly Invoice[],
+): string | null {
+  const d = deposits.find((x) => x.id === id);
+  if (!d) return null;
+  const left = retainerBalance(
+    d.contactId,
+    deposits.filter((x) => x.id !== id),
+    invoices,
+  );
+  return left < 0 ? formatMoney(-left) + " of this deposit has already paid invoices, so it can't be removed." : null;
+}
+
 /** What's left of a client's retainer. */
 export function retainerBalance(contactId: string, deposits: readonly Deposit[], invoices: readonly Invoice[]): number {
   const rows = retainerHistory(contactId, deposits, invoices);

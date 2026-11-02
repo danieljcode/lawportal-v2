@@ -2,9 +2,16 @@
 // history, the floor kept on the contact, and the top-up letter.
 import { describe, expect, it } from "vitest";
 import { createContactStore } from "@/lib/contacts";
-import { cleanPayment, createInvoiceStore } from "@/lib/invoices";
+import { cleanPayment, createInvoiceStore, type Invoice } from "@/lib/invoices";
 import { cleanEntry } from "@/lib/ledger";
-import { cleanDeposit, createRetainerStore, retainerBalance, retainerHistory, topUpLetterHtml } from "@/lib/retainers";
+import {
+  cleanDeposit,
+  createRetainerStore,
+  depositRemovalProblem,
+  retainerBalance,
+  retainerHistory,
+  topUpLetterHtml,
+} from "@/lib/retainers";
 import { memoryKV } from "@/lib/storage";
 
 const T0 = "2026-10-29T10:00:00.000Z";
@@ -21,7 +28,7 @@ describe("retainers", () => {
       caseId: "case0001",
       character: "alice001",
       date: "1990-10-02",
-      hours: 2,
+      hours: 3,
       activity: "court",
       created: T0,
     })!;
@@ -45,6 +52,18 @@ describe("retainers", () => {
     expect(rows[1].depositId).toBeUndefined();
     expect(retainerBalance("judy0001", deposits.list(), invoices.list())).toBe(200);
     expect(retainerBalance("nobody01", deposits.list(), invoices.list())).toBe(0);
+  });
+
+  it("won't lose a deposit that has paid invoices", () => {
+    const deposit = (id: string, amount: number) =>
+      cleanDeposit({ id, contactId: "judy0001", date: "1990-10-01", amount, method: "cash" })!;
+    const deposits = [deposit("dep00001", 500), deposit("dep00002", 100)];
+    const invoice = {
+      payments: [{ method: "retainer", contactId: "judy0001", date: "1990-10-02", amount: 400 }],
+    } as unknown as Invoice;
+    expect(depositRemovalProblem("dep00001", deposits, [invoice])).toMatch(/^\$300\.00 of this deposit/);
+    expect(depositRemovalProblem("dep00002", deposits, [invoice])).toBeNull();
+    expect(depositRemovalProblem("gone0001", deposits, [invoice])).toBeNull();
   });
 
   it("refuse a deposit without an amount, and never take one as a retainer draw", () => {
