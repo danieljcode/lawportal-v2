@@ -33,7 +33,7 @@ export interface Dialogs {
   closeDialog(): void;
   autoSyncDone(): void;
   /** Close the Dockets dialog and ask the open form to load this docket. */
-  loadDocketInForm(docketId: string): void;
+  loadDocketInForm(docketId: string, formId?: string): void;
 }
 
 export function useDialogs(): Dialogs {
@@ -58,9 +58,10 @@ export function useDialogs(): Dialogs {
   const openJump = useCallback(() => setDialog("jump"), []);
   const autoSyncDone = useCallback(() => setAutoSync(false), []);
 
-  const loadDocketInForm = (docketId: string) => {
+  /** Load a case into the open form, or into `formId` once it opens. */
+  const loadDocketInForm = (docketId: string, formId?: string) => {
     setDialog(null);
-    setDocketRequest((r) => ({ docketId, seq: (r ? r.seq : 0) + 1 }));
+    setDocketRequest((r) => ({ docketId, formId, seq: (r ? r.seq : 0) + 1 }));
   };
 
   const openFilings = () => setDialog("filings");

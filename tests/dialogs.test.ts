@@ -294,7 +294,7 @@ describe("J.A.P.", () => {
 });
 
 describe("Dockets dialog", () => {
-  it("adds a case, rejects a duplicate, filters closed cases and offers Use in form", () => {
+  it("adds a case, rejects a duplicate, filters closed cases and offers Use in form", async () => {
     let id = "";
     act(() => {
       id = characterStore().save({ name: "John Doe", title: "Attorney at Law" }).id;
@@ -302,6 +302,9 @@ describe("Dockets dialog", () => {
     });
     go("#civil-complaint");
     click("#open-dockets");
+    await act(async () => {
+      await vi.dynamicImportSettled();
+    });
     expect(must("#dockets-title").textContent).toBe("John Doe's docket");
     expect(must("#docket-list").textContent).toContain("No cases yet.");
 

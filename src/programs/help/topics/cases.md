@@ -13,4 +13,6 @@ Each case has:
 
 **Upcoming** lists the next 14 days, overdue first. The Case File shows a dot when something is due within 48 hours.
 
+**Court Docket** is for judges (a title such as Judge, Justice, Magistrate or Commissioner). It lists the cases before them, soonest next date first, each one **Pending**, **Scheduled**, **Under advisement** (the status is Awaiting judgement, so a ruling is owed) or **Closed**. Filter by those, and pick a judge template and **Start** to open it with the case's details filled in.
+
 See also: [Clients](#help/clients), [Writing a filing](#help/filings).
