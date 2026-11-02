@@ -21,6 +21,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     date: "2026-11-02",
     items: [
       {
+        type: "fix",
+        text: "A new invoice no longer bills time that's already on an earlier invoice. An invoice with more than 1,000 entries now asks for shorter dates instead of leaving some out.",
+      },
+      {
         type: "new",
         text: "Each case now has a billing summary: time logged, what isn't invoiced yet, and what's been invoiced, paid and is still owed. Log time, Invoices and Open in Ledger open the Ledger for just that case, with a link back.",
       },

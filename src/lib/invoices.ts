@@ -253,6 +253,11 @@ export interface InvoiceDraft {
 /** The lines for a draft, oldest first. Throws when there's nothing to bill or an entry has no rate. */
 export function invoiceLines(d: InvoiceDraft): InvoiceLine[] {
   if (!d.entries.length) throw new Error("There's no logged time on this case in that period.");
+  if (d.entries.length > MAX_LINES) {
+    throw new Error(
+      "An invoice can hold up to " + MAX_LINES + " entries, and this has " + d.entries.length + ". Pick shorter dates.",
+    );
+  }
   const unpriced = d.entries.filter((e) => d.rateOf(e) === null).length;
   if (unpriced) {
     throw new Error(
@@ -361,9 +366,13 @@ export function createInvoiceStore(kv: KV): InvoiceStore {
     create(d) {
       const list = store.get();
       if (list.length >= MAX_INVOICES) throw new Error("The Ledger can hold up to " + MAX_INVOICES + " invoices.");
+      // Time goes on one invoice only; deleting that invoice frees it again.
+      const billed = new Set(list.flatMap((x) => x.lines.map((l) => l.entryId)));
+      const entries = d.entries.filter((e) => !billed.has(e.id));
+      if (d.entries.length && !entries.length) throw new Error("All the time in that period is already on an invoice.");
       const now = new Date().toISOString();
       const inv = cleanInvoice(
-        { ...d, number: nextInvoiceNumber(list, d.date), lines: invoiceLines(d), created: now },
+        { ...d, number: nextInvoiceNumber(list, d.date), lines: invoiceLines({ ...d, entries }), created: now },
         now,
       );
       if (!inv) throw new Error("Pick a case and the date to issue it on.");
