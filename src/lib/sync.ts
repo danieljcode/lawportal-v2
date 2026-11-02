@@ -25,6 +25,7 @@ import { cleanCheck, conflictLog, type ConflictCheck } from "./conflicts";
 import { cleanFiling, filingStore, type Filing } from "./filings";
 import { cleanEntry, timeStore, type TimeEntry } from "./ledger";
 import { cleanInvoice, invoiceStore, renumberClashes, type Invoice } from "./invoices";
+import { CODE_RE } from "./syncCode";
 import { cleanDeposit, retainerStore, type Deposit } from "./retainers";
 import { cleanPrecedent, precedentStore, type Precedent } from "./precedents";
 import { docketStore } from "./dockets";
@@ -43,8 +44,7 @@ export const BASE_KEY = "lawapp_sync_base";
 /** This browser's versions of characters that lost the last merge ({at, characters}), for "Restore my version". */
 export const LOST_KEY = "lawapp_sync_lost";
 
-/** Same accept rule as the server (src/lib/server/code.ts). */
-export const CODE_RE = /^JSA(-[A-Z0-9]{4}){5}$/;
+export { CODE_RE };
 /** This server needs an invite word for a new code, and it wasn't given or isn't right (LP-178). */
 export const BAD_INVITE = "This server needs an invite word to turn on sync. Ask whoever runs it, then enter it below.";
 
@@ -245,13 +245,7 @@ export function snapshot(): SyncDoc {
     cases: caseStore()
       .list()
       .map((c) => JSON.parse(JSON.stringify(c)) as Case),
-    filings: filingStore().list(),
-    conflictChecks: conflictLog().list(),
-    precedents: precedentStore().list(),
-    contacts: contactStore().list(),
-    time: timeStore().list(),
-    invoices: invoiceStore().list(),
-    retainers: retainerStore().list(),
+    ...Object.fromEntries(LISTS.map((l) => [l.key, l.store().list()])),
   };
 }
 
@@ -270,6 +264,35 @@ const contactsOf = (doc: unknown) => listOf<Contact>(doc, "contacts", cleanConta
 const precedentsOf = (doc: unknown) => listOf<Precedent>(doc, "precedents", cleanPrecedent);
 const checksOf = (doc: unknown) => listOf<ConflictCheck>(doc, "conflictChecks", cleanCheck);
 const filingsOf = (doc: unknown) => listOf<Filing>(doc, "filings", cleanFiling);
+
+/** A list that syncs item by item, with its own stamp. */
+interface SyncList {
+  key: string;
+  of(doc: unknown): { id: string }[] | null;
+  store(): { list(): { id: string }[]; replaceAll(items: unknown): void; subscribe(fn: () => void): () => void };
+  /** Its items' keys in the base (BASE_KEY). */
+  prefix: string;
+  stamp(x: { id: string }): string;
+}
+
+const syncList = <T extends { id: string }>(
+  key: keyof SyncDoc,
+  of: (doc: unknown) => T[] | null,
+  store: () => { list(): readonly T[]; replaceAll(items: unknown): void; subscribe(fn: () => void): () => void },
+  prefix: string,
+  stamp: (x: T) => string,
+) => ({ key, of, store, prefix, stamp }) as unknown as SyncList;
+
+/** A new list that syncs like these is one line here, and its type in SyncDoc. */
+const LISTS: readonly SyncList[] = [
+  syncList("filings", filingsOf, filingStore, "filing:", (f) => f.at),
+  syncList("conflictChecks", checksOf, conflictLog, "conflict:", (c) => c.at),
+  syncList("precedents", precedentsOf, precedentStore, "precedent:", (p) => p.updated),
+  syncList("contacts", contactsOf, contactStore, "contact:", (c) => c.updated),
+  syncList("time", timeOf, timeStore, "time:", (e) => e.updated),
+  syncList("invoices", invoicesOf, invoiceStore, "invoice:", (i) => i.updated),
+  syncList("retainers", retainersOf, retainerStore, "deposit:", (d) => d.updated),
+];
 
 /** A document's cases; one from before LP-4 has dockets inside its characters instead. */
 function casesOf(doc: unknown): Case[] {
@@ -323,20 +346,10 @@ function apply(doc: unknown): number {
       }
     });
     caseStore().replaceAll(casesOf(doc));
-    const filings = filingsOf(doc);
-    if (filings) filingStore().replaceAll(filings);
-    const checks = checksOf(doc);
-    if (checks) conflictLog().replaceAll(checks);
-    const precedents = precedentsOf(doc);
-    if (precedents) precedentStore().replaceAll(precedents);
-    const contacts = contactsOf(doc);
-    if (contacts) contactStore().replaceAll(contacts);
-    const time = timeOf(doc);
-    if (time) timeStore().replaceAll(time);
-    const invoices = invoicesOf(doc);
-    if (invoices) invoiceStore().replaceAll(invoices);
-    const retainers = retainersOf(doc);
-    if (retainers) retainerStore().replaceAll(retainers);
+    for (const l of LISTS) {
+      const items = l.of(doc);
+      if (items) l.store().replaceAll(items);
+    }
   } finally {
     applying = false;
   }
@@ -349,31 +362,18 @@ export function merge(serverDoc: unknown): SyncDoc {
     serverDoc && typeof serverDoc === "object" ? (serverDoc as { characters?: unknown }).characters : undefined;
   const list = Array.isArray(raw) ? raw.filter((c): c is Record<string, unknown> => !!c && typeof c === "object") : [];
   const local = snapshot();
-  const serverFilings = filingsOf(serverDoc) || [];
-  const haveFiling = new Set(serverFilings.map((f) => f.id));
-  const serverChecks = checksOf(serverDoc) || [];
-  const haveCheck = new Set(serverChecks.map((c) => c.id));
-  const serverPrecedents = precedentsOf(serverDoc) || [];
-  const havePrecedent = new Set(serverPrecedents.map((p) => p.id));
-  const serverContacts = contactsOf(serverDoc) || [];
-  const haveContact = new Set(serverContacts.map((c) => c.id));
-  const serverTime = timeOf(serverDoc) || [];
-  const haveTime = new Set(serverTime.map((e) => e.id));
-  const serverInvoices = invoicesOf(serverDoc) || [];
-  const haveInvoice = new Set(serverInvoices.map((i) => i.id));
-  const serverRetainers = retainersOf(serverDoc) || [];
-  const haveDeposit = new Set(serverRetainers.map((d) => d.id));
+  const lists = LISTS.map((l): [string, { id: string }[]] => {
+    const server = l.of(serverDoc) || [];
+    const have = new Set(server.map((x) => x.id));
+    const mine = ((local as unknown as Record<string, { id: string }[]>)[l.key] || []).filter((x) => !have.has(x.id));
+    return [l.key, [...server, ...mine]];
+  });
   const out: SyncDoc = {
     characters: list.slice(),
     cases: unifyCases(casesOf(serverDoc), casesOf(local)),
-    filings: [...serverFilings, ...(local.filings || []).filter((f) => !haveFiling.has(f.id))],
-    conflictChecks: [...serverChecks, ...(local.conflictChecks || []).filter((c) => !haveCheck.has(c.id))],
-    precedents: [...serverPrecedents, ...(local.precedents || []).filter((p) => !havePrecedent.has(p.id))],
-    contacts: [...serverContacts, ...(local.contacts || []).filter((c) => !haveContact.has(c.id))],
-    time: [...serverTime, ...(local.time || []).filter((e) => !haveTime.has(e.id))],
-    invoices: renumberClashes([...serverInvoices, ...(local.invoices || []).filter((i) => !haveInvoice.has(i.id))]),
-    retainers: [...serverRetainers, ...(local.retainers || []).filter((d) => !haveDeposit.has(d.id))],
+    ...Object.fromEntries(lists),
   };
+  out.invoices = renumberClashes(out.invoices || []);
   const have = new Set(out.characters.map((c) => c.id));
   for (const c of local.characters) if (!have.has(c.id)) out.characters.push(c);
   return out;
@@ -406,13 +406,7 @@ function saveBase(doc: unknown): void {
   const o: Record<string, string> = {};
   for (const c of charactersOf(doc)) if (typeof c.id === "string") o[c.id] = stampOf(c);
   for (const c of casesOf(doc)) o["case:" + c.id] = c.updated;
-  for (const f of filingsOf(doc) || []) o["filing:" + f.id] = f.at;
-  for (const c of checksOf(doc) || []) o["conflict:" + c.id] = c.at;
-  for (const p of precedentsOf(doc) || []) o["precedent:" + p.id] = p.updated;
-  for (const c of contactsOf(doc) || []) o["contact:" + c.id] = c.updated;
-  for (const e of timeOf(doc) || []) o["time:" + e.id] = e.updated;
-  for (const i of invoicesOf(doc) || []) o["invoice:" + i.id] = i.updated;
-  for (const d of retainersOf(doc) || []) o["deposit:" + d.id] = d.updated;
+  for (const l of LISTS) for (const x of l.of(doc) || []) o[l.prefix + x.id] = l.stamp(x);
   lsSet(BASE_KEY, JSON.stringify(o));
 }
 
@@ -450,25 +444,11 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
 
   // Cases (LP-4): the same rules, one case at a time, by each case's own `updated`.
   const cases = resolveList(casesOf(serverDoc), caseStore().list(), base, "case:", (c) => c.updated);
-  // Filings (LP-15) likewise, by when each was filed.
-  const filings = mergeOptional(filingsOf(serverDoc), filingStore().list(), base, "filing:", (f) => f.at);
-  // The conflict check log (LP-10), the same way.
-  const checks = mergeOptional(checksOf(serverDoc), conflictLog().list(), base, "conflict:", (c) => c.at);
-  // Precedents (LP-16): edited like cases, so the newer `updated` wins each ruling.
-  const precedents = mergeOptional(
-    precedentsOf(serverDoc),
-    precedentStore().list(),
-    base,
-    "precedent:",
-    (p) => p.updated,
+  // The other lists likewise, each by its own stamp. Only precedents and contacts keep a losing edit.
+  const merged = new Map(
+    LISTS.map((l) => [l.key, mergeOptional(l.of(serverDoc), l.store().list(), base, l.prefix, l.stamp)]),
   );
-  // Contacts (LP-30): the same, by each contact's `updated`.
-  const contacts = mergeOptional(contactsOf(serverDoc), contactStore().list(), base, "contact:", (c) => c.updated);
-  // Time entries (LP-32): by `updated`, and like filings a losing edit isn't kept.
-  const time = mergeOptional(timeOf(serverDoc), timeStore().list(), base, "time:", (e) => e.updated);
-  // Invoices (LP-33): the same.
-  const invoices = mergeOptional(invoicesOf(serverDoc), invoiceStore().list(), base, "invoice:", (i) => i.updated);
-  const retainers = mergeOptional(retainersOf(serverDoc), retainerStore().list(), base, "deposit:", (d) => d.updated);
+  const invoices = merged.get("invoices") as ReturnType<typeof mergeOptional<Invoice>>;
   const paid = keepBothPayments(invoices.out, invoicesOf(serverDoc) || [], invoiceStore().list(), base);
   const numbered = renumberClashes(paid);
   return {
@@ -476,29 +456,18 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
     doc: {
       characters: chars.out,
       cases: unifyCases(cases.out),
-      filings: filings.out,
-      conflictChecks: checks.out,
-      precedents: precedents.out,
-      contacts: contacts.out,
-      time: time.out,
+      ...Object.fromEntries([...merged].map(([key, m]) => [key, m.out])),
       invoices: numbered,
-      retainers: retainers.out,
     },
     lost: chars.lost,
     lostCases: cases.lost,
-    lostPrecedents: precedents.lost,
-    lostContacts: contacts.lost,
+    lostPrecedents: merged.get("precedents")!.lost as Precedent[],
+    lostContacts: merged.get("contacts")!.lost as Contact[],
     keptLocal:
       chars.keptLocal ||
       cases.keptLocal ||
-      filings.keptLocal ||
-      checks.keptLocal ||
-      precedents.keptLocal ||
-      contacts.keptLocal ||
-      time.keptLocal ||
-      invoices.keptLocal ||
-      numbered.some((inv, i) => inv !== invoices.out[i]) ||
-      retainers.keptLocal,
+      [...merged.values()].some((m) => m.keptLocal) ||
+      numbered.some((inv, i) => inv !== invoices.out[i]),
   };
 }
 
@@ -891,13 +860,7 @@ export function init(): Promise<void> {
   const unsubs = [
     characterStore().subscribe(changed),
     caseStore().subscribe(changed),
-    filingStore().subscribe(changed),
-    conflictLog().subscribe(changed),
-    precedentStore().subscribe(changed),
-    contactStore().subscribe(changed),
-    timeStore().subscribe(changed),
-    invoiceStore().subscribe(changed),
-    retainerStore().subscribe(changed),
+    ...LISTS.map((l) => l.store().subscribe(changed)),
     portfolioStore().subscribe(changed),
   ];
   const onVisible = () => {
