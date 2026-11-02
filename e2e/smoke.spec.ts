@@ -110,6 +110,8 @@ for (const layout of LAYOUTS) {
       await page.locator("#intake-summary").fill("Wants to sue her landlord.");
       await page.locator("#intake-open").click();
       // The case gets a stand-in number until the court gives it one.
+      await expect(page.locator("#intake-opened-title")).toHaveText("Case PENDING-1 opened");
+      await page.locator("#intake-open-case").click();
       await expect(page).toHaveURL(/#cases\/[a-z0-9]+$/);
       await expect(page.locator("#case-form-title")).toHaveText("PENDING-1");
     });

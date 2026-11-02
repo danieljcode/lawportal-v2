@@ -454,7 +454,7 @@ function LedgerView({ shell }: ProgramProps) {
         </>
       )}
       <Invoices cases={cases} entries={all} filter={filter} rateOf={rateOf} nameOf={nameOf} />
-      <Retainers />
+      <Retainers openFor={shell.route.program === "ledger" ? shell.route.retainerFor : undefined} />
       <Reports entries={all} cases={cases} characters={shell.characters} nameOf={nameOf} rateOf={rateOf} />
     </section>
   );
