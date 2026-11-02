@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.5.0](https://github.com/danieljcode/lawportal-v2/compare/v0.4.0...v0.5.0) (2026-11-02)
+
+
+### Features
+
+* **cases:** a court docket view for judges [LP-91] ([#154](https://github.com/danieljcode/lawportal-v2/issues/154)) ([d309ee6](https://github.com/danieljcode/lawportal-v2/commit/d309ee635272bf0c8e6e51a699970cfe94e45fef))
+* **cases:** case outcomes and a firm record [LP-92] ([#155](https://github.com/danieljcode/lawportal-v2/issues/155)) ([1b83dca](https://github.com/danieljcode/lawportal-v2/commit/1b83dca10ddeb2eb0777f960c65bed0ed939156e))
+* **cases:** next actions with owner, due date and done [LP-170] ([#151](https://github.com/danieljcode/lawportal-v2/issues/151)) ([263c779](https://github.com/danieljcode/lawportal-v2/commit/263c779fdfbf864c249ab17eb85f8d0f375ebf8d))
+* **home:** a work list of court dates, actions and bills [LP-171] ([#153](https://github.com/danieljcode/lawportal-v2/issues/153)) ([bc6c85a](https://github.com/danieljcode/lawportal-v2/commit/bc6c85acc7b01a7dccf5d73bca585491365f05fc))
+* **security:** send a full content security policy [LP-169] ([#152](https://github.com/danieljcode/lawportal-v2/issues/152)) ([e30c6cf](https://github.com/danieljcode/lawportal-v2/commit/e30c6cf82e36cf6bb728275330ac57293a6fe210))
+
+
+### Docs
+
+* **changelog:** mark what's new for 0.4.0 and 0.3.0 [LP-26] ([#149](https://github.com/danieljcode/lawportal-v2/issues/149)) ([649a578](https://github.com/danieljcode/lawportal-v2/commit/649a578a2640e17a3af64254b6392b1a3de6eb01))
+
 ## [0.4.0](https://github.com/danieljcode/lawportal-v2/compare/v0.3.0...v0.4.0) (2026-10-31)
 
 
