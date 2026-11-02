@@ -8,7 +8,14 @@ import { formatDay, gameToday } from "@/lib/deadlines";
 import { invoiceStore, METHOD_LABELS, type Invoice } from "@/lib/invoices";
 import { formatMoney, parseRate } from "@/lib/ledger";
 import { letterheadStore } from "@/lib/letterhead";
-import { retainerBalance, retainerHistory, retainerStore, topUpLetterHtml, type Deposit } from "@/lib/retainers";
+import {
+  depositRemovalProblem,
+  retainerBalance,
+  retainerHistory,
+  retainerStore,
+  topUpLetterHtml,
+  type Deposit,
+} from "@/lib/retainers";
 import GameDateInput from "@/ui/GameDateInput";
 import { useContactVersion, useInvoiceVersion, useRetainerVersion } from "@/ui/useStore";
 import Sheet from "./Sheet";
@@ -168,7 +175,11 @@ function ClientRetainer({
                       <button
                         type="button"
                         className="mini danger-quiet"
-                        onClick={() => confirm("Remove this deposit?") && retainerStore().remove(r.depositId!)}
+                        onClick={() => {
+                          const problem = depositRemovalProblem(r.depositId!, deposits, invoices);
+                          setError(problem ?? "");
+                          if (!problem && confirm("Remove this deposit?")) retainerStore().remove(r.depositId!);
+                        }}
                       >
                         Remove
                       </button>

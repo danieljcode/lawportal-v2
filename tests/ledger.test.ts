@@ -104,6 +104,8 @@ describe("rates and values", () => {
   it("parse a rate as typed, to the cent", () => {
     expect(parseRate("150")).toBe(150);
     expect(parseRate(" $1,200.555 ")).toBe(1200.56);
+    expect(parseRate("1 200")).toBe(1200);
+    expect(parseRate("150s")).toBeNull();
     expect(parseRate("0")).toBeNull();
     expect(parseRate("lots")).toBeNull();
     expect(parseRate(undefined)).toBeNull();
