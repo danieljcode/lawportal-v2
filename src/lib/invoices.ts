@@ -7,7 +7,15 @@
 
 import { BRANDING } from "@/branding";
 import { addDays, formatDay, gameToday } from "./deadlines";
-import { ACTIVITY_LABELS, formatMoney, parseRate, type Activity, type TimeEntry } from "./ledger";
+import {
+  ACTIVITY_LABELS,
+  entryValue,
+  formatMoney,
+  parseRate,
+  totalHours,
+  type Activity,
+  type TimeEntry,
+} from "./ledger";
 import type { Letterhead } from "./letterhead";
 import type { SafeHtml } from "./safeHtml";
 import { ISO_DATE_RE, ISO_TIME_RE, defaultKV, isId, newId, text, uniqueById, type KV } from "./storage";
@@ -180,6 +188,35 @@ export function receivables(list: readonly Invoice[]): Invoice[] {
   return list
     .filter((inv) => invoiceBalance(inv) > 0)
     .sort((a, b) => (a.date !== b.date ? (a.date < b.date ? -1 : 1) : a.number.localeCompare(b.number)));
+}
+
+/**
+ * One case's money (LP-173): its logged time, what isn't on an invoice yet, and its invoices. Retainers
+ * belong to the client, not the case, so only what has paid one of these invoices counts.
+ */
+export function caseBilling(
+  caseId: string,
+  entries: readonly TimeEntry[],
+  invoices: readonly Invoice[],
+  rateOf: (e: TimeEntry) => number | null,
+) {
+  const logged = entries.filter((e) => e.caseId === caseId);
+  const own = invoices.filter((inv) => inv.caseId === caseId);
+  const billed = new Set(own.flatMap((inv) => inv.lines.map((l) => l.entryId)));
+  const unbilled = logged.filter((e) => !billed.has(e.id));
+  const values = unbilled.map((e) => entryValue(e, rateOf(e)));
+  return {
+    loggedHours: totalHours(logged),
+    unbilledHours: totalHours(unbilled),
+    unbilledValue: sum(values.map((v) => v ?? 0)),
+    /** Unbilled entries with no rate, so left out of unbilledValue. */
+    unpriced: values.filter((v) => v === null).length,
+    invoiceCount: own.length,
+    invoiced: sum(own.map(invoiceTotal)),
+    paid: sum(own.map(invoicePaid)),
+    /** As Accounts receivable counts it: an overpaid invoice doesn't reduce another's balance. */
+    outstanding: sum(receivables(own).map(invoiceBalance)),
+  };
 }
 
 /** The firm's letters for invoice numbers: "F&A" → "FA". */

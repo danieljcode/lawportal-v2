@@ -105,8 +105,24 @@
 
 /* ---------- next actions (LP-170) and deadlines (LP-18) ---------- */
 .case-links #case-actions,
+.case-links #case-billing,
 .case-links #case-deadlines {
   grid-column: 1 / -1;
+}
+.case-billing {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 2px 12px;
+  margin: 0 0 8px;
+}
+.case-billing dt {
+  font-weight: 600;
+}
+.case-billing dd {
+  margin: 0;
+}
+.case-billing-links {
+  margin-top: 8px;
 }
 .action-buttons {
   display: flex;

@@ -6,6 +6,7 @@ Each case has:
 
 - its **details**;
 - **next actions**: the everyday work, like _Call the client_, each with who's doing it (or Unassigned) and an optional due date. Overdue ones are marked. Tick one off and it moves to **Done**, where you can reopen it; **Edit** changes it;
+- **billing**: the time logged, what isn't on an invoice yet, and what's been invoiced, paid and is still owed, from the [Ledger](#help/ledger). A client's retainer isn't counted, except what has paid an invoice on this case. **Log time**, **Invoices** and **Open in Ledger** open the Ledger for just this case, with a link back;
 - **deadlines and hearings**;
 - the **filings** made for it;
 - **contacts** from the Rolodex, each in a role such as client or witness;

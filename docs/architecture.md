@@ -115,7 +115,7 @@ browser.
   doubles their ids, and in Settings the File and Help menu items scroll to the section instead.
 - **Hash routing** (`useRoute.ts`). Routes are prefixed by program: `#filings` and
   `#filings/<formId>`, `#cases`, `#cases/<id>` and `#cases/upcoming`, `#clients/intake` and
-  `#clients/conflicts`, `#clients/rolodex`, `#library/penal-code` and `#library/precedents`, `#ledger`, `#find`, `#help` and `#help/<topic>`, `#jap`, `#control`; an
+  `#clients/conflicts`, `#clients/rolodex`, `#library/penal-code` and `#library/precedents`, `#ledger` and `#ledger/case/<id>` (with `/log` or `/invoices`, LP-173), `#find`, `#help` and `#help/<topic>`, `#jap`, `#control`; an
   empty hash is home. `parseHash` also reads the old flat hashes (`#cases`, `#upcoming`,
   `#intake`, `#conflicts`, `#library`, `#jap`, `#<formId>`), and the hook rewrites them to the
   new ones with `replaceState`. The last place is remembered under `lawapp_last_form` as a hash

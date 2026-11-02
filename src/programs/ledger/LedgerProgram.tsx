@@ -1,7 +1,8 @@
 // The Ledger program (LP-32): billable time logged against Case File cases, with
 // a form to log or edit an entry, filters by case, character and date range,
 // and the filtered total. Each entry is worth its hours at the case's rate, else
-// the character's own. A timer logs an entry when it stops.
+// the character's own. A timer logs an entry when it stops. #ledger/case/<id> opens
+// it scoped to one case, from that case's billing summary (LP-173).
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { caseStore } from "@/lib/cases";
@@ -12,7 +13,9 @@ import {
   entryValue,
   filterEntries,
   formatMoney,
+  hoursText,
   parseRate,
+  rateLookup,
   timerMinutes,
   timerStore,
   timeStore,
@@ -32,8 +35,6 @@ import Retainers from "./Retainers";
 
 /** "90SCCR00147 Smith v. Jones". */
 const caseLabel = (c: Case) => [c.caseNumber, [c.plaintiff, c.defendant].filter(Boolean).join(" v. ")].join(" ").trim();
-
-const hoursText = (h: number) => h.toFixed(1) + (h === 1 ? " hour" : " hours");
 
 interface Draft {
   caseId: string;
@@ -301,17 +302,32 @@ function LedgerView({ shell }: ProgramProps) {
   );
   const caseById = useMemo(() => new Map(cases.map((c) => [c.id, c])), [cases]);
   const nameOf = (id: string) => shell.characters.find((c) => c.id === id)?.name || "Deleted character";
-  /** An entry's hourly rate: the case's, else the character's; null with neither. */
-  const rateOf = (e: TimeEntry) =>
-    caseById.get(e.caseId)?.rate ?? parseRate(shell.characters.find((c) => c.id === e.character)?.rate);
+  const rateOf = rateLookup(cases, shell.characters);
   const valueOf = (e: TimeEntry) => entryValue(e, rateOf(e));
-  const [filter, setFilter] = useState<TimeFilter>({});
+  const { route } = shell;
+  /** Where the route asks to arrive (LP-173): the Ledger scoped to a case that's still here. */
+  const arrival = route.program === "ledger" && route.caseId && caseById.has(route.caseId) ? route : null;
+  const canLog = shell.characters.length > 0;
+  const [filter, setFilter] = useState<TimeFilter>(arrival ? { caseId: arrival.caseId } : {});
   const shown = useMemo(() => filterEntries(all, filter), [all, filter]);
   const values = shown.map(valueOf);
   const unpriced = values.filter((v) => v === null).length;
   const filteredCase = filter.caseId ? caseById.get(filter.caseId) : undefined;
   /** The entry being edited, "new" for the log form, or null. */
-  const [editing, setEditing] = useState<TimeEntry | "new" | null>(null);
+  const [editing, setEditing] = useState<TimeEntry | "new" | null>(arrival?.at === "log" && canLog ? "new" : null);
+  // Each navigation here is a new route object, so a second Log time from the same case still opens the form.
+  const [seenRoute, setSeenRoute] = useState(route);
+  if (route !== seenRoute) {
+    setSeenRoute(route);
+    if (arrival) {
+      setFilter({ caseId: arrival.caseId });
+      if (arrival.at === "log" && canLog) setEditing("new");
+    }
+  }
+  const arriveAt = arrival?.at;
+  useEffect(() => {
+    if (arriveAt) document.getElementById(arriveAt === "log" ? "time-form" : "invoices")?.scrollIntoView?.();
+  }, [arriveAt, route]);
   const setF = (k: keyof TimeFilter) => (v: string) => setFilter({ ...filter, [k]: v || undefined });
 
   const remove = (e: TimeEntry) => {
@@ -325,6 +341,13 @@ function LedgerView({ shell }: ProgramProps) {
           <h2 id="ledger-title">Ledger</h2>
         </div>
       </div>
+      {filteredCase && (
+        <p className="small">
+          <a id="ledger-back-case" href={"#cases/" + filteredCase.id}>
+            {"← Back to " + filteredCase.caseNumber}
+          </a>
+        </p>
+      )}
       <div className="row ledger-head">
         <p className="small muted">Billable time, logged against the firm&apos;s cases.</p>
         {!editing && cases.length > 0 && shell.characters.length > 0 && (
@@ -353,7 +376,7 @@ function LedgerView({ shell }: ProgramProps) {
       )}
       {editing && (
         <EntryForm
-          key={editing === "new" ? "new" : editing.id}
+          key={editing === "new" ? "new" + (arrival?.caseId || "") : editing.id}
           editing={editing === "new" ? null : editing}
           cases={cases}
           characters={shell.characters}

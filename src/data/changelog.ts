@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "new",
+        text: "Each case now has a billing summary: time logged, what isn't invoiced yet, and what's been invoiced, paid and is still owed. Log time, Invoices and Open in Ledger open the Ledger for just that case, with a link back.",
+      },
+      {
+        type: "new",
         text: "Record how a case ended when you close it: won, lost, settled, dismissed, plea deal or withdrawn, with a note. The Firm Record, in the Case File, adds them up with the win rate for the firm and each lawyer, by matter type and dates, and prints or copies as a summary.",
       },
       {

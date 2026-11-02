@@ -102,6 +102,26 @@ for (const layout of LAYOUTS) {
       await expect(page.locator(".case-row")).toContainText("Lead: Judy Bench");
     });
 
+    test("Case File: log time from a case's billing, then come back to the case", async ({ page }) => {
+      await seedJudge(page);
+      await openFromHome(page, "cases");
+      await page.locator("#case-new").click();
+      await page.locator("#case-caseNumber").fill("90SCCR00321");
+      await page.locator("#case-lead").selectOption("e2ejudge1");
+      await page.locator("#case-save").click();
+      await expect(page.locator("#case-billing-empty")).toBeVisible();
+
+      await page.locator("#case-billing-log").click();
+      await expect(page).toHaveURL(/#ledger\/case\/[a-z0-9]+\/log$/);
+      await page.locator("#time-hours").fill("1.5");
+      await page.locator("#time-save").click();
+      await expect(page.locator("#ledger-total")).toContainText("1.5 hours");
+
+      await page.locator("#ledger-back-case").click();
+      await expect(page.locator("#case-form-title")).toHaveText("90SCCR00321");
+      await expect(page.locator("#case-billing-logged")).toHaveText("1.5 hours");
+    });
+
     test("Clients: a new client's intake opens a case", async ({ page }) => {
       await seedJudge(page);
       await openFromHome(page, "clients");
