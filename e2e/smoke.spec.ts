@@ -31,6 +31,31 @@ async function seedJudge(page: Page): Promise<void> {
   });
 }
 
+// The Content-Security-Policy (LP-169): no journey trips it. Chromium reports each blocked
+// script, style or request on the console.
+let cspErrors: string[] = [];
+test.beforeEach(({ page }) => {
+  cspErrors = [];
+  page.on("console", (m) => {
+    if (/Content Security Policy/i.test(m.text())) cspErrors.push(m.text());
+  });
+});
+test.afterEach(() => expect(cspErrors).toEqual([]));
+
+test("pages are sent with a Content-Security-Policy that trusts only this request's scripts", async ({ page }) => {
+  const response = await page.goto("/");
+  const csp = response!.headers()["content-security-policy"];
+  const scriptSrc = /script-src ([^;]+)/.exec(csp)![1];
+  expect(scriptSrc).toMatch(/'nonce-[^']+'/);
+  expect(scriptSrc).not.toContain("'unsafe-inline'");
+  const nonce = /'nonce-([^']+)'/.exec(scriptSrc)![1];
+  // Every script in the page as sent carries it (the theme and title scripts too). Those added
+  // later by a trusted script ('strict-dynamic') don't need it.
+  const tags = (await response!.text()).match(/<script\b[^>]*>/g) || [];
+  expect(tags.length).toBeGreaterThan(0);
+  expect(tags.filter((t) => !t.includes(`nonce="${nonce}"`))).toEqual([]);
+});
+
 for (const layout of LAYOUTS) {
   test.describe(`${layout} layout`, () => {
     test.beforeEach(async ({ page }) => {

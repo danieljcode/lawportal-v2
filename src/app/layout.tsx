@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import { BRANDING, iconHref, titleScript } from "@/branding";
 import { THEME_SCRIPT } from "@/lib/theme";
 import { Analytics } from "@vercel/analytics/next";
@@ -21,12 +22,15 @@ export const viewport: Viewport = {
   themeColor: BRANDING.colours.primary,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+// The Content-Security-Policy (LP-169) runs only scripts with this request's nonce, from
+// src/proxy.ts. Reading it renders the page per request instead of once at build.
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
-        <script dangerouslySetInnerHTML={{ __html: titleScript() }} />
+        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: titleScript() }} />
       </head>
       <body>{children}</body>
       <Analytics />
