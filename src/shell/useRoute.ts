@@ -1,7 +1,7 @@
 // Hash routing for the program shell (LP-103; from App.tsx in LP-7): which
 // program is open and where in it, the last place reopened on boot,
 // back/forward, the page title, and going home. Routes are prefixed by
-// program: #filings/<formId>, #cases/<caseId>, #cases/upcoming, #cases/docket,
+// program: #filings/<formId>, #cases/<caseId>, #cases/upcoming, #cases/docket, #cases/record,
 // #clients/intake, #clients/conflicts, #clients/rolodex, #library/penal-code,
 // #library/precedents, #ledger, #find, #help, #help/<topic>, #jap, #control. The old flat hashes (#cases, #upcoming,
 // #intake, #conflicts, #library, #jap, #<formId>) still open the same place
@@ -22,7 +22,7 @@ export type LibraryPage = "penal-code" | "precedents";
 export type Route =
   | { program: "home" }
   | { program: "filings"; formId: string | null }
-  | { program: "cases"; caseId: string | null; upcoming?: boolean; docket?: boolean }
+  | { program: "cases"; caseId: string | null; upcoming?: boolean; docket?: boolean; record?: boolean }
   | { program: "clients"; page: ClientsPage }
   | { program: "library"; page: LibraryPage; chapter?: string }
   | { program: "ledger" }
@@ -37,6 +37,7 @@ export const JAP_TITLE = "Judicial Advancement Portfolio";
 export const CASES_TITLE = "Case File";
 export const UPCOMING_TITLE = "Upcoming";
 export const DOCKET_TITLE = "Court Docket";
+export const RECORD_TITLE = "Firm Record";
 export const INTAKE_TITLE = "New client intake";
 export const CONFLICTS_TITLE = "Conflict check";
 export const ROLODEX_TITLE = "Rolodex";
@@ -65,7 +66,10 @@ export function hashFor(r: Route): string {
     case "filings":
       return "#filings" + (r.formId ? "/" + r.formId : "");
     case "cases":
-      return "#cases" + (r.upcoming ? "/upcoming" : r.docket ? "/docket" : r.caseId ? "/" + r.caseId : "");
+      return (
+        "#cases" +
+        (r.upcoming ? "/upcoming" : r.docket ? "/docket" : r.record ? "/record" : r.caseId ? "/" + r.caseId : "")
+      );
     case "clients":
       return "#clients/" + r.page;
     case "library":
@@ -99,6 +103,7 @@ export function parseHash(hash: string): Route {
     case "cases":
       if (rest === "upcoming") return { program: "cases", caseId: null, upcoming: true };
       if (rest === "docket") return { program: "cases", caseId: null, docket: true };
+      if (rest === "record") return { program: "cases", caseId: null, record: true };
       return { program: "cases", caseId: CASE_ID.test(rest) ? rest : null };
     case "clients":
       return { program: "clients", page: rest === "conflicts" || rest === "rolodex" ? rest : "intake" };
@@ -140,7 +145,7 @@ export function pageTitle(r: Route, form: FormInfo | null): string | null {
     case "filings":
       return form ? form.title : "Court Filings";
     case "cases":
-      return r.upcoming ? UPCOMING_TITLE : r.docket ? DOCKET_TITLE : CASES_TITLE;
+      return r.upcoming ? UPCOMING_TITLE : r.docket ? DOCKET_TITLE : r.record ? RECORD_TITLE : CASES_TITLE;
     case "clients":
       return r.page === "conflicts" ? CONFLICTS_TITLE : r.page === "rolodex" ? ROLODEX_TITLE : INTAKE_TITLE;
     case "library":

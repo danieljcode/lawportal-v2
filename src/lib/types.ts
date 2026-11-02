@@ -156,6 +156,8 @@ export interface Case extends Docket {
   exhibits: Exhibit[];
   /** Next actions (LP-170), in the order added. Absent when there are none. */
   actions?: CaseAction[];
+  /** How it ended (LP-92). Counts towards the Firm Record while the case is Closed. */
+  outcome?: CaseOutcome;
   /** Hourly rate in dollars for everyone's time on this case, over their own (the Ledger, LP-32). */
   rate?: number;
 }
@@ -171,6 +173,16 @@ export interface Exhibit {
   obtained?: string;
   /** Chain of custody (LP-14), oldest first; only ever added to. Absent when empty. */
   custody?: CustodyEntry[];
+}
+
+export type OutcomeResult = "won" | "lost" | "settled" | "dismissed" | "plea" | "withdrawn";
+
+/** How a case ended (LP-92). */
+export interface CaseOutcome {
+  result: OutcomeResult;
+  /** In-game date, YYYY-MM-DD. */
+  date: string;
+  note?: string;
 }
 
 /** A piece of everyday work on a case (LP-170), owned by a character or no one. */

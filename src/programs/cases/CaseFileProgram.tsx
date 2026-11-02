@@ -1,6 +1,6 @@
 // The Case File program (LP-103, LP-106): the firm's cases (#cases, #cases/<id>),
-// what's due (#cases/upcoming) and, for a judge, the Court Docket (#cases/docket,
-// LP-91), with a navigation pane for those and the open case, and links across
+// what's due (#cases/upcoming), the Firm Record (#cases/record, LP-92) and, for a
+// judge, the Court Docket (#cases/docket, LP-91), with a navigation pane for those and the open case, and links across
 // to the Clients program.
 
 import { useMemo } from "react";
@@ -10,6 +10,7 @@ import { dueSoonCount, gameToday } from "@/lib/deadlines";
 import CaseFileView from "./CaseFileView";
 import CourtDocketView from "./CourtDocketView";
 import ErrorBoundary from "@/ui/ErrorBoundary";
+import FirmRecordView from "./FirmRecordView";
 import UpcomingView from "./UpcomingView";
 import { useCaseVersion } from "@/ui/useStore";
 import type { ProgramProps } from "@/shell/program";
@@ -21,6 +22,7 @@ export default function CaseFileProgram({ shell }: ProgramProps) {
   // Only a judge gets it; anyone else on the address sees All cases.
   const judge = isJudge(shell.active) ? shell.active : null;
   const docket = !!judge && r.program === "cases" && !!r.docket;
+  const record = r.program === "cases" && !!r.record;
   const version = useCaseVersion();
   const open = useMemo(() => (caseId && version >= 0 ? caseStore().get(caseId) : null), [caseId, version]);
   const today = gameToday();
@@ -42,7 +44,7 @@ export default function CaseFileProgram({ shell }: ProgramProps) {
           <details open>
             <summary>Case File</summary>
             <ul>
-              <li>{link("#cases", "All cases", !upcoming && !docket && !caseId, "case-nav-all")}</li>
+              <li>{link("#cases", "All cases", !upcoming && !docket && !record && !caseId, "case-nav-all")}</li>
               <li>
                 {link(
                   "#cases/upcoming",
@@ -51,6 +53,7 @@ export default function CaseFileProgram({ shell }: ProgramProps) {
                   "case-nav-upcoming",
                 )}
               </li>
+              <li>{link("#cases/record", "Firm Record", record, "case-nav-record")}</li>
               {judge && <li>{link("#cases/docket", "Court Docket", docket, "case-nav-docket")}</li>}
               {caseId && (
                 <li className="case-nav-open">
@@ -80,6 +83,10 @@ export default function CaseFileProgram({ shell }: ProgramProps) {
         {upcoming ? (
           <ErrorBoundary where="Upcoming" resetKey="upcoming">
             <UpcomingView character={shell.active} />
+          </ErrorBoundary>
+        ) : record ? (
+          <ErrorBoundary where="the Firm Record" resetKey="record">
+            <FirmRecordView characters={shell.characters} />
           </ErrorBoundary>
         ) : docket && judge ? (
           <ErrorBoundary where="the Court Docket" resetKey="docket">

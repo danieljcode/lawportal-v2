@@ -187,6 +187,64 @@
   color: var(--bad);
   font-weight: 700;
 }
+/* The Firm Record (LP-92). */
+.record-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.record-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.record-scroll {
+  overflow-x: auto;
+}
+.record-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--field);
+  color: var(--text);
+}
+.record-table th,
+.record-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--shadow);
+  text-align: left;
+  white-space: nowrap;
+}
+.record-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.record-lawyer {
+  margin-top: 12px;
+}
+.record-open-list {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+/* Print just the record: the section has this id only while the print dialog is open. */
+@media print {
+  body:has(#record-print-sheet) * {
+    visibility: hidden;
+  }
+  body:has(#record-print-sheet) #record-print-sheet,
+  body:has(#record-print-sheet) #record-print-sheet * {
+    visibility: visible;
+  }
+  body:has(#record-print-sheet) #record-print-sheet {
+    position: absolute;
+    inset: 0 0 auto;
+  }
+  #record-print-sheet .record-actions,
+  #record-print-sheet .record-filters button {
+    display: none;
+  }
+}
+
 /* The Court Docket's template picker (LP-91). */
 .docket-start {
   display: flex;
