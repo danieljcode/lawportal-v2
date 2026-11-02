@@ -71,6 +71,21 @@ describe("the invoice store", () => {
     expect(() => store.create(draft([entry("time0001", { character: "bob00001" })]))).toThrow(/1 entry has no rate/);
   });
 
+  it("bills time once, and frees it when its invoice is deleted", () => {
+    const first = store.create(draft([entry("time0001", { hours: 2 })]));
+    const second = store.create(draft([entry("time0001", { hours: 2 }), entry("time0002", { hours: 1 })]));
+    expect(second.lines.map((l) => l.entryId)).toEqual(["time0002"]);
+    expect(() => store.create(draft([entry("time0001", {}), entry("time0002", {})]))).toThrow(/already on an invoice/);
+    store.remove(first.id);
+    expect(store.create(draft([entry("time0001", { hours: 2 })])).lines[0].entryId).toBe("time0001");
+  });
+
+  it("refuses more time than an invoice holds, rather than cutting it off", () => {
+    const many = Array.from({ length: 1001 }, (_, i) => entry("time" + String(i).padStart(4, "0"), {}));
+    expect(() => store.create(draft(many))).toThrow(/up to 1000 entries, and this has 1001/);
+    expect(store.list()).toEqual([]);
+  });
+
   it("records payments: Unpaid, Part paid, Paid", () => {
     const inv = store.create(draft([entry("time0001", { hours: 2 })]));
     expect(invoiceStatus(inv, "1990-11-01")).toBe("Unpaid");
