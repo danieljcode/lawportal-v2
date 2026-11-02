@@ -1,7 +1,11 @@
 // New client intake (LP-19): one form that captures a new client's details and
 // opens the case in the Case File, so nothing is typed twice. Pure: building
-// the case and its notes from an intake; IntakeView saves it.
+// the case and its notes from an intake; IntakeView saves it. Onboarding (LP-172)
+// adds what travels with an unfinished intake: its conflict check and its choice
+// of Rolodex client, kept on this device until the case opens or it's discarded.
 
+import { nameMatch, nameWords, type ConflictMatch } from "./conflicts";
+import type { Contact } from "./contacts";
 import { DIVISION_COURTS, GENERAL_COURT, APPELLATE_COURT } from "./courts";
 import { formatDay } from "./deadlines";
 import type { Case } from "./types";
@@ -121,4 +125,85 @@ export function intakeToCase(
     lead: i.lead || null,
     assigned: [],
   };
+}
+
+/* ---------- onboarding (LP-172) ---------- */
+
+export const INTAKE_DRAFT_KEY = "lawapp_intake_draft";
+
+/** The names a conflict check runs on: the client and the other side. */
+export function checkNames(i: Pick<Intake, "clientName" | "opposingParty">): string[] {
+  return [i.clientName, i.opposingParty].map((n) => n.trim()).filter(Boolean);
+}
+
+const namesKey = (names: readonly string[]) => names.map((n) => nameWords(n).join(" ")).join("|");
+
+/** A conflict check run from this intake, and whether its matches were reviewed. */
+export interface IntakeCheck {
+  names: string[];
+  matches: ConflictMatch[];
+  reviewed?: boolean;
+}
+
+export type CheckState = "unchecked" | "stale" | "clear" | "review" | "reviewed";
+
+export function checkState(i: Intake, check: IntakeCheck | null): CheckState {
+  if (!check) return "unchecked";
+  if (namesKey(check.names) !== namesKey(checkNames(i))) return "stale";
+  if (!check.matches.length) return "clear";
+  return check.reviewed ? "reviewed" : "review";
+}
+
+/** Which Rolodex contact the case links: a contact's id, or one of these. */
+export const ROLODEX_NEW = "new";
+export const ROLODEX_NONE = "none";
+
+/** The Rolodex's clients this name might already be, the same name first. */
+export function rolodexMatches(name: string, contacts: readonly Contact[]): Contact[] {
+  const words = nameWords(name).join(" ");
+  if (!words) return [];
+  const clients = contacts.filter((c) => c.type === "client");
+  return [
+    ...clients.filter((c) => nameWords(c.name).join(" ") === words),
+    ...clients.filter((c) => nameWords(c.name).join(" ") !== words && nameMatch(name, c.name)),
+  ];
+}
+
+/**
+ * The Rolodex choice before anyone picks: the client with this very name, or a new contact when
+ * nobody looks like them. "" when someone only might be them: that's for the user to settle, so a
+ * contact is never duplicated without asking.
+ */
+export function rolodexDefault(name: string, contacts: readonly Contact[]): string {
+  const [first] = rolodexMatches(name, contacts);
+  if (!first) return ROLODEX_NEW;
+  return nameWords(first.name).join(" ") === nameWords(name).join(" ") ? first.id : "";
+}
+
+/** An unfinished intake, as saved between visits. */
+export interface IntakeDraft {
+  intake: Intake;
+  check: IntakeCheck | null;
+  /** The Rolodex choice made by hand; null follows rolodexDefault. */
+  rolodex: string | null;
+}
+
+/** A saved draft, or null when there's nothing usable. It's this device's own, but may be old. */
+export function cleanIntakeDraft(raw: unknown, lead = ""): IntakeDraft | null {
+  if (!raw || typeof raw !== "object") return null;
+  const o = raw as Record<string, unknown>;
+  if (!o.intake || typeof o.intake !== "object") return null;
+  const saved = o.intake as Record<string, unknown>;
+  const intake = emptyIntake(lead);
+  for (const key of Object.keys(intake) as (keyof Intake)[]) {
+    const v = saved[key];
+    if (typeof v === "string") (intake as unknown as Record<string, string>)[key] = v;
+  }
+  if (intake.side !== "plaintiff" && intake.side !== "defendant") intake.side = matterFor(intake.matter).side;
+  const c = o.check as Partial<IntakeCheck> | null | undefined;
+  const check =
+    c && Array.isArray(c.names) && Array.isArray(c.matches)
+      ? { names: c.names.map(String), matches: c.matches, ...(c.reviewed === true ? { reviewed: true } : {}) }
+      : null;
+  return { intake, check, rolodex: typeof o.rolodex === "string" ? o.rolodex : null };
 }

@@ -2,7 +2,7 @@
 // drawn out, with the running balance; a warning below the client's floor, and
 // a request top-up letter (Sheet).
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { contactStore, type Contact } from "@/lib/contacts";
 import { formatDay, gameToday } from "@/lib/deadlines";
 import { invoiceStore, METHOD_LABELS, type Invoice } from "@/lib/invoices";
@@ -184,8 +184,8 @@ function ClientRetainer({
   );
 }
 
-/** Every Rolodex client with their retainer balance; open one to manage it. */
-export default function Retainers() {
+/** Every Rolodex client with their retainer balance; open one to manage it, or arrive at one (`openFor`, LP-172). */
+export default function Retainers({ openFor }: { openFor?: string }) {
   const contactVersion = useContactVersion();
   const clients = useMemo(
     () =>
@@ -200,7 +200,15 @@ export default function Retainers() {
   const deposits = useMemo(() => (depositVersion >= 0 ? retainerStore().list() : []), [depositVersion]);
   const invoiceVersion = useInvoiceVersion();
   const invoices = useMemo(() => (invoiceVersion >= 0 ? invoiceStore().list() : []), [invoiceVersion]);
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [openId, setOpenId] = useState<string | null>(openFor || null);
+  const [seenFor, setSeenFor] = useState(openFor);
+  if (openFor !== seenFor) {
+    setSeenFor(openFor);
+    if (openFor) setOpenId(openFor);
+  }
+  useEffect(() => {
+    if (openFor) document.getElementById("retainers")?.scrollIntoView?.();
+  }, [openFor]);
   const open = openId ? clients.find((c) => c.id === openId) : undefined;
 
   return (

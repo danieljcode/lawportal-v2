@@ -180,7 +180,7 @@ describe("the intake program (LP-19)", () => {
     expect(must("#intake-sheet").textContent).toContain("Arrested for jaywalking.");
   });
 
-  it("matter type sets the client's side; Open case makes the case and opens it", () => {
+  it("matter type sets the client's side; Open case makes the case and confirms it", () => {
     setValue("#intake-clientName", "Cy Ng");
     setValue("#intake-matter", "Civil");
     expect(must<HTMLSelectElement>("#intake-side").value).toBe("plaintiff");
@@ -198,13 +198,17 @@ describe("the intake program (LP-19)", () => {
     });
     expect(c.notes).toContain("Unpaid invoice.");
     expect(c.notes).toContain("Taken by: Alice Lawyer");
-    expect(location.hash).toBe("#cases/" + c.id);
+    expect(must("#intake-opened-title").textContent).toBe("Case PENDING-1 opened");
+    expect(must("#intake-open-case").getAttribute("href")).toBe("#cases/" + c.id);
   });
 
-  it("empties the form after Open case, so pressing it twice makes one case (LP-149)", () => {
+  it("empties the form after Open case, so the case can't be made twice (LP-149)", () => {
     setValue("#intake-clientName", "Cy Ng");
     setValue("#intake-summary", "Unpaid invoice.");
     submit("#intake-form");
+    expect(document.querySelector("#intake-form")).toBeNull();
+    expect(caseStore().list()).toHaveLength(1);
+    act(() => must("#intake-another").click());
     submit("#intake-form");
     expect(caseStore().list()).toHaveLength(1);
     expect(must<HTMLInputElement>("#intake-clientName").value).toBe("");
