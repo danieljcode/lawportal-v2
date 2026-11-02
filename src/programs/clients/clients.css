@@ -30,6 +30,20 @@
   }
 }
 
+/* ---------- the case opened (LP-172) ---------- */
+.intake-opened {
+  padding: 8px 10px;
+  border: 2px solid var(--good);
+  margin-bottom: 12px;
+}
+.intake-opened h2,
+.intake-opened p {
+  margin: 0 0 4px;
+}
+.intake-next {
+  flex-wrap: wrap;
+}
+
 /* ---------- conflict check (LP-10) ---------- */
 .conflict-result {
   display: flex;

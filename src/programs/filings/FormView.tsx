@@ -109,6 +109,8 @@ export interface DocketRequest {
   docketId: string;
   /** The form it's for, when that form isn't open yet; absent for the open form. */
   formId?: string;
+  /** More fields to fill, by label. */
+  values?: Record<string, string>;
   seq: number;
 }
 
@@ -421,10 +423,10 @@ export default function FormView({
   }, [showDocket, judge, caseVersion]);
   const currentDocket = showDocket ? linkedCase : null;
 
-  const loadDocket = (caseId: string) => {
+  const loadDocket = (caseId: string, extra?: Record<string, string>) => {
     const d = caseStore().get(caseId);
     if (!d) return;
-    const { state: loaded, filled } = docketToForm(entries, state, d);
+    const { state: loaded, filled } = docketToForm(entries, state, d, extra);
     // A loaded judgement date reflows the case schedule.
     const m = { ...loaded, values: materializeBlocks(entries, loaded.values) };
     setState(applyPrefills(entries, m, now));
@@ -512,7 +514,7 @@ export default function FormView({
     if (docketRequest.formId && docketRequest.formId !== form.id) return;
     handledRequests.add(docketRequest);
     // eslint-disable-next-line react-hooks/set-state-in-effect -- a request from outside the form, taken once
-    loadDocket(docketRequest.docketId);
+    loadDocket(docketRequest.docketId, docketRequest.values);
     // loadDocket reads this render's state; only a new request should trigger it.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- deliberately keyed on the request alone
   }, [docketRequest]);

@@ -24,9 +24,15 @@ export function hasField(entries: Entry[], values: Values, label: string): boole
 /**
  * Put a docket entry's details into whichever of the matching fields the form
  * has (top level), clearing their derived/autofilled marks. The caller then runs
- * materializeBlocks → applyPrefills (a loaded judgement date reflows a schedule).
+ * materializeBlocks → applyPrefills (a loaded judgement date reflows a schedule). `extra` fills
+ * more fields by label (a letter's client details from the intake, LP-172).
  */
-export function docketToForm(entries: Entry[], s: FormState, d: Docket): { state: FormState; filled: number } {
+export function docketToForm(
+  entries: Entry[],
+  s: FormState,
+  d: Docket,
+  extra: Readonly<Record<string, string>> = {},
+): { state: FormState; filled: number } {
   const have = labelsOf(entries, s.values);
   const values: Values = { ...s.values };
   let autofilled = s.autofilled;
@@ -60,6 +66,7 @@ export function docketToForm(entries: Entry[], s: FormState, d: Docket): { state
     put("Judgment date", d.nextDate);
   }
   if (d.nextDate && /trial/i.test(d.nextEvent || "")) put("Trial date", d.nextDate);
+  for (const [label, value] of Object.entries(extra)) put(label, value);
 
   return { state: filled ? { values, autofilled, derived } : s, filled };
 }

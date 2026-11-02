@@ -17,22 +17,24 @@ export interface ConflictResultProps {
   runBy: Character | null;
   /** Show Copy memo and Print memo (the Conflict check program). */
   memoActions?: boolean;
+  /** For the ids, when the result is on a page with another (the intake, LP-172). */
+  idPrefix?: string;
 }
 
 /** The verdict banner, the matches and (optionally) the memo. */
-export function ConflictResult({ run, characters, runBy, memoActions }: ConflictResultProps) {
+export function ConflictResult({ run, characters, runBy, memoActions, idPrefix = "conflict" }: ConflictResultProps) {
   const [status, setStatus] = useState("");
   const nameOf = (id: string) => characters.find((c) => c.id === id)?.name || "Unknown character";
   const clear = run.matches.length === 0;
   const memo = conflictMemo(run.names, run.matches, gameToday(), runBy?.name, nameOf);
 
   return (
-    <div className="conflict-result" id="conflict-result">
-      <p className={"conflict-verdict " + (clear ? "clear" : "review")} id="conflict-verdict" role="status">
+    <div className="conflict-result" id={idPrefix + "-result"}>
+      <p className={"conflict-verdict " + (clear ? "clear" : "review")} id={idPrefix + "-verdict"} role="status">
         {clear ? VERDICT_CLEAR : VERDICT_REVIEW}
       </p>
       {!clear && (
-        <ul className="conflict-matches" id="conflict-matches">
+        <ul className="conflict-matches" id={idPrefix + "-matches"}>
           {run.matches.map((m, i) => (
             <li key={m.caseId + m.side + i}>
               <a href={"#cases/" + m.caseId}>

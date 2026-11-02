@@ -26,6 +26,10 @@ export const CHANGELOG: ChangelogEntry[] = [
       },
       {
         type: "new",
+        text: "New client intake now carries you through: run the conflict check on the page, with a result that goes out of date if the names change; pick the client from the Rolodex or add them; and after the case opens, go straight to an engagement letter with their details or their retainer. An unfinished intake survives a refresh.",
+      },
+      {
+        type: "new",
         text: "The Court Docket, in the Case File for judges: the cases before them, soonest next date first, marked Pending, Scheduled, Under advisement or Closed. Start a judge template from a case with its details filled in.",
       },
       {

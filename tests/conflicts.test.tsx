@@ -242,7 +242,7 @@ describe("the Conflict check program and the intake (LP-10)", () => {
     setValue("#intake-clientName", "Cy Ng");
     setValue("#intake-opposingParty", "Ann Lee");
     act(() => must("#intake-conflicts").click());
-    expect(must("#conflict-verdict").textContent).toBe("Possible conflict: review before accepting");
+    expect(must("#intake-conflict-verdict").textContent).toBe("Possible conflict: review before accepting");
     expect(conflictLog().list()[0].names).toEqual(["Cy Ng", "Ann Lee"]);
   });
 });
