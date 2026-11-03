@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "fix",
+        text: "The conflict check now matches names with or without accents. Searching Jose Nunez finds José Núñez, where before it said no conflicts were found.",
+      },
+      {
+        type: "fix",
         text: "If the first send fails when you turn sync on, your data now stays marked as unsent and is sent again. Before, another device's save could replace everything on this one.",
       },
       {

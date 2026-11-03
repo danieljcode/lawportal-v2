@@ -14,11 +14,13 @@ import type { Case } from "./types";
 
 const IGNORED = new Set(["the", "and", "of", "llc", "inc", "ltd", "corp", "co", "company", "mr", "mrs", "ms", "dr"]);
 
-/** A name as matchable words: lowercase, no punctuation, no filler or suffixes. */
+/** A name as matchable words: lowercase, no accents or punctuation, no filler or suffixes. */
 export function nameWords(name: string): string[] {
   return name
+    .normalize("NFD") // "é" becomes "e" plus its accent, and the accent goes
+    .replace(/\p{M}/gu, "")
     .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
     .split(/\s+/)
     .filter((w) => w && !IGNORED.has(w));
 }
