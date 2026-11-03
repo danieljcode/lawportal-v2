@@ -5,7 +5,7 @@ How to work here: [docs/contributing.md](docs/contributing.md) (branches, commit
 
 ## Project memory (LP-130)
 
-If the Obsidian vault at `C:\Obsidian\Claude` is there, read its `CLAUDE.md` and `Projects/lawapp/lawapp.md` (and
+If the project's Obsidian vault is available, read its `CLAUDE.md` and `Projects/lawapp/lawapp.md` (and
 `lawapp state`) before searching the code, and update the notes after a change, as part of the change. The vault keeps
 what the repo can't (decisions, state, gotchas, session history); `docs/` stays the source of truth, and the notes
 link to it rather than copy it.
