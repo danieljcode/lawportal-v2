@@ -18,6 +18,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-11-03",
+    items: [
+      {
+        type: "fix",
+        text: "Pressing Esc and then Ctrl+K straight away opens the jump box again. The second key could be lost.",
+      },
+    ],
+  },
+  {
     date: "2026-11-02",
     items: [
       {
