@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "fix",
+        text: "If the first send fails when you turn sync on, your data now stays marked as unsent and is sent again. Before, another device's save could replace everything on this one.",
+      },
+      {
+        type: "fix",
         text: "A change saved in one tab now shows straight away in your other open tabs, without a reload.",
       },
       {
