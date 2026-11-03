@@ -4,6 +4,8 @@
 // title-bar ✕) reports back through onClose. A close caused by `open` turning
 // false is not reported, so switching from one dialog to another never closes
 // the new one. The contents mount only while open, so each opening starts fresh.
+// The native close event comes a moment late: Esc closes through `open` instead, and
+// an event for a dialog that has reopened since is ignored, or it would close it (LP-181).
 
 import { useEffect, useRef, type ReactNode } from "react";
 
@@ -45,7 +47,7 @@ export default function Dialog({ open, onClose, titleId, title, id, className, c
     const el = ref.current;
     if (!el) return;
     const onNativeClose = () => {
-      if (openRef.current) onCloseRef.current();
+      if (openRef.current && !el.open) onCloseRef.current();
     };
     el.addEventListener("close", onNativeClose);
     return () => el.removeEventListener("close", onNativeClose);
@@ -58,7 +60,17 @@ export default function Dialog({ open, onClose, titleId, title, id, className, c
   };
 
   return (
-    <dialog ref={ref} id={id} className={className} aria-labelledby={titleId}>
+    <dialog
+      ref={ref}
+      id={id}
+      className={className}
+      aria-labelledby={titleId}
+      onKeyDown={(e) => {
+        if (e.key !== "Escape" || e.defaultPrevented) return;
+        e.preventDefault();
+        onClose();
+      }}
+    >
       <div className="dialog-head">
         <h2 id={titleId}>{title}</h2>
         <button type="button" data-close="" aria-label="Close" title="Close" onClick={close}>

@@ -244,6 +244,19 @@ test("Ctrl+K jumps to a form, and Esc closes the box and gives the focus back", 
   await expect(page.locator("#form-view")).toBeVisible();
 });
 
+test("Ctrl+K right after Esc opens the jump box again", async ({ page }) => {
+  await page.goto("/#cases");
+  await expect(page.locator("#case-file-title")).toHaveText("Case File");
+  await page.keyboard.press("Control+k");
+  await expect(page.locator("#jump-input")).toBeFocused();
+  // No wait between the keys, as a fast typist. Lost about half the time before LP-181, so a few rounds.
+  for (let i = 0; i < 5; i++) {
+    await page.keyboard.press("Escape");
+    await page.keyboard.press("Control+k");
+    await expect(page.locator("#jump-input")).toBeFocused();
+  }
+});
+
 /** The first-load JavaScript budget for the home screen, uncompressed (README, "First-load budget"; LP-122, LP-133). */
 const FIRST_LOAD_BUDGET_KIB = 650;
 
