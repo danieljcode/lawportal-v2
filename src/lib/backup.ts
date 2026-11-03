@@ -22,6 +22,9 @@ export const BACKUP_VERSION = 1;
 /** When this browser last made a backup (ISO); for the 30-day reminder. Not itself backed up. */
 export const LAST_BACKUP_KEY = "lawapp_backup_last";
 export const REMIND_AFTER_DAYS = 30;
+/** Far above what the stores can hold; a backup has no 5 MB limit like the characters file (LP-185). */
+export const MAX_BACKUP_BYTES = 100 * 1024 * 1024;
+export const BACKUP_TOO_LARGE = "Backup file is too large (max 100 MB).";
 
 const PREFIX = "lawapp_";
 /** Device-only keys: the sync code, sync bookkeeping and the backup date. */
@@ -48,6 +51,11 @@ export interface BackupDoc {
 
 /** What a chosen file turned out to be. */
 export type ParsedFile = { kind: "backup"; doc: BackupDoc } | { kind: "characters" };
+
+/** Throws BACKUP_TOO_LARGE before the file is read. */
+export function checkBackupSize(bytes: number): void {
+  if (bytes > MAX_BACKUP_BYTES) throw new Error(BACKUP_TOO_LARGE);
+}
 
 export function isBackedUp(key: string): boolean {
   return key.startsWith(PREFIX) && !NOT_BACKED_UP.has(key);

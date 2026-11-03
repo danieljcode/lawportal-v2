@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "fix",
+        text: "Backups over 5 MB can now be restored, and restoring waits until everything is saved before it reloads the app.",
+      },
+      {
+        type: "fix",
         text: "A client with money in their retainer can't be deleted or changed to another type, so the money can't drop off the Retainers page.",
       },
       {
