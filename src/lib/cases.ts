@@ -109,11 +109,13 @@ function combine(newer: Case, older: Case): Case {
  * Fold lists of cases into one, newest first: the same id, or the same case
  * number, is one case. The newer `updated` wins each field, with gaps filled
  * from the older copy, and everyone working either copy stays on it. The first
- * list's id is kept for a case number both lists have.
+ * list's id is kept for a case number both lists have. `moved` maps each id
+ * that went to the id kept in its place, for whatever links to the case (LP-182).
  */
-export function unifyCases(...lists: Case[][]): Case[] {
+export function foldCases(...lists: Case[][]): { cases: Case[]; moved: Map<string, string> } {
   const byId = new Map<string, Case>();
   const byNumber = new Map<string, string>();
+  const moved = new Map<string, string>();
   for (const list of lists) {
     for (const c of list) {
       const id = byId.has(c.id) ? c.id : byNumber.get(upper(c.caseNumber));
@@ -126,10 +128,13 @@ export function unifyCases(...lists: Case[][]): Case[] {
       const merged = c.updated > existing.updated ? combine(c, existing) : combine(existing, c);
       merged.id = existing.id;
       byId.set(existing.id, merged);
+      if (c.id !== existing.id) moved.set(c.id, existing.id);
     }
   }
-  return [...byId.values()];
+  return { cases: [...byId.values()], moved };
 }
+
+export const unifyCases = (...lists: Case[][]): Case[] => foldCases(...lists).cases;
 
 /**
  * Per-character docket lists → cases, one per case number (the LP-4 migration,
