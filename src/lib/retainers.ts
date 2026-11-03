@@ -120,6 +120,20 @@ export function depositRemovalProblem(
   return left < 0 ? formatMoney(-left) + " of this deposit has already paid invoices, so it can't be removed." : null;
 }
 
+/** Why a client can't be deleted or stop being a client: the Retainers page would lose their money. Null when they can. */
+export function clientRemovalProblem(
+  contactId: string,
+  deposits: readonly Deposit[],
+  invoices: readonly Invoice[],
+): string | null {
+  const left = retainerBalance(contactId, deposits, invoices);
+  return left
+    ? "This client's retainer stands at " +
+        formatMoney(left) +
+        ", so they can't be deleted or changed to another type. Use it on invoices or remove the deposits in the Ledger first."
+    : null;
+}
+
 /** What's left of a client's retainer. */
 export function retainerBalance(contactId: string, deposits: readonly Deposit[], invoices: readonly Invoice[]): number {
   const rows = retainerHistory(contactId, deposits, invoices);

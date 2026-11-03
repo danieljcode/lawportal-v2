@@ -7,6 +7,7 @@ import { cleanEntry } from "@/lib/ledger";
 import {
   cleanDeposit,
   createRetainerStore,
+  clientRemovalProblem,
   depositRemovalProblem,
   retainerBalance,
   retainerHistory,
@@ -52,6 +53,18 @@ describe("retainers", () => {
     expect(rows[1].depositId).toBeUndefined();
     expect(retainerBalance("judy0001", deposits.list(), invoices.list())).toBe(200);
     expect(retainerBalance("nobody01", deposits.list(), invoices.list())).toBe(0);
+  });
+
+  it("won't lose a client who holds a balance, in credit or overdrawn (LP-184)", () => {
+    const deposits = [
+      cleanDeposit({ id: "dep00001", contactId: "judy0001", date: "1990-10-01", amount: 500, method: "cash" })!,
+    ];
+    const paid = (amount: number) =>
+      ({ payments: [{ method: "retainer", contactId: "judy0001", date: "1990-10-02", amount }] }) as unknown as Invoice;
+    expect(clientRemovalProblem("judy0001", deposits, [paid(400)])).toContain("$100.00");
+    expect(clientRemovalProblem("judy0001", deposits, [paid(600)])).toMatch(/can't be deleted/);
+    expect(clientRemovalProblem("judy0001", deposits, [paid(500)])).toBeNull();
+    expect(clientRemovalProblem("nobody01", deposits, [])).toBeNull();
   });
 
   it("won't lose a deposit that has paid invoices", () => {

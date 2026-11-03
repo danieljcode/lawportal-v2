@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { contactStore } from "@/lib/contacts";
+import { invoiceStore } from "@/lib/invoices";
+import { retainerStore } from "@/lib/retainers";
 import RolodexView from "@/programs/clients/RolodexView";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -37,6 +39,8 @@ const button = (card: number, text: string) =>
 beforeEach(() => {
   localStorage.clear();
   contactStore().replaceAll([]);
+  retainerStore().replaceAll([]);
+  invoiceStore().replaceAll([]);
   container = document.createElement("div");
   document.body.appendChild(container);
   root = createRoot(container);
@@ -87,5 +91,42 @@ describe("the Rolodex page (LP-30)", () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
     click(button(0, "Delete"));
     expect(cards()).toEqual(["Judy Bench-Smith"]);
+  });
+
+  it("won't delete or retype a client who holds retainer money (LP-184)", () => {
+    let deposit!: ReturnType<ReturnType<typeof retainerStore>["deposit"]>;
+    act(() => {
+      const client = contactStore().save({ name: "Ann Lee", type: "client" });
+      deposit = retainerStore().deposit({
+        contactId: client.id,
+        date: "1990-10-01",
+        amount: 200,
+        method: "cash",
+        note: "",
+      });
+    });
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
+
+    click(button(0, "Delete"));
+    expect(confirm).not.toHaveBeenCalled();
+    expect(must("#rolodex-error").textContent).toContain("$200.00");
+    expect(cards()).toEqual(["Ann Lee"]);
+
+    click(button(0, "Edit"));
+    setValue("#contact-type", "business");
+    click(must("#contact-save"));
+    expect(must("#contact-error").textContent).toContain("$200.00");
+    expect(contactStore().list()[0].type).toBe("client");
+
+    // A client's other details still save, and clearing the balance frees them.
+    setValue("#contact-type", "client");
+    setValue("#contact-name", "Ann Lee-Ray");
+    click(must("#contact-save"));
+    expect(cards()).toEqual(["Ann Lee-Ray"]);
+
+    act(() => retainerStore().remove(deposit.id));
+    click(button(0, "Delete"));
+    expect($("#rolodex-error")).toBeNull();
+    expect(cards()).toEqual([]);
   });
 });

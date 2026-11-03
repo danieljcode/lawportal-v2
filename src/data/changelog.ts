@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "fix",
+        text: "A client with money in their retainer can't be deleted or changed to another type, so the money can't drop off the Retainers page.",
+      },
+      {
+        type: "fix",
         text: "Time on an invoice is now locked, so the invoice and the time log can't disagree. To change it, delete that invoice and bill the time again.",
       },
       {
