@@ -202,4 +202,5 @@ message saying where to get them, and the parity suites are skipped (see [Testin
 **The app's own data is private too (LP-165).** `forms.json`, `form-index.json` and `penal-code.json`
 live in that repo's `app-data/`, not here (see [Development](development.md#app-data)). After
 `npm run port-forms`, `npm run penal-code` or a `form-index` snapshot update, copy the changed file
-to `app-data/` there and commit it.
+to `app-data/` there and commit it. Do the same for `tests/__snapshots__/*.snap` after updating a
+snapshot, and push it there before the pull request here, because CI compares against that copy.
