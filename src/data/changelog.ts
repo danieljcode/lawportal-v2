@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "fix",
+        text: "The conflict check now matches names with or without accents. Searching Jose Nunez finds José Núñez, where before it said no conflicts were found.",
+      },
+      {
+        type: "fix",
         text: "A change saved in one tab now shows straight away in your other open tabs, without a reload.",
       },
       {
