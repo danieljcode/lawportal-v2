@@ -354,8 +354,8 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
     ("<name>'s cases", then "Other firm cases"), loads any of them, and **Save to Case File** updates
     the firm's case with that number (putting the character on it) or adds one with them as lead.
   - **Dockets are a view** (`dockets.ts`): a character's docket is the cases they lead or are
-    assigned to, with the `DocketStore` API the Dockets dialog, the docket bar's saving and the
-    J.A.P. use. Saving a number the firm already has puts the character on that case; removing one
+    assigned to, with the `DocketStore` API the docket bar's saving and the J.A.P. use. The Dockets dialog
+    that also used it was retired in LP-197; the Case File edits cases now. Saving a number the firm already has puts the character on that case; removing one
     takes them off it, deleting it when nobody is left. Only the LP-4 migration reads the old
     `lawapp_dockets_<id>` keys. The pure docket
     fields (`FIELDS`, `clean`, `divisionFor`…) live in `docketFields.ts`, so the two don't import

@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "fix",
+        text: "The old Dockets window is gone, and its button and menu item with it. Add and edit cases in the Case File, and load one into a form with the docket bar, which works as before.",
+      },
+      {
+        type: "fix",
         text: "The conflict check now matches names with or without accents. Searching Jose Nunez finds José Núñez, where before it said no conflicts were found.",
       },
       {

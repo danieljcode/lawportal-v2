@@ -1,7 +1,7 @@
 // The modern shell (LP-125): a slim app rail (Home and each program the active
 // character can see), and a top bar with the program's name, its menus, the
 // active character and sync status (LP-109: characters, theme, What's new and
-// About live in Settings and the menus; Dockets stays for now). The program's
+// About live in Settings and the menus). The program's
 // own panes fill the rest; the page never scrolls, only the panes do. At phone
 // width the rail is a bottom bar and the navigation pane a drawer (☰). Classic
 // keeps the Windows 3.x window instead (App.tsx).
@@ -32,8 +32,6 @@ export interface ModernFrameProps {
   syncStatus: SyncStatus | null;
   /** What's new has entries not seen yet: a dot on Settings. */
   changelogUnread: boolean;
-  showDockets: boolean;
-  onDockets(): void;
   onHome(e: MouseEvent): void;
   /** Shown above the program (the set-aside notice). */
   notice?: ReactNode;
@@ -99,11 +97,6 @@ export default function ModernFrame(p: ModernFrameProps) {
           </h1>
           <MenuBar menus={p.menus} />
           <div className="m-actions">
-            {p.showDockets && (
-              <button type="button" className="btn" id="open-dockets" onClick={p.onDockets}>
-                Dockets
-              </button>
-            )}
             <label className="m-char">
               <span className="muted">Filing as</span>
               <select

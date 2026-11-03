@@ -20,7 +20,6 @@ describe("pinned strings", () => {
       "S_STORAGE_MEMORY",
       "S_STORAGE_SYNC",
       "S_SYNC_OFF",
-      "S_SYNC_ON",
       "S_SYNC_APPLY_FAIL",
       "S_JAP_OFF",
       "S_JAP_ON",

@@ -2,8 +2,7 @@
 //
 // Since LP-4, cases belong to the firm (cases.ts) and a character's docket is
 // a view of them: the cases the character leads or is assigned to. This keeps
-// the DocketStore API the Dockets dialog, the docket bar and the J.A.P. use
-// until the Case File program takes over (LP-101, LP-100). Behaviour follows
+// the DocketStore API the docket bar and the J.A.P. use. Behaviour follows
 // the reference js_dockets.js, with these changes for shared cases:
 //
 // - Saving a case number the firm already has puts the character on that case.

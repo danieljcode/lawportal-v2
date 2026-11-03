@@ -12,7 +12,7 @@
 import { Activity, lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { FORM_INDEX, formInfo } from "@/data/form-index";
 import { BRANDING } from "@/branding";
-import { characterStore, hasDocket } from "@/lib/characters";
+import { characterStore } from "@/lib/characters";
 import { caseStore } from "@/lib/cases";
 import { dueSoonCount, gameToday } from "@/lib/deadlines";
 import { draftHistory, hasContent } from "@/lib/draftHistory";
@@ -56,17 +56,14 @@ import type { Route } from "./useRoute";
 // Filing history renders filings with their templates, so its code and the forms load the first
 // time it opens (LP-133).
 const FilingsDialog = lazy(() => import("@/ui/FilingsDialog"));
-const DocketsDialog = lazy(() => import("./DocketsDialog"));
 
 export default function App() {
   const { route, form, goHome } = useRoute();
   const {
     dialog,
-    docketsFor,
     autoSync,
     docketRequest,
     changelogUnread,
-    openDockets,
     openCharacters,
     openChangelog,
     markChangelogSeen,
@@ -81,13 +78,8 @@ export default function App() {
   /** Filing history has been opened, so it stays mounted (and its open/close works as the other dialogs'). */
   const [filingsUsed, setFilingsUsed] = useState(false);
   if (dialog === "filings" && !filingsUsed) setFilingsUsed(true);
-  /** The same for the Dockets dialog: neither loads until it's first opened (the first-load budget). */
-  const [docketsUsed, setDocketsUsed] = useState(false);
-  if (dialog === "dockets" && !docketsUsed) setDocketsUsed(true);
   /** Filing history's "Use as new draft" for the form already open (LP-15). */
   const [draftRequest, setDraftRequest] = useState<DraftRequest | null>(null);
-  /** The open form shows its docket bar (it has a Case number and the active character keeps a docket). */
-  const [docketBar, setDocketBar] = useState(false);
   /** The open form's filing tools, for the Form menu (LP-105). */
   const [formTools, setFormTools] = useState<FormTools | null>(null);
   const [theme, setThemeState] = useState<ThemeMode>(getTheme);
@@ -221,8 +213,6 @@ export default function App() {
     () => (caseVersion >= 0 ? dueSoonCount(caseStore().list(), active ? active.id : null, today) : 0),
     [caseVersion, active, today],
   );
-  // "Use in form" only for the active character's own docket, into a form that shows the docket bar.
-  const canUseDocket = route.program === "filings" && docketBar && !!active && docketsFor === active.id;
 
   // In Settings (LP-109), Characters, What's new and About are sections of the page: the menus
   // scroll to them rather than opening the same content again in a dialog.
@@ -244,7 +234,6 @@ export default function App() {
     syncState,
     docketRequest,
     draftRequest,
-    onDocketBar: setDocketBar,
     onFormTools: setFormTools,
     openCharacters: showCharacters,
     openFilings,
@@ -255,7 +244,6 @@ export default function App() {
     },
     openChangelog: showChangelog,
     openAbout: showAbout,
-    openDockets: (charId) => openDockets(charId),
     markChangelogSeen,
     theme,
     setTheme,
@@ -364,10 +352,6 @@ export default function App() {
         ...fileItems,
         ...(fileItems.length ? (["-"] as MenuItem[]) : []),
         { label: "Characters…", id: "menu-characters", onSelect: () => showCharacters() },
-        // In every program, so a phone (where the top bar drops its Dockets button) still has it.
-        ...(hasDocket(active)
-          ? [{ label: "Dockets…", id: "menu-dockets", onSelect: () => openDockets(activeId) }]
-          : []),
         // Exit closes the program, back to the Program Manager.
         ...(program ? (["-", { label: "Exit", id: "menu-exit", onSelect: () => goHome() }] as MenuItem[]) : []),
       ],
@@ -494,8 +478,6 @@ export default function App() {
           onActive={(id) => characterStore().setActive(id)}
           syncStatus={syncOn ? syncState.status : null}
           changelogUnread={changelogUnread}
-          showDockets={hasDocket(active)}
-          onDockets={() => openDockets(activeId)}
           onHome={goHome}
           notice={notice}
         >
@@ -562,23 +544,9 @@ export default function App() {
           onClose={closeDialog}
           characters={characters}
           activeId={active ? active.id : null}
-          onDockets={(id) => openDockets(id)}
           autoSync={autoSync}
           onAutoSyncDone={autoSyncDone}
         />
-      </ErrorBoundary>
-      <ErrorBoundary where="the Dockets dialog" variant="dialog" resetKey={dialog} onDismiss={closeDialog}>
-        {docketsUsed && (
-          <Suspense fallback={null}>
-            <DocketsDialog
-              open={dialog === "dockets"}
-              onClose={closeDialog}
-              charId={docketsFor}
-              canUse={canUseDocket}
-              onUse={(id) => loadDocketInForm(id)}
-            />
-          </Suspense>
-        )}
       </ErrorBoundary>
       <ErrorBoundary where={"What's new"} variant="dialog" resetKey={dialog} onDismiss={closeDialog}>
         <ChangelogDialog open={dialog === "changelog"} onClose={closeDialog} />

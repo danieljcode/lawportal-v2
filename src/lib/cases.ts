@@ -4,9 +4,8 @@
 //
 // Version 1 is the first: with nothing saved, its migration step turns the old
 // per-character dockets (lawapp_dockets_<id>, LP-99) into cases, one per case
-// number, and removes those keys once the cases are saved. The Dockets dialog
-// and the docket bar read and write cases through dockets.ts until the Case
-// File program takes over (LP-101, LP-100).
+// number, and removes those keys once the cases are saved. The docket bar
+// and the J.A.P. read and write cases through dockets.ts.
 
 import { cleanActions, unionActions } from "./actions";
 import { cleanDeadlines, unionDeadlines } from "./deadlines";

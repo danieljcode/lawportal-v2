@@ -1778,35 +1778,10 @@ dialog.jump-box {
   flex-direction: column;
   gap: 8px;
 }
-#char-fields,
-#docket-fields {
+#char-fields {
   display: flex;
   flex-direction: column;
   gap: 8px;
-}
-
-/* Dockets dialog */
-.docket-tools {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  align-items: center;
-  margin: 4px 0 8px;
-}
-.docket-tools input {
-  flex: 1 1 220px;
-  width: auto;
-}
-.docket-tools select {
-  width: auto;
-}
-.docket-list li {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-.docket-list li.closed {
-  color: var(--muted);
 }
 
 /* What's new */
@@ -2794,7 +2769,6 @@ body:has(.m-app) {
     max-width: 160px;
   }
   /* The File, View and Help menus have these on a phone; the top bar keeps who's filing and sync. */
-  .m-actions #open-dockets,
   .m-actions #open-changelog,
   .m-actions #open-about,
   .m-actions #theme-toggle {
