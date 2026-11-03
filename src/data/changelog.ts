@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "fix",
+        text: "A change saved in one tab now shows straight away in your other open tabs, without a reload.",
+      },
+      {
+        type: "fix",
         text: "Retainer deposits and floors can now go up to $10,000,000, the same as payments. They stopped at $100,000 with a confusing message.",
       },
       {

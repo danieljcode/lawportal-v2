@@ -14,9 +14,25 @@ export interface KV {
   keys?(): string[];
   /** Resolves once every write so far is really saved; throws if one failed. Only for stores that save later. */
   settled?(): Promise<void>;
+  /** Calls fn with the keys when another tab saves. Only for storage shared between open tabs. */
+  onOtherTab?(fn: (keys: string[]) => void): void;
 }
 
 export type Backend = "indexeddb" | "local" | "memory";
+
+let otherTab = false;
+
+/** True while subscribers hear about another tab's save: already saved, and that tab syncs it. */
+export const fromOtherTab = () => otherTab;
+
+export function whileOtherTab(fn: () => void): void {
+  otherTab = true;
+  try {
+    fn();
+  } finally {
+    otherTab = false;
+  }
+}
 
 export const SAVE_FAILED = "Couldn't save in this browser (storage is full or blocked).";
 

@@ -31,7 +31,7 @@ import { cleanPrecedent, precedentStore, type Precedent } from "./precedents";
 import { docketStore } from "./dockets";
 import { portfolioStore } from "./portfolio";
 import { deleteCharacter } from "./services/characters";
-import { defaultKV, replaceById } from "./storage";
+import { defaultKV, fromOtherTab, replaceById } from "./storage";
 import type { Case } from "./types";
 import { S_SYNC_APPLY_FAIL, S_SYNC_LOST, S_SYNC_MERGED } from "./strings";
 
@@ -813,7 +813,7 @@ export async function pull(force = false): Promise<boolean> {
 
 /** Called after any data change in the stores (never for the active-character switch). */
 function changed(): void {
-  if (applying || !code()) return;
+  if (applying || fromOtherTab() || !code()) return;
   edits++;
   lsSet(DIRTY_KEY, "1");
   if (timer) clearTimeout(timer);

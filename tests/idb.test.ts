@@ -4,6 +4,7 @@ import { IDBDatabase, IDBFactory } from "fake-indexeddb";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { IDB_MARKER, initStorage, openIdbKV } from "@/lib/idb";
 import { __resetDefaultKVForTests, backend, defaultKV, SAVE_FAILED, saveFailedVersion } from "@/lib/storage";
+import { createKeyedStore, createStore } from "@/lib/store";
 import { THEME_KEY } from "@/lib/theme";
 
 /** Lets fake-indexeddb finish its transactions and the BroadcastChannel deliver. */
@@ -93,6 +94,33 @@ describe("IndexedDB storage (LP-36)", () => {
     a.set("lawapp_chars", "[1]");
     await settle();
     expect(b.get("lawapp_chars")).toBe("[1]");
+  });
+
+  it("another tab's saves tell only the stores holding those keys (LP-190)", async () => {
+    const a = (await openIdbKV())!;
+    const b = (await openIdbKV())!;
+    const options = { version: 1, validate: (x: unknown) => x };
+    const chars = vi.fn();
+    const cases = vi.fn();
+    const dockets = vi.fn();
+    const charStore = createStore(b, { ...options, key: "lawapp_chars" });
+    charStore.subscribe(chars);
+    createStore(b, { ...options, key: "lawapp_cases" }).subscribe(cases);
+    createKeyedStore(b, { ...options, prefix: "lawapp_dockets_", isId: () => true }).subscribe(dockets);
+    const before = charStore.version();
+
+    a.set("lawapp_chars", "[1]");
+    await settle();
+    expect(chars).toHaveBeenCalledTimes(1);
+    expect(charStore.version()).toBe(before + 1);
+    expect(cases).not.toHaveBeenCalled();
+    expect(dockets).not.toHaveBeenCalled();
+
+    a.remove("lawapp_chars");
+    a.set("lawapp_dockets_abcd1234", "{}");
+    await settle();
+    expect(chars).toHaveBeenCalledTimes(2);
+    expect(dockets).toHaveBeenCalledTimes(1);
   });
 
   it("initStorage uses IndexedDB when it opens", async () => {
