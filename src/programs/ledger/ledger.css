@@ -132,6 +132,10 @@
 .ledger-actions {
   white-space: nowrap;
 }
+.invoices .warn {
+  color: var(--bad);
+  font-weight: 700;
+}
 .ledger-actions .mini + .mini {
   margin-left: 4px;
 }

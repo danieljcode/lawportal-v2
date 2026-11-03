@@ -9,6 +9,7 @@ import {
   receivables,
   nextInvoiceNumber,
   renumberClashes,
+  sharedTime,
   type Invoice,
   type InvoiceDraft,
   type InvoiceStore,
@@ -141,6 +142,25 @@ describe("the invoice store", () => {
     const tampered = { ...inv, lines: [{ ...inv.lines[0], amount: 1 }] };
     expect(cleanInvoice(tampered)?.lines[0].amount).toBe(150);
     expect(cleanInvoice({ ...inv, lines: [] })).toBeNull();
+  });
+});
+
+describe("time on more than one invoice (LP-186)", () => {
+  const inv = (id: string, number: string, ...entries: string[]) =>
+    ({ id, number, lines: entries.map((entryId) => ({ entryId })) }) as unknown as Invoice;
+
+  it("names the others for each invoice sharing time", () => {
+    const shared = sharedTime([
+      inv("a", "FA-1", "e1", "e2"),
+      inv("b", "FA-2", "e2", "e3"),
+      inv("c", "FA-3", "e3"),
+      inv("d", "FA-4", "e4"),
+    ]);
+    expect(Object.fromEntries(shared)).toEqual({ a: ["FA-2"], b: ["FA-1", "FA-3"], c: ["FA-2"] });
+  });
+
+  it("finds nothing when no time is shared, even with a line repeated on one invoice", () => {
+    expect(sharedTime([inv("a", "FA-1", "e1", "e1"), inv("b", "FA-2", "e2")]).size).toBe(0);
   });
 });
 

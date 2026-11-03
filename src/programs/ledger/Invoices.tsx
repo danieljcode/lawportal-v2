@@ -14,6 +14,7 @@ import {
   METHOD_LABELS,
   PAYMENT_METHODS,
   receivables,
+  sharedTime,
   type Invoice,
   type PaymentMethod,
 } from "@/lib/invoices";
@@ -26,7 +27,7 @@ import { useContactVersion, useInvoiceVersion } from "@/ui/useStore";
 import Sheet from "./Sheet";
 
 /** One invoice: the sheet, its payments, and print, copy and download. */
-function InvoiceView({ inv, onClose }: { inv: Invoice; onClose(): void }) {
+function InvoiceView({ inv, alsoOn, onClose }: { inv: Invoice; alsoOn?: string[]; onClose(): void }) {
   const html = useMemo(() => invoiceHtml(inv, letterheadStore().get()), [inv]);
   const [status, setStatus] = useState<{ text: string; bad: boolean } | null>(null);
   const [date, setDate] = useState(gameToday);
@@ -71,6 +72,13 @@ function InvoiceView({ inv, onClose }: { inv: Invoice; onClose(): void }) {
 
   return (
     <div className="invoice" id="invoice">
+      {alsoOn && (
+        <p className="small warn" role="alert" id="invoice-shared">
+          {"Some of this time is also on " +
+            alsoOn.join(", ") +
+            ". Two devices may have billed it while offline. Check them and delete any that bills it twice."}
+        </p>
+      )}
       <Sheet html={html} title={"Invoice " + inv.number} filename={"invoice-" + inv.number} prefix="invoice">
         <button type="button" className="btn danger-quiet" id="invoice-delete" onClick={remove}>
           Delete
@@ -158,6 +166,7 @@ export default function Invoices({
   const version = useInvoiceVersion();
   const all = useMemo(() => (version >= 0 ? invoiceStore().list() : []), [version]);
   const shown = filter.caseId ? all.filter((i) => i.caseId === filter.caseId) : all;
+  const shared = useMemo(() => sharedTime(all), [all]);
   const owed = receivables(shown);
   const [openId, setOpenId] = useState<string | null>(null);
   const open = openId ? all.find((i) => i.id === openId) : undefined;
@@ -199,7 +208,7 @@ export default function Invoices({
       <p className="error" role="alert" id="invoice-error">
         {error}
       </p>
-      {open && <InvoiceView key={open.id} inv={open} onClose={() => setOpenId(null)} />}
+      {open && <InvoiceView key={open.id} inv={open} alsoOn={shared.get(open.id)} onClose={() => setOpenId(null)} />}
       {owed.length > 0 && (
         <>
           <h4 id="receivables-title">Accounts receivable</h4>
@@ -271,7 +280,12 @@ export default function Invoices({
                   <td>{formatDay(inv.date)}</td>
                   <td className="num">{formatMoney(invoiceTotal(inv))}</td>
                   <td className="num">{formatMoney(invoiceBalance(inv))}</td>
-                  <td>{invoiceStatus(inv)}</td>
+                  <td>
+                    {invoiceStatus(inv)}
+                    {shared.has(inv.id) && (
+                      <span className="small warn">{" Time also on " + shared.get(inv.id)!.join(", ")}</span>
+                    )}
+                  </td>
                   <td className="ledger-actions">
                     <button type="button" className="mini" onClick={() => setOpenId(inv.id)}>
                       Open

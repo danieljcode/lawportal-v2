@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "fix",
+        text: "If two offline devices bill the same time, both invoices now warn you and name each other, so you can delete the extra one.",
+      },
+      {
+        type: "fix",
         text: "Backups over 5 MB can now be restored, and restoring waits until everything is saved before it reloads the app.",
       },
       {
