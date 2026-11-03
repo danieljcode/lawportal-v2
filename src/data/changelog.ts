@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "fix",
+        text: "A slow reply from the sync server can no longer roll this device back to an older copy for a moment.",
+      },
+      {
+        type: "fix",
         text: "If two offline devices bill the same time, both invoices now warn you and name each other, so you can delete the extra one.",
       },
       {

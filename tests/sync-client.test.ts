@@ -284,6 +284,50 @@ describe("change tracking", () => {
     expect(warn).toHaveBeenCalled();
   });
 
+  describe("a reply's version against this device's (LP-187)", () => {
+    function atRevSix() {
+      localStorage.setItem(sync.CODE_KEY, CODE);
+      const who = characterStore().save({ name: "New one" });
+      localStorage.removeItem(sync.DIRTY_KEY);
+      localStorage.setItem(sync.REV_KEY, "6");
+      localStorage.setItem(sync.BASE_KEY, JSON.stringify({ characters: [who] }));
+      return who;
+    }
+
+    it("ignores an older reply: nothing rolls back and nothing is sent", async () => {
+      atRevSix();
+      const base = localStorage.getItem(sync.BASE_KEY);
+      const calls = stubFetch({ status: 200, body: { rev: 5, updated: "u5", data: { characters: [] } } });
+      expect(await sync.pull(true)).toBe(true);
+      expect(names()).toEqual(["New one"]);
+      expect(localStorage.getItem(sync.REV_KEY)).toBe("6");
+      expect(localStorage.getItem(sync.BASE_KEY)).toBe(base);
+      expect(calls).toHaveLength(1);
+    });
+
+    it("keeps its data when the versions match, and notes the copy it synced with", async () => {
+      const who = atRevSix();
+      localStorage.setItem(sync.BASE_KEY, "{}");
+      const calls = stubFetch({ status: 200, body: { rev: 6, updated: "u6", data: { characters: [who] } } });
+      expect(await sync.pull(true)).toBe(true);
+      expect(names()).toEqual(["New one"]);
+      expect(localStorage.getItem(sync.REV_KEY)).toBe("6");
+      expect(Object.keys(JSON.parse(localStorage.getItem(sync.BASE_KEY)!))).toEqual([who.id]);
+      expect(calls).toHaveLength(1);
+    });
+
+    it("still takes a newer reply", async () => {
+      atRevSix();
+      stubFetch({
+        status: 200,
+        body: { rev: 7, updated: "u7", data: { characters: [{ id: "srv00001", name: "From server" }] } },
+      });
+      expect(await sync.pull(true)).toBe(true);
+      expect(localStorage.getItem(sync.REV_KEY)).toBe("7");
+      expect(names()).toContain("From server");
+    });
+  });
+
   it("pull is throttled to 20 s unless forced", async () => {
     const calls = stubFetch({ status: 200, body: { rev: 0, data: { characters: [] }, updated: "u" } });
     expect(await sync.pull(true)).toBe(true);
