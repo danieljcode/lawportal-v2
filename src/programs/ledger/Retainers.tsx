@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { contactStore, type Contact } from "@/lib/contacts";
 import { formatDay, gameToday } from "@/lib/deadlines";
 import { invoiceStore, METHOD_LABELS, type Invoice } from "@/lib/invoices";
-import { formatMoney, parseRate } from "@/lib/ledger";
+import { formatMoney, MAX_PAYMENT, overPaymentLimit, parseRate } from "@/lib/ledger";
 import { letterheadStore } from "@/lib/letterhead";
 import {
   depositRemovalProblem,
@@ -47,7 +47,9 @@ function ClientRetainer({
 
   const saveFloor = (ev: FormEvent) => {
     ev.preventDefault();
-    const n = parseRate(floor);
+    const over = overPaymentLimit(floor);
+    if (over) return setError(over);
+    const n = parseRate(floor, MAX_PAYMENT);
     if (floor.trim() && n === null) return setError("Give the floor in dollars, e.g. 500.");
     setError("");
     contactStore().save({ ...client, retainerFloor: n ?? undefined });
@@ -56,7 +58,15 @@ function ClientRetainer({
   const deposit = (ev: FormEvent) => {
     ev.preventDefault();
     try {
-      retainerStore().deposit({ contactId: client.id, date, amount: parseRate(amount) ?? 0, method, note });
+      const over = overPaymentLimit(amount);
+      if (over) throw new Error(over);
+      retainerStore().deposit({
+        contactId: client.id,
+        date,
+        amount: parseRate(amount, MAX_PAYMENT) ?? 0,
+        method,
+        note,
+      });
       setAmount("");
       setNote("");
       setError("");

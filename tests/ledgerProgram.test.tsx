@@ -214,6 +214,28 @@ describe("the Ledger page (LP-32)", () => {
     expect(must("#invoice-list").textContent).not.toContain("also on");
   });
 
+  it("takes deposits and floors up to the payment limit, and says so over it (LP-188)", () => {
+    contactStore().save({ name: "Judy Reyes", type: "client" });
+    mount();
+    click(must("#retainer-list button"));
+
+    setValue("#deposit-amount", "150,000");
+    click(must("#deposit-add"));
+    expect(must("#retainer-title").textContent).toBe("Judy Reyes: $150,000.00");
+    setValue("#deposit-amount", "10000001");
+    click(must("#deposit-add"));
+    expect(must("#retainer-error").textContent).toContain("$10,000,000.00");
+    expect(retainerStore().list()).toHaveLength(1);
+
+    setValue("#retainer-floor", "200000");
+    click(must("#floor-save"));
+    expect(contactStore().list()[0].retainerFloor).toBe(200000);
+    setValue("#retainer-floor", "10000001");
+    click(must("#floor-save"));
+    expect(must("#retainer-error").textContent).toContain("$10,000,000.00");
+    expect(contactStore().list()[0].retainerFloor).toBe(200000);
+  });
+
   it("keeps a client's retainer: deposit, pay an invoice from it, warn and write the top-up letter (LP-93)", () => {
     caseStore().save({ id: "case0001", caseNumber: "90SCCR00147", lead: "alice001" });
     const judy = contactStore().save({ name: "Judy Reyes", type: "client" });

@@ -53,12 +53,15 @@ export function parseHours(v: unknown): number | null {
 /** Most an hourly rate can be, in dollars. */
 export const MAX_RATE = 100_000;
 
+/** Most a payment, deposit or retainer floor can be, in dollars. */
+export const MAX_PAYMENT = 10_000_000;
+
 /** A rate as typed ("150", "$1,200.5") → dollars to the cent, or null when it isn't one from 0.01 to MAX_RATE. */
-export function parseRate(v: unknown): number | null {
+export function parseRate(v: unknown, max: number = MAX_RATE): number | null {
   const n = typeof v === "number" ? v : typeof v === "string" && v.trim() ? Number(v.replace(/[$,\s]/g, "")) : NaN;
   if (!Number.isFinite(n)) return null;
   const cents = Math.round(n * 100) / 100;
-  return cents >= 0.01 && cents <= MAX_RATE ? cents : null;
+  return cents >= 0.01 && cents <= max ? cents : null;
 }
 
 /** An entry's worth at an hourly rate, to the cent; null without a rate. */
@@ -81,6 +84,13 @@ export const hoursText = (h: number) => h.toFixed(1) + (h === 1 ? " hour" : " ho
 /** "$1,234.50". */
 export function formatMoney(n: number): string {
   return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+/** The message for a typed amount over MAX_PAYMENT, or null when it isn't over. */
+export function overPaymentLimit(v: unknown): string | null {
+  return (parseRate(v, Infinity) ?? 0) > MAX_PAYMENT
+    ? "The most an amount can be is " + formatMoney(MAX_PAYMENT) + "."
+    : null;
 }
 
 /** Normalise an untrusted entry (form, sync, backup); null without a case, character, date or hours. */
