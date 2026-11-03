@@ -16,6 +16,8 @@ import { parseHash, hashFor, pageTitle } from "@/shell/useRoute";
 describe("contacts (LP-30)", () => {
   it("cleans untrusted input: needs a name, keeps known fields, defaults the type", () => {
     expect(cleanContact({ name: "  " })).toBeNull();
+    expect(cleanContact({ name: "Big", retainerFloor: 150000 })?.retainerFloor).toBe(150000);
+    expect(cleanContact({ name: "Big", retainerFloor: 10_000_001 })?.retainerFloor).toBeUndefined();
     expect(cleanContact(null)).toBeNull();
     const c = cleanContact({ name: " Judy Bench ", type: "wizard", phone: "555-0100", evil: "<b>", notes: "" })!;
     expect(c).toMatchObject({ name: "Judy Bench", type: "client", phone: "555-0100" });

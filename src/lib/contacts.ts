@@ -5,7 +5,7 @@
 // A contact keeps its own links to Case File cases, each with its role there,
 // so the links sync with it and the cases store never changes.
 
-import { parseRate } from "./ledger";
+import { MAX_PAYMENT, parseRate } from "./ledger";
 import { searchTerms } from "./precedents";
 import { defaultKV, isId, ISO_TIME_RE, newId, text, uniqueById, type KV } from "./storage";
 import { createStore } from "./store";
@@ -103,7 +103,7 @@ export function cleanContact(input: unknown, now: string = new Date().toISOStrin
   };
   const created = typeof o.created === "string" && ISO_TIME_RE.test(o.created) ? o.created : now;
   const cases = cleanLinks(o.cases);
-  const retainerFloor = parseRate(o.retainerFloor);
+  const retainerFloor = parseRate(o.retainerFloor, MAX_PAYMENT);
   return {
     id: isId(o.id) ? o.id : newId(),
     name,

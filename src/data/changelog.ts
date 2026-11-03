@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "fix",
+        text: "Retainer deposits and floors can now go up to $10,000,000, the same as payments. They stopped at $100,000 with a confusing message.",
+      },
+      {
+        type: "fix",
         text: "A slow reply from the sync server can no longer roll this device back to an older copy for a moment.",
       },
       {

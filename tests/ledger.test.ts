@@ -8,6 +8,7 @@ import {
   filterEntries,
   formatMoney,
   parseHours,
+  overPaymentLimit,
   parseRate,
   timerHours,
   totalHours,
@@ -103,6 +104,11 @@ describe("filters and totals", () => {
 describe("rates and values", () => {
   it("parse a rate as typed, to the cent", () => {
     expect(parseRate("150")).toBe(150);
+    expect(parseRate("150000")).toBeNull();
+    expect(parseRate("150000", 10_000_000)).toBe(150000);
+    expect(overPaymentLimit("10,000,000")).toBeNull();
+    expect(overPaymentLimit("lots")).toBeNull();
+    expect(overPaymentLimit("10,000,000.01")).toBe("The most an amount can be is $10,000,000.00.");
     expect(parseRate(" $1,200.555 ")).toBe(1200.56);
     expect(parseRate("1 200")).toBe(1200);
     expect(parseRate("150s")).toBeNull();

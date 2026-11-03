@@ -11,6 +11,7 @@ import {
   ACTIVITY_LABELS,
   entryValue,
   formatMoney,
+  MAX_PAYMENT,
   parseRate,
   totalHours,
   type Activity,
@@ -27,8 +28,6 @@ export const INVOICES_VERSION = 1;
 export const MAX_INVOICES = 2000;
 const MAX_LINES = 1000;
 const MAX_PAYMENTS = 200;
-/** Largest payment, in dollars. */
-export const MAX_PAYMENT = 10_000_000;
 
 /** One logged entry as billed: who did what, and its amount at the rate then. */
 export interface InvoiceLine {
@@ -124,7 +123,7 @@ function cleanLine(raw: unknown): InvoiceLine | null {
 export function cleanPayment(raw: unknown): Payment | null {
   if (!raw || typeof raw !== "object") return null;
   const o = raw as Record<string, unknown>;
-  const n = typeof o.amount === "number" ? o.amount : parseRate(o.amount);
+  const n = typeof o.amount === "number" ? o.amount : parseRate(o.amount, MAX_PAYMENT);
   const amount = n === null || !Number.isFinite(n) ? null : cents(n);
   if (!isDate(o.date) || !amount || amount < 0.01 || amount > MAX_PAYMENT) return null;
   const note = text(o.note, 200);
