@@ -317,13 +317,10 @@ function apply(doc: unknown): number {
   const portfolio = portfolioStore();
   let failed = 0;
   try {
-    const raw = doc && typeof doc === "object" ? (doc as { characters?: unknown }).characters : undefined;
-    const incoming = Array.isArray(raw) ? raw : [];
     const keep = new Set<string>();
     const order: string[] = [];
-    for (const item of incoming) {
+    for (const c of charactersOf(doc)) {
       try {
-        const c = (item && typeof item === "object" ? item : {}) as Record<string, unknown>;
         // Kept even if the save below fails: a copy that won't store must not delete this device's.
         if (typeof c.id === "string") keep.add(c.id);
         const saved = chars.save(c, { keepStamp: true });
@@ -358,9 +355,6 @@ function apply(doc: unknown): number {
 
 /** Fold this browser's characters into a server document (the server wins on id clashes). */
 export function merge(serverDoc: unknown): SyncDoc {
-  const raw =
-    serverDoc && typeof serverDoc === "object" ? (serverDoc as { characters?: unknown }).characters : undefined;
-  const list = Array.isArray(raw) ? raw.filter((c): c is Record<string, unknown> => !!c && typeof c === "object") : [];
   const local = snapshot();
   const lists = LISTS.map((l): [string, { id: string }[]] => {
     const server = l.of(serverDoc) || [];
@@ -370,7 +364,7 @@ export function merge(serverDoc: unknown): SyncDoc {
   });
   const { cases, moved } = foldCases(casesOf(serverDoc), casesOf(local));
   const out: SyncDoc = {
-    characters: list.slice(),
+    characters: charactersOf(serverDoc),
     cases,
     ...Object.fromEntries(lists),
   };
