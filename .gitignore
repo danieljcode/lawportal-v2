@@ -16,6 +16,7 @@ next-env.d.ts
 /src/data/form-index.json
 /src/data/penal-code.json
 /src/data/.app-data
+/tests/__snapshots__/
 
 # npm run release-notes output
 release-notes.md

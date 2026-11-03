@@ -44,6 +44,18 @@ describe("matching names", () => {
     expect(nameMatch("Los Santos Customs", "los santos customs inc")).toBe("exact");
   });
 
+  it("matches with or without accents, either way round (LP-195)", () => {
+    expect(nameMatch("Jose Nunez", "José Núñez")).toBe("exact");
+    expect(nameMatch("José Núñez", "Jose Nunez")).toBe("exact");
+    expect(nameMatch("Nunez", "José Núñez")).toBe("exact");
+    expect(nameMatch("Cereza Beauty", "Cerezá Beauty")).toBe("exact");
+  });
+
+  it("keeps letters outside A to Z, so they still match", () => {
+    expect(nameWords("Søren Иван")).toEqual(["søren", "иван"]);
+    expect(nameMatch("Иван", "Иван Petrov")).toBe("exact");
+  });
+
   it("finds part of a name and initials, marked partial", () => {
     expect(nameMatch("Lee", "Ann Lee")).toBe("exact");
     expect(nameMatch("A. Lee", "Ann Lee")).toBe("partial");

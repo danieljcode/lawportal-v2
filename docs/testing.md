@@ -46,7 +46,13 @@ the layout (`layout`) and Discord (`discord`) for every form. When a change is m
 output, update them with `-u` and **read the diff**: only what you meant to change should move.
 
 Running the suites on Windows can rewrite these files with different line endings while their
-content stays the same; `git checkout -- tests/__snapshots__` puts them back.
+content stays the same.
+
+These files hold the real forms' text, so they aren't in this repo (LP-194). They live in `app-data/`
+of the private reference repo, and `scripts/app-data.mjs` copies them in. To change them: update
+them with `-u`, read the diff against that repo's copy, copy them to its `app-data/` and push there
+first, then open the pull request here. CI fails on a snapshot that's missing, so one left out of
+`SNAPSHOTS` in that script can't pass unnoticed.
 
 ## Parity tests and reference data
 
