@@ -829,6 +829,8 @@ export async function enable(invite = ""): Promise<string> {
     throw new Error(b.error || "The server refused (" + r.status + ").");
   lsSet(CODE_KEY, b.code);
   lsSet(REV_KEY, "0");
+  // Unsent until the server has it: if this send fails, a later pull must not take the server's copy over it.
+  lsSet(DIRTY_KEY, "1");
   await push();
   return b.code;
 }
@@ -847,6 +849,8 @@ export async function link(typed: string): Promise<void> {
   lsSet(REV_KEY, String(b.rev));
   const failed = apply(merge(b.data));
   setAfterApply(failed, "synced", "", b.updated);
+  // Unsent until the server has it: if this send fails, a later pull must not take the server's copy over it.
+  lsSet(DIRTY_KEY, "1");
   await push();
 }
 

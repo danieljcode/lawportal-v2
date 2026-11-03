@@ -801,6 +801,50 @@ describe("enable / link / disable / destroy", () => {
     expect(localStorage.getItem(sync.REV_KEY)).toBe("1");
   });
 
+  // A failed first send used to leave nothing marked unsent, so another device's save wiped this one (LP-193).
+  describe.each([
+    ["enable", () => sync.enable(), { status: 201, body: { code: CODE } }],
+    ["link", () => sync.link(CODE), { status: 200, body: { rev: 1, updated: "u1", data: { characters: [] } } }],
+  ])("%s when its first send fails", (_name, start, first) => {
+    it.each([
+      ["a server error", { status: 500, body: { error: "no" } }],
+      ["no connection", new Error("offline")],
+    ])("keeps this device's data after %s", async (_why, failure) => {
+      characterStore().save({ id: "local001", name: "Only Here" });
+      stubFetch(first, failure as Reply);
+      await start();
+      expect(localStorage.getItem(sync.DIRTY_KEY)).toBe("1");
+      const rev = Number(localStorage.getItem(sync.REV_KEY));
+
+      // Another device saved in the meantime.
+      stubFetch(
+        {
+          status: 200,
+          body: { rev: rev + 1, updated: "u9", data: { characters: [{ id: "other001", name: "From Device 2" }] } },
+        },
+        { status: 200, body: { rev: rev + 2, updated: "u10" } },
+      );
+      await sync.pull(true);
+      expect(names().sort()).toEqual(["From Device 2", "Only Here"]);
+    });
+
+    it("sends again at the same revision instead of showing Synced", async () => {
+      characterStore().save({ id: "local001", name: "Only Here" });
+      stubFetch(first, { status: 500, body: { error: "no" } });
+      await start();
+      const rev = Number(localStorage.getItem(sync.REV_KEY));
+
+      const calls = stubFetch(
+        { status: 200, body: { rev, updated: "u1", data: { characters: [] } } },
+        { status: 200, body: { rev: rev + 1, updated: "u2" } },
+      );
+      await sync.pull(true);
+      expect(calls.map((c) => c.method)).toEqual(["GET", "PUT"]);
+      expect(pushedNames(calls[1])).toContain("Only Here");
+      expect(localStorage.getItem(sync.DIRTY_KEY)).toBeNull();
+    });
+  });
+
   it("enable sends the invite word, and says when one is needed (LP-178)", async () => {
     const calls = stubFetch({ status: 403, body: { error: "no" } });
     await expect(sync.enable()).rejects.toThrow(sync.BAD_INVITE);
