@@ -1,5 +1,46 @@
 # Changelog
 
+## [0.5.0](https://github.com/danieljcode/lawportal-v2/compare/v0.4.0...v0.5.0) (2026-11-03)
+
+
+### Features
+
+* **cases:** a billing summary and Ledger links on a case [LP-173] ([#160](https://github.com/danieljcode/lawportal-v2/issues/160)) ([3ff8388](https://github.com/danieljcode/lawportal-v2/commit/3ff83880d10f949603661e17799a3da7d278b454))
+* **cases:** a court docket view for judges [LP-91] ([#154](https://github.com/danieljcode/lawportal-v2/issues/154)) ([d309ee6](https://github.com/danieljcode/lawportal-v2/commit/d309ee635272bf0c8e6e51a699970cfe94e45fef))
+* **cases:** case outcomes and a firm record [LP-92] ([#155](https://github.com/danieljcode/lawportal-v2/issues/155)) ([1b83dca](https://github.com/danieljcode/lawportal-v2/commit/1b83dca10ddeb2eb0777f960c65bed0ed939156e))
+* **cases:** next actions with owner, due date and done [LP-170] ([#151](https://github.com/danieljcode/lawportal-v2/issues/151)) ([263c779](https://github.com/danieljcode/lawportal-v2/commit/263c779fdfbf864c249ab17eb85f8d0f375ebf8d))
+* **clients:** connect intake, conflict check and case opening [LP-172] ([#156](https://github.com/danieljcode/lawportal-v2/issues/156)) ([4b91bb4](https://github.com/danieljcode/lawportal-v2/commit/4b91bb435655a1e8b03e65a0c24528925691b1c0))
+* **home:** a work list of court dates, actions and bills [LP-171] ([#153](https://github.com/danieljcode/lawportal-v2/issues/153)) ([bc6c85a](https://github.com/danieljcode/lawportal-v2/commit/bc6c85acc7b01a7dccf5d73bca585491365f05fc))
+* **security:** send a full content security policy [LP-169] ([#152](https://github.com/danieljcode/lawportal-v2/issues/152)) ([e30c6cf](https://github.com/danieljcode/lawportal-v2/commit/e30c6cf82e36cf6bb728275330ac57293a6fe210))
+
+
+### Fixes
+
+* **backup:** restore big backups and wait for the save [LP-185] ([#172](https://github.com/danieljcode/lawportal-v2/issues/172)) ([3f4e534](https://github.com/danieljcode/lawportal-v2/commit/3f4e5340e7e09a328a6c27dac000925fbdaa33f0))
+* **clients:** keep clients who hold retainer money [LP-184] ([#171](https://github.com/danieljcode/lawportal-v2/issues/171)) ([a7b759d](https://github.com/danieljcode/lawportal-v2/commit/a7b759d1c93ca6d32fcd0fd1ff944116bd01dd55))
+* **clients:** match names with or without accents [LP-195] ([#182](https://github.com/danieljcode/lawportal-v2/issues/182)) ([2f2f8e1](https://github.com/danieljcode/lawportal-v2/commit/2f2f8e1746baa9cd0e0280653147096a23367a5e))
+* **desktop:** reopen the jump box right after Esc [LP-181] ([#168](https://github.com/danieljcode/lawportal-v2/issues/168)) ([5496b11](https://github.com/danieljcode/lawportal-v2/commit/5496b11cb9d09f212eebb1cb0fa5c8cb75696913))
+* **forms:** keep the test snapshots with the private data [LP-194] ([#183](https://github.com/danieljcode/lawportal-v2/issues/183)) ([857762a](https://github.com/danieljcode/lawportal-v2/commit/857762ae11dda7cfd70e7174b95e605589e6a529))
+* **ledger:** bill logged time on one invoice only [LP-174] ([#161](https://github.com/danieljcode/lawportal-v2/issues/161)) ([b090f49](https://github.com/danieljcode/lawportal-v2/commit/b090f49709d736739271bb478a80f783a8338d7e))
+* **ledger:** keep invoice numbers unique across devices [LP-176] ([#163](https://github.com/danieljcode/lawportal-v2/issues/163)) ([1b7b3cc](https://github.com/danieljcode/lawportal-v2/commit/1b7b3cc8e7ec28e51d9e5b4c801e44d7085b52e2))
+* **ledger:** lock time that is on an invoice [LP-183] ([#170](https://github.com/danieljcode/lawportal-v2/issues/170)) ([5e6208f](https://github.com/danieljcode/lawportal-v2/commit/5e6208fe898624f39f9c096d9c6845e01a7f4772))
+* **ledger:** refuse overpayments and overdrawn retainers [LP-175] ([#162](https://github.com/danieljcode/lawportal-v2/issues/162)) ([9820235](https://github.com/danieljcode/lawportal-v2/commit/982023553852bdc66881634a6234a0bc198de2db))
+* **ledger:** take deposits and floors up to the limit [LP-188] ([#175](https://github.com/danieljcode/lawportal-v2/issues/175)) ([0bdb2a7](https://github.com/danieljcode/lawportal-v2/commit/0bdb2a7ff651b4d6028f73dd1cd6b8cb4e946757))
+* **ledger:** warn when invoices bill the same time [LP-186] ([#173](https://github.com/danieljcode/lawportal-v2/issues/173)) ([9c28856](https://github.com/danieljcode/lawportal-v2/commit/9c28856323aef56ab4205ec9908445b4e9391724))
+* **storage:** redraw other tabs when data is saved [LP-190] ([#177](https://github.com/danieljcode/lawportal-v2/issues/177)) ([f56e2ff](https://github.com/danieljcode/lawportal-v2/commit/f56e2ffd85786b376e504c468381c4d1b88de391))
+* **sync:** cap the new sync code request body [LP-189] ([#176](https://github.com/danieljcode/lawportal-v2/issues/176)) ([a8b56f3](https://github.com/danieljcode/lawportal-v2/commit/a8b56f387131e750925d327097da975747ea0be2))
+* **sync:** ignore a reply older than this device [LP-187] ([#174](https://github.com/danieljcode/lawportal-v2/issues/174)) ([3c7815f](https://github.com/danieljcode/lawportal-v2/commit/3c7815fb0e1561fd17e0d6edbe080aece5d3bf24))
+* **sync:** keep both payments and failed characters [LP-177] ([#164](https://github.com/danieljcode/lawportal-v2/issues/164)) ([81d4ea1](https://github.com/danieljcode/lawportal-v2/commit/81d4ea13b276147709934bb2093d5ce75715164b))
+* **sync:** keep data marked unsent on the first send [LP-193] ([#181](https://github.com/danieljcode/lawportal-v2/issues/181)) ([de0a61b](https://github.com/danieljcode/lawportal-v2/commit/de0a61b9ff960baf59b19fb971cace1cb126b10e))
+* **sync:** keep links when cases join by number [LP-182] ([#169](https://github.com/danieljcode/lawportal-v2/issues/169)) ([418cc02](https://github.com/danieljcode/lawportal-v2/commit/418cc029facfc5401c9c054b0f7beefac244ff81))
+* **sync:** let a site require an invite word for new codes [LP-178] ([#165](https://github.com/danieljcode/lawportal-v2/issues/165)) ([ac77659](https://github.com/danieljcode/lawportal-v2/commit/ac7765939c19a5ef5a2df258394a3d567efbdf8c))
+
+
+### Docs
+
+* **changelog:** mark what's new for 0.4.0 and 0.3.0 [LP-26] ([#149](https://github.com/danieljcode/lawportal-v2/issues/149)) ([649a578](https://github.com/danieljcode/lawportal-v2/commit/649a578a2640e17a3af64254b6392b1a3de6eb01))
+* **claude:** remove the local vault section [LP-192] ([#180](https://github.com/danieljcode/lawportal-v2/issues/180)) ([7356596](https://github.com/danieljcode/lawportal-v2/commit/7356596562266641ec77f420a2484029b88f3c9f))
+
 ## [0.4.0](https://github.com/danieljcode/lawportal-v2/compare/v0.3.0...v0.4.0) (2026-10-31)
 
 
