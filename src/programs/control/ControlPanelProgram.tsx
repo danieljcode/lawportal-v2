@@ -107,7 +107,6 @@ export default function ControlPanelProgram({ shell }: ProgramProps) {
             <CharactersBody
               characters={shell.characters}
               activeId={shell.active ? shell.active.id : null}
-              onDockets={shell.openDockets}
               withSync={false}
             />
           </Section>

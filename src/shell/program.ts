@@ -23,12 +23,10 @@ export interface Shell {
   navOpen: boolean;
   syncOn: boolean;
   syncState: SyncState;
-  /** Dockets "Use in form" for the open form. */
+  /** A case for the open form to load. */
   docketRequest: DocketRequest | null;
   /** Filing history's "Use as new draft" for the open form (LP-15). */
   draftRequest: DraftRequest | null;
-  /** The open form shows its docket bar. */
-  onDocketBar(on: boolean): void;
   /** The open form's filing tools, for Court Filings' Form menu (LP-105). */
   onFormTools(tools: FormTools | null): void;
   openCharacters(startSync?: boolean): void;
@@ -39,8 +37,6 @@ export interface Shell {
   openFormForCase(formId: string, caseId: string, values?: Record<string, string>): void;
   openChangelog(): void;
   openAbout(): void;
-  /** The Dockets dialog for a character (Settings' character list, LP-109). */
-  openDockets(charId: string): void;
   /** Settings showed What's new: clear its unread dot. */
   markChangelogSeen(): void;
   /** Light, dark or system, separate from the theme. */

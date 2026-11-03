@@ -37,7 +37,7 @@ const storedLength = (page: Page, key: string) =>
     key,
   );
 
-/** A judge (so the Dockets button shows), already saved and active. */
+/** A judge (so forms show the docket bar), already saved and active. */
 async function seedJudge(page: Page): Promise<void> {
   await page.addInitScript(() => {
     // Seed once: after the first load the data has moved to IndexedDB (LP-36).
@@ -253,24 +253,6 @@ test("add a character, and it becomes the one filing", async ({ page }) => {
   await page.locator("#char-form button[type=submit]").click();
   await expect(page.locator("#char-list")).toContainText("Casey Counsel");
   await expect(page.locator("#active-character option", { hasText: "Casey Counsel" })).toHaveCount(1);
-});
-
-test("add a case to a judge's docket", async ({ page }) => {
-  await seedJudge(page);
-  await page.goto("/");
-  // A phone's top bar keeps Dockets in the File menu (LP-125).
-  const dockets = page.locator("#open-dockets");
-  if (await dockets.isVisible()) await dockets.click();
-  else {
-    await page.locator("#menu-file").click();
-    await page.locator("#menu-dockets").click();
-  }
-  await expect(page.locator("#dockets-title")).toContainText("Judy Bench");
-  await page.locator("#new-docket").click();
-  await page.locator("#docket-caseNumber").fill("90SCCR00147");
-  await page.locator("#docket-plaintiff").fill("People");
-  await page.locator("#docket-form button[type=submit]").click();
-  await expect(page.locator("#docket-list")).toContainText("90SCCR00147");
 });
 
 test("Ctrl+K jumps to a form, and Esc closes the box and gives the focus back", async ({ page }) => {

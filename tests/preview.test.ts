@@ -107,10 +107,6 @@ function unmount(): void {
   container = null;
 }
 
-function click(el: HTMLElement): void {
-  act(() => el.click());
-}
-
 function choose(sel: string, value: string): void {
   const select = must<HTMLSelectElement>(sel);
   act(() => {
@@ -243,7 +239,7 @@ describe("forum preview with no frames and no input", () => {
     expectRendered(COURT_LS, "MOTION TITLE");
   });
 
-  it("shows a docket loaded with Use in form", async () => {
+  it("shows a case loaded from the docket bar", () => {
     const id = saveCharacter("John Doe", "Attorney at Law");
     act(() => {
       characterStore().setActive(id);
@@ -252,15 +248,7 @@ describe("forum preview with no frames and no input", () => {
     history.replaceState(null, "", "#civil-complaint");
     mount();
     expectRendered(COURT, "John Doe");
-    click(must("#open-dockets"));
-    await act(async () => {
-      await vi.dynamicImportSettled();
-    });
-    const use = [...document.querySelectorAll<HTMLButtonElement>("#docket-list button")].find(
-      (b) => b.textContent === "Use in form",
-    );
-    expect(use).toBeDefined();
-    click(use!);
+    choose("#docket-pick", docketStore().list(id)[0].id);
     expectRendered(COURT, "90SCCC00147", "Ann Smith");
   });
 

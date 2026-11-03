@@ -61,7 +61,6 @@ export default function CourtFilingsProgram({ shell }: ProgramProps) {
               onOutputGone={onOutputGone}
               docketRequest={shell.docketRequest}
               draftRequest={shell.draftRequest}
-              onDocketBar={shell.onDocketBar}
               onTools={shell.onFormTools}
             />
           </ErrorBoundary>
