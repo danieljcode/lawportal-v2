@@ -8,9 +8,8 @@ How packages are kept up to date and checked for security problems (LP-85).
 
 - **npm packages:** minor and patch updates are grouped into one PR; each major update gets its own
   PR. At most 5 are open at once.
-- **Pairs that must stay on the same version** always arrive together, in one PR, majors included:
-  `playwright` with `@playwright/test` (each needs its own browser build), and `next` with
-  `eslint-config-next`. `tests/dependencies.test.ts` fails if either pair ever differs.
+- **A pair that must stay on the same version** always arrives together, in one PR, majors included:
+  `next` with `eslint-config-next`. `tests/dependencies.test.ts` fails if the pair ever differs.
 - **GitHub Actions** (the `actions/…` steps in the workflows): minor and patch updates grouped, majors
   separate.
 - **Titles** are `chore(deps): …`, `chore(deps-dev): …` (development-only packages) or
