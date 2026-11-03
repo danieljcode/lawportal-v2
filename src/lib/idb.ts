@@ -13,7 +13,7 @@
 
 import { BOOT_OFF_KEY } from "./boot";
 import { READABLE_FONT_KEY, SHELL_KEY } from "./shell";
-import { memoryKV, reportSaveFailed, setDefaultKV, type KV } from "./storage";
+import { memoryKV, reportSaveFailed, SAVE_FAILED, setDefaultKV, type KV } from "./storage";
 import { THEME_KEY } from "./theme";
 
 const DB = "lawapp";
@@ -90,6 +90,7 @@ export async function openIdbKV(gaveUp: () => boolean = () => false): Promise<KV
 function cachedKV(db: IDBDatabase, map: Map<string, string>, ls: Storage): KV {
   let pending = new Map<string, string | null>();
   let scheduled = false;
+  let lastWrite: Promise<void> = Promise.resolve();
   const tabs = typeof BroadcastChannel === "function" ? new BroadcastChannel(DB) : null;
   if (tabs) {
     tabs.onmessage = (e: MessageEvent<Op[]>) => {
@@ -122,7 +123,7 @@ function cachedKV(db: IDBDatabase, map: Map<string, string>, ls: Storage): KV {
       failed(batch, err);
       return;
     }
-    done(tx).then(
+    lastWrite = done(tx).then(
       () => tabs?.postMessage([...batch] satisfies Op[]),
       (err: unknown) => failed(batch, err),
     );
@@ -156,6 +157,11 @@ function cachedKV(db: IDBDatabase, map: Map<string, string>, ls: Storage): KV {
       queue(key, null);
     },
     keys: () => [...map.keys(), ...[...LOCAL_KEYS].filter((k) => ls.getItem(k) !== null)],
+    async settled() {
+      await null; // lets a queued flush start
+      await lastWrite; // transactions run in order, so the earlier ones are finished too
+      if (pending.size) throw new Error(SAVE_FAILED);
+    },
   };
 }
 

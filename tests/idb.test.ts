@@ -3,7 +3,7 @@
 import { IDBDatabase, IDBFactory } from "fake-indexeddb";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { IDB_MARKER, initStorage, openIdbKV } from "@/lib/idb";
-import { __resetDefaultKVForTests, backend, defaultKV, saveFailedVersion } from "@/lib/storage";
+import { __resetDefaultKVForTests, backend, defaultKV, SAVE_FAILED, saveFailedVersion } from "@/lib/storage";
 import { THEME_KEY } from "@/lib/theme";
 
 /** Lets fake-indexeddb finish its transactions and the BroadcastChannel deliver. */
@@ -71,6 +71,20 @@ describe("IndexedDB storage (LP-36)", () => {
     const again = (await openIdbKV())!;
     expect(again.get("lawapp_chars")).toBe("[1]");
     expect(again.get("lawapp_cases")).toBe("[2]");
+  });
+
+  it("settled waits until writes are really saved, and throws if one failed (LP-185)", async () => {
+    const kv = (await openIdbKV())!;
+    kv.set("lawapp_chars", "[1]");
+    await kv.settled!();
+    // No settle(): the write must already be on disk when settled resolves.
+    expect((await openIdbKV())!.get("lawapp_chars")).toBe("[1]");
+
+    vi.spyOn(IDBDatabase.prototype, "transaction").mockImplementationOnce(() => {
+      throw new DOMException("full", "QuotaExceededError");
+    });
+    kv.set("lawapp_cases", "[2]");
+    await expect(kv.settled!()).rejects.toThrow(SAVE_FAILED);
   });
 
   it("another tab's saves reach this tab's copy", async () => {

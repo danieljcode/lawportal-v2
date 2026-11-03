@@ -2,17 +2,21 @@
 import { describe, expect, it } from "vitest";
 import {
   backupFilename,
+  BACKUP_TOO_LARGE,
   backupText,
+  checkBackupSize,
   countsOf,
   daysSinceBackup,
   LAST_BACKUP_KEY,
   makeBackup,
+  MAX_BACKUP_BYTES,
   needsBackupReminder,
   parseFile,
   restoreBackup,
   restorePreview,
   type BackupDoc,
 } from "@/lib/backup";
+import { MAX_IMPORT_BYTES } from "@/lib/characterFile";
 import { memoryKV, SAVE_FAILED, type KV } from "@/lib/storage";
 
 const NOW = new Date("2026-10-19T12:00:00Z");
@@ -43,6 +47,15 @@ function filled(): KV {
     other_app_key: "not ours",
   });
 }
+
+describe("the restore size limit (LP-185)", () => {
+  it("takes backups far bigger than the characters file limit", () => {
+    expect(MAX_IMPORT_BYTES).toBeLessThan(MAX_BACKUP_BYTES);
+    expect(() => checkBackupSize(MAX_IMPORT_BYTES + 1)).not.toThrow();
+    expect(() => checkBackupSize(MAX_BACKUP_BYTES)).not.toThrow();
+    expect(() => checkBackupSize(MAX_BACKUP_BYTES + 1)).toThrow(BACKUP_TOO_LARGE);
+  });
+});
 
 describe("making a backup", () => {
   it("holds every lawapp_ key exactly as stored, except the sync code and device-only keys", () => {

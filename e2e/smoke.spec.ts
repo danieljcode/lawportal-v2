@@ -22,6 +22,21 @@ async function openForm(page: Page, id: string): Promise<void> {
   await expect(page.locator("#form-view")).toBeVisible();
 }
 
+/** Read a stored string straight from IndexedDB, so this proves what was really saved. */
+const storedLength = (page: Page, key: string) =>
+  page.evaluate(
+    (k) =>
+      new Promise<number>((resolve, reject) => {
+        const open = indexedDB.open("lawapp", 1);
+        open.onerror = () => reject(new Error("IndexedDB wouldn't open"));
+        open.onsuccess = () => {
+          const got = open.result.transaction("kv").objectStore("kv").get(k);
+          got.onsuccess = () => resolve(typeof got.result === "string" ? got.result.length : -1);
+        };
+      }),
+    key,
+  );
+
 /** A judge (so the Dockets button shows), already saved and active. */
 async function seedJudge(page: Page): Promise<void> {
   await page.addInitScript(() => {
@@ -42,6 +57,30 @@ test.beforeEach(({ page }) => {
   });
 });
 test.afterEach(() => expect(cspErrors).toEqual([]));
+
+test("restores a backup over 5 MB and keeps it after the reload (LP-185)", async ({ page }) => {
+  const size = 30 * 1024 * 1024;
+  const doc = {
+    app: "jsa-form-generator",
+    kind: "backup",
+    version: 1,
+    created: "2026-11-03T00:00:00.000Z",
+    appVersion: "0.5.0",
+    data: { lawapp_big: "x".repeat(size) },
+  };
+  page.on("dialog", (d) => void d.accept());
+  await page.goto("/#control");
+  await page.locator("#restore-file").waitFor({ state: "attached" });
+  await Promise.all([
+    page.waitForEvent("load"),
+    page.locator("#restore-file").setInputFiles({
+      name: "backup.json",
+      mimeType: "application/json",
+      buffer: Buffer.from(JSON.stringify(doc)),
+    }),
+  ]);
+  expect(await storedLength(page, "lawapp_big")).toBe(size);
+});
 
 test("pages are sent with a Content-Security-Policy that trusts only this request's scripts", async ({ page }) => {
   const response = await page.goto("/");

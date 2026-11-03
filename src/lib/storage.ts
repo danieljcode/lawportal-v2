@@ -12,6 +12,8 @@ export interface KV {
   remove(key: string): void;
   /** Every key stored (the full backup, LP-1). Optional: the stores never need it. */
   keys?(): string[];
+  /** Resolves once every write so far is really saved; throws if one failed. Only for stores that save later. */
+  settled?(): Promise<void>;
 }
 
 export type Backend = "indexeddb" | "local" | "memory";

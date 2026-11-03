@@ -7,6 +7,7 @@ import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import {
   backupFilename,
   backupText,
+  checkBackupSize,
   countsOf,
   currentData,
   daysSinceBackup,
@@ -174,11 +175,12 @@ export function CharactersBody({
     const file = input.files && input.files[0];
     if (!file) return;
     try {
-      checkFileSize(file.size);
+      checkBackupSize(file.size);
       const text = await file.text();
       const parsed = parseFile(text);
       if (parsed.kind === "characters") {
         // An older characters-only export: imported the usual way, merged by id.
+        checkFileSize(file.size);
         alert("That's a characters file, not a full backup. " + importedMessage(importText(text)));
         return;
       }
@@ -191,6 +193,8 @@ export function CharactersBody({
       );
       if (!confirm(question)) return;
       restoreBackup(kv, parsed.doc);
+      // A reload would abort a write still running, and a big backup takes a while (LP-185).
+      await kv.settled?.();
       // Every store, the theme and the open form re-read what was restored.
       window.location.reload();
     } catch (err) {
