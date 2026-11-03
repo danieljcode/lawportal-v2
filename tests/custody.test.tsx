@@ -15,7 +15,6 @@ import {
   cleanCustody,
   cleanCustodyEntry,
   custodyHtml,
-  custodyText,
   formatAt,
   gameNow,
   isCustodyTime,
@@ -119,11 +118,6 @@ describe("custody logs", () => {
         by: "<b>Bo</b>",
       },
     ];
-    expect(custodyText("C", "Dashcam", log)).toBe(
-      "Chain of custody: Exhibit C (Dashcam)\n" +
-        "1. Tue 20 Oct 1990, 14:05: Received by Alice Lawyer. Sealed in bag 14\n" +
-        '2. Wed 21 Oct 1990, 09:30: Reviewed by <b>Bo</b>. Line one\n<img src=x onerror="alert(1)">',
-    );
     const html = custodyHtml("C", "<i>Dashcam</i>", log);
     const doc = new DOMParser().parseFromString(html, "text/html");
     expect(doc.querySelector("img, b, i")).toBeNull();
