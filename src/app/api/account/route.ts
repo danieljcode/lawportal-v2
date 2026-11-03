@@ -1,5 +1,6 @@
 // POST /api/account: create a sync code. DELETE /api/account: delete the server copy.
 // Design §Sync server route table; the host check runs first (D7).
+import { readCapped } from "@/lib/server/body";
 import { checkSync } from "@/lib/server/guard";
 import { inviteAccepted, parseBearer } from "@/lib/server/code";
 import { clientIp, limitCreate, limitLookup, lookupFailed, TOO_MANY_CODES, tooMany } from "@/lib/server/rateLimit";
@@ -10,12 +11,22 @@ import { errCode, isJson, json, NO_STORE } from "@/lib/server/http";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+/** Room for an invite word and nothing more. */
+const MAX_BODY = 1000;
+
 export async function POST(req: Request): Promise<Response> {
   const refused = checkSync(req);
   if (refused) return refused;
   if (!isJson(req)) return json({ error: "Expected application/json." }, 415);
   // Before the code limits, so strangers can't use them up. Wrong guesses count as failed lookups.
-  const body: unknown = await req.json().catch(() => null);
+  const text = await readCapped(req, MAX_BODY);
+  if (text === "too-large") return json({ error: "Request too large." }, 413);
+  let body: unknown = null;
+  try {
+    body = JSON.parse(text);
+  } catch {
+    // no invite in it
+  }
   if (!inviteAccepted((body as { invite?: unknown } | null)?.invite)) {
     const slow = limitLookup(req);
     if (slow) return slow;

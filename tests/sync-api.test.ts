@@ -64,6 +64,39 @@ function put(code: string, body: unknown, extra: Record<string, string> = {}): R
 
 const doc = (characters: unknown[] = [{ id: "abcd1234", name: "Jane Doe" }]) => ({ characters });
 
+describe("POST /api/account's body limit (LP-189)", () => {
+  const post = (body: BodyInit, extra: RequestInit = {}) =>
+    POST(
+      new Request(BASE + "/account", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body,
+        ...extra,
+      }),
+    );
+
+  it("refuses a big body by its length, and one that hides its length", async () => {
+    const big = JSON.stringify({ invite: "x".repeat(2000) });
+    expect((await post(big)).status).toBe(413);
+    const stream = new ReadableStream({
+      start(c) {
+        for (let i = 0; i < 5; i++) c.enqueue(new TextEncoder().encode("x".repeat(500)));
+        c.close();
+      },
+    });
+    expect((await post(stream, { duplex: "half" } as RequestInit)).status).toBe(413);
+  });
+
+  it("still reads a normal body, and treats a broken one as having no invite", async () => {
+    expect((await post("{}")).status).toBe(201);
+    expect((await post("not json")).status).toBe(201);
+    vi.stubEnv("LAWAPP_SYNC_INVITE", "open sesame");
+    expect((await post("not json")).status).toBe(403);
+    expect((await post(JSON.stringify({ invite: "open sesame" }))).status).toBe(201);
+    vi.unstubAllEnvs();
+  });
+});
+
 describe("sync codes", () => {
   it("generates codes in the accepted format", () => {
     for (let i = 0; i < 50; i++) expect(generateCode()).toMatch(CODE_RE);
