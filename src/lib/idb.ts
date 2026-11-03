@@ -13,7 +13,7 @@
 
 import { BOOT_OFF_KEY } from "./boot";
 import { READABLE_FONT_KEY, SHELL_KEY } from "./shell";
-import { memoryKV, reportSaveFailed, SAVE_FAILED, setDefaultKV, type KV } from "./storage";
+import { memoryKV, reportSaveFailed, SAVE_FAILED, setDefaultKV, whileOtherTab, type KV } from "./storage";
 import { THEME_KEY } from "./theme";
 
 const DB = "lawapp";
@@ -91,6 +91,7 @@ function cachedKV(db: IDBDatabase, map: Map<string, string>, ls: Storage): KV {
   let pending = new Map<string, string | null>();
   let scheduled = false;
   let lastWrite: Promise<void> = Promise.resolve();
+  const otherTabListeners: Array<(keys: string[]) => void> = [];
   const tabs = typeof BroadcastChannel === "function" ? new BroadcastChannel(DB) : null;
   if (tabs) {
     tabs.onmessage = (e: MessageEvent<Op[]>) => {
@@ -98,6 +99,10 @@ function cachedKV(db: IDBDatabase, map: Map<string, string>, ls: Storage): KV {
         if (v === null) map.delete(k);
         else map.set(k, v);
       }
+      const keys = e.data.map(([k]) => k);
+      whileOtherTab(() => {
+        for (const fn of otherTabListeners) fn(keys);
+      });
     };
   }
 
@@ -157,6 +162,7 @@ function cachedKV(db: IDBDatabase, map: Map<string, string>, ls: Storage): KV {
       queue(key, null);
     },
     keys: () => [...map.keys(), ...[...LOCAL_KEYS].filter((k) => ls.getItem(k) !== null)],
+    onOtherTab: (fn) => void otherTabListeners.push(fn),
     async settled() {
       await null; // lets a queued flush start
       await lastWrite; // transactions run in order, so the earlier ones are finished too

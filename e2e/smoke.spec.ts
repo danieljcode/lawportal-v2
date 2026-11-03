@@ -58,6 +58,19 @@ test.beforeEach(({ page }) => {
 });
 test.afterEach(() => expect(cspErrors).toEqual([]));
 
+test("a contact saved in one tab shows in another open tab (LP-190)", async ({ context, page }) => {
+  await page.goto("/#clients/rolodex");
+  await page.locator("#contact-new").waitFor();
+  const other = await context.newPage();
+  await other.goto("/#clients/rolodex");
+  await other.locator("#contact-new").waitFor();
+
+  await page.locator("#contact-new").click();
+  await page.locator("#contact-name").fill("Ann Lee");
+  await page.locator("#contact-save").click();
+  await expect(other.locator(".contact-card")).toContainText("Ann Lee");
+});
+
 test("restores a backup over 5 MB and keeps it after the reload (LP-185)", async ({ page }) => {
   const size = 30 * 1024 * 1024;
   const doc = {

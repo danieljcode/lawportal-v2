@@ -165,6 +165,9 @@ export function createStore<T>(kv: KV, opts: StoreOptions<T>): Store<T> {
   checkVersion(opts.key, opts.version);
   const slot = schema(kv, opts)(opts.key);
   const changes = createChannel();
+  kv.onOtherTab?.((keys) => {
+    if (keys.includes(opts.key)) changes.emit();
+  });
   return {
     key: opts.key,
     stored: slot.stored,
@@ -188,6 +191,9 @@ export function createKeyedStore<T>(kv: KV, opts: KeyedStoreOptions<T>): KeyedSt
   checkVersion(prefix + "*", opts.version);
   const slotFor = schema(kv, opts);
   const changes = createChannel();
+  kv.onOtherTab?.((keys) => {
+    if (keys.some((k) => k.startsWith(prefix))) changes.emit();
+  });
 
   function ids(): string[] {
     if (!kv.keys) return [];

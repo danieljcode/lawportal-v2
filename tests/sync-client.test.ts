@@ -9,6 +9,7 @@ import { invoiceStore } from "@/lib/invoices";
 import { timeStore } from "@/lib/ledger";
 import { portfolioStore } from "@/lib/portfolio";
 import { precedentStore } from "@/lib/precedents";
+import { whileOtherTab } from "@/lib/storage";
 import { S_SYNC_APPLY_FAIL, S_SYNC_LOST } from "@/lib/strings";
 import * as sync from "@/lib/sync";
 
@@ -139,6 +140,19 @@ describe("change tracking", () => {
   beforeEach(() => {
     localStorage.setItem(sync.CODE_KEY, CODE);
     localStorage.setItem(sync.REV_KEY, "0");
+  });
+
+  it("another tab's save isn't sent again from this tab (LP-190)", async () => {
+    vi.useFakeTimers();
+    const calls = stubFetch({ status: 200, body: { rev: 0, data: { characters: [] }, updated: "u" } });
+    await sync.init();
+    const before = calls.length;
+    whileOtherTab(() => void characterStore().save({ name: "Jane Doe" }));
+    expect(localStorage.getItem(sync.DIRTY_KEY)).toBeNull();
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(calls).toHaveLength(before);
+    characterStore().save({ name: "Ann Lee" });
+    expect(localStorage.getItem(sync.DIRTY_KEY)).toBe("1");
   });
 
   it("setActive does not set lawapp_sync_dirty or schedule a push", async () => {
