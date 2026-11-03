@@ -19,7 +19,6 @@ import {
   isCommissioner,
   levelFromTitle,
   LEVELS,
-  progress,
   render,
   topicTitle,
 } from "@/lib/portfolio";
@@ -535,17 +534,9 @@ describe("portfolio", () => {
     expect(cleanUrl("https://e.com/" + "a".repeat(1000))).toBe("");
   });
 
-  it("counts progress and completeness", () => {
+  it("counts completeness", () => {
     expect(complete("case", { num: "1", link: "https://x" })).toBe(true);
     expect(complete("case", { num: "1" })).toBe(false);
-    const p = progress("I", {
-      "1.1": [
-        { num: "1", link: "https://x" },
-        { num: "2", link: "https://y" },
-        { num: "3", link: "https://z" },
-      ],
-    });
-    expect(p).toEqual({ done: 2, need: 24 });
   });
 
   it("stores per character, keeps levels apart and ignores invalid ids", () => {

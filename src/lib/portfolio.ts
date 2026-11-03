@@ -343,22 +343,6 @@ export function complete(kind: TaskKind | null, e: PortfolioEntry | null | undef
   return fieldsFor(kind).every((f) => f.key === "caption" || !!(e && e[f.key]));
 }
 
-/** Done lines against required lines (each required task counts at most its own count). */
-export function progress(
-  level: PortfolioLevel,
-  data: Record<string, PortfolioEntry[]> | null | undefined,
-): { done: number; need: number } {
-  let done = 0;
-  let need = 0;
-  for (const t of tasks(level)) {
-    if (!t.count) continue;
-    need += t.count;
-    const finished = ((data || {})[t.id] || []).filter((e) => complete(t.kind, e)).length;
-    done += Math.min(t.count, finished);
-  }
-  return { done, need };
-}
-
 /* ---------- storage ---------- */
 
 export interface PortfolioStore {

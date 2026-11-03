@@ -66,6 +66,9 @@ and says so. `APP_DATA=sample` forces the sample, to try the code as a stranger 
 build fails without the real data instead of shipping the sample, so the live app keeps its last
 good deploy. `npm run app-data` runs the step on its own.
 
+The test snapshots hold the real forms' text, so they're private too (LP-194). They come from the
+same `app-data/` folder and go to `tests/__snapshots__/` (gitignored). The sample has none.
+
 ## Code style and editor set-up
 
 Formatting is Prettier's job and ESLint checks for mistakes (LP-86); CI runs both.
@@ -200,6 +203,6 @@ when its feature ships.
 | `[parity] skipped: reference data not found`                  | Normal without access to the reference data. With access, clone it into `.agents/reference/jsa` (see above).             |
 | `port-forms: the reference forms aren't here`                 | The same: `port-forms` needs the reference data.                                                                         |
 | `bad option: --experimental-strip-types`                      | Node is older than 22.6. Upgrade Node.                                                                                   |
-| Snapshot files show as changed after running tests on Windows | Only line endings changed: `git checkout -- tests/__snapshots__`.                                                        |
+| Snapshot files show as changed after running tests on Windows | No longer happens: they're gitignored since LP-194.                                                                      |
 | A commit is refused with "doesn't follow the convention"      | The commit-message hook. Fix the message as it explains, or see [Contributing](contributing.md).                         |
 | "Some saved data couldn't be read and was set aside."         | A saved value was damaged. See [Sync, storage and recovery](sync.md#damaged-data).                                       |

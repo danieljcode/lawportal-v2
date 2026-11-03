@@ -14,14 +14,20 @@
 // src/data/.app-data says which ("real" or "sample"); tests that need the real forms skip
 // without it. A Vercel build never ships the sample: it fails instead, and the live app keeps
 // its last good deploy.
+//
+// The test snapshots hold the real forms' text, so they're private too (LP-194): they come from
+// the same places and go to tests/__snapshots__. The sample has none; its tests don't use them.
 import { execFileSync } from "node:child_process";
-import { copyFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DATA = path.join(ROOT, "src/data");
 export const FILES = ["forms.json", "form-index.json", "penal-code.json"];
+const SNAPSHOTS = ["discord.test.ts.snap", "layout.test.ts.snap", "template.parity.test.ts.snap"];
+const SNAPSHOT_DIR = path.join(ROOT, "tests/__snapshots__");
+const ALL = [...FILES, ...SNAPSHOTS];
 export const MARKER = path.join(DATA, ".app-data");
 const CHECKOUT = path.join(ROOT, ".agents/reference/jsa/app-data");
 const REPO = "danieljcode/lawportal-reference";
@@ -37,7 +43,7 @@ function token() {
 
 async function download(auth) {
   const out = {};
-  for (const f of FILES) {
+  for (const f of ALL) {
     const res = await fetch(`https://api.github.com/repos/${REPO}/contents/app-data/${f}`, {
       headers: { Authorization: `Bearer ${auth}`, Accept: "application/vnd.github.raw+json" },
     });
@@ -48,7 +54,12 @@ async function download(auth) {
 }
 
 function write(files, kind) {
+  mkdirSync(SNAPSHOT_DIR, { recursive: true });
   for (const [f, text] of Object.entries(files)) {
+    if (SNAPSHOTS.includes(f)) {
+      writeFileSync(path.join(SNAPSHOT_DIR, f), text);
+      continue;
+    }
     JSON.parse(text); // never write a file the app can't read
     writeFileSync(path.join(DATA, f), text);
   }
@@ -67,8 +78,8 @@ async function main() {
     copySample();
     return console.log("[app-data] sample data (APP_DATA=sample)");
   }
-  if (FILES.every((f) => existsSync(path.join(CHECKOUT, f)))) {
-    write(Object.fromEntries(FILES.map((f) => [f, readFileSync(path.join(CHECKOUT, f), "utf8")])), "real");
+  if (ALL.every((f) => existsSync(path.join(CHECKOUT, f)))) {
+    write(Object.fromEntries(ALL.map((f) => [f, readFileSync(path.join(CHECKOUT, f), "utf8")])), "real");
     return console.log("[app-data] real data from the reference checkout");
   }
   const auth = token();
