@@ -16,22 +16,28 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.64.1-noble
       options: --ipc=host
-    env:
-      # Read-only token for the private reference repo (docs/templates-and-forms.md, Reference data).
-      REFERENCE_TOKEN: ${{ secrets.REFERENCE_TOKEN }}
     steps:
       - uses: actions/checkout@v7
       # The container runs as root over files the runner owns; checkout trusts them only for its own step.
       - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
+      # Later steps run package code, so they only learn whether the secret is there, never the secret (LP-196).
+      - name: Is the reference data available?
+        id: reference
+        env:
+          # Read-only token for the private reference repo (docs/templates-and-forms.md, Reference data).
+          REFERENCE_TOKEN: ${{ secrets.REFERENCE_TOKEN }}
+        run: if [ -n "$REFERENCE_TOKEN" ]; then echo "available=1" >> "$GITHUB_OUTPUT"; fi
+
       # The parity tests need it; without the secret (forks) they skip with a note.
       - name: Check out reference data
-        if: env.REFERENCE_TOKEN != ''
+        if: steps.reference.outputs.available == '1'
         uses: actions/checkout@v7
         with:
           repository: danieljcode/lawportal-reference
           token: ${{ secrets.REFERENCE_TOKEN }}
           path: .agents/reference/jsa
+          persist-credentials: false
 
       - uses: actions/setup-node@v7
         with:
@@ -52,7 +58,7 @@ jobs:
       - run: npm test
         env:
           # With the data checked out, a missing file fails the run instead of skipping.
-          LAWAPP_REQUIRE_REFERENCE: ${{ env.REFERENCE_TOKEN != '' && '1' || '' }}
+          LAWAPP_REQUIRE_REFERENCE: ${{ steps.reference.outputs.available }}
       - run: npm run build
 
       # Real-browser smoke tests of the key journeys, at desktop and phone widths (LP-6), and the
