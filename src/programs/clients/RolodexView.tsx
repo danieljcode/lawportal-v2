@@ -13,7 +13,9 @@ import {
   type Contact,
   type ContactType,
 } from "@/lib/contacts";
+import { invoiceStore } from "@/lib/invoices";
 import { searchTerms } from "@/lib/precedents";
+import { clientRemovalProblem, retainerStore } from "@/lib/retainers";
 import Marked from "@/ui/Marked";
 import { useCaseVersion, useContactVersion } from "@/ui/useStore";
 
@@ -25,6 +27,8 @@ interface Draft {
   organisation: string;
   notes: string;
 }
+
+const removalProblem = (id: string) => clientRemovalProblem(id, retainerStore().list(), invoiceStore().list());
 
 const EMPTY: Draft = { name: "", type: "client", phone: "", address: "", organisation: "", notes: "" };
 
@@ -45,6 +49,8 @@ function ContactForm({ editing, onDone }: { editing: Contact | null; onDone(): v
 
   const submit = (ev: FormEvent) => {
     ev.preventDefault();
+    const problem = editing?.type === "client" && draft.type !== "client" ? removalProblem(editing.id) : null;
+    if (problem) return setError(problem);
     try {
       contactStore().save({ ...(editing ? { id: editing.id } : {}), ...draft });
       onDone();
@@ -119,8 +125,12 @@ export default function RolodexView() {
   /** The contact being edited, "new" for the add form, or null. */
   const [editing, setEditing] = useState<Contact | "new" | null>(null);
 
+  const [problem, setProblem] = useState("");
+
   const remove = (c: Contact) => {
-    if (confirm("Delete " + c.name + " from the Rolodex?")) contactStore().remove(c.id);
+    const refused = removalProblem(c.id);
+    setProblem(refused ?? "");
+    if (!refused && confirm("Delete " + c.name + " from the Rolodex?")) contactStore().remove(c.id);
   };
 
   return (
@@ -141,6 +151,11 @@ export default function RolodexView() {
           </button>
         )}
       </div>
+      {problem && (
+        <p className="error" role="alert" id="rolodex-error">
+          {problem}
+        </p>
+      )}
       {editing && (
         <ContactForm
           key={editing === "new" ? "new" : editing.id}
