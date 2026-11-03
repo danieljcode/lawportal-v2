@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // Settings (LP-109; the Control Panel in Classic): Characters, Sync, Letterhead (LP-23),
 // Appearance, What's new and About on one page; the top bar keeps only the active character,
-// sync status and Dockets; Classic has no global toolbar; the dialogs other
+// sync status; Classic has no global toolbar; the dialogs other
 // programs open still work.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // The FEAT-005 UI through the whole App: the Characters dialog (12 fields, the
 // name error, the docket box following the title, storage note), J.A.P. gating
-// and output, the Dockets dialog, and What's new clearing the unread dot.
+// and output, and What's new clearing the unread dot.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
@@ -249,7 +249,6 @@ describe("Characters dialog", () => {
     expect(characterStore().activeId()).toBe(c.id); // the first character becomes active
     expect(must("#char-list").textContent).toContain("active");
     expect($("#rail-jap")).not.toBeNull();
-    expect($("#open-dockets")).not.toBeNull();
   });
 });
 
@@ -290,71 +289,6 @@ describe("J.A.P.", () => {
     choose("#active-character", "");
     expect($("#jap-gate")).not.toBeNull();
     expect($("#jap-output")).toBeNull();
-  });
-});
-
-describe("Dockets dialog", () => {
-  it("adds a case, rejects a duplicate, filters closed cases and offers Use in form", async () => {
-    let id = "";
-    act(() => {
-      id = characterStore().save({ name: "John Doe", title: "Attorney at Law" }).id;
-      characterStore().setActive(id);
-    });
-    go("#civil-complaint");
-    click("#open-dockets");
-    await act(async () => {
-      await vi.dynamicImportSettled();
-    });
-    expect(must("#dockets-title").textContent).toBe("John Doe's docket");
-    expect(must("#docket-list").textContent).toContain("No cases yet.");
-
-    click("#new-docket");
-    expect(must<HTMLTextAreaElement>("#docket-notes").maxLength).toBe(4000); // LP-151
-    type("#docket-caseNumber", "90SCCC00147");
-    type("#docket-plaintiff", "Ann Smith");
-    submit("#docket-form");
-    expect(
-      docketStore()
-        .list(id)
-        .map((d) => d.caseNumber),
-    ).toEqual(["90SCCC00147"]);
-
-    click("#new-docket");
-    type("#docket-caseNumber", "90sccc00147");
-    submit("#docket-form");
-    expect(must("#docket-error").textContent).toBe("90sccc00147 is already on this docket.");
-    click("#cancel-docket");
-
-    type("#docket-search", "ann smith");
-    expect(must("#docket-list").textContent).toContain("90SCCC00147");
-    // Field names and stored stamps aren't searched (LP-150).
-    for (const word of ["court", "plaintiff", "updated"]) {
-      type("#docket-search", word);
-      expect(must("#docket-list").textContent).not.toContain("90SCCC00147");
-    }
-    type("#docket-search", "90sccc00147");
-    expect(must("#docket-list").textContent).toContain("90SCCC00147");
-    type("#docket-search", "ann smith");
-    const buttons = () => [...document.querySelectorAll<HTMLButtonElement>("#docket-list button")];
-    expect(buttons().map((b) => b.textContent)).toEqual(["Use in form", "Edit", "Close case", "Delete"]);
-
-    act(() =>
-      buttons()
-        .find((b) => b.textContent === "Close case")!
-        .click(),
-    );
-    expect(must("#docket-list").textContent).toContain("No cases match.");
-    choose("#docket-filter", "");
-    expect(must("#docket-list").textContent).toContain("Closed");
-
-    act(() =>
-      buttons()
-        .find((b) => b.textContent === "Use in form")!
-        .click(),
-    );
-    expect(must<HTMLDialogElement>("#dockets-dialog").hasAttribute("open")).toBe(false);
-    expect(must<HTMLInputElement>("#f-case-number").value).toBe("90SCCC00147");
-    expect(must("#docket-status").textContent).toMatch(/^Loaded 90SCCC00147/);
   });
 });
 

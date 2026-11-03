@@ -66,7 +66,7 @@ export const FIELDS: readonly CharacterField[] = [
     key: "docket",
     label: "Keeps a docket (judge or lawyer)",
     checkbox: true,
-    hint: "Turns on Dockets for this character: a list of their cases they can load into any form.",
+    hint: "Turns on the docket bar for this character, so they can load a case into any form that has a case number.",
   },
 ];
 

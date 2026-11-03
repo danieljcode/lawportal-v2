@@ -142,18 +142,6 @@ describe("the modern shell (LP-125)", () => {
     expect(characterStore().activeId()).toBe("carl0001");
   });
 
-  it("offers Dockets in every program's File menu, for a phone's slimmer top bar", async () => {
-    characterStore().save({ id: "judy0001", name: "Judy Bench", title: "Judge" });
-    characterStore().setActive("judy0001");
-    mount("#cases");
-    click("#menu-file");
-    click("#menu-dockets");
-    await act(async () => {
-      await vi.dynamicImportSettled();
-    });
-    expect(must<HTMLDialogElement>("#dockets-dialog").open).toBe(true);
-  });
-
   it("shows the sync status in the top bar when sync is on", () => {
     vi.spyOn(sync, "code").mockReturnValue("ABCD-EFGH-IJKL");
     mount("#cases");

@@ -75,10 +75,8 @@ export interface FormViewProps {
   onOutput(o: FormOutput | null, formId: string): void;
   /** This form's view is going away: drop its output (so a later reopen can't show it). */
   onOutputGone?(formId: string): void;
-  /** A docket to load (Dockets dialog "Use in form"); each new `seq` loads once. */
+  /** A case to load (from the Case File); each new `seq` loads once. */
   docketRequest?: DocketRequest | null;
-  /** Reports whether the docket bar is shown (so the Dockets dialog can offer "Use in form"). */
-  onDocketBar?(shown: boolean): void;
   /** A filing to open as a new draft of this form (Filing history, LP-15); each new `seq` once. */
   draftRequest?: DraftRequest | null;
   /** This form's filing tools, for the Court Filings program's Form menu (LP-105); null when it goes. */
@@ -146,7 +144,6 @@ export default function FormView({
   onOutput,
   onOutputGone,
   docketRequest,
-  onDocketBar,
   draftRequest,
   onTools,
 }: FormViewProps) {
@@ -487,12 +484,6 @@ export default function FormView({
     }
   };
 
-  useEffect(() => {
-    if (!onDocketBar) return;
-    onDocketBar(showDocket);
-    return () => onDocketBar(false);
-  }, [showDocket, onDocketBar]);
-
   // The Form menu's tools (LP-105): the same actions as the buttons here, reported when they change.
   const linkedCaseId = linkedCase ? linkedCase.id : null;
   const ready = !!tree;
@@ -508,7 +499,7 @@ export default function FormView({
   }, [onTools, ready, showDocket, linkedCaseId]);
   useEffect(() => (onTools ? () => onTools(null) : undefined), [onTools]);
 
-  // "Use in form" from the Dockets dialog: load each request once (a request older than this view is skipped).
+  // A case sent from the Case File: load each request once (a request older than this view is skipped).
   useEffect(() => {
     if (!docketRequest || handledRequests.has(docketRequest)) return;
     if (docketRequest.formId && docketRequest.formId !== form.id) return;

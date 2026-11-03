@@ -27,7 +27,7 @@ import * as sync from "@/lib/sync";
 import type { Character } from "@/lib/types";
 import Dialog from "@/ui/Dialog";
 import SyncPanel from "./SyncPanel";
-import { useDocketVersion, useSetAsideVersion, useSyncState } from "@/ui/useStore";
+import { useSetAsideVersion, useSyncState } from "@/ui/useStore";
 
 export const DAMAGED_FILENAME = "court-filing-damaged-data.json";
 
@@ -41,8 +41,6 @@ export interface CharactersDialogProps {
   onClose(): void;
   characters: Character[];
   activeId: string | null;
-  /** Open the Dockets dialog for a character (closes this one). */
-  onDockets(charId: string): void;
   /** Turn sync on as soon as the dialog opens (J.A.P. "Turn on sync"). */
   autoSync?: boolean;
   onAutoSyncDone?(): void;
@@ -86,14 +84,12 @@ export type CharactersBodyProps = Omit<CharactersDialogProps, "open" | "onClose"
 export function CharactersBody({
   characters,
   activeId,
-  onDockets,
   autoSync,
   onAutoSyncDone,
   withSync = true,
 }: CharactersBodyProps) {
   const [editing, setEditing] = useState<Editing | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-  useDocketVersion(); // the "Dockets (n)" counts follow docket changes
   useSyncState(); // the storage note follows sync on/off
   useSetAsideVersion(); // the download button appears once something is set aside
   const hasDamaged = listSetAside(defaultKV()).length > 0;
@@ -247,11 +243,6 @@ export function CharactersBody({
                     <button type="button" className="mini" onClick={() => edit(c)}>
                       Edit
                     </button>
-                    {hasDocket(c) && (
-                      <button type="button" className="mini" onClick={() => onDockets(c.id)}>
-                        {"Dockets (" + docketStore().list(c.id).length + ")"}
-                      </button>
-                    )}
                     <button type="button" className="mini" onClick={() => duplicateCharacter(c.id)}>
                       Duplicate
                     </button>
