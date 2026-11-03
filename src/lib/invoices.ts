@@ -196,6 +196,29 @@ export function billedEntries(invoices: readonly Invoice[]): Map<string, string>
 }
 
 /**
+ * For each invoice sharing time with others, their numbers. One device can't bill time twice, but two
+ * offline devices can, and a person has to decide which invoice stands (LP-186).
+ */
+export function sharedTime(invoices: readonly Invoice[]): Map<string, string[]> {
+  const onEntry = new Map<string, Invoice[]>();
+  for (const inv of invoices) {
+    for (const entryId of new Set(inv.lines.map((l) => l.entryId))) {
+      onEntry.set(entryId, [...(onEntry.get(entryId) ?? []), inv]);
+    }
+  }
+  const others = new Map<string, Set<string>>();
+  for (const list of onEntry.values()) {
+    if (list.length < 2) continue;
+    for (const inv of list) {
+      const set = others.get(inv.id) ?? new Set<string>();
+      for (const other of list) if (other !== inv) set.add(other.number);
+      others.set(inv.id, set);
+    }
+  }
+  return new Map([...others].map(([id, numbers]) => [id, [...numbers].sort()]));
+}
+
+/**
  * One case's money (LP-173): its logged time, what isn't on an invoice yet, and its invoices. Retainers
  * belong to the client, not the case, so only what has paid one of these invoices counts.
  */

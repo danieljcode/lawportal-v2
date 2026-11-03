@@ -193,6 +193,27 @@ describe("the Ledger page (LP-32)", () => {
     expect($("#ledger-billed-note")).toBeNull();
   });
 
+  it("warns when two invoices bill the same time, and deletes nothing (LP-186)", () => {
+    caseStore().save({ id: "case0001", caseNumber: "90SCCR00147", lead: "alice001" });
+    timeStore().save({ caseId: "case0001", character: "alice001", date: "1990-10-02", hours: 2, activity: "court" });
+    mount();
+    setValue("#ledger-case", "case0001");
+    click(must("#invoice-new"));
+    expect($("#invoice-shared")).toBeNull();
+    expect(must("#invoice-list").textContent).not.toContain("also on");
+
+    const [first] = invoiceStore().list();
+    act(() => invoiceStore().replaceAll([first, { ...first, id: "invoice2", number: "FA-1990-0002" }]));
+    expect(must("#invoice-shared").textContent).toContain("also on FA-1990-0002");
+    expect(must("#invoice-list").textContent).toContain("Time also on FA-1990-0001");
+    expect(must("#invoice-list").textContent).toContain("Time also on FA-1990-0002");
+    expect(invoiceStore().list()).toHaveLength(2);
+
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    click(must("#invoice-delete"));
+    expect(must("#invoice-list").textContent).not.toContain("also on");
+  });
+
   it("keeps a client's retainer: deposit, pay an invoice from it, warn and write the top-up letter (LP-93)", () => {
     caseStore().save({ id: "case0001", caseNumber: "90SCCR00147", lead: "alice001" });
     const judy = contactStore().save({ name: "Judy Reyes", type: "client" });
