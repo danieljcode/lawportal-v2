@@ -837,3 +837,87 @@ describe("enable / link / disable / destroy", () => {
     });
   });
 });
+
+describe("cases joined by number keep what links to them (LP-182)", () => {
+  const OLD = "2026-01-01T00:00:00.000Z";
+  const bare = { assigned: [], deadlines: [], exhibits: [], created: OLD, updated: OLD };
+
+  function localWork() {
+    localStorage.setItem(sync.CODE_KEY, CODE);
+    const who = characterStore().save({ name: "Jane Doe" });
+    const mine = caseStore().save({ caseNumber: "90SCCR00147", lead: who.id } as never);
+    const entry = timeStore().save({
+      caseId: mine.id,
+      character: who.id,
+      date: "1990-10-01",
+      hours: 2,
+      activity: "court",
+    });
+    const invoice = invoiceStore().create({
+      caseId: mine.id,
+      caseNumber: mine.caseNumber,
+      date: "1990-10-02",
+      entries: [entry],
+      rateOf: () => 100,
+      nameOf: () => "Jane Doe",
+    });
+    const contact = contactStore().save({ name: "Ann Lee", cases: [{ id: mine.id, role: "client" }] });
+    const other = { ...bare, id: "serverside01", caseNumber: "90SCCR00147", lead: who.id };
+    return { who, mine, invoice, contact, other };
+  }
+
+  it("moves them to the kept case in a merge after a conflict, and sends the result", () => {
+    const { who, mine, invoice, contact, other } = localWork();
+    const r = sync.resolve({ characters: [who], cases: [other] }, new Map());
+    expect(r.doc.cases.map((c) => c.id)).toHaveLength(1);
+    const kept = r.doc.cases[0].id;
+    expect(kept).not.toBe(mine.id);
+    expect(r.doc.time!.map((e) => e.caseId)).toEqual([kept]);
+    expect(r.doc.time![0].updated > OLD).toBe(true);
+    expect(r.doc.invoices!.find((i) => i.id === invoice.id)!.caseId).toBe(kept);
+    expect(r.doc.contacts!.find((c) => c.id === contact.id)!.cases).toEqual([{ id: kept, role: "client" }]);
+    expect(r.keptLocal).toBe(true);
+  });
+
+  it("moves them when a device links to a code that has the case", () => {
+    const { who, mine, invoice, contact, other } = localWork();
+    const doc = sync.merge({ characters: [who], cases: [other] });
+    const kept = doc.cases[0].id;
+    expect(kept).toBe(other.id);
+    expect(kept).not.toBe(mine.id);
+    expect(doc.time!.map((e) => e.caseId)).toEqual([kept]);
+    expect(doc.invoices!.find((i) => i.id === invoice.id)!.caseId).toBe(kept);
+    expect(doc.contacts!.find((c) => c.id === contact.id)!.cases).toEqual([{ id: kept, role: "client" }]);
+  });
+
+  it("moves a filing's link and joins a contact's two links into one", () => {
+    const { who, mine, other } = localWork();
+    const both = contactStore().save({
+      name: "Bo Reed",
+      cases: [
+        { id: mine.id, role: "client" },
+        { id: other.id, role: "witness" },
+      ],
+    });
+    const filing = {
+      id: "filing000001",
+      at: OLD,
+      formId: "motion",
+      formTitle: "Motion",
+      charId: null,
+      caseId: mine.id,
+      via: "forum",
+      state: { values: {} },
+    };
+    const doc = sync.merge({ characters: [who], cases: [other], filings: [filing] } as never);
+    expect(doc.filings!.map((f) => [f.caseId, f.at])).toEqual([[other.id, OLD]]);
+    expect(doc.contacts!.find((c) => c.id === both.id)!.cases!.map((l) => l.id)).toEqual([other.id]);
+  });
+
+  it("leaves two different case numbers alone", () => {
+    const { who, mine, other } = localWork();
+    const doc = sync.merge({ characters: [who], cases: [{ ...other, caseNumber: "90SCCR00999" }] });
+    expect(doc.cases).toHaveLength(2);
+    expect(doc.time!.map((e) => e.caseId)).toEqual([mine.id]);
+  });
+});

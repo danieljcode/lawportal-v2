@@ -18,7 +18,7 @@
 //
 // The code lives in local storage under lawapp_sync_code and is only ever sent
 // to /api/ in the Authorization header. Client only: nothing runs at import.
-import { caseStore, casesFromDockets, cleanCase, unifyCases } from "./cases";
+import { caseStore, casesFromDockets, cleanCase, foldCases } from "./cases";
 import { characterStore } from "./characters";
 import { cleanContact, contactStore, type Contact } from "./contacts";
 import { cleanCheck, conflictLog, type ConflictCheck } from "./conflicts";
@@ -368,15 +368,35 @@ export function merge(serverDoc: unknown): SyncDoc {
     const mine = ((local as unknown as Record<string, { id: string }[]>)[l.key] || []).filter((x) => !have.has(x.id));
     return [l.key, [...server, ...mine]];
   });
+  const { cases, moved } = foldCases(casesOf(serverDoc), casesOf(local));
   const out: SyncDoc = {
     characters: list.slice(),
-    cases: unifyCases(casesOf(serverDoc), casesOf(local)),
+    cases,
     ...Object.fromEntries(lists),
   };
+  relinkCases(out, moved);
   out.invoices = renumberClashes(out.invoices || []);
   const have = new Set(out.characters.map((c) => c.id));
   for (const c of local.characters) if (!have.has(c.id)) out.characters.push(c);
   return out;
+}
+
+/**
+ * Point everything that links to a case at the id kept when cases merged (LP-182). A new stamp so the
+ * move wins on other devices; a filing keeps its own, as it's dated by when it was filed.
+ */
+function relinkCases(doc: SyncDoc, moved: ReadonlyMap<string, string>): void {
+  if (!moved.size) return;
+  const updated = new Date().toISOString();
+  const to = (id: string) => moved.get(id) ?? id;
+  doc.time = doc.time?.map((e) => (moved.has(e.caseId) ? { ...e, caseId: to(e.caseId), updated } : e));
+  doc.invoices = doc.invoices?.map((i) => (moved.has(i.caseId) ? { ...i, caseId: to(i.caseId), updated } : i));
+  doc.filings = doc.filings?.map((x) => (x.caseId && moved.has(x.caseId) ? { ...x, caseId: to(x.caseId) } : x));
+  doc.contacts = doc.contacts?.map((c) => {
+    if (!c.cases?.some((l) => moved.has(l.id))) return c;
+    const links = c.cases.map((l) => ({ ...l, id: to(l.id) }));
+    return { ...c, cases: links.filter((l, i) => links.findIndex((x) => x.id === l.id) === i), updated };
+  });
 }
 
 type Doc = Record<string, unknown>;
@@ -451,14 +471,17 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
   const invoices = merged.get("invoices") as ReturnType<typeof mergeOptional<Invoice>>;
   const paid = keepBothPayments(invoices.out, invoicesOf(serverDoc) || [], invoiceStore().list(), base);
   const numbered = renumberClashes(paid);
+  // Two devices can make the same case number separately: they become one case.
+  const unified = foldCases(cases.out);
+  const doc: SyncDoc = {
+    characters: chars.out,
+    cases: unified.cases,
+    ...Object.fromEntries([...merged].map(([key, m]) => [key, m.out])),
+    invoices: numbered,
+  };
+  relinkCases(doc, unified.moved);
   return {
-    // Two devices can make the same case number separately: they become one case.
-    doc: {
-      characters: chars.out,
-      cases: unifyCases(cases.out),
-      ...Object.fromEntries([...merged].map(([key, m]) => [key, m.out])),
-      invoices: numbered,
-    },
+    doc,
     lost: chars.lost,
     lostCases: cases.lost,
     lostPrecedents: merged.get("precedents")!.lost as Precedent[],
@@ -467,6 +490,7 @@ export function resolve(serverDoc: unknown, base: Map<string, string> | null = r
       chars.keptLocal ||
       cases.keptLocal ||
       [...merged.values()].some((m) => m.keptLocal) ||
+      unified.moved.size > 0 ||
       numbered.some((inv, i) => inv !== invoices.out[i]),
   };
 }

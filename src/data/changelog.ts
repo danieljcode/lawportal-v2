@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "fix",
+        text: "When sync joins two copies of the same case number, the case's time, invoices, contacts and filings stay with it.",
+      },
+      {
+        type: "fix",
         text: "Pressing Esc and then Ctrl+K straight away opens the jump box again. The second key could be lost.",
       },
     ],
