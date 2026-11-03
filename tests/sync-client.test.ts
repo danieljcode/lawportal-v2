@@ -911,7 +911,7 @@ describe("cases joined by number keep what links to them (LP-182)", () => {
     };
     const doc = sync.merge({ characters: [who], cases: [other], filings: [filing] } as never);
     expect(doc.filings!.map((f) => [f.caseId, f.at])).toEqual([[other.id, OLD]]);
-    expect(doc.contacts!.find((c) => c.id === both.id)!.cases.map((l) => l.id)).toEqual([other.id]);
+    expect(doc.contacts!.find((c) => c.id === both.id)!.cases!.map((l) => l.id)).toEqual([other.id]);
   });
 
   it("leaves two different case numbers alone", () => {
