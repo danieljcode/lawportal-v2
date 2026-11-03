@@ -782,6 +782,8 @@ export async function pull(force = false): Promise<boolean> {
   }
   const b = r.body || {};
   if (r.status === 200) {
+    // A reply older than this copy, sent before a save that has since finished: nothing to learn from it.
+    if (typeof b.rev === "number" && b.rev < rev()) return true;
     // LP-71: a server copy still carrying the pre-LP-70 `server` field is sent back clean
     // (this browser's copy never has it), so every other device gets it clean too.
     const stale = charactersOf(b.data).some((c) => "server" in c);
