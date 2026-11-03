@@ -19,7 +19,37 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-11-03",
+    title: "Daily work: next actions, the work list and case billing",
+    version: "0.5.0",
     items: [
+      {
+        type: "new",
+        text: "Each case now has a billing summary: time logged, what isn't invoiced yet, and what's been invoiced, paid and is still owed. Log time, Invoices and Open in Ledger open the Ledger for just that case, with a link back.",
+      },
+      {
+        type: "new",
+        text: "Record how a case ended when you close it: won, lost, settled, dismissed, plea deal or withdrawn, with a note. The Firm Record, in the Case File, adds them up with the win rate for the firm and each lawyer, by matter type and dates, and prints or copies as a summary.",
+      },
+      {
+        type: "new",
+        text: "New client intake now carries you through: run the conflict check on the page, with a result that goes out of date if the names change; pick the client from the Rolodex or add them; and after the case opens, go straight to an engagement letter with their details or their retainer. An unfinished intake survives a refresh.",
+      },
+      {
+        type: "new",
+        text: "The Court Docket, in the Case File for judges: the cases before them, soonest next date first, marked Pending, Scheduled, Under advisement or Closed. Start a judge template from a case with its details filled in.",
+      },
+      {
+        type: "new",
+        text: "The home screen's work list: court deadlines, next actions and unpaid invoices in one place, overdue first, then the next two weeks. Switch between My work and All firm, and tick actions off right there.",
+      },
+      {
+        type: "new",
+        text: "Next actions on a case: the everyday work a court deadline doesn't cover, like Call the client. Give each one to a character (or leave it unassigned) and an optional due date; overdue ones are marked. Tick them off into a Done list, and reopen them from there.",
+      },
+      {
+        type: "update",
+        text: "A site can now ask for an invite word before turning on sync, so strangers can't use up its sync codes. Codes already in use keep working.",
+      },
       {
         type: "fix",
         text: "The old Dockets window is gone, and its button and menu item with it. Add and edit cases in the Case File, and load one into a form with the docket bar, which works as before.",
@@ -68,15 +98,6 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "fix",
         text: "Pressing Esc and then Ctrl+K straight away opens the jump box again. The second key could be lost.",
       },
-    ],
-  },
-  {
-    date: "2026-11-02",
-    items: [
-      {
-        type: "update",
-        text: "A site can now ask for an invite word before turning on sync, so strangers can't use up its sync codes. Codes already in use keep working.",
-      },
       {
         type: "fix",
         text: "Sync keeps payments recorded on the same invoice on two devices, where before one could vanish. A character that can't be saved from sync no longer removes your copy.",
@@ -92,30 +113,6 @@ export const CHANGELOG: ChangelogEntry[] = [
       {
         type: "fix",
         text: "The Ledger now refuses a payment above what an invoice still owes, and won't remove a retainer deposit that has already paid invoices. Rates typed with a space, like 1 200, now work.",
-      },
-      {
-        type: "new",
-        text: "Each case now has a billing summary: time logged, what isn't invoiced yet, and what's been invoiced, paid and is still owed. Log time, Invoices and Open in Ledger open the Ledger for just that case, with a link back.",
-      },
-      {
-        type: "new",
-        text: "Record how a case ended when you close it: won, lost, settled, dismissed, plea deal or withdrawn, with a note. The Firm Record, in the Case File, adds them up with the win rate for the firm and each lawyer, by matter type and dates, and prints or copies as a summary.",
-      },
-      {
-        type: "new",
-        text: "New client intake now carries you through: run the conflict check on the page, with a result that goes out of date if the names change; pick the client from the Rolodex or add them; and after the case opens, go straight to an engagement letter with their details or their retainer. An unfinished intake survives a refresh.",
-      },
-      {
-        type: "new",
-        text: "The Court Docket, in the Case File for judges: the cases before them, soonest next date first, marked Pending, Scheduled, Under advisement or Closed. Start a judge template from a case with its details filled in.",
-      },
-      {
-        type: "new",
-        text: "The home screen's work list: court deadlines, next actions and unpaid invoices in one place, overdue first, then the next two weeks. Switch between My work and All firm, and tick actions off right there.",
-      },
-      {
-        type: "new",
-        text: "Next actions on a case: the everyday work a court deadline doesn't cover, like Call the client. Give each one to a character (or leave it unassigned) and an optional due date; overdue ones are marked. Tick them off into a Done list, and reopen them from there.",
       },
     ],
   },
