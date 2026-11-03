@@ -7,6 +7,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { caseStore } from "@/lib/cases";
 import { formatDay, gameToday } from "@/lib/deadlines";
+import { billedEntries, invoiceStore } from "@/lib/invoices";
 import {
   ACTIVITIES,
   ACTIVITY_LABELS,
@@ -27,7 +28,7 @@ import {
 import type { Case } from "@/lib/types";
 import ErrorBoundary from "@/ui/ErrorBoundary";
 import GameDateInput from "@/ui/GameDateInput";
-import { useCaseVersion, useTimerVersion, useTimeVersion } from "@/ui/useStore";
+import { useCaseVersion, useInvoiceVersion, useTimerVersion, useTimeVersion } from "@/ui/useStore";
 import type { ProgramProps } from "@/shell/program";
 import Invoices from "./Invoices";
 import Reports from "./Reports";
@@ -295,6 +296,12 @@ function CaseRate({ c }: { c: Case }) {
 function LedgerView({ shell }: ProgramProps) {
   const version = useTimeVersion();
   const all = useMemo(() => (version >= 0 ? timeStore().list() : []), [version]);
+  const invoiceVersion = useInvoiceVersion();
+  // An invoice keeps its own copy of the time, so billed time is locked to keep the two the same (LP-183).
+  const billedOn = useMemo(
+    () => (invoiceVersion >= 0 ? billedEntries(invoiceStore().list()) : new Map<string, string>()),
+    [invoiceVersion],
+  );
   const caseVersion = useCaseVersion();
   const cases = useMemo(
     () => [...(caseVersion >= 0 ? caseStore().list() : [])].sort((a, b) => a.caseNumber.localeCompare(b.caseNumber)),
@@ -314,7 +321,9 @@ function LedgerView({ shell }: ProgramProps) {
   const unpriced = values.filter((v) => v === null).length;
   const filteredCase = filter.caseId ? caseById.get(filter.caseId) : undefined;
   /** The entry being edited, "new" for the log form, or null. */
-  const [editing, setEditing] = useState<TimeEntry | "new" | null>(arrival?.at === "log" && canLog ? "new" : null);
+  const [formFor, setEditing] = useState<TimeEntry | "new" | null>(arrival?.at === "log" && canLog ? "new" : null);
+  // The form shuts if the time it's editing goes on an invoice meanwhile.
+  const editing = formFor && formFor !== "new" && billedOn.has(formFor.id) ? null : formFor;
   // Each navigation here is a new route object, so a second Log time from the same case still opens the form.
   const [seenRoute, setSeenRoute] = useState(route);
   if (route !== seenRoute) {
@@ -426,6 +435,11 @@ function LedgerView({ shell }: ProgramProps) {
             {unpriced > 0 && " (" + unpriced + " with no rate)"}
           </p>
           {filteredCase && <CaseRate key={filteredCase.id + (filteredCase.rate ?? "")} c={filteredCase} />}
+          {shown.some((e) => billedOn.has(e.id)) && (
+            <p className="small" id="ledger-billed-note">
+              Time on an invoice is locked. To change it, delete that invoice below, then bill the time again.
+            </p>
+          )}
           {shown.length > 0 && (
             <div className="ledger-scroll">
               <table className="ledger-table" id="ledger-list">
@@ -460,12 +474,18 @@ function LedgerView({ shell }: ProgramProps) {
                         <td className="num">{values[i] === null ? "—" : formatMoney(values[i]!)}</td>
                         <td>{e.note}</td>
                         <td className="ledger-actions">
-                          <button type="button" className="mini" onClick={() => setEditing(e)}>
-                            Edit
-                          </button>
-                          <button type="button" className="mini danger-quiet" onClick={() => remove(e)}>
-                            Delete
-                          </button>
+                          {billedOn.has(e.id) ? (
+                            "On " + billedOn.get(e.id)
+                          ) : (
+                            <>
+                              <button type="button" className="mini" onClick={() => setEditing(e)}>
+                                Edit
+                              </button>
+                              <button type="button" className="mini danger-quiet" onClick={() => remove(e)}>
+                                Delete
+                              </button>
+                            </>
+                          )}
                         </td>
                       </tr>
                     );

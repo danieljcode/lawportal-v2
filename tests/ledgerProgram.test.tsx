@@ -170,6 +170,29 @@ describe("the Ledger page (LP-32)", () => {
     expect(invoiceStore().list()).toEqual([]);
   });
 
+  it("locks billed time until its invoice is deleted (LP-183)", () => {
+    caseStore().save({ id: "case0001", caseNumber: "90SCCR00147", lead: "alice001" });
+    timeStore().save({ caseId: "case0001", character: "alice001", date: "1990-10-02", hours: 2, activity: "court" });
+    mount();
+    expect(button(0, "Edit")).toBeTruthy();
+    expect($("#ledger-billed-note")).toBeNull();
+
+    click(button(0, "Edit"));
+    setValue("#ledger-case", "case0001");
+    click(must("#invoice-new"));
+    expect($("#time-form")).toBeNull();
+    expect(button(0, "Edit")).toBeUndefined();
+    expect(button(0, "Delete")).toBeUndefined();
+    expect(must("#ledger-list tbody tr").textContent).toContain("On FA-1990-0001");
+    expect(must("#ledger-billed-note").textContent).toContain("delete that invoice");
+
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    click(must("#invoice-delete"));
+    expect(button(0, "Edit")).toBeTruthy();
+    expect(button(0, "Delete")).toBeTruthy();
+    expect($("#ledger-billed-note")).toBeNull();
+  });
+
   it("keeps a client's retainer: deposit, pay an invoice from it, warn and write the top-up letter (LP-93)", () => {
     caseStore().save({ id: "case0001", caseNumber: "90SCCR00147", lead: "alice001" });
     const judy = contactStore().save({ name: "Judy Reyes", type: "client" });

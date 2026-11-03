@@ -190,6 +190,11 @@ export function receivables(list: readonly Invoice[]): Invoice[] {
     .sort((a, b) => (a.date !== b.date ? (a.date < b.date ? -1 : 1) : a.number.localeCompare(b.number)));
 }
 
+/** Each billed entry's id and the number of the invoice it's on. */
+export function billedEntries(invoices: readonly Invoice[]): Map<string, string> {
+  return new Map(invoices.flatMap((inv) => inv.lines.map((l) => [l.entryId, inv.number] as const)));
+}
+
 /**
  * One case's money (LP-173): its logged time, what isn't on an invoice yet, and its invoices. Retainers
  * belong to the client, not the case, so only what has paid one of these invoices counts.
@@ -202,7 +207,7 @@ export function caseBilling(
 ) {
   const logged = entries.filter((e) => e.caseId === caseId);
   const own = invoices.filter((inv) => inv.caseId === caseId);
-  const billed = new Set(own.flatMap((inv) => inv.lines.map((l) => l.entryId)));
+  const billed = billedEntries(own);
   const unbilled = logged.filter((e) => !billed.has(e.id));
   const values = unbilled.map((e) => entryValue(e, rateOf(e)));
   return {
@@ -403,7 +408,7 @@ export function createInvoiceStore(kv: KV): InvoiceStore {
       const list = store.get();
       if (list.length >= MAX_INVOICES) throw new Error("The Ledger can hold up to " + MAX_INVOICES + " invoices.");
       // Time goes on one invoice only; deleting that invoice frees it again.
-      const billed = new Set(list.flatMap((x) => x.lines.map((l) => l.entryId)));
+      const billed = billedEntries(list);
       const entries = d.entries.filter((e) => !billed.has(e.id));
       if (d.entries.length && !entries.length) throw new Error("All the time in that period is already on an invoice.");
       const now = new Date().toISOString();

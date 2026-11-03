@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "fix",
+        text: "Time on an invoice is now locked, so the invoice and the time log can't disagree. To change it, delete that invoice and bill the time again.",
+      },
+      {
+        type: "fix",
         text: "When sync joins two copies of the same case number, the case's time, invoices, contacts and filings stay with it.",
       },
       {
