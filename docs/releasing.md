@@ -41,6 +41,8 @@ When every issue in the Jira version is Done:
    pull request, give the release's entry in `src/data/changelog.ts` `version: "0.3.0"` and make
    sure it says everything players will notice. A test fails if a What's new version is ahead of
    `package.json`, so do this after the Release PR is merged.
+4. **Point the Release PR at the next version.** Any later commit in the changelog, such as step 3's,
+   reopens it at the next patch (0.5.0 → 0.5.1). Add a `Release-As:` footer for the next Jira version.
 
 ## Manual release (fallback)
 
