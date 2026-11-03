@@ -26,7 +26,6 @@ export const S_SYNC_ON_PARTS = [
   "Keep it private:",
   " anyone with it can see and change them.",
 ] as const;
-export const S_SYNC_ON = S_SYNC_ON_PARTS.join("");
 
 export function S_SYNC_APPLY_FAIL(n: number): string {
   return `Couldn't store ${n} synced character(s) in this browser.`;

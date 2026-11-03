@@ -109,11 +109,6 @@ export function custodyTitle(letter: string, title: string): string {
   return "Chain of custody: Exhibit " + letter + " (" + title + ")";
 }
 
-/** The log as plain text: a title, then numbered lines. */
-export function custodyText(letter: string, title: string, log: CustodyEntry[]): string {
-  return [custodyTitle(letter, title), ...log.map((e, i) => i + 1 + ". " + custodyLine(e))].join("\n");
-}
-
 const LIST = compile("<p><strong>{{Title}}</strong></p>\n<ol>\n{{Entries:list|<li>No entries.</li>}}\n</ol>");
 
 /** The log as HTML for a filing, through the template engine (every value escaped). */
