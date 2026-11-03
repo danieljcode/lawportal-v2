@@ -107,10 +107,6 @@ function unmount(): void {
   container = null;
 }
 
-function click(el: HTMLElement): void {
-  act(() => el.click());
-}
-
 function choose(sel: string, value: string): void {
   const select = must<HTMLSelectElement>(sel);
   act(() => {
