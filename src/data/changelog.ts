@@ -24,6 +24,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "new",
         text: "A charge calculator on the Law Library's Penal Code page. Add charges from the list, as many of each as needed, to see the total time, its range and the total fine. Charges left to the judge are listed apart. Copy gives the charges and totals as text, and the list stays on this device until you clear it.",
       },
+      {
+        type: "update",
+        text: "Case notes are now dated entries instead of one box. Add a note to a case and it's stamped with the game date and time and who added it; edit or delete any note. A case's old notes are kept as its first note.",
+      },
     ],
   },
   {

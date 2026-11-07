@@ -11,6 +11,7 @@ import { filingsForCase, filingStore, type Filing } from "@/lib/filings";
 import { OUTCOME_LABELS } from "@/lib/outcomes";
 import type { Case, Character, OutcomeResult } from "@/lib/types";
 import CaseActions from "./CaseActions";
+import CaseNotes from "./CaseNotes";
 import CaseBilling from "./CaseBilling";
 import CaseContacts from "./CaseContacts";
 import CaseDeadlines from "./CaseDeadlines";
@@ -230,11 +231,12 @@ export default function CaseFileView({
   );
 }
 
-/** The case's details and who's on it, but not its deadlines, actions, evidence or save times (LP-148). */
+/** The case's details and who's on it, but not its deadlines, actions, notes, evidence or save times (LP-148). */
 function detailsStamp(c: Case): string {
   const {
     deadlines: _deadlines,
     actions: _actions,
+    caseNotes: _caseNotes,
     exhibits: _exhibits,
     updated: _updated,
     created: _created,
@@ -244,7 +246,7 @@ function detailsStamp(c: Case): string {
 }
 
 /**
- * A case's linked areas: its next actions (LP-170), billing (LP-173), deadlines (LP-18), contacts (LP-30),
+ * A case's linked areas: its notes (LP-227), next actions (LP-170), billing (LP-173), deadlines (LP-18), contacts (LP-30),
  * filings (LP-15) and evidence (LP-12).
  */
 function CaseLinks({
@@ -262,6 +264,10 @@ function CaseLinks({
 }) {
   return (
     <div className="case-links">
+      <section className="case-empty" id="case-notes" aria-labelledby="case-notes-title">
+        <h4 id="case-notes-title">Notes</h4>
+        <CaseNotes c={c} characters={characters} active={active} />
+      </section>
       <section className="case-empty" id="case-actions" aria-labelledby="case-actions-title">
         <h4 id="case-actions-title">Next actions</h4>
         <CaseActions c={c} characters={characters} />
@@ -412,16 +418,6 @@ function CaseEditor({ initial, characters, saved, onSaved, onCancel }: CaseEdito
             );
           } else if (f.type === "date") {
             input = <GameDateInput id={fid} aria-label={f.label} value={value} onChange={(v) => set(f.key, v)} />;
-          } else if (f.multiline) {
-            input = (
-              <textarea
-                id={fid}
-                rows={4}
-                maxLength={MAX_TEXT}
-                value={value}
-                onChange={(e) => set(f.key, e.target.value)}
-              />
-            );
           } else {
             input = (
               <input
@@ -436,15 +432,10 @@ function CaseEditor({ initial, characters, saved, onSaved, onCancel }: CaseEdito
             );
           }
           return (
-            <div className={"field" + (f.multiline ? " wide" : "")} key={f.key}>
+            <div className="field" key={f.key}>
               <label htmlFor={fid}>{f.label + (f.required ? " *" : "")}</label>
               {input}
               {f.hint && <p className="help">{f.hint}</p>}
-              {f.multiline && value.length > MAX_TEXT - 500 && (
-                <p className="help" id={fid + "-count"}>
-                  {value.length.toLocaleString("en-GB")} / {MAX_TEXT.toLocaleString("en-GB")}
-                </p>
-              )}
             </div>
           );
         })}

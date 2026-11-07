@@ -220,8 +220,8 @@ describe("the Evidence area on a case (LP-12)", () => {
   });
 
   it("keeps unsaved edits to the case while exhibits and custody change, and Save keeps both (LP-148)", () => {
-    const notes = () => must<HTMLTextAreaElement>("#case-notes").value;
-    setValue("#case-notes", "Not saved yet");
+    const notes = () => must<HTMLInputElement>("#case-nextEvent").value;
+    setValue("#case-nextEvent", "Not saved yet");
     add("First");
     add("Second");
     expect(notes()).toBe("Not saved yet");
@@ -240,15 +240,15 @@ describe("the Evidence area on a case (LP-12)", () => {
 
     act(() => must("#case-form").dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })));
     const saved = caseStore().get("case0001")!;
-    expect(saved.notes).toBe("Not saved yet");
+    expect(saved.nextEvent).toBe("Not saved yet");
     expect(saved.exhibits.map((e) => [e.title, e.custody?.length])).toEqual([["Second, edited", 1]]);
   });
 
   it("still reloads the case form when the details change elsewhere (a sync)", () => {
     act(() => {
-      caseStore().save({ ...caseStore().get("case0001")!, notes: "From another device" });
+      caseStore().save({ ...caseStore().get("case0001")!, nextEvent: "From another device" });
     });
-    expect(must<HTMLTextAreaElement>("#case-notes").value).toBe("From another device");
+    expect(must<HTMLInputElement>("#case-nextEvent").value).toBe("From another device");
   });
 
   it("shows typed text as text, never markup", () => {

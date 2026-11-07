@@ -79,7 +79,10 @@ describe("checking the firm's cases", () => {
   const cases = [
     mk("case0001", { plaintiff: "People of San Andreas", defendant: "Ann Lee", status: "Closed" }),
     mk("case0002", { plaintiff: "Bo Day, Ann Lee", defendant: "Los Santos Customs LLC", lead: "bob00001" }),
-    mk("case0003", { plaintiff: "Cy Ng", notes: "Witness: Ann Lee saw the crash." }),
+    mk("case0003", {
+      plaintiff: "Cy Ng",
+      caseNotes: [{ id: "note0001", text: "Witness: Ann Lee saw the crash.", at: T }],
+    }),
     mk("case0004", { plaintiff: "Dee Long", defendant: "Eve Park" }),
   ];
 

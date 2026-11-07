@@ -4,6 +4,7 @@
 // adds what travels with an unfinished intake: its conflict check and its choice
 // of Rolodex client, kept on this device until the case opens or it's discarded.
 
+import { newCaseNote } from "./caseNotes";
 import { nameMatch, nameWords, type ConflictMatch } from "./conflicts";
 import type { Contact } from "./contacts";
 import { DIVISION_COURTS, GENERAL_COURT, APPELLATE_COURT } from "./courts";
@@ -121,7 +122,7 @@ export function intakeToCase(
     defendant: i.side === "defendant" ? client : other,
     court: matter.court,
     status: "Open",
-    notes: intakeNotes(i, inGameDay, leadName),
+    caseNotes: [newCaseNote(intakeNotes(i, inGameDay, leadName), i.lead)],
     lead: i.lead || null,
     assigned: [],
   };

@@ -19,7 +19,6 @@ export interface DocketField {
   type?: "date" | "url";
   options?: readonly string[];
   hint?: string;
-  multiline?: boolean;
 }
 
 export const FIELDS: readonly DocketField[] = [
@@ -32,7 +31,6 @@ export const FIELDS: readonly DocketField[] = [
   { key: "nextEvent", label: "Next event", hint: "e.g. Openings due, Judgement" },
   { key: "nextDate", label: "Next date", type: "date" },
   { key: "link", label: "Forum thread", type: "url" },
-  { key: "notes", label: "Notes", multiline: true },
 ];
 
 /** Litigation codes inside a case number (90SCCR00147 → CR). */

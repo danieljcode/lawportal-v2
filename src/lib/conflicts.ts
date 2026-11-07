@@ -118,9 +118,14 @@ export function checkConflicts(names: readonly string[], cases: readonly Case[])
           }
         }
       }
-      if (!onParty && c.notes) {
-        const found = noteMatches(searched, c.notes);
-        if (found) out.push({ ...base, side: "notes", matched: found, strength: "exact" });
+      if (!onParty) {
+        for (const note of c.caseNotes || []) {
+          const found = noteMatches(searched, note.text);
+          if (found) {
+            out.push({ ...base, side: "notes", matched: found, strength: "exact" });
+            break;
+          }
+        }
       }
     }
   }

@@ -97,7 +97,7 @@ describe("building the case from an intake", () => {
       urgency: longest(URGENCIES),
       summary,
     });
-    const notes = cleanCase(intakeToCase(i, [], "1990-10-19", full)).notes || "";
+    const notes = cleanCase(intakeToCase(i, [], "1990-10-19", full)).caseNotes?.[0].text || "";
     expect(notes.endsWith("\n\n" + summary)).toBe(true);
   });
 
@@ -196,8 +196,8 @@ describe("the intake program (LP-19)", () => {
       status: "Open",
       lead: "alice001",
     });
-    expect(c.notes).toContain("Unpaid invoice.");
-    expect(c.notes).toContain("Taken by: Alice Lawyer");
+    expect(c.caseNotes?.[0].text).toContain("Unpaid invoice.");
+    expect(c.caseNotes?.[0].text).toContain("Taken by: Alice Lawyer");
     expect(must("#intake-opened-title").textContent).toBe("Case PENDING-1 opened");
     expect(must("#intake-open-case").getAttribute("href")).toBe("#cases/" + c.id);
   });

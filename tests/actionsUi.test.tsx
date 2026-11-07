@@ -86,14 +86,14 @@ describe("next actions on a case (LP-170)", () => {
 
   it("adds, edits, completes, reopens and removes an action, keeping unsaved edits to the case", () => {
     mount("#cases/case0001");
-    setValue("#case-notes", "Not saved yet");
+    setValue("#case-nextEvent", "Not saved yet");
     setValue("#action-title", "Request disclosure");
     setValue("#action-owner", "bob00001");
     setValue("#action-due", "1990-10-18");
     submit("#action-form");
     expect(actions()).toMatchObject([{ title: "Request disclosure", owner: "bob00001", due: "1990-10-18" }]);
     expect(must<HTMLInputElement>("#action-title").value).toBe("");
-    expect(must<HTMLTextAreaElement>("#case-notes").value).toBe("Not saved yet");
+    expect(must<HTMLInputElement>("#case-nextEvent").value).toBe("Not saved yet");
 
     const item = must("#action-list li");
     expect(item.className).toContain("overdue");
@@ -122,7 +122,7 @@ describe("next actions on a case (LP-170)", () => {
 
     click(must('[aria-label="Remove Request disclosure from the DA"]'));
     expect(actions()).toEqual([]);
-    expect(must<HTMLTextAreaElement>("#case-notes").value).toBe("Not saved yet");
+    expect(must<HTMLInputElement>("#case-nextEvent").value).toBe("Not saved yet");
   });
 
   it("cancelling an edit changes nothing", () => {

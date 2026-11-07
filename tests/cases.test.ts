@@ -84,7 +84,10 @@ describe("the migration from per-character dockets", () => {
       assigned: ["alice001"],
       plaintiff: "Ann", // a gap filled from Alice's entry
       defendant: "Bo",
-      notes: "Bob's note\n\nAlice's note",
+      caseNotes: [
+        { text: "Alice's note", at: T1, by: "alice001" },
+        { text: "Bob's note", at: T2, by: "bob00001" },
+      ],
       updated: T2,
       created: T1,
     });
@@ -192,12 +195,12 @@ describe("the docket view over cases", () => {
 
   it("upsert keeps fields the patch doesn't mention", () => {
     const { dockets } = setup();
-    dockets.save("alice001", { caseNumber: "90SCCR00147", plaintiff: "Ann", notes: "Keep me" });
+    dockets.save("alice001", { caseNumber: "90SCCR00147", plaintiff: "Ann", nextEvent: "Keep me" });
     dockets.upsert("alice001", { caseNumber: "90SCCR00147", defendant: "Bo" });
     expect(dockets.findByCase("alice001", "90sccr00147")).toMatchObject({
       plaintiff: "Ann",
       defendant: "Bo",
-      notes: "Keep me",
+      nextEvent: "Keep me",
     });
   });
 });
