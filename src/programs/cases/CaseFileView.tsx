@@ -4,7 +4,7 @@
 // phone the case replaces the list, with a link back.
 
 import { useMemo, useState, type FormEvent } from "react";
-import { caseProblem, caseStore, filterCases, members, needsLead, NEEDS_LEAD } from "@/lib/cases";
+import { caseParties, caseProblem, caseStore, filterCases, members, needsLead, NEEDS_LEAD } from "@/lib/cases";
 import { FIELDS, MAX_TEXT, STATUSES } from "@/lib/docketFields";
 import { gameToday } from "@/lib/deadlines";
 import { filingsForCase, filingStore, type Filing } from "@/lib/filings";
@@ -196,9 +196,7 @@ export default function CaseFileView({
                       <span className="case-status">{c.status}</span>
                       {needsLead(c) && <span className="tag req">Needs a lead</span>}
                     </span>
-                    {(c.plaintiff || c.defendant) && (
-                      <span className="case-parties">{[c.plaintiff, c.defendant].filter(Boolean).join(" v. ")}</span>
-                    )}
+                    {(c.plaintiff || c.defendant) && <span className="case-parties">{caseParties(c)}</span>}
                     <span className="small muted">
                       {[
                         c.court,

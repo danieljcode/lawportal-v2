@@ -4,7 +4,7 @@
 
 import { useMemo, useState } from "react";
 import { BRANDING } from "@/branding";
-import { caseStore } from "@/lib/cases";
+import { caseParties, caseStore } from "@/lib/cases";
 import { copyText } from "@/lib/clipboard";
 import { formatDay } from "@/lib/deadlines";
 import { firmRecord, MATTERS, matterOf, OUTCOME_ORDER, recordSummary, winRateText, type Tally } from "@/lib/firmRecord";
@@ -14,8 +14,7 @@ import GameDateInput from "@/ui/GameDateInput";
 import { printAs } from "@/ui/printAs";
 import { useCaseVersion } from "@/ui/useStore";
 
-const caseName = (c: Case) =>
-  c.caseNumber + (c.plaintiff || c.defendant ? " · " + [c.plaintiff, c.defendant].filter(Boolean).join(" v. ") : "");
+const caseName = (c: Case) => c.caseNumber + (caseParties(c) ? " · " + caseParties(c) : "");
 
 function TallyRow({ name, tally }: { name: string; tally: Tally }) {
   return (

@@ -7,7 +7,7 @@
 // the Program Manager (LP-104) as its home.
 
 import { useMemo, useState } from "react";
-import { caseStore, isMember } from "@/lib/cases";
+import { caseParties, caseStore, isMember } from "@/lib/cases";
 import { formatDay, gameToday, relativeDay, SOON_DAYS, upcoming } from "@/lib/deadlines";
 import { snapshotTime } from "@/lib/draftHistory";
 import { filingStore, type Filing } from "@/lib/filings";
@@ -37,8 +37,7 @@ export interface ModernHomeProps {
   onOpenFiling(f: Filing): void;
 }
 
-const caseName = (c: Case) =>
-  c.caseNumber + (c.plaintiff || c.defendant ? " · " + [c.plaintiff, c.defendant].filter(Boolean).join(" v. ") : "");
+const caseName = (c: Case) => c.caseNumber + (caseParties(c) ? " · " + caseParties(c) : "");
 
 export default function ModernHome({ programs, hrefFor, active, characters, onOpenFiling }: ModernHomeProps) {
   const caseVersion = useCaseVersion();
