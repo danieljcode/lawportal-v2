@@ -44,6 +44,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "fix",
         text: "Picking a different case on a form clears what the new case leaves blank. Before, the last case's defendant or filed date could stay beside the new case number.",
       },
+      {
+        type: "fix",
+        text: "Download PDF now adds the filing to Filing history and its case, like a copy or a .docx. It's listed as Printed or saved as PDF, since the app can't tell if the print was cancelled.",
+      },
     ],
   },
   {
