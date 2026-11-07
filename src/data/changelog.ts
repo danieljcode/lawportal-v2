@@ -28,6 +28,18 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "update",
         text: "Sync codes can be typed loosely: in lowercase, with spaces, or without the dashes. The box shows the code as it will be used, and says so if you type an O, 0, I or 1, which codes never use.",
       },
+      {
+        type: "fix",
+        text: "Changing character on the New client intake page no longer saves one character's unfinished intake over another's. Each character's intake is kept, and comes back when you switch to them.",
+      },
+      {
+        type: "fix",
+        text: "A date that doesn't exist, such as 31 Feb 1990, is now outlined in red with a note saying it isn't used and which date is kept. Before, the box showed it while the old date was quietly saved.",
+      },
+      {
+        type: "fix",
+        text: "A form's Today button, Auto and + Add use the day you press them. A form left open since an earlier day gave that day's date.",
+      },
     ],
   },
   {

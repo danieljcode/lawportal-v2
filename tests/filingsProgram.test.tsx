@@ -69,6 +69,19 @@ describe("the Court Filings program (LP-105)", () => {
     vi.unstubAllGlobals();
   });
 
+  it("Today gives the day it's pressed, on a form opened days before (LP-206)", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-26T16:00:00Z")); // Mon 26 Oct 1990 in game time
+    mount("#filings/extra-general-motion");
+    vi.setSystemTime(new Date("2026-10-28T16:00:00Z")); // two days later, the form still open
+    const today = [...document.querySelectorAll("button")].find((b) => b.textContent === "Today")!;
+    act(() => today.click());
+    const input = today.closest(".field")!.querySelector<HTMLInputElement>("input")!;
+    expect(input.value).toContain("28");
+    expect(input.value).not.toContain("26");
+    vi.useRealTimers();
+  });
+
   it("lists court forms only, even for a Court Commissioner", () => {
     characterStore().setActive("carl0001");
     mount("#filings");

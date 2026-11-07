@@ -185,6 +185,24 @@ describe("GameDateInput (LP-159)", () => {
     expect(changes).toEqual(["1990-10-29", ""]);
   });
 
+  it("says an impossible date isn't real, and which date is kept (LP-205)", () => {
+    mount("1990-10-29");
+    type("#d", "31 Feb 1990");
+    act(() => text().dispatchEvent(new FocusEvent("focusout", { bubbles: true })));
+    const error = must(".game-date-error");
+    expect(error.textContent).toBe("Not a real date. Keeping Thu 29 Oct 1990.");
+    expect(text().getAttribute("aria-describedby")).toBe(error.id);
+    expect(changes).toEqual([]);
+    type("#d", "30 Oct 1990");
+    expect(document.querySelector(".game-date-error")).toBeNull();
+    expect(text().hasAttribute("aria-describedby")).toBe(false);
+
+    type("#d", "");
+    type("#d", "31 Feb 1990");
+    act(() => text().dispatchEvent(new FocusEvent("focusout", { bubbles: true })));
+    expect(must(".game-date-error").textContent).toBe("Not a real date. No date is set.");
+  });
+
   it("shows a date set from outside", () => {
     mount("1990-10-29");
     click("#reset");
