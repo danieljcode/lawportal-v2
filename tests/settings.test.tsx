@@ -80,6 +80,7 @@ describe("Settings (LP-109)", () => {
       "Characters",
       "Sync",
       "Letterhead",
+      "Checklists",
       "Appearance",
       "What's new",
       "About Court Filing System",

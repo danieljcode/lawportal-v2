@@ -583,3 +583,14 @@
 .case-timeline-detail {
   white-space: pre-wrap;
 }
+
+/* ---------- add checklist (LP-230) ---------- */
+.case-checklist {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-top: 6px;
+}
+.case-checklist select {
+  max-width: 100%;
+}

@@ -15,6 +15,7 @@ import { ChangelogList } from "@/shell/ChangelogDialog";
 import { CharactersBody } from "@/shell/CharactersDialog";
 import type { ProgramProps } from "@/shell/program";
 import SyncPanel from "@/shell/SyncPanel";
+import ChecklistSettings from "./ChecklistSettings";
 import { CONTROL_TITLE, SETTINGS_TITLE } from "@/shell/useRoute";
 
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
@@ -119,6 +120,11 @@ export default function ControlPanelProgram({ shell }: ProgramProps) {
         {visible && (
           <Section id="settings-letterhead" title="Letterhead">
             <LetterheadSettings />
+          </Section>
+        )}
+        {visible && (
+          <Section id="settings-checklists" title="Checklists">
+            <ChecklistSettings />
           </Section>
         )}
         <Section id="settings-appearance" title="Appearance">

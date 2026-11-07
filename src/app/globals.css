@@ -3002,3 +3002,21 @@ body:has(.quick-add-btn) .m-main {
 .quick-save {
   min-height: 44px;
 }
+
+/* Next-action checklists in Settings (LP-230). */
+.checklist-items {
+  margin: 8px 0;
+  padding-left: 1.6em;
+}
+.checklist-items li {
+  margin: 2px 0;
+}
+.checklist-items li > span {
+  margin-right: 8px;
+  overflow-wrap: anywhere;
+}
+.checklist-add,
+.checklist-manage {
+  flex-wrap: wrap;
+  gap: 8px;
+}
