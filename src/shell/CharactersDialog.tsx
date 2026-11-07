@@ -16,7 +16,8 @@ import {
   restoreBackup,
   restorePreview,
 } from "@/lib/backup";
-import { checkFileSize, EXPORT_FILENAME, exportText, importedMessage, importText } from "@/lib/characterFile";
+import { checkFileSize, EXPORT_FILENAME, exportText, importedMessage } from "@/lib/characterFile";
+import { importCharacters } from "@/lib/services/characters";
 import { deleteCharacter, duplicateCharacter } from "@/lib/services/characters";
 import { characterStore, FIELDS, hasDocket, titleKeepsDocket } from "@/lib/characters";
 import { docketStore } from "@/lib/dockets";
@@ -177,7 +178,7 @@ export function CharactersBody({
       if (parsed.kind === "characters") {
         // An older characters-only export: imported the usual way, merged by id.
         checkFileSize(file.size);
-        alert("That's a characters file, not a full backup. " + importedMessage(importText(text)));
+        alert("That's a characters file, not a full backup. " + importedMessage(importCharacters(text)));
         return;
       }
       const kv = defaultKV();
@@ -206,7 +207,7 @@ export function CharactersBody({
     if (!file) return;
     try {
       checkFileSize(file.size);
-      const n = importText(await file.text());
+      const n = importCharacters(await file.text());
       alert(importedMessage(n));
     } catch (err) {
       alert("Could not import: " + (err instanceof Error ? err.message : String(err)));

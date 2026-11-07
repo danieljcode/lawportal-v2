@@ -30,6 +30,10 @@ export const CHANGELOG: ChangelogEntry[] = [
       },
       {
         type: "fix",
+        text: "Changing character on the New client intake page no longer saves one character's unfinished intake over another's. Each character's intake is kept, and comes back when you switch to them.",
+      },
+      {
+        type: "fix",
         text: "A date that doesn't exist, such as 31 Feb 1990, is now outlined in red with a note saying it isn't used and which date is kept. Before, the box showed it while the old date was quietly saved.",
       },
     ],

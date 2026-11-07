@@ -6,10 +6,10 @@ import {
   exportText,
   FILE_TOO_LARGE,
   importedMessage,
-  importText,
   MAX_IMPORT_BYTES,
   type Stores,
 } from "@/lib/characterFile";
+import { importCharacters } from "@/lib/services/characters";
 import { createCharacterStore } from "@/lib/characters";
 import { createDocketStore } from "@/lib/dockets";
 import { createPortfolioStore } from "@/lib/portfolio";
@@ -37,7 +37,7 @@ describe("character file", () => {
     expect(doc.characters[0].jap.II["2.1"][0].num).toBe("AW-00001");
 
     const b = stores();
-    const n = importText(text, b);
+    const n = importCharacters(text, b);
     expect(n).toBe(2);
     expect(importedMessage(n)).toBe("Imported 2 characters.");
     expect(b.characters.list().map((c) => c.name)).toEqual(["Jane Roe", "John Doe"]);
@@ -49,7 +49,7 @@ describe("character file", () => {
   it("restores dockets under the stored id when the file's id is unsafe", () => {
     const s = stores();
     const text = JSON.stringify({ characters: [{ id: "../x", name: "Odd", dockets: [{ caseNumber: "C-1" }] }] });
-    expect(importText(text, s)).toBe(1);
+    expect(importCharacters(text, s)).toBe(1);
     expect(importedMessage(1)).toBe("Imported 1 character.");
     const [c] = s.characters.list();
     expect(c.id).not.toBe("../x");
@@ -59,8 +59,8 @@ describe("character file", () => {
   it("rejects files over 5 MB and passes on the store's errors", () => {
     expect(() => checkFileSize(MAX_IMPORT_BYTES + 1)).toThrow(FILE_TOO_LARGE);
     expect(() => checkFileSize(MAX_IMPORT_BYTES)).not.toThrow();
-    expect(() => importText("not json", stores())).toThrow("That file isn't valid JSON.");
-    expect(() => importText("{}", stores())).toThrow("No characters found in that file.");
+    expect(() => importCharacters("not json", stores())).toThrow("That file isn't valid JSON.");
+    expect(() => importCharacters("{}", stores())).toThrow("No characters found in that file.");
   });
 
   it("imports an export from before LP-70: the old server field is dropped, the rest is kept", () => {
@@ -71,7 +71,7 @@ describe("character file", () => {
         { id: "def456", name: "Sam Style", server: "other" },
       ],
     });
-    importText(text, s);
+    importCharacters(text, s);
     const [a, b] = s.characters.list();
     expect(a).toMatchObject({ name: "Gee Tee", title: "Attorney at Law" });
     expect(b.name).toBe("Sam Style");
