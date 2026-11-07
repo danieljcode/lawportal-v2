@@ -103,3 +103,53 @@
 .library-nav a {
   white-space: normal;
 }
+
+/* ---------- charge calculator (LP-218) ---------- */
+.charge-calc {
+  margin: 0 0 12px;
+  padding: 6px 8px;
+  border: 1px solid var(--shadow);
+  background: var(--field);
+  color: var(--text);
+}
+.charge-calc h3 {
+  margin: 0 0 4px;
+}
+.charge-calc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 4px 0;
+  padding: 0;
+  list-style: none;
+}
+.charge-calc-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+.charge-calc-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.charge-calc-name {
+  flex: 1 1 200px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.charge-calc-totals {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 2px 12px;
+  margin: 6px 0;
+}
+.charge-calc-totals dt {
+  font-weight: bold;
+}
+.charge-calc-totals dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}

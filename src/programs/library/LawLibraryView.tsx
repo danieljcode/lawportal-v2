@@ -7,6 +7,7 @@
 // into the form field last clicked in.
 
 import { useMemo, useState, type FormEvent } from "react";
+import { addCharge, readChargeList, writeChargeList, type ChargeLine } from "@/lib/chargeList";
 import { copyText } from "@/lib/clipboard";
 import { formatDay } from "@/lib/deadlines";
 import { safeLink } from "@/lib/exhibits";
@@ -20,9 +21,11 @@ import {
   type Precedent,
 } from "@/lib/precedents";
 import Marked from "@/ui/Marked";
+import ChargeCalculator from "./ChargeCalculator";
 import PenalCodeSearch from "./PenalCodeSearch";
 import GameDateInput from "@/ui/GameDateInput";
 import { usePrecedentVersion } from "@/ui/useStore";
+import { SAVE_FAILED } from "@/lib/storage";
 
 export type LibraryTab = "code" | "precedents";
 
@@ -380,6 +383,13 @@ export default function LawLibraryView({
 }) {
   /** The ruling being edited, "new" for the add form, or null. */
   const [editing, setEditing] = useState<Precedent | "new" | null>(null);
+  // The charge calculator's list, kept on this device (LP-218).
+  const [charges, setCharges] = useState<ChargeLine[]>(() => readChargeList());
+  const [chargesUnsaved, setChargesUnsaved] = useState(false);
+  const changeCharges = (list: ChargeLine[]) => {
+    setCharges(list);
+    setChargesUnsaved(!writeChargeList(list));
+  };
 
   return (
     <section id="library" className="form-view library">
@@ -391,7 +401,14 @@ export default function LawLibraryView({
       </div>
       {tab === "code" ? (
         <section aria-labelledby="library-title" className="penal-code-section" id="code-section">
-          <PenalCodeSearch idPrefix="code" chapter={chapter} onChapter={onChapter || (() => {})} />
+          <ChargeCalculator list={charges} onChange={changeCharges} />
+          {chargesUnsaved && <p className="small bad">{SAVE_FAILED}</p>}
+          <PenalCodeSearch
+            idPrefix="code"
+            chapter={chapter}
+            onChapter={onChapter || (() => {})}
+            onAdd={(c) => changeCharges(addCharge(charges, c.section))}
+          />
         </section>
       ) : (
         <section aria-labelledby="library-title" className="precedents" id="precedents-section">

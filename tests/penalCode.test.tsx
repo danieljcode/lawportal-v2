@@ -240,6 +240,36 @@ describe("the Penal Code in the Law Library (LP-17)", () => {
     expect(copy).toHaveBeenCalledWith("PC 1001 Assault");
   });
 
+  it("totals charges in the charge calculator, keeps them on reload, and copies them (LP-218)", async () => {
+    const copy = vi.spyOn(clipboard, "copyText").mockResolvedValue(true);
+    mount("#library");
+    expect(must("#charge-calc-empty")).toBeTruthy();
+    setValue("#code-q", "1001");
+    click(button(must("#code-list"), "Add to calculator"));
+    click(button(must("#code-list"), "Add to calculator"));
+    setValue("#code-q", "1029");
+    click(button(must("#code-list"), "Add to calculator"));
+    expect(must("#charge-calc-time").textContent).toBe("20 months (range 16–26 months)");
+    expect(must("#charge-calc-fine").textContent).toBe("$600");
+    expect(must("#charge-calc-discretion").textContent).toBe("PC 1029 1st Degree Murder (up to life)");
+
+    // The list survives a reload.
+    act(() => root!.unmount());
+    container!.remove();
+    mount("#library");
+    expect(must('[aria-label="Count of PC 1001 Assault"]').textContent).toBe("2 ×");
+    click(must('[aria-label="One fewer PC 1001 Assault"]'));
+    expect(must("#charge-calc-time").textContent).toBe("10 months (range 8–13 months)");
+
+    await act(async () => must("#charge-calc-copy").click());
+    expect(copy.mock.calls[0][0]).toContain("1 × PC 1001 Assault\n1 × PC 1029 1st Degree Murder\nTime: 10 months");
+
+    click(must('[aria-label="Remove PC 1029 1st Degree Murder"]'));
+    expect(document.querySelector("#charge-calc-discretion")).toBeNull();
+    click(must("#charge-calc-clear"));
+    expect(must("#charge-calc-empty")).toBeTruthy();
+  });
+
   it("opens from the home screen, not the forms list", () => {
     mount("#filings");
     // Court Filings' list is court forms only (LP-105).

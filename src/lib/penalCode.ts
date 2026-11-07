@@ -75,7 +75,8 @@ export function chargeCitation(c: Charge): string {
   return c.section + " " + c.title;
 }
 
-const months = (n: number) => n.toLocaleString("en-GB") + (n === 1 ? " month" : " months");
+/** "1 month", "1,200 months". */
+export const months = (n: number) => n.toLocaleString("en-GB") + (n === 1 ? " month" : " months");
 
 /** The sentence in words: the default and range, or the judge's guidance. */
 export function sentenceText(c: Charge): string {
