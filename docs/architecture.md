@@ -279,6 +279,7 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
 | Ledger time entries (LP-32)       | `src/lib/ledger.ts`                      | `lawapp_time`                        |
 | Ledger invoices (LP-33)           | `src/lib/invoices.ts`                    | `lawapp_invoices`                    |
 | Client retainer deposits (LP-93)  | `src/lib/retainers.ts`                   | `lawapp_retainers`                   |
+| Next-action checklists (LP-230)   | `src/lib/checklists.ts`                  | `lawapp_checklists`                  |
 | Sync state                        | `src/lib/sync.ts`                        | `lawapp_sync_*`                      |
 
 - **KV wrapper** (`src/lib/storage.ts`). The stores never touch the browser's storage directly:

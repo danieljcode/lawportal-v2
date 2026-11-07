@@ -27,6 +27,7 @@ import { cleanEntry, timeStore, type TimeEntry } from "./ledger";
 import { cleanInvoice, invoiceStore, renumberClashes, type Invoice } from "./invoices";
 import { CODE_RE, LOOKALIKE_HINT, normaliseCode } from "./syncCode";
 import { cleanDeposit, retainerStore, type Deposit } from "./retainers";
+import { checklistStore, cleanChecklist, type Checklist } from "./checklistStore";
 import { cleanPrecedent, precedentStore, type Precedent } from "./precedents";
 import { docketStore } from "./dockets";
 import { portfolioStore } from "./portfolio";
@@ -99,6 +100,8 @@ export interface SyncDoc {
   invoices?: Invoice[];
   /** Client retainer deposits (LP-93); absent in copies from before them. */
   retainers?: Deposit[];
+  /** The firm's next-action checklists (LP-230); absent in copies from before them. */
+  checklists?: Checklist[];
 }
 
 interface ApiBody {
@@ -260,6 +263,7 @@ function listOf<T>(doc: unknown, key: string, clean: (x: unknown) => T | null): 
 const timeOf = (doc: unknown) => listOf<TimeEntry>(doc, "time", cleanEntry);
 const invoicesOf = (doc: unknown) => listOf<Invoice>(doc, "invoices", cleanInvoice);
 const retainersOf = (doc: unknown) => listOf<Deposit>(doc, "retainers", cleanDeposit);
+const checklistsOf = (doc: unknown) => listOf<Checklist>(doc, "checklists", (x) => cleanChecklist(x));
 const contactsOf = (doc: unknown) => listOf<Contact>(doc, "contacts", cleanContact);
 const precedentsOf = (doc: unknown) => listOf<Precedent>(doc, "precedents", cleanPrecedent);
 const checksOf = (doc: unknown) => listOf<ConflictCheck>(doc, "conflictChecks", cleanCheck);
@@ -292,6 +296,7 @@ const LISTS: readonly SyncList[] = [
   syncList("time", timeOf, timeStore, "time:", (e) => e.updated),
   syncList("invoices", invoicesOf, invoiceStore, "invoice:", (i) => i.updated),
   syncList("retainers", retainersOf, retainerStore, "deposit:", (d) => d.updated),
+  syncList("checklists", checklistsOf, checklistStore, "checklist:", (c) => c.updated),
 ];
 
 /** A document's cases; one from before LP-4 has dockets inside its characters instead. */

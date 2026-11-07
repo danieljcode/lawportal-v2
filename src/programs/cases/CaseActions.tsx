@@ -9,6 +9,7 @@ import { caseStore } from "@/lib/cases";
 import { formatDay, gameToday, relativeDay } from "@/lib/deadlines";
 import type { Case, CaseAction, Character } from "@/lib/types";
 import GameDateInput from "@/ui/GameDateInput";
+import CaseChecklist from "./CaseChecklist";
 
 export default function CaseActions({ c, characters }: { c: Case; characters: Character[] }) {
   const today = gameToday();
@@ -112,6 +113,7 @@ export default function CaseActions({ c, characters }: { c: Case; characters: Ch
         onSave={(a) => saveList([...list, a]) && setAdded((n) => n + 1)}
         onError={setError}
       />
+      <CaseChecklist c={c} />
       <p className="error" role="alert" id="action-error">
         {error}
       </p>

@@ -12,6 +12,7 @@ import { contactStore } from "@/lib/contacts";
 import { invoiceStore } from "@/lib/invoices";
 import { timeStore, timerStore } from "@/lib/ledger";
 import { retainerStore } from "@/lib/retainers";
+import { checklistStore } from "@/lib/checklistStore";
 import { precedentStore } from "@/lib/precedents";
 import { filingStore } from "@/lib/filings";
 import { docketStore } from "@/lib/dockets";
@@ -71,6 +72,8 @@ export const useTimerVersion = versionHook(timerStore);
 export const useInvoiceVersion = versionHook(invoiceStore);
 /** Bumps on every change to the client retainer deposits (LP-93). */
 export const useRetainerVersion = versionHook(retainerStore);
+/** Bumps on every change to the firm's next-action checklists (LP-230). */
+export const useChecklistVersion = versionHook(checklistStore);
 
 /** Counts values set aside as unreadable since the page loaded (0: none). */
 export function useSetAsideVersion(): number {

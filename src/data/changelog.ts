@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "new",
+        text: "Checklists: Add checklist under a case's next actions adds the routine jobs for that kind of case, like Criminal defence or Civil plaintiff, skipping any the case already has. The firm edits the lists in Settings, and they sync.",
+      },
+      {
+        type: "new",
         text: "Offers on each case: log every plea or settlement offer with its date, who made it and the terms, then mark it accepted, rejected or countered (and point to the counter-offer). Accepting one offers to close the case as a plea deal or settlement; it never closes it by itself.",
       },
       {
