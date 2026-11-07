@@ -79,6 +79,38 @@ export function addDays(iso: string, n: number): string {
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+/** The most days the deadline calculator counts (LP-220): ten years. */
+export const MAX_COUNT_DAYS = 3650;
+
+/** 0 (Sunday) to 6 for a game date: the real date's weekday (LP-135). */
+function weekday(iso: string): number {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(Date.UTC(y - YEAR_OFFSET, m - 1, d)).getUTCDay();
+}
+
+/**
+ * The game date `days` days after `start` (LP-220): calendar days, or weekdays only (Saturdays and
+ * Sundays aren't counted). "" for a bad date or a count outside 0 to MAX_COUNT_DAYS.
+ */
+export function dueDate(start: string, days: number, weekdaysOnly = false): string {
+  if (
+    !ISO_DATE_RE.test(start) ||
+    addDays(start, 0) !== start ||
+    !Number.isInteger(days) ||
+    days < 0 ||
+    days > MAX_COUNT_DAYS
+  )
+    return "";
+  if (!weekdaysOnly) return addDays(start, days);
+  let date = start;
+  for (let left = days; left > 0;) {
+    date = addDays(date, 1);
+    const w = weekday(date);
+    if (w !== 0 && w !== 6) left--;
+  }
+  return date;
+}
+
 /** "Sun 25 Oct 1990" for 1990-10-25: the weekday of the real date it maps to (2026-10-25). */
 export function formatDay(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);

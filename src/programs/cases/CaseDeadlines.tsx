@@ -1,12 +1,13 @@
 // A case's deadlines and hearing dates (LP-18): in-game dates with a label and
 // a note, marked done, removed, or added. Each change saves the case straight
-// away (the case details form above has its own Save).
+// away (the case details form above has its own Save). Calculate works a date out (LP-220).
 
 import { useState, type FormEvent } from "react";
 import { caseStore } from "@/lib/cases";
 import { cleanDeadline, formatDay, gameToday, relativeDay, sortDeadlines } from "@/lib/deadlines";
 import type { Case, Deadline } from "@/lib/types";
 import GameDateInput from "@/ui/GameDateInput";
+import DeadlineCalculator from "./DeadlineCalculator";
 
 export default function CaseDeadlines({ c }: { c: Case }) {
   const today = gameToday();
@@ -14,6 +15,7 @@ export default function CaseDeadlines({ c }: { c: Case }) {
   const [label, setLabel] = useState("");
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
+  const [calc, setCalc] = useState(false);
 
   const saveList = (deadlines: Deadline[]) => {
     try {
@@ -100,7 +102,25 @@ export default function CaseDeadlines({ c }: { c: Case }) {
         <button type="submit" className="btn" id="deadline-submit">
           Add
         </button>
+        <button
+          type="button"
+          className="btn"
+          id="deadline-calc-toggle"
+          aria-expanded={calc}
+          aria-controls="deadline-calc"
+          onClick={() => setCalc(!calc)}
+        >
+          Calculate
+        </button>
       </form>
+      {calc && (
+        <DeadlineCalculator
+          onAdd={(d) => {
+            saveList(sortDeadlines([...c.deadlines, d]));
+            setCalc(false);
+          }}
+        />
+      )}
       <p className="error" role="alert" id="deadline-error">
         {error}
       </p>
