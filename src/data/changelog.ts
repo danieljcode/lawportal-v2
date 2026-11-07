@@ -40,6 +40,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "fix",
         text: "A form's Today button, Auto and + Add use the day you press them. A form left open since an earlier day gave that day's date.",
       },
+      {
+        type: "fix",
+        text: "Picking a different case on a form clears what the new case leaves blank. Before, the last case's defendant or filed date could stay beside the new case number.",
+      },
     ],
   },
   {
