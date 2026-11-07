@@ -52,6 +52,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "fix",
         text: "A form's list lettered past Z now goes on to AA and AB, as exhibits in the Case File do. Before, the 27th item got \"[\".",
       },
+      {
+        type: "fix",
+        text: "The Ledger opens quickly with a lot of time logged: it shows the newest 100 entries, with Show more for the rest. The totals still count everything. With a year of time it took several seconds on a phone.",
+      },
     ],
   },
   {
