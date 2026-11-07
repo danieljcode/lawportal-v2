@@ -2,7 +2,7 @@
 // cases (every firm case with no character), overdue first. Dates are in-game.
 
 import { useMemo } from "react";
-import { caseStore } from "@/lib/cases";
+import { caseParties, caseStore } from "@/lib/cases";
 import { formatDay, gameToday, relativeDay, upcoming, UPCOMING_DAYS } from "@/lib/deadlines";
 import type { Character } from "@/lib/types";
 import { useCaseVersion } from "@/ui/useStore";
@@ -53,7 +53,7 @@ export default function UpcomingView({ character }: { character: Character | nul
                 <strong>{d.label}</strong>
                 <a href={"#cases/" + c.id}>
                   {c.caseNumber}
-                  {c.plaintiff || c.defendant ? " · " + [c.plaintiff, c.defendant].filter(Boolean).join(" v. ") : ""}
+                  {caseParties(c) ? " · " + caseParties(c) : ""}
                 </a>
                 {d.note && <span className="small muted">{d.note}</span>}
               </span>

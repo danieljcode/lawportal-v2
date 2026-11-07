@@ -5,7 +5,7 @@
 // it scoped to one case, from that case's billing summary (LP-173).
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { caseStore } from "@/lib/cases";
+import { caseParties, caseStore } from "@/lib/cases";
 import { formatDay, gameToday } from "@/lib/deadlines";
 import { billedEntries, invoiceStore } from "@/lib/invoices";
 import {
@@ -35,7 +35,7 @@ import Reports from "./Reports";
 import Retainers from "./Retainers";
 
 /** "90SCCR00147 Smith v. Jones". */
-const caseLabel = (c: Case) => [c.caseNumber, [c.plaintiff, c.defendant].filter(Boolean).join(" v. ")].join(" ").trim();
+const caseLabel = (c: Case) => [c.caseNumber, caseParties(c)].join(" ").trim();
 
 interface Draft {
   caseId: string;
