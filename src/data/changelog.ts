@@ -48,6 +48,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "fix",
         text: "Download PDF now adds the filing to Filing history and its case, like a copy or a .docx. It's listed as Printed or saved as PDF, since the app can't tell if the print was cancelled.",
       },
+      {
+        type: "fix",
+        text: "The Ledger opens quickly with a lot of time logged: it shows the newest 100 entries, with Show more for the rest. The totals still count everything. With a year of time it took several seconds on a phone.",
+      },
     ],
   },
   {

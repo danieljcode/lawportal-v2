@@ -136,6 +136,33 @@ describe("the Ledger page (LP-32)", () => {
     ).toEqual(["case0002"]);
   });
 
+  it("draws the newest 100 rows, with Show more, and totals every entry (LP-222)", () => {
+    caseStore().save({ id: "case0001", caseNumber: "90SCCR00147", lead: "alice001" });
+    const T = "2026-10-19T16:00:00.000Z";
+    timeStore().replaceAll(
+      Array.from({ length: 250 }, (_, i) => ({
+        id: "te" + String(i).padStart(6, "0"),
+        caseId: "case0001",
+        character: "bob00001",
+        date: "1990-10-" + String((i % 28) + 1).padStart(2, "0"),
+        hours: 1,
+        activity: "research" as const,
+        created: T,
+        updated: T,
+      })),
+    );
+    mount();
+    const rows = () => container.querySelectorAll("#ledger-list tbody tr").length;
+    expect(rows()).toBe(100);
+    expect(must("#ledger-list tbody td").textContent).toContain("28 Oct 1990");
+    expect(must("#ledger-total").textContent).toContain("250.0 hours in 250 entries");
+    expect(must("#ledger-more").textContent).toBe("Show more (150 left)");
+    click(must("#ledger-more"));
+    click(must("#ledger-more"));
+    expect(rows()).toBe(250);
+    expect($("#ledger-more")).toBeNull();
+  });
+
   it("times a case and logs it when stopped", () => {
     caseStore().save({ id: "case0001", caseNumber: "90SCCR00147", lead: "alice001" });
     mount();
