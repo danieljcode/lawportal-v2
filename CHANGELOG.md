@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.7.0](https://github.com/danieljcode/lawportal-v2/compare/v0.6.0...v0.7.0) (2026-11-07)
+
+
+### Features
+
+* **cases:** case notes as dated entries [LP-227] ([#213](https://github.com/danieljcode/lawportal-v2/issues/213)) ([226001b](https://github.com/danieljcode/lawportal-v2/commit/226001b2aeee5286d2bc6a4f41a3162b6586f515))
+* **library:** charge calculator for total time and fine [LP-218] ([#212](https://github.com/danieljcode/lawportal-v2/issues/212)) ([8311dae](https://github.com/danieljcode/lawportal-v2/commit/8311daedca424176b6442b649c5de51c49757b32))
+
+
+### Fixes
+
+* **forms:** match case numbers in any capitals on load [LP-232] ([#210](https://github.com/danieljcode/lawportal-v2/issues/210)) ([d71ac4e](https://github.com/danieljcode/lawportal-v2/commit/d71ac4e385e1105533d7f5c70df7d94d9b26599a))
+* **ledger:** start Show more again when the filter changes [LP-233] ([#211](https://github.com/danieljcode/lawportal-v2/issues/211)) ([742e338](https://github.com/danieljcode/lawportal-v2/commit/742e338b7f0ec1776bd760f65615275102de96c7))
+
+
+### Docs
+
+* **changelog:** mark what's new for 0.6.0 and target 0.7.0 [LP-235] ([#208](https://github.com/danieljcode/lawportal-v2/issues/208)) ([61af3a7](https://github.com/danieljcode/lawportal-v2/commit/61af3a798c162e5a2c0b1831d326da33790b85a9))
+
 ## [0.6.0](https://github.com/danieljcode/lawportal-v2/compare/v0.5.0...v0.6.0) (2026-11-07)
 
 
