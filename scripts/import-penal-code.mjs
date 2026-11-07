@@ -14,6 +14,7 @@
 
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 const SHEET = process.env.PENAL_CODE_SHEET || "";
 const TAB = "Penal Code";
@@ -129,7 +130,8 @@ async function main() {
   console.log(`Wrote ${charges.length} charges to ${path.relative(process.cwd(), OUT)} (updated ${data.updated}).`);
 }
 
-if (import.meta.url === `file://${process.argv[1].replace(/\\/g, "/").replace(/^(?=[A-Za-z]:)/, "/")}`) {
+// pathToFileURL encodes spaces, so it also runs from a folder like "My Projects" (LP-215).
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {
     console.error(err.message);
     process.exit(1);
