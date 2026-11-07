@@ -52,7 +52,13 @@ When the audit fails:
 
 ### Overrides
 
-There are none at the moment. Next 15 needed one (LP-85): it pinned PostCSS 8.4.31, which has
+- **`minimatch@^10` → `^11.0.5`** (LP-216): ESLint and typescript-eslint pull minimatch 10, which has a
+  moderate advisory (GHSA-g3hv-75wg-m249, a crafted pattern can hang the tool). Development only, but
+  it cleared 10 `npm audit` warnings and lint still passes. The 3.x copies other ESLint plugins use
+  aren't affected and keep their own version. Remove it once ESLint and typescript-eslint depend on
+  minimatch 11.
+
+Earlier: Next 15 needed one (LP-85): it pinned PostCSS 8.4.31, which has
 high-severity advisories (GHSA-qx2v-qp2m-jg93 and related), so `package.json` gave it PostCSS 8.5.31.
 Next 16 ships a fixed PostCSS, so the override went with the upgrade (LP-97). If you add one, list it
 here with the reason and when it can go.
