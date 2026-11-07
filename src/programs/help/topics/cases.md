@@ -2,6 +2,8 @@
 
 The **Case File** holds every firm case, with its lead and the characters working it. Search and filter the list to find one.
 
+**Copy brief**, at the top of a case, copies where it stands as one Discord message for the firm channel: the case number and parties, status, lead and who else is on it, the next court date (the soonest open deadline or hearing, marked if overdue), and the open next actions. A long list ends with "…and n more" so it fits one message. Billing (hours, invoiced, paid and owed) is only added when you tick **Include billing**.
+
 Each case has:
 
 - its **details**;

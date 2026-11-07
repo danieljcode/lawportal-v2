@@ -104,6 +104,7 @@
 }
 
 /* ---------- notes (LP-227), next actions (LP-170) and deadlines (LP-18) ---------- */
+.case-links #case-brief,
 .case-links #case-notes,
 .case-links #case-actions,
 .case-links #case-billing,
@@ -465,6 +466,13 @@
 }
 .case-note-form textarea {
   width: 100%;
+}
+
+/* ---------- copy brief (LP-228) ---------- */
+.case-brief {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
 }
 
 /* ---------- deadline calculator (LP-220) ---------- */

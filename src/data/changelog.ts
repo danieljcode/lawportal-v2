@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "new",
+        text: "Copy brief on a case copies where it stands as one Discord message: case number, parties, status, who's on it, the next court date and the open next actions. Billing is only added if you tick Include billing.",
+      },
+      {
+        type: "new",
         text: "Quick add: the round + on the home screen and on an open case adds a note, time or a next action in a couple of taps, handy on a phone. It starts on the case you have open, or the one you worked on last; pick another from the list.",
       },
       {

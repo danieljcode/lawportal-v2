@@ -11,6 +11,7 @@ import { filingsForCase, filingStore, type Filing } from "@/lib/filings";
 import { OUTCOME_LABELS } from "@/lib/outcomes";
 import type { Case, Character, OutcomeResult } from "@/lib/types";
 import CaseActions from "./CaseActions";
+import CaseBrief from "./CaseBrief";
 import CaseNotes from "./CaseNotes";
 import CaseTimeline from "./CaseTimeline";
 import CaseBilling from "./CaseBilling";
@@ -265,6 +266,9 @@ function CaseLinks({
 }) {
   return (
     <div className="case-links">
+      <section className="case-empty" id="case-brief" aria-label="Brief">
+        <CaseBrief c={c} characters={characters} />
+      </section>
       <section className="case-empty" id="case-notes" aria-labelledby="case-notes-title">
         <h4 id="case-notes-title">Notes</h4>
         <CaseNotes c={c} characters={characters} active={active} />
