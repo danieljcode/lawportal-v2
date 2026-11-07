@@ -16,6 +16,9 @@ import {
 import { serializeLine } from "./serialize";
 import { gridLines } from "./tables";
 
+/** A web address typed in a field, split out of the text around it (the capture keeps it in the parts). */
+const TYPED_URL = /(https?:\/\/[^\s<>"]+)/i;
+
 /* --------------------------------------------------------- the main walker */
 
 export interface Ctx {
@@ -64,8 +67,20 @@ export class Converter {
       const t = raw.replace(/\u00a0/g, " ").replace(/\s+/g, " ");
       if (!t) return;
       // Ordinary whitespace between tags never starts a line; &nbsp; does (a spacer paragraph).
-      const starts = /[^\s]/.test(t) || raw.includes("\u00a0");
-      this.b.text({ text: escapeMarkdown(t), marks: outer.marks, px: outer.px ?? undefined }, outer.base, starts);
+      const nbsp = raw.includes("\u00a0");
+      // A typed web address goes out as typed: escaped, its link would carry the backslashes (LP-210).
+      t.split(TYPED_URL).forEach((part, i) => {
+        if (!part) return;
+        if (i % 2) this.bareUrl(part, outer);
+        else {
+          const starts = /[^\s]/.test(part) || nbsp;
+          this.b.text(
+            { text: escapeMarkdown(part), marks: outer.marks, px: outer.px ?? undefined },
+            outer.base,
+            starts,
+          );
+        }
+      });
       return;
     }
     if (n.nodeType !== ELEMENT_NODE) return;

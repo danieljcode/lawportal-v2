@@ -192,6 +192,13 @@ describe("toDiscord: links and images", () => {
     expect(md('<p><a href="https://e.com"></a></p>')).toBe("https://e.com");
   });
 
+  it("leaves a web address typed into a field as typed, and escapes the text around it (LP-210)", () => {
+    expect(md("<p>see https://x.com/a_b_c now</p>")).toBe("see https://x.com/a_b_c now");
+    expect(md("<p>a_b https://e.com/x*y~z</p>")).toBe("a\\_b https://e.com/x*y~z");
+    expect(md("<p><b>see https://e.com/a_b</b></p>")).toBe("**see** https://e.com/a_b");
+    expect(md("<p>not_a_link http:/x_y</p>")).toBe("not\\_a\\_link http:/x\\_y");
+  });
+
   it("keeps formatting away from a bare URL (Discord's autolink would swallow it), but spoilers stay hidden", () => {
     expect(md('<p><u>see <a href="https://e.com/a">https://e.com/a</a> now</u></p>')).toBe(
       "__see__ https://e.com/a __now__",

@@ -64,6 +64,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "update",
         text: "The J.A.P. portfolio now goes out as Discord messages, each with its own Copy button, in place of the BBCode forum post. Anything you haven't filled in yet keeps its placeholder.",
       },
+      {
+        type: "fix",
+        text: "A web address typed into a form now works when the filing is copied for Discord. Before, an address with underscores, such as https://x.com/a_b, could lead to the wrong page.",
+      },
     ],
   },
   {
