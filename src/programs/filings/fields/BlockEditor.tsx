@@ -6,7 +6,7 @@ import { useFormCtx } from "./FormContext";
 import ItemList, { type ScopeProps } from "./ItemList";
 
 export default function BlockEditor({ entry, scope, path, prefix }: ScopeProps & { entry: BlockEntry }) {
-  const { entries, character, onState, now } = useFormCtx();
+  const { entries, character, onState } = useFormCtx();
   const name = entry.block.name;
   const raw = scope["#" + name];
   const items = Array.isArray(raw) ? raw : [];
@@ -62,8 +62,8 @@ export default function BlockEditor({ entry, scope, path, prefix }: ScopeProps &
         type="button"
         className="btn add"
         // R6: materialise the new item's nested blocks, prefill, then the non-force character fill.
-        // `now` is the form's real time; the prefills turn it into game time.
-        onClick={() => onState((s) => afterAddItem(entries, addItem(s, path, name), character, now))}
+        // The time of the click (LP-206); the prefills turn it into game time.
+        onClick={() => onState((s) => afterAddItem(entries, addItem(s, path, name), character, new Date()))}
       >
         {"+ Add " + one.toLowerCase()}
       </button>
