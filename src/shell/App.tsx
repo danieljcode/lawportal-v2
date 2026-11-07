@@ -56,6 +56,8 @@ import type { Route } from "./useRoute";
 // Filing history renders filings with their templates, so its code and the forms load the first
 // time it opens (LP-133).
 const FilingsDialog = lazy(() => import("@/ui/FilingsDialog"));
+// Quick add (LP-221) loads the first time its button is pressed.
+const QuickAddDialog = lazy(() => import("@/ui/QuickAddDialog"));
 
 export default function App() {
   const { route, form, goHome } = useRoute();
@@ -78,6 +80,11 @@ export default function App() {
   /** Filing history has been opened, so it stays mounted (and its open/close works as the other dialogs'). */
   const [filingsUsed, setFilingsUsed] = useState(false);
   if (dialog === "filings" && !filingsUsed) setFilingsUsed(true);
+  /** Quick add (LP-221): open, and opened once (so it stays mounted). From home or an open case. */
+  const [quickOpen, setQuickOpen] = useState(false);
+  const [quickUsed, setQuickUsed] = useState(false);
+  const quickCase = route.program === "cases" ? route.caseId : null;
+  const showQuick = route.program === "home" || !!quickCase;
   /** Filing history's "Use as new draft" for the form already open (LP-15). */
   const [draftRequest, setDraftRequest] = useState<DraftRequest | null>(null);
   /** The open form's filing tools, for the Form menu (LP-105). */
@@ -589,6 +596,33 @@ export default function App() {
               characters={characters}
               onUse={openFiling}
             />
+          </Suspense>
+        )}
+      </ErrorBoundary>
+      {showQuick && (
+        <button
+          type="button"
+          className="quick-add-btn"
+          id="quick-add"
+          aria-label="Quick add: a note, time or next action"
+          title="Quick add"
+          onClick={() => {
+            setQuickUsed(true);
+            setQuickOpen(true);
+          }}
+        >
+          +
+        </button>
+      )}
+      <ErrorBoundary
+        where="Quick add"
+        variant="dialog"
+        resetKey={String(quickOpen)}
+        onDismiss={() => setQuickOpen(false)}
+      >
+        {quickUsed && (
+          <Suspense fallback={null}>
+            <QuickAddDialog open={quickOpen} onClose={() => setQuickOpen(false)} caseId={quickCase} active={active} />
           </Suspense>
         )}
       </ErrorBoundary>

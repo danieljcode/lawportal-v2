@@ -14,6 +14,8 @@ Each case has:
 - its **evidence**: lettered exhibits (A, B, C…) with links and dates. Each exhibit has a **chain of custody** you can copy into a filing or print;
 - a **timeline**: all of the above in date order, newest first and grouped by game day, to catch up on a case at a glance. **Show** picks one type, such as filings only. Click an entry to go to it; time and invoices open in the Ledger. A next action shows the day it was ticked off; ones ticked off before the timeline came in are under **No date**.
 
+The round **+** adds a note, time or a next action to the open case in a couple of taps ([Quick add](#help/home)).
+
 **Upcoming** lists the next 14 days, overdue first. The Case File shows a dot when something is due within 48 hours.
 
 **Firm Record** adds up how closed cases ended, with the win rate, for the firm and each lawyer. When you set a case to **Closed**, pick its outcome (won, lost, settled, dismissed, plea deal or withdrawn), with a date and an optional note; you can add one to an already closed case the same way. Filter by matter type and dates. **Print / PDF** prints it and **Copy summary** copies a few lines of text. Win rate is wins out of the cases won or lost, and **Closed with no outcome yet** lists what still needs one.

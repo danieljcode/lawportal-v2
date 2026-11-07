@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "new",
+        text: "Quick add: the round + on the home screen and on an open case adds a note, time or a next action in a couple of taps, handy on a phone. It starts on the case you have open, or the one you worked on last; pick another from the list.",
+      },
+      {
+        type: "new",
         text: "Calculate on a case's deadlines works out a date for you: pick a start date (today in the game unless you change it), enter a number of days, and count calendar days or weekdays only. It shows the date with its weekday; Add as deadline puts it on the case.",
       },
       {
