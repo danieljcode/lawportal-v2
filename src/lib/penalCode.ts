@@ -35,7 +35,6 @@ export interface PenalCode {
   title: string;
   /** Said alongside it, e.g. that it's a draft. */
   note?: string;
-  source: string;
   /** When the data file was last brought up to date (real date), YYYY-MM-DD. */
   updated: string;
   charges: Charge[];
