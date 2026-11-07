@@ -30,6 +30,18 @@ export const CHANGELOG: ChangelogEntry[] = [
       },
       {
         type: "fix",
+        text: "Changing character on the New client intake page no longer saves one character's unfinished intake over another's. Each character's intake is kept, and comes back when you switch to them.",
+      },
+      {
+        type: "fix",
+        text: "A date that doesn't exist, such as 31 Feb 1990, is now outlined in red with a note saying it isn't used and which date is kept. Before, the box showed it while the old date was quietly saved.",
+      },
+      {
+        type: "fix",
+        text: "A form's Today button, Auto and + Add use the day you press them. A form left open since an earlier day gave that day's date.",
+      },
+      {
+        type: "fix",
         text: "Picking a different case on a form clears what the new case leaves blank. Before, the last case's defendant or filed date could stay beside the new case number.",
       },
     ],

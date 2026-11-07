@@ -56,7 +56,9 @@ export default function ClientsProgram({ shell }: ProgramProps) {
       <main className="editor" id={shell.visible ? "editor" : undefined}>
         <div hidden={page !== "intake"}>
           <ErrorBoundary where="the intake" resetKey="intake">
+            {/* A fresh form per character (LP-204), so one's draft is never saved under another's. */}
             <IntakeView
+              key={shell.active?.id ?? "firm"}
               characters={shell.characters}
               active={shell.active}
               onShowConflicts={showFromIntake}

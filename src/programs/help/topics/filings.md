@@ -7,6 +7,8 @@
 3. Fill in each section. The section headings count what's filled, and required fields are marked.
 4. Check the live preview beside the form. **Highlight unfilled** shows what's still empty.
 
+Date boxes take a typed date, such as 29 Oct 1990, or open a calendar. A date that doesn't exist, such as 31 Feb, is outlined in red and isn't used: the box says which date is kept.
+
 Drafts save as you type. **Undo** and **Redo** step through your changes, and **Draft history** brings back an earlier draft.
 
 ## The Form menu
