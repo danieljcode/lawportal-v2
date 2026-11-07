@@ -109,6 +109,8 @@ describe("sync codes", () => {
     expect(parseBearer(req("Bearer " + code))).toBe(code);
     expect(parseBearer(req("Bearer " + code.toLowerCase()))).toBe(code);
     expect(parseBearer(req("Bearer JSA-../../x"))).toBeNull();
+    // The alphabet has no I, O, 0 or 1, on the server as on the client (LP-53).
+    expect(parseBearer(req("Bearer JSA-ABC0-EFGH-JKLM-NPQR-STUV"))).toBeNull();
     expect(parseBearer(req("Basic " + code))).toBeNull();
     expect(parseBearer(new Request(BASE))).toBeNull();
   });

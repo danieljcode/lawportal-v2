@@ -862,9 +862,29 @@ describe("enable / link / disable / destroy", () => {
 
   it("link rejects a malformed code before any request", async () => {
     const calls = stubFetch({ status: 200 });
-    await expect(sync.link("JSA-1234")).rejects.toThrow(sync.BAD_CODE);
+    await expect(sync.link("JSA-2345")).rejects.toThrow(sync.BAD_CODE);
     await expect(sync.link("../etc")).rejects.toThrow(sync.BAD_CODE);
+    await expect(sync.link("JSA-ABCD-EFGH-JKLM-NPQR-STU0")).rejects.toThrow(sync.LOOKALIKE_HINT);
     expect(calls).toHaveLength(0);
+  });
+
+  it("link takes a code typed loosely: lowercase, spaces, no dashes or prefix (LP-53)", async () => {
+    stubFetch({ status: 200, body: { rev: 0, data: { characters: [] } } });
+    await sync.link("  jsa abcd efgh jklm npqr stuv ");
+    expect(sync.code()).toBe(CODE);
+    sync.disable();
+    await sync.link("abcdefghjklmnpqrstuv");
+    expect(sync.code()).toBe(CODE);
+  });
+
+  it("hints at the code as it's typed", () => {
+    expect(sync.codeHint("")).toEqual({ text: "", ok: false });
+    expect(sync.codeHint("jsa abcd ef")).toEqual({ text: "JSA-ABCD-EF (6 of 20)", ok: false });
+    expect(sync.codeHint("jsa-abcd-efgh-jklm-npqr-stuv")).toEqual({ text: CODE, ok: true });
+    expect(sync.codeHint("JSA-ABCO")).toEqual({ text: sync.LOOKALIKE_HINT, ok: false });
+    expect(sync.codeHint(CODE + "W").ok).toBe(false);
+    // A code typed without its prefix can start with JSA itself.
+    expect(sync.codeHint("JSAB-CDEF-GHJK-LMNP-QRST").text).toBe("JSA-JSAB-CDEF-GHJK-LMNP-QRST");
   });
 
   it("link reports an unknown code", async () => {
