@@ -1,8 +1,8 @@
 // Judicial Advancement Portfolio (J.A.P.) for Court Commissioners (INV §e.3).
 //
-// Two fixed forum templates (Court Commissioner I and II). The filer adds the
-// cases, warrants and optional tasks they have completed; render() puts them
-// into the template and keeps the template's placeholder lines for anything
+// Two fixed templates (Court Commissioner I and II). The filer adds the
+// cases, warrants and optional tasks they have completed; portfolioHtml() puts
+// them into the template and keeps the template's placeholder lines for anything
 // not done yet. Kept per character under lawapp_jap_<charId>; each level's work
 // is stored separately. The task texts, counts, colours and notes are the
 // court's requirements, transcribed from the reference js_portfolio.js.
@@ -11,7 +11,8 @@ import { DEFAULT_COURTHOUSE } from "./courts";
 import type { Character, Portfolio, PortfolioEntry, PortfolioLevel } from "./types";
 import { defaultKV, isId, ISO_DATE_RE, ISO_TIME_RE, touchCharacter, type KV } from "./storage";
 import { createKeyedStore, type Migration } from "./store";
-import { formatDate } from "./template";
+import { trustAsSafeHtml, type SafeHtml } from "./safeHtml";
+import { escapeHtml, formatDate } from "./template";
 
 export const JAP_PREFIX = "lawapp_jap_";
 /** The saved portfolios' schema version (LP-99). */
@@ -210,13 +211,9 @@ export function levelFromTitle(title: string | undefined): PortfolioLevel {
   return /\bcommissioner\s+(ii|2)\b/i.test(title || "") ? "II" : "I";
 }
 
-export function topicTitle(name: string | undefined): string {
-  return "[J.A.P.] " + (String(name || "").trim() || "Firstname Lastname");
-}
-
 /* ---------- cleaning (imported and synced data is never trusted) ---------- */
 
-/** Control characters become spaces and square brackets become parentheses (they would open BBCode tags). */
+/** Control characters become spaces and square brackets become parentheses (kept from the BBCode days, so saved data reads the same). */
 export function cleanText(v: unknown, max = 300): string {
   return String(v == null ? "" : v)
     .replace(/[\u0000-\u001f\u007f]+/g, " ")
@@ -279,63 +276,64 @@ export function isEmpty(p: Portfolio | null | undefined): boolean {
   return !p || (!Object.keys(p.I || {}).length && !Object.keys(p.II || {}).length);
 }
 
-/* ---------- BBCode ---------- */
+/* ---------- output (Discord, LP-224) ---------- */
 
 /** `2026-01-02` → `02/JAN/2026`; anything else → "". */
 export function shortDate(iso: string | undefined): string {
   return iso && ISO_DATE_RE.test(iso) ? formatDate(iso, "short") : "";
 }
 
+/** A link, or its text and the placeholder where no address is filled in yet. */
+function link(href: string, text: string): string {
+  return /^https?:\/\//i.test(href)
+    ? `<a href="${escapeHtml(href)}">${escapeHtml(text)}</a>`
+    : `${escapeHtml(text)} (${escapeHtml(href)})`;
+}
+
 function line(kind: TaskKind, e: PortfolioEntry | undefined): string {
   const entry = e || {};
   const v: Partial<Record<EntryKey, string>> = {};
   for (const f of fieldsFor(kind)) v[f.key] = (f.date ? shortDate(entry[f.key]) : entry[f.key]) || f.ph;
-  if (isWarrant(kind)) return `[*][url=${v.link}]${v.num}[/url]`;
-  if (kind === "transcript") return `[*][url=${v.link}]${v.date}[/url]`;
-  let out = `[*][url=${v.link}][${v.num}] ${v.caption}[/url]`;
-  if (kind === "probation") out += `, [url=${v.discord}]#courts-csb/#sadcr[/url]`;
+  if (isWarrant(kind)) return link(v.link!, v.num!);
+  if (kind === "transcript") return link(v.link!, v.date!);
+  let out = link(v.link!, `[${v.num}] ${v.caption}`);
+  if (kind === "probation") out += ", " + link(v.discord!, "#courts-csb/#sadcr");
   return out;
 }
 
 /**
- * The finished forum post. Required tasks always list at least as many lines as
- * they ask for, optional ones at least one; missing lines keep the template's placeholders.
+ * The finished portfolio as HTML, for the Discord panel. Required tasks always list at least as many
+ * lines as they ask for, optional ones at least one; missing lines keep the template's placeholders.
+ * Every value is escaped.
  */
-export function render(
+export function portfolioHtml(
   level: PortfolioLevel,
   data: Record<string, PortfolioEntry[]> | null | undefined,
   name?: string,
-): string {
+): SafeHtml {
   const L = LEVELS[level === "II" ? "II" : "I"];
   const d = data || {};
   const head =
-    "[divbox=transparent][br][/br][size=165][b][center]JUDICIAL ADVANCEMENT PORTFOLIO[/center][/b][/size]\n" +
-    `[center]${cleanText(name, 100) || "Firstname Lastname"} - ${L.title}[/center][hr]\n`;
+    "<h2>JUDICIAL ADVANCEMENT PORTFOLIO</h2>" +
+    `<p>${escapeHtml(cleanText(name, 100) || "Firstname Lastname")} - ${L.title}</p>`;
   const body = L.sections
     .map((s) => {
-      const taskText = s.tasks
+      const tasks = s.tasks
         .map((t) => {
-          const parts = [`[b]${t.id}. ${t.text}[/b]`];
-          if (t.note) parts.push(`[color=#444444]${t.note}[/color]`);
-          if (!t.kind) return parts.join("\n") + "\n";
+          let out = `<p><strong>${escapeHtml(t.id + ". " + t.text)}</strong></p>`;
+          if (t.note) out += `<p><em>${escapeHtml(t.note)}</em></p>`;
+          if (!t.kind) return out;
           const entries = d[t.id] || [];
           const want = Math.max(t.count || 1, entries.length);
           const lines: string[] = [];
-          for (let i = 0; i < want; i++) lines.push(line(t.kind, entries[i]));
-          parts.push("[list]\n" + lines.join("\n") + "\n[/list]");
-          return parts.join("\n");
+          for (let i = 0; i < want; i++) lines.push(`<li>${line(t.kind, entries[i])}</li>`);
+          return out + `<ul>${lines.join("")}</ul>`;
         })
-        .join("\n");
-      return (
-        `[divbox=${s.color}][b][color=#ffffff][center]${s.title}[/center][/color][/b][/divbox]\n` +
-        "[divbox4=white][br][/br]" +
-        (s.intro ? `[color=#444444]${s.intro}[/color]\n\n` : "") +
-        taskText +
-        "[br][/br][/divbox4]"
-      );
+        .join("");
+      return `<h3>${escapeHtml(s.title)}</h3>` + (s.intro ? `<p><em>${escapeHtml(s.intro)}</em></p>` : "") + tasks;
     })
-    .join("\n\n");
-  return head + body + "[/divbox]";
+    .join("");
+  return trustAsSafeHtml(head + body);
 }
 
 /** A line counts as done when every part except the caption is filled. */

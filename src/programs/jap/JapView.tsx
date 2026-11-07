@@ -8,17 +8,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { caseParties } from "@/lib/cases";
 import { docketStore } from "@/lib/dockets";
-import {
-  clean,
-  complete,
-  fieldsFor,
-  LEVELS,
-  levelFromTitle,
-  portfolioStore,
-  tasks,
-  topicTitle,
-  type Task,
-} from "@/lib/portfolio";
+import { clean, complete, fieldsFor, LEVELS, levelFromTitle, portfolioStore, tasks, type Task } from "@/lib/portfolio";
 import { S_DISCLAIMER, S_JAP_OFF, S_JAP_ON } from "@/lib/strings";
 import type { SyncState } from "@/lib/sync";
 import type { Character, Docket, Portfolio, PortfolioEntry, PortfolioLevel } from "@/lib/types";
@@ -221,7 +211,6 @@ function JapBody({ character, syncOn, syncState, onTurnOnSync }: BodyProps) {
     updateList(t.id, (list) => [...list, {}], false);
   };
 
-  const topic = topicTitle(character.name);
   const serverText = syncOn
     ? /error|offline|conflict/.test(syncState.status) && syncState.message
       ? syncState.message
@@ -233,17 +222,10 @@ function JapBody({ character, syncOn, syncState, onTurnOnSync }: BodyProps) {
       <JapHead level={level} disabled={false} onLevel={(l) => persist(l, work)} />
       <div id="jap-body">
         <div className="jap-note">
-          {level === "I" ? (
-            <p id="jap-where">
-              Post this as a new topic titled <strong>{topic}</strong>. When you&apos;re promoted to Court Commissioner
-              II, switch the template to CC II above and reply to that same topic with it.
-            </p>
-          ) : (
-            <p id="jap-where">
-              Started out as a Court Commissioner I? Reply to your existing J.A.P. topic with this. Starting at Court
-              Commissioner II? Post it as a new topic titled <strong>{topic}</strong>.
-            </p>
-          )}
+          <p id="jap-where">
+            Copy the finished portfolio into Discord part by part, from the Discord pane. When you&apos;re promoted to
+            Court Commissioner II, switch the template to CC II above.
+          </p>
           <p className="small muted">
             Only completed motions, cases and warrants count. Work done as a Court Commissioner I can&apos;t be used for
             the Court Commissioner II portfolio, so each template keeps its own list.

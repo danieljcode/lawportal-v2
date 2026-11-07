@@ -1,6 +1,6 @@
-// The Discord tab of the output pane: the filing as Discord markdown, split into
-// messages, each with a dark Discord-style preview (or the raw text), its
-// character count and its own Copy button. Mounted only while the tab is shown.
+// HTML as Discord markdown, split into messages, each with a dark Discord-style preview (or the
+// raw text), its character count and its own Copy button. Court Filings shows it as its Discord
+// tab; the J.A.P. as its whole output (LP-224). Mounted only while it's shown.
 
 import { useMemo, useState } from "react";
 import { copyText } from "@/lib/clipboard";
@@ -18,11 +18,19 @@ export interface DiscordPanelProps {
   guard?(what: string, run: () => void): void;
   /** A part was copied (filing history, LP-15). */
   onCopied?(): void;
+  /** The Discord tab's panel (Court Filings); false where it stands on its own (the J.A.P.). */
+  asTab?: boolean;
 }
 
 const fmt = (n: number) => n.toLocaleString("en-US");
 
-export default function DiscordPanel({ finalHtml, onStatus, guard = (_, run) => run(), onCopied }: DiscordPanelProps) {
+export default function DiscordPanel({
+  finalHtml,
+  onStatus,
+  guard = (_, run) => run(),
+  onCopied,
+  asTab = true,
+}: DiscordPanelProps) {
   // App is client-only (AppLoader, ssr: false), so storage can be read in the initializer.
   const [settings, setSettings] = useState<DiscordSettings>(() => readDiscordSettings());
   const { limit, tables, markers } = settings;
@@ -54,7 +62,7 @@ export default function DiscordPanel({ finalHtml, onStatus, guard = (_, run) => 
   const n = parts.length;
 
   return (
-    <div id="discord-pane" role="tabpanel" aria-labelledby="tab-discord">
+    <div id="discord-pane" {...(asTab ? { role: "tabpanel", "aria-labelledby": "tab-discord" } : {})}>
       <div className="dc-settings">
         <label htmlFor="dc-limit">Limit</label>
         <select

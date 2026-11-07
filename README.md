@@ -114,7 +114,7 @@ in, your searches and where you'd scrolled to are still there when you come back
   **precedents**: rulings with the court, judge, key holding, summary, forum link and topics. Copy a
   citation ("PC 1001 Assault") or insert it into a form.
 - **J.A.P.** The Judicial Advancement Portfolio for Court Commissioners I and II: task lists,
-  progress and the finished BBCode. Only Court Commissioners see it.
+  progress and the finished portfolio as Discord messages. Only Court Commissioners see it.
 - **Home.** A tile for each program, and what needs your attention: deadlines due in the next 48
   hours or overdue, your latest filings to open again, and the cases you worked on most recently.
 - **Settings.** Characters, sync and backups, the Letterhead on firm letters, Appearance (the theme,

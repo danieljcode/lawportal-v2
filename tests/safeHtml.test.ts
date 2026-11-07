@@ -3,7 +3,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import type { DiscordPanelProps } from "@/programs/filings/DiscordPanel";
+import type { DiscordPanelProps } from "@/ui/DiscordPanel";
 import type { FormOutput } from "@/programs/filings/FormView";
 import type { OutputPaneProps } from "@/programs/filings/OutputPane";
 import { copyRich } from "@/lib/clipboard";
@@ -51,9 +51,11 @@ describe("SafeHtml sources", () => {
   });
 
   it("only the renderers mark HTML as safe", () => {
-    // The renderers: escapeHtml and render() (template/, LP-7) and the Discord preview.
+    // The renderers: escapeHtml and render() (template/, LP-7), the Discord preview, and the
+    // J.A.P. portfolio, which escapes every value (portfolioHtml, LP-224).
     const allowed = [
       "src/lib/safeHtml.ts",
+      "src/lib/portfolio.ts",
       "src/lib/template/escape.ts",
       "src/lib/template/render.ts",
       "src/lib/discordPreview.ts",

@@ -60,6 +60,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "update",
         text: "Filings now go out as a Word file, a PDF or Discord messages. Copy for forum, Copy BBCode and the BBCode tab are gone, and so are the forum copy on invoices and Filing history's Copy again. The preview stays, showing the filing as it will look on the page.",
       },
+      {
+        type: "update",
+        text: "The J.A.P. portfolio now goes out as Discord messages, each with its own Copy button, in place of the BBCode forum post. Anything you haven't filled in yet keeps its placeholder.",
+      },
     ],
   },
   {
