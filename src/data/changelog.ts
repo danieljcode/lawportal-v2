@@ -28,6 +28,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "update",
         text: "Sync codes can be typed loosely: in lowercase, with spaces, or without the dashes. The box shows the code as it will be used, and says so if you type an O, 0, I or 1, which codes never use.",
       },
+      {
+        type: "fix",
+        text: "Picking a different case on a form clears what the new case leaves blank. Before, the last case's defendant or filed date could stay beside the new case number.",
+      },
     ],
   },
   {

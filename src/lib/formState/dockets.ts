@@ -38,8 +38,19 @@ export function docketToForm(
   let autofilled = s.autofilled;
   let derived = s.derived;
   let filled = 0;
+  let cleared = false;
+  // Another case than the one in the form (LP-207): what it leaves blank is cleared, not kept from the last.
+  const was = str(s.values["Case number"]);
+  const switching = !!d.caseNumber && !!was && was !== d.caseNumber;
   const put = (label: string, value: string | undefined) => {
-    if (!value || !have.has(label)) return;
+    if (!have.has(label)) return;
+    if (!value) {
+      if (switching && str(values[label])) {
+        values[label] = "";
+        cleared = true;
+      }
+      return;
+    }
     values[label] = value;
     derived = without(derived, label);
     autofilled = without(autofilled, label);
@@ -57,18 +68,17 @@ export function docketToForm(
   put("Court division", div ? titleWords(div.replace(/ DIVISION$/, "")) : undefined);
   // The judge templates' court line (LP-90); no other form has this label.
   put("Court name", d.court ? d.court.toUpperCase() : undefined);
-  if (d.plaintiff) put("Plaintiff label", plural(d.plaintiff) ? "Plaintiffs" : "Plaintiff");
-  if (d.defendant) put("Defendant label", plural(d.defendant) ? "Defendants" : "Defendant");
+  put("Plaintiff label", d.plaintiff ? (plural(d.plaintiff) ? "Plaintiffs" : "Plaintiff") : undefined);
+  put("Defendant label", d.defendant ? (plural(d.defendant) ? "Defendants" : "Defendant") : undefined);
 
   for (const l of FILED_LABELS) put(l, d.filed);
-  if (d.nextDate && /judg/i.test(d.nextEvent || "")) {
-    put("Judgement", d.nextDate);
-    put("Judgment date", d.nextDate);
-  }
-  if (d.nextDate && /trial/i.test(d.nextEvent || "")) put("Trial date", d.nextDate);
+  const judgement = d.nextDate && /judg/i.test(d.nextEvent || "") ? d.nextDate : undefined;
+  put("Judgement", judgement);
+  put("Judgment date", judgement);
+  put("Trial date", d.nextDate && /trial/i.test(d.nextEvent || "") ? d.nextDate : undefined);
   for (const [label, value] of Object.entries(extra)) put(label, value);
 
-  return { state: filled ? { values, autofilled, derived } : s, filled };
+  return { state: filled || cleared ? { values, autofilled, derived } : s, filled };
 }
 
 /**
