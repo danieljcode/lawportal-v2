@@ -260,7 +260,6 @@ function CaseLinks({
   characters: Character[];
   active: Character | null;
 }) {
-  const [filingStatus, setFilingStatus] = useState<{ text: string; bad: boolean } | null>(null);
   return (
     <div className="case-links">
       <section className="case-empty" id="case-actions" aria-labelledby="case-actions-title">
@@ -282,17 +281,7 @@ function CaseLinks({
       <section className="case-empty" id="case-filings" aria-labelledby="case-filings-title">
         <h4 id="case-filings-title">Filings</h4>
         {filings.length ? (
-          <>
-            <FilingList
-              filings={filings}
-              hideCase
-              onUse={onUseFiling}
-              onStatus={(text, bad) => setFilingStatus({ text, bad })}
-            />
-            <p className={"small" + (filingStatus?.bad ? " bad" : " good")} role="status">
-              {filingStatus?.text || ""}
-            </p>
-          </>
+          <FilingList filings={filings} hideCase onUse={onUseFiling} />
         ) : (
           <>
             <p className="small muted">

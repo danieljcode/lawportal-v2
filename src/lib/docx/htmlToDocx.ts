@@ -23,7 +23,6 @@ import {
   WidthType,
 } from "docx";
 import { HTMLElement, parse, TextNode, type Node } from "node-html-parser";
-import { toHex } from "../bbcode";
 
 type Alignment = (typeof AlignmentType)[keyof typeof AlignmentType];
 type BorderStyleValue = (typeof BorderStyle)[keyof typeof BorderStyle];
@@ -54,6 +53,13 @@ export function parseStyle(attr?: string): Record<string, string> {
     if (key && value) out[key] = value;
   }
   return out;
+}
+
+/** `rgb(255, 0, 0)` / `rgba(…)` → `#ff0000`; anything else is returned as-is. */
+function toHex(color: string): string {
+  const m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(color);
+  if (!m) return color;
+  return "#" + [m[1], m[2], m[3]].map((n) => Number(n).toString(16).padStart(2, "0")).join("");
 }
 
 /** A CSS colour as Word's 6-digit hex (`FF0000`), or undefined for named colours and malformed values. */

@@ -22,7 +22,7 @@ path itself.
 | Template engine  | `template.test.ts`, `template.parity.test.ts`, `layout.test.ts`                                                    |
 | Safety           | `xss.test.ts`, `template-safety.test.ts`, `safeHtml.test.ts`                                                       |
 | Wording          | `strings.test.ts` (no outside branding or links in the app's own text)                                             |
-| Outputs          | `bbcode.test.ts`, `discord*.test.ts`, `docx.test.ts`, `preview.test.ts`                                            |
+| Outputs          | `discord*.test.ts`, `docx.test.ts`, `preview.test.ts`, `outputParity.test.ts`                                      |
 | Forms and state  | `formState.test.ts`, `formView.test.ts`, `extra-forms.test.ts`, `form-index.test.ts`, `draftWriter.test.ts`        |
 | Game and courts  | `gameTime.test.ts`, `court-wording.test.ts`, `oneServer.test.tsx`                                                  |
 | Stores and files | `stores.test.ts`, `characterFile.test.ts`                                                                          |
@@ -56,7 +56,7 @@ first, then open the pull request here. CI fails on a snapshot that's missing, s
 
 ## Parity tests and reference data
 
-The parity suites compare our template engine and BBCode converter with the original JSA engine,
+The parity suites compare our template engine with the original JSA engine,
 using the [reference data](templates-and-forms.md#reference-data) in `.agents/reference/jsa/`.
 
 - Without the data they're **skipped, visibly**: the run prints
@@ -107,7 +107,7 @@ a real Chromium, at **desktop** (1440×900) and **phone** (Pixel 7) sizes, each 
   - **Clients**: a new client's intake opens a case;
   - **Law Library**: search the penal code;
   - **Settings**: switch to the dark theme;
-- **Copy for forum**: the clipboard holds the filing as HTML;
+- **Copy for Discord**: the clipboard holds the filing's first message;
 - **Download .docx**: a real Word file (a zip) downloads;
 - **Download PDF**: the print dialog shows only the filing, named after the form (Save as PDF);
 - add a character, and it appears in "Filing as";

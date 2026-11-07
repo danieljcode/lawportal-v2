@@ -1,9 +1,8 @@
 // A Ledger sheet (an invoice, a top-up letter): the page as paper, with Print,
-// Copy for forum, Copy for Discord and Download .docx, all from the one render.
+// Copy for Discord and Download .docx, all from the one render.
 
 import { useState, type ReactNode } from "react";
-import { fromHtml } from "@/lib/bbcode";
-import { copyRich, copyText } from "@/lib/clipboard";
+import { copyText } from "@/lib/clipboard";
 import { toDiscord } from "@/lib/discord";
 import { saveDocx } from "@/lib/docx/saveDocx";
 import type { SafeHtml } from "@/lib/safeHtml";
@@ -48,17 +47,6 @@ export default function Sheet({
       <div className="row invoice-actions">
         <button type="button" className="btn" id={prefix + "-print"} onClick={print}>
           Print / PDF
-        </button>
-        <button
-          type="button"
-          className="btn"
-          id={prefix + "-copy"}
-          onClick={async () => {
-            const ok = await copyRich(html, fromHtml(html));
-            say(ok ? "Copied. Paste it into the forum editor." : "Copy failed.", !ok);
-          }}
-        >
-          Copy for forum
         </button>
         <button
           type="button"

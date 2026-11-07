@@ -6,11 +6,11 @@ import { S_CREDIT, S_DISCLAIMER_EMPTY } from "@/lib/strings";
 export default function EmptyState() {
   return (
     <div className="empty" id="empty-state">
-      <p className="eyebrow">Court filings, ready to paste</p>
+      <p className="eyebrow">Court filings, ready to send</p>
       <h2>Pick a form to get started</h2>
       <p className="lede">
-        Choose a petition from the list, fill in the fields, then copy the result straight into the forum&apos;s post
-        editor.
+        Choose a petition from the list, fill in the fields, then download it as a Word file or PDF, or copy it for
+        Discord.
       </p>
       <ol className="steps">
         <li>
@@ -38,8 +38,8 @@ export default function EmptyState() {
             3
           </span>
           <div>
-            <strong>Copy for forum</strong>
-            <p>Paste into the editor. Tables, bold text, sizes and spoilers come through intact.</p>
+            <strong>Download or copy for Discord</strong>
+            <p>Download .docx or PDF keeps the layout. The Discord tab splits it into messages that fit.</p>
           </div>
         </li>
       </ol>

@@ -5,7 +5,6 @@
 
 import { useState, type FormEvent } from "react";
 import { flushSync } from "react-dom";
-import { fromHtml } from "@/lib/bbcode";
 import { copyRich } from "@/lib/clipboard";
 import {
   ACTION_LABELS,
@@ -77,8 +76,9 @@ export default function ExhibitCustody({ exhibit, letter, characters, active, on
   };
 
   const copy = async () => {
-    const html = custodyHtml(letter, exhibit.title, log);
-    const ok = await copyRich(html, fromHtml(html));
+    // Formatted where the paste takes HTML, its lines as plain text elsewhere.
+    const text = [custodyTitle(letter, exhibit.title), ...log.map(custodyLine)].join("\n");
+    const ok = await copyRich(custodyHtml(letter, exhibit.title, log), text);
     setStatus(
       ok
         ? { text: "Copied the chain of custody. Paste it into your filing.", bad: false }

@@ -4,8 +4,7 @@
 
 A web app for writing San Andreas court filings on a roleplay server, growing into
 the office system of the in-game law firm **Friedman & Associates**. Pick a court form, fill it in,
-and copy the finished filing straight into the forum editor (as formatted text or BBCode), into
-Discord, or download it as a Word `.docx`. Alongside the forms are the firm's own tools: a Case File
+and download the finished filing as a Word `.docx` or PDF, or copy it into Discord. Alongside the forms are the firm's own tools: a Case File
 with evidence and deadlines, client intake and conflict checks, and a Law Library with the penal
 code and the firm's precedents.
 
@@ -16,7 +15,7 @@ date the app fills in is 36 years before today's real date.
 
 > These are roleplay court forms, not legal documents. Always check a filing before posting it.
 
-![A civil complaint being filled in, with the live forum preview beside it](docs/screenshots/form-light.png)
+![A civil complaint being filled in, with the live preview beside it](docs/screenshots/form-light.png)
 
 ![The same complaint as Discord messages, in the dark theme](docs/screenshots/discord-dark.png)
 
@@ -97,8 +96,8 @@ in, your searches and where you'd scrolled to are still there when you come back
   - **Editing:** sections with "x of y filled" counts, required fields, repeatable items, dates on
     the 1990 calendar, Fill from character, Undo and Redo, and Draft history. Drafts save as you
     type.
-  - **Output:** a live forum preview with Highlight unfilled; **Copy for forum**, **Copy BBCode**,
-    **Download .docx**, **Download PDF**, and Discord messages split to fit (2,000 characters, or 4,000 with Nitro).
+  - **Output:** a live preview with Highlight unfilled; **Download .docx**, **Download PDF**, and Discord
+    messages split to fit (2,000 characters, or 4,000 with Nitro). Forum and BBCode output went in LP-223.
   - **The Form menu:** pick a firm case to fill the form from, open the form's case, insert a
     citation from the Law Library, Draft history and Filing history. Under a text box, **Insert
     exhibit** adds "Exhibit C (Dashcam footage)", which follows the exhibit if it's moved.

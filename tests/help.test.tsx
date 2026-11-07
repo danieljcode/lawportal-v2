@@ -74,7 +74,7 @@ describe("Help's topics (LP-94)", () => {
   });
 
   it("search the words, not the Markdown or link addresses", () => {
-    expect(searchTopics(["nitro"]).map((t) => t.id)).toEqual(["forum"]);
+    expect(searchTopics(["nitro"]).map((t) => t.id)).toEqual(["sending"]);
     expect(searchTopics(["restore"]).map((t) => t.id)).toEqual(["sync"]);
     expect(searchTopics(["#help/"])).toEqual([]);
     expect(searchTopics([])).toEqual([]);
@@ -139,7 +139,7 @@ describe("the Help program (LP-94)", () => {
     show("#help");
     expect(must<HTMLButtonElement>("#help-back").disabled).toBe(true);
     show("#help/filings");
-    show("#help/forum");
+    show("#help/sending");
     act(() => must("#help-back").click());
     expect(location.hash).toBe("#help/filings");
     show("#help/filings");

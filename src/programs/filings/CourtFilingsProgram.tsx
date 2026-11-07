@@ -1,5 +1,5 @@
 // The Court Filings program (LP-103, LP-105): the court forms as its navigation
-// pane, the open form (or the "pick a form" page) and its forum preview. The
+// pane, the open form (or the "pick a form" page) and its preview. The
 // output of the open form, and whether its panel crashed, live here; the form's
 // filing tools go up to the shell's Form menu.
 
@@ -69,7 +69,7 @@ export default function CourtFilingsProgram({ shell }: ProgramProps) {
         )}
       </main>
       {form && formOutput && !formCrashed && (
-        <ErrorBoundary where="the forum preview" resetKey={form.id}>
+        <ErrorBoundary where="the preview" resetKey={form.id}>
           <OutputPane
             form={form}
             finalHtml={formOutput.finalHtml}

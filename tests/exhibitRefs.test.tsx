@@ -7,7 +7,6 @@ import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import App from "@/shell/App";
 import { renderFiling } from "@/ui/FilingsDialog";
-import { fromHtml } from "@/lib/bbcode";
 import { caseStore } from "@/lib/cases";
 import { characterStore } from "@/lib/characters";
 import { toDiscord } from "@/lib/discord";
@@ -81,7 +80,6 @@ describe("the exhibit list token", () => {
         "<li><strong>Exhibit C</strong>: Photo of the scene</li>\n" +
         "</ul>",
     );
-    expect(fromHtml(out)).toContain("Exhibit A");
     expect(toDiscord(out)).toContain("Exhibit C");
   });
 

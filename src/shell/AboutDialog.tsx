@@ -59,8 +59,8 @@ export function AboutContent() {
         Licensed to <strong>{BRANDING.firmName}</strong>
       </p>
       <p className="small">
-        Court filings for a roleplay server: forms, the firm&apos;s cases and evidence, and the Law Library. Filings
-        posted to the forum carry no firm branding.
+        Court filings for a roleplay server: forms, the firm&apos;s cases and evidence, and the Law Library. Court
+        filings carry no firm branding.
       </p>
       <hr />
       <ul className="small about-credits" id="about-credits">

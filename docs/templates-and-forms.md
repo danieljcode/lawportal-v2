@@ -70,7 +70,7 @@ template, not in it, so the token syntax, the template-safety check and the pari
 unaffected.
 
 - **In the editor**, an empty required field shows a small **Required** tag by its label.
-- **Copy for forum, Copy BBCode, the Discord copy buttons, Download .docx and Download PDF** check first. If any
+- **The Discord copy buttons, Download .docx and Download PDF** check first. If any
   are empty, a dialog lists them (each links to its field, opening its section) with **Go back** and
   **Copy anyway** (or **Download anyway**).
 - **What counts as empty:** nothing but spaces. Fields in an optional section that's switched off
@@ -101,7 +101,7 @@ in this was escaped". Only the renderers make it: `escapeHtml` and `render()` in
 `renderDiscordHtml` in `discordPreview.ts` (each calls `trustAsSafeHtml` after escaping). The places
 HTML goes require it:
 
-- the forum preview (`OutputPaneProps.previewHtml`) and a form's output (`FormOutput`);
+- the preview (`OutputPaneProps.previewHtml`) and a form's output (`FormOutput`);
 - the Discord preview (`DiscordPanelProps.finalHtml`);
 - the clipboard (`copyRich`);
 - the `.docx` download (`saveDocx`).
@@ -142,7 +142,7 @@ Add a `FormDef` to `src/data/extra-forms.ts`:
 }
 ```
 
-Use our court names. Then run `npm test`: the template-safety, engine, BBCode, Discord and
+Use our court names. Then run `npm test`: the template-safety, engine, Discord and
 `.docx` suites cover every form, and the Discord snapshots will need updating
 (`npx vitest run -u tests/discord.test.ts`) and reviewing.
 
@@ -186,8 +186,9 @@ those four, rewrite it with `npx vitest run -u tests/form-index.test.ts`; that t
 
 ## Reference data
 
-`port-forms` and the parity tests use three files from a third-party form generator (credited in
-the private repo's README): `js_template.js`, `js_bbcode.js` and `js_forms.data.js`. They have no
+`port-forms` and the parity tests use two files from a third-party form generator (credited in
+the private repo's README): `js_template.js` and `js_forms.data.js` (the private repo also still holds
+`js_bbcode.js`, unused since the BBCode output went in LP-223). They have no
 licence, so they're kept apart from this code, in the private repo `danieljcode/lawportal-reference`
 (files at its root), with `blocked-hosts.json`, the old forum hosts `scripts/scrub-links.mjs`
 unwraps. With access:

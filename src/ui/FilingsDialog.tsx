@@ -1,11 +1,9 @@
 // Filing history (LP-15): every filing copied or downloaded, with a search, a
-// filter by character and case number, a preview, and "Use as new draft" or
-// "Copy again". FilingList is also used by the Case File for a case's filings.
+// filter by character and case number, a preview, and "Use as new draft".
+// FilingList is also used by the Case File for a case's filings.
 
 import { useMemo, useState } from "react";
 import { getForm } from "@/data";
-import { fromHtml } from "@/lib/bbcode";
-import { copyRich } from "@/lib/clipboard";
 import { caseStore } from "@/lib/cases";
 import { snapshotTime } from "@/lib/draftHistory";
 import { exhibitRefs, resolveExhibitRefs } from "@/lib/exhibits";
@@ -38,29 +36,18 @@ export function renderFiling(f: Filing) {
   }
 }
 
-/** Copy a filing for the forum again; the message to show. */
-export async function copyFilingAgain(f: Filing): Promise<{ text: string; bad: boolean }> {
-  const html = renderFiling(f);
-  if (!html) return { text: "That form isn't available any more.", bad: true };
-  const ok = await copyRich(html, fromHtml(html));
-  return ok
-    ? { text: "Copied " + f.formTitle + " again. Paste it into the forum editor.", bad: false }
-    : { text: "Copy failed: try again.", bad: true };
-}
-
 export interface FilingListProps {
   filings: Filing[];
   /** The filing shown in a preview, if the list has one. */
   picked?: string | null;
   onPick?(id: string): void;
   onUse(f: Filing): void;
-  onStatus(text: string, bad: boolean): void;
   /** Omit the case number on each row (the Case File lists one case's filings). */
   hideCase?: boolean;
 }
 
 /** Filings with their time, form, character and case, and the two actions. */
-export function FilingList({ filings, picked, onPick, onUse, onStatus, hideCase }: FilingListProps) {
+export function FilingList({ filings, picked, onPick, onUse, hideCase }: FilingListProps) {
   return (
     <ul className="filing-list">
       {filings.map((f) => (
@@ -76,13 +63,6 @@ export function FilingList({ filings, picked, onPick, onUse, onStatus, hideCase 
           <span className="filing-actions">
             <button type="button" className="mini" onClick={() => onUse(f)}>
               Use as new draft
-            </button>
-            <button
-              type="button"
-              className="mini"
-              onClick={() => void copyFilingAgain(f).then((m) => onStatus(m.text, m.bad))}
-            >
-              Copy again
             </button>
           </span>
         </li>
@@ -120,7 +100,6 @@ function FilingsBody({ characters, onUse }: FilingsDialogProps) {
   const [charId, setCharId] = useState("");
   const [caseNumber, setCaseNumber] = useState("");
   const [picked, setPicked] = useState<string | null>(null);
-  const [status, setStatus] = useState<{ text: string; bad: boolean } | null>(null);
   const shown = useMemo(() => filterFilings(all, { q, charId, caseNumber }), [all, q, charId, caseNumber]);
   const current = shown.find((f) => f.id === picked) || shown[0] || null;
   const preview = useMemo(() => (current ? renderFiling(current) : null), [current]);
@@ -132,8 +111,7 @@ function FilingsBody({ characters, onUse }: FilingsDialogProps) {
   if (!all.length) {
     return (
       <p id="filings-empty">
-        No filings yet. Each time you copy a filing for the forum, as BBCode or for Discord, or download it as .docx, a
-        copy is kept here.
+        No filings yet. Each time you copy a filing for Discord, or download it as .docx or PDF, a copy is kept here.
       </p>
     );
   }
@@ -185,13 +163,7 @@ function FilingsBody({ characters, onUse }: FilingsDialogProps) {
       <div className="history-layout">
         <div>
           {shown.length ? (
-            <FilingList
-              filings={shown}
-              picked={current?.id}
-              onPick={setPicked}
-              onUse={onUse}
-              onStatus={(text, bad) => setStatus({ text, bad })}
-            />
+            <FilingList filings={shown} picked={current?.id} onPick={setPicked} onUse={onUse} />
           ) : (
             <p className="muted">No filings match.</p>
           )}
@@ -209,9 +181,6 @@ function FilingsBody({ characters, onUse }: FilingsDialogProps) {
           )}
         </div>
       </div>
-      <p className={"small" + (status ? (status.bad ? " bad" : " good") : "")} role="status" id="filings-status">
-        {status?.text || ""}
-      </p>
     </>
   );
 }

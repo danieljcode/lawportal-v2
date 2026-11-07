@@ -208,23 +208,21 @@ for (const layout of LAYOUTS) {
   });
 }
 
-test("Copy for forum puts the filing on the clipboard as HTML", async ({ page, context, browserName }) => {
+test("Copy for Discord puts the filing on the clipboard", async ({ page, context, browserName }) => {
   test.skip(sampleData(), "needs the private forms");
   test.skip(browserName !== "chromium", "clipboard permissions are Chromium-only");
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await openForm(page, "civil-complaint");
   await page.locator("#f-plaintiff-name").fill("Ann Lee");
   // The defendant and case number are still empty (LP-87): the copy asks first.
-  await page.locator("#copy-rich").click();
+  await page.locator("#tab-discord").click();
+  await page.locator("#dc-copy-1").click();
   await expect(page.locator("#missing-list")).toContainText("Defendant name");
   await page.locator("#missing-anyway").click();
-  await expect(page.locator("#copy-status")).toContainText("Copied");
-  const html = await page.evaluate(async () => {
-    const [item] = await navigator.clipboard.read();
-    return (await item.getType("text/html")).text();
-  });
-  expect(html).toContain("Ann Lee");
-  expect(html).toContain("SAN ANDREAS COURT");
+  await expect(page.locator("#copy-status")).toContainText("copied");
+  const text = await page.evaluate(() => navigator.clipboard.readText());
+  expect(text).toContain("Ann Lee");
+  expect(text).toContain("SAN ANDREAS COURT");
 });
 
 test("Download .docx gives a Word file", async ({ page }) => {

@@ -20,4 +20,4 @@ Drafts save as you type. **Undo** and **Redo** step through your changes, and **
 
 Under a text box, **Insert exhibit** adds a case exhibit, such as "Exhibit C (Dashcam footage)".
 
-When it's ready, see [Copying to the forum](#help/forum).
+When it's ready, see [Sending a filing](#help/sending).
