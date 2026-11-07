@@ -32,6 +32,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "fix",
         text: "Changing character on the New client intake page no longer saves one character's unfinished intake over another's. Each character's intake is kept, and comes back when you switch to them.",
       },
+      {
+        type: "fix",
+        text: "Download PDF now adds the filing to Filing history and its case, like a copy or a .docx. It's listed as Printed or saved as PDF, since the app can't tell if the print was cancelled.",
+      },
     ],
   },
   {

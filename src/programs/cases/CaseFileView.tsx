@@ -298,7 +298,7 @@ function CaseLinks({
         ) : (
           <>
             <p className="small muted">
-              No filings yet. Filings copied or downloaded with this case number will be listed here.
+              No filings yet. Filings copied, downloaded or printed with this case number will be listed here.
             </p>
             <a className="btn" id="case-filings-start" href="#filings">
               Start a filing
