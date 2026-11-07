@@ -69,9 +69,10 @@ describe("required fields (LP-87)", () => {
     expect(must(".field.missing .tag.req").textContent).toBe("Required");
   });
 
-  it("Copy BBCode lists the empty fields; Go back copies nothing", () => {
+  it("Copy for Discord lists the empty fields; Go back copies nothing", () => {
     mount(FORM);
-    click("#copy-bbcode");
+    click("#tab-discord");
+    click("#dc-copy-1");
     expect(dialogOpen()).toBe(true);
     expect(listed()).toEqual(["Plaintiff name", "Case number", "Defendant name", "Name"]);
     expect(must("#missing-anyway").textContent).toBe("Copy anyway");
@@ -82,22 +83,24 @@ describe("required fields (LP-87)", () => {
 
   it("Copy anyway copies", async () => {
     mount(FORM);
-    click("#copy-bbcode");
+    click("#tab-discord");
+    click("#dc-copy-1");
     await act(async () => {
       must("#missing-anyway").click();
       await new Promise((r) => setTimeout(r, 0));
     });
     expect(dialogOpen()).toBe(false);
     expect(writeText).toHaveBeenCalledTimes(1);
-    expect(must("#copy-status").textContent).toBe("BBCode copied.");
+    expect(must("#copy-status").textContent).toBe("Part 1 copied. Paste it into Discord.");
   });
 
   it("copies straight away once every required field is filled", async () => {
     writeDraft(defaultKV(), FORM, { ...EMPTY_STATE, values: FILLED });
     mount(FORM);
     expect(tagged()).toEqual([]);
+    click("#tab-discord");
     await act(async () => {
-      must("#copy-bbcode").click();
+      must("#dc-copy-1").click();
       await new Promise((r) => setTimeout(r, 0));
     });
     expect(dialogOpen()).toBe(false);
@@ -113,7 +116,8 @@ describe("required fields (LP-87)", () => {
         (d) => d.querySelector(".section-title")?.textContent === "Signature",
       )!;
     expect(signature().open).toBe(false);
-    click("#copy-rich");
+    click("#tab-discord");
+    click("#dc-copy-1");
     expect(listed()).toEqual(["Name"]);
     await act(async () => {
       must<HTMLAnchorElement>("#missing-list a").click();

@@ -7,12 +7,12 @@ import clients from "./topics/clients.md";
 import control from "./topics/control.md";
 import filings from "./topics/filings.md";
 import find from "./topics/find.md";
-import forum from "./topics/forum.md";
 import help from "./topics/help.md";
 import home from "./topics/home.md";
 import jap from "./topics/jap.md";
 import ledger from "./topics/ledger.md";
 import library from "./topics/library.md";
+import sending from "./topics/sending.md";
 import sync from "./topics/sync.md";
 import themes from "./topics/themes.md";
 
@@ -53,7 +53,7 @@ export const CONTENTS: readonly { heading: string; topics: readonly Topic[] }[] 
     heading: "How to",
     topics: [
       topic("home", home),
-      topic("forum", forum),
+      topic("sending", sending),
       topic("characters", characters),
       topic("sync", sync),
       topic("themes", themes),

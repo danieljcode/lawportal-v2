@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // Filing history through the whole App (LP-15): a copy is kept, Filing history
 // lists and previews it, "Use as new draft" on the open form (an undo step) and
-// on another form (after asking), "Copy again", and a case's filings in the Case File.
+// on another form (after asking), and a case's filings in the Case File.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
@@ -61,6 +61,12 @@ function setValue(sel: string, value: string): void {
   });
 }
 
+/** Copy the filing's first Discord message, the way a filing is now sent (LP-223). */
+async function copyForDiscord(): Promise<void> {
+  await clickAsync("#tab-discord");
+  await clickAsync("#dc-copy-1");
+}
+
 const buttonIn = (sel: string, text: string) =>
   [...document.querySelectorAll<HTMLButtonElement>(sel + " button")].find((b) => b.textContent === text)!;
 
@@ -97,7 +103,7 @@ afterEach(() => {
 describe("filing history (LP-15)", () => {
   it("keeps a filing when it's copied, with the character and case", async () => {
     mount("#" + FORM);
-    await clickAsync("#copy-bbcode");
+    await copyForDiscord();
     expect(writeText).toHaveBeenCalledTimes(1);
     expect(filingStore().list()).toMatchObject([
       {
@@ -106,7 +112,7 @@ describe("filing history (LP-15)", () => {
         charName: "Alice Lawyer",
         caseNumber: "90SCCC00001",
         caseId: "case0001",
-        via: "bbcode",
+        via: "discord",
       },
     ]);
     expect(filingStore().list()[0].state.values).toMatchObject(FILLED);
@@ -116,24 +122,24 @@ describe("filing history (LP-15)", () => {
     writeText.mockImplementation(() => Promise.reject(new Error("denied")));
     Object.defineProperty(document, "execCommand", { value: () => false, configurable: true });
     mount("#" + FORM);
-    await clickAsync("#copy-bbcode");
+    await copyForDiscord();
     expect(filingStore().list()).toEqual([]);
   });
 
   it("Filing history lists and previews filings, and finds them by case number", async () => {
     mount("#" + FORM);
-    await clickAsync("#copy-bbcode");
+    await copyForDiscord();
     await clickAsync("#open-filings");
     expect(must("#filings-dialog").hasAttribute("open")).toBe(true);
     expect(must(".filing-list .filing").textContent).toContain("Civil Complaint");
-    expect(must(".filing-list .filing").textContent).toContain("Copied as BBCode");
+    expect(must(".filing-list .filing").textContent).toContain("Copied for Discord");
     expect(must("#filings-preview").textContent).toContain("Ann Lee");
     expect(must<HTMLSelectElement>("#filings-case").options[1].value).toBe("90SCCC00001");
   });
 
   it("Use as new draft on the open form is an undo step", async () => {
     mount("#" + FORM);
-    await clickAsync("#copy-bbcode");
+    await copyForDiscord();
     setValue("#f-plaintiff-name", "Changed");
     await clickAsync("#open-filings");
     await act(async () => buttonIn("#filings-dialog .filing", "Use as new draft").click());
@@ -146,7 +152,7 @@ describe("filing history (LP-15)", () => {
   it("Use as new draft for another form replaces its draft after asking, keeping the old one", async () => {
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
     mount("#" + FORM);
-    await clickAsync("#copy-bbcode");
+    await copyForDiscord();
     go("#extra-subpoena"); // leaving the form saves its draft, so change it afterwards
     writeDraft(defaultKV(), FORM, { ...EMPTY_STATE, values: { "Plaintiff name": "Newer draft" } });
     await clickAsync("#open-filings");
@@ -158,21 +164,9 @@ describe("filing history (LP-15)", () => {
     expect(draftHistory().list(FORM)[0].state.values["Plaintiff name"]).toBe("Newer draft");
   });
 
-  it("Copy again copies the filing for the forum", async () => {
-    mount("#" + FORM);
-    await clickAsync("#copy-bbcode");
-    await clickAsync("#open-filings");
-    await act(async () => {
-      buttonIn("#filings-dialog .filing", "Copy again").click();
-      await new Promise((r) => setTimeout(r, 0));
-    });
-    expect(write).toHaveBeenCalledTimes(1);
-    expect(must("#filings-status").textContent).toContain("Copied Civil Complaint again");
-  });
-
   it("a case's filings show on it in the Case File", async () => {
     mount("#" + FORM);
-    await clickAsync("#copy-bbcode");
+    await copyForDiscord();
     go("#cases/case0001");
     expect(must("#case-filings .filing").textContent).toContain("Civil Complaint");
     expect(must("#case-filings .filing").textContent).not.toContain("90SCCC00001");

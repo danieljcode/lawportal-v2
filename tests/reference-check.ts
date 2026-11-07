@@ -6,7 +6,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { REAL_DATA_TESTS, sampleData } from "./real-data";
 
-const FILES = ["js_template.js", "js_bbcode.js", "js_forms.data.js"];
+const FILES = ["js_template.js", "js_forms.data.js"];
 
 export default function setup(): void {
   if (sampleData()) {

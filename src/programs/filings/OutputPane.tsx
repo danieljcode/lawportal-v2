@@ -1,9 +1,7 @@
-// The forum preview window (FR7, INV §a aside#output): Preview/BBCode/Discord tabs,
-// Highlight unfilled, Copy for forum, Copy BBCode, Download .docx and Download PDF.
+// The output window (FR7, INV §a aside#output): Preview and Discord tabs, Highlight unfilled,
+// Download .docx and Download PDF. Filings go out as .docx, PDF or Discord, not the forum (LP-223).
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { fromHtml } from "@/lib/bbcode";
-import { copyRich, copyText } from "@/lib/clipboard";
+import { useEffect, useRef, useState } from "react";
 import { saveDocx } from "@/lib/docx/saveDocx";
 import type { FilingVia } from "@/lib/filings";
 import type { MissingField } from "@/lib/formState";
@@ -30,10 +28,10 @@ export interface OutputPaneProps {
   onOpenHistory?(): void;
 }
 
-type Tab = "preview" | "bbcode" | "discord";
+type Tab = "preview" | "discord";
 
-const TABS: Tab[] = ["preview", "bbcode", "discord"];
-const PANEL_ID: Record<Tab, string> = { preview: "preview", bbcode: "bbcode-pane", discord: "discord-pane" };
+const TABS: Tab[] = ["preview", "discord"];
+const PANEL_ID: Record<Tab, string> = { preview: "preview", discord: "discord-pane" };
 
 export default function OutputPane({
   form,
@@ -54,7 +52,7 @@ export default function OutputPane({
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** A copy or download waiting on the missing-fields dialog: "Copy anyway" runs it. */
   const [pending, setPending] = useState<{ what: string; run: () => void } | null>(null);
-  const tabRefs = useRef<Record<Tab, HTMLButtonElement | null>>({ preview: null, bbcode: null, discord: null });
+  const tabRefs = useRef<Record<Tab, HTMLButtonElement | null>>({ preview: null, discord: null });
 
   useEffect(
     () => () => {
@@ -63,25 +61,10 @@ export default function OutputPane({
     [],
   );
 
-  // BBCode is only computed while its tab is visible (and on copy).
-  const bbcode = useMemo(() => (tab === "bbcode" ? fromHtml(finalHtml) : ""), [tab, finalHtml]);
-
   const flash = (text: string, bad = false) => {
     setStatus({ text, bad });
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => setStatus(null), 4000);
-  };
-
-  const copyForum = async () => {
-    const ok = await copyRich(finalHtml, fromHtml(finalHtml));
-    flash(ok ? "Copied. Paste it into the forum editor." : "Copy failed: select the preview and press Ctrl+C.", !ok);
-    if (ok) onFiled?.("forum");
-  };
-
-  const copyBBCode = async () => {
-    const ok = await copyText(bbcode || fromHtml(finalHtml));
-    flash(ok ? "BBCode copied." : "Copy failed: select the text and press Ctrl+C.", !ok);
-    if (ok) onFiled?.("bbcode");
   };
 
   // The browser makes the PDF: Save as PDF in its print dialog, named after the form like the .docx.
@@ -159,14 +142,13 @@ export default function OutputPane({
     <aside className="output window" id="output" aria-labelledby="output-title">
       <div className="title-bar">
         <span className="title-bar-text" id="output-title">
-          Forum preview
+          Preview
         </span>
       </div>
       <div className="window-body output-body">
         <div className="output-bar">
           <div className="tabs" role="tablist" aria-label="Output">
             {tabButton("preview", "Preview")}
-            {tabButton("bbcode", "BBCode")}
             {tabButton("discord", "Discord")}
           </div>
           <label className="toggle">
@@ -182,15 +164,9 @@ export default function OutputPane({
         </div>
         <div className="tab-panel">
           <div className="copy-row">
-            <button type="button" className="btn primary" id="copy-rich" onClick={() => guard("Copy", copyForum)}>
-              Copy for forum
-            </button>
-            <button type="button" className="btn" id="copy-bbcode" onClick={() => guard("Copy", copyBBCode)}>
-              Copy BBCode
-            </button>
             <button
               type="button"
-              className="btn"
+              className="btn primary"
               id="download-docx"
               onClick={() => guard("Download", downloadDocx)}
               disabled={building}
@@ -202,7 +178,7 @@ export default function OutputPane({
             </button>
           </div>
           {printing && (
-            // The final filing, never the highlighted preview, in the forum post's own look.
+            // The final filing, never the highlighted preview, in the preview's own look.
             <div className="post pdf-sheet" id="pdf-sheet" dangerouslySetInnerHTML={{ __html: finalHtml }} />
           )}
           {tab === "preview" ? (
@@ -216,23 +192,8 @@ export default function OutputPane({
                 dangerouslySetInnerHTML={{ __html: previewHtml }}
               />
             </div>
-          ) : tab === "discord" ? (
-            <DiscordPanel finalHtml={finalHtml} onStatus={flash} guard={guard} onCopied={() => onFiled?.("discord")} />
           ) : (
-            <div id="bbcode-pane" role="tabpanel" aria-labelledby="tab-bbcode">
-              <p className="note">
-                Invision has no table BBCode, so table layouts are flattened here. Use <strong>Copy for forum</strong>{" "}
-                to keep them.
-              </p>
-              <textarea
-                id="bbcode"
-                className="code-area"
-                readOnly
-                spellCheck={false}
-                value={bbcode}
-                aria-label="BBCode"
-              />
-            </div>
+            <DiscordPanel finalHtml={finalHtml} onStatus={flash} guard={guard} onCopied={() => onFiled?.("discord")} />
           )}
         </div>
       </div>

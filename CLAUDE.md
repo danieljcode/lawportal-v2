@@ -53,7 +53,7 @@ Flagged work is done only when its feature ships and the flag, with every check 
 - What differs between looks is a variable in `src/app/globals.css`. `data-look` rules hold only variables, and a
   program's stylesheet (`src/programs/<id>/<id>.css`) uses only variables, never hard-coded colours, fonts, font
   sizes, radii or bevels. `tests/stylesheets.test.ts` checks both.
-- The forum preview (`.post`), the Discord message and the print sheets keep fixed looks in every theme, and court
+- The preview (`.post`), the Discord message and the print sheets keep fixed looks in every theme, and court
   forms never carry firm branding.
 - A change that moves a screen fails the screenshot tests; take the new ones with `npm run screenshots:accept`
   (docs/testing.md).

@@ -1,9 +1,8 @@
-// Filing history (LP-15): a copy of every filing copied for the forum, as
-// BBCode or for Discord, or downloaded as .docx, so it can be looked up, reused
-// as a new draft, or copied again. One list under lawapp_filings, newest last,
+// Filing history (LP-15): a copy of every filing copied for Discord, or
+// downloaded as .docx or PDF, so it can be looked up or reused as a new draft. One list under lawapp_filings, newest last,
 // on the store base. It syncs and is in the full backup.
 //
-// A filing keeps the form's values, not its HTML: "Copy again" renders them
+// A filing keeps the form's values, not its HTML: its preview renders them
 // with today's template, and the list stays small enough to sync. The newest
 // MAX_FILINGS are kept; if storage is full, the oldest go first.
 
@@ -16,6 +15,7 @@ export const FILINGS_KEY = "lawapp_filings";
 export const FILINGS_VERSION = 1;
 export const MAX_FILINGS = 150;
 
+// "forum" and "bbcode" only label filings kept before those outputs went (LP-223).
 export const VIAS = ["forum", "bbcode", "discord", "docx", "pdf"] as const;
 export type FilingVia = (typeof VIAS)[number];
 
@@ -109,7 +109,7 @@ export interface FilingStore {
   get(id: string): Filing | null;
   /**
    * Keep a filing. Copying the same form with the same values and character
-   * again (say Copy for forum, then Download .docx) refreshes the newest entry
+   * again (say Download PDF, then Download .docx) refreshes the newest entry
    * instead of adding another. Returns the entry, or null when storage refused.
    */
   add(input: NewFiling): Filing | null;

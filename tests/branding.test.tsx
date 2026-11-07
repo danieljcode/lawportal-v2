@@ -10,7 +10,6 @@ import { appTitle, BRANDING, iconHref, titleScript, type Branding } from "@/bran
 import { ALL_FORMS } from "@/data";
 import { markBooted } from "@/lib/boot";
 import { toDiscord } from "@/lib/discord";
-import { fromHtml } from "@/lib/bbcode";
 import { compile, fields, render } from "@/lib/template";
 import { APP_VERSION } from "@/lib/version";
 import { setShell } from "@/lib/shell";
@@ -51,12 +50,12 @@ describe("the branding config", () => {
 });
 
 describe("court forms stay unbranded", () => {
-  it("never carry the firm's name in the forum post, BBCode or Discord text", () => {
+  it("never carry the firm's name in the filing or its Discord text", () => {
     for (const form of ALL_FORMS) {
       const tree = compile(form.html);
       for (const variant of ["A", "B"] as const) {
         const html = render(tree, fixture(fields(tree), variant));
-        for (const out of [html, fromHtml(html), toDiscord(html)]) {
+        for (const out of [html, toDiscord(html)]) {
           expect(out, form.id).not.toContain(BRANDING.firmName);
           expect(out, form.id).not.toContain("Friedman");
         }

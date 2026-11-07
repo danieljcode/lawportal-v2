@@ -1,6 +1,7 @@
 // Types and shared constants for HTML → Discord markdown.
 
-import type { HtmlParser } from "../bbcode";
+/** Parses HTML into a DOM: the browser's DOMParser by default, another in tests or scripts. */
+export type HtmlParser = (html: string) => Document;
 
 export type TablesMode = "code" | "lines";
 export type Mark = "b" | "i" | "u" | "s" | "spoiler";

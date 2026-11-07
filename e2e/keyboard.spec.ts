@@ -39,17 +39,20 @@ for (const layout of LAYOUTS) {
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/#cases\/case0001$/);
 
-    // Fill in a filing and copy it for the forum.
+    // Fill in a filing and copy it for Discord.
     await jump(page, "civil complaint");
     await expect(page.locator("#form-view")).toBeVisible();
     await tabTo(page, "#f-plaintiff-name");
     await page.keyboard.type("Ann Lee");
     await expect(page.locator("#preview")).toContainText("Ann Lee");
-    await tabTo(page, "#copy-rich");
+    // The tabs are one Tab stop; the arrow keys move between them.
+    await tabTo(page, "#tab-preview");
+    await page.keyboard.press("ArrowRight");
+    await tabTo(page, "#dc-copy-1");
     await page.keyboard.press("Enter");
     await tabTo(page, "#missing-anyway");
     await page.keyboard.press("Enter");
-    await expect(page.locator("#copy-status")).toContainText("Copied");
+    await expect(page.locator("#copy-status")).toContainText("copied");
 
     // The menus: Help → Contents.
     await tabTo(page, "#menu-help");

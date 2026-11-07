@@ -52,7 +52,7 @@ import type { SafeHtml } from "@/lib/safeHtml";
 import { useCaseVersion, useContactVersion, useLetterheadVersion } from "@/ui/useStore";
 
 export interface FormOutput {
-  /** Final HTML (no highlight): Copy for forum, BBCode, .docx. Rendered, so SafeHtml (LP-5). */
+  /** Final HTML (no highlight): .docx, PDF and Discord. Rendered, so SafeHtml (LP-5). */
   finalHtml: SafeHtml;
   /** What the preview shows (highlight per the checkbox). */
   previewHtml: SafeHtml;

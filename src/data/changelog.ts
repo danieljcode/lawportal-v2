@@ -52,6 +52,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "fix",
         text: "A form's list lettered past Z now goes on to AA and AB, as exhibits in the Case File do. Before, the 27th item got \"[\".",
       },
+      {
+        type: "update",
+        text: "Filings now go out as a Word file, a PDF or Discord messages. Copy for forum, Copy BBCode and the BBCode tab are gone, and so are the forum copy on invoices and Filing history's Copy again. The preview stays, showing the filing as it will look on the page.",
+      },
     ],
   },
   {

@@ -98,7 +98,6 @@ describe("Discord tab", () => {
     expect(must("#tab-discord").getAttribute("aria-controls")).toBe("discord-pane");
     must("#discord-pane");
     expect(document.querySelector("#preview")).toBeNull();
-    expect(document.querySelector("#bbcode")).toBeNull();
     expect(parts().length).toBeGreaterThanOrEqual(1);
     expect(must("#dc-count-1").textContent).toMatch(/^[\d,]+ \/ 2,000$/);
     expect(must("#dc-copy-1").textContent).toBe("Copy part 1");
@@ -201,10 +200,10 @@ describe("Discord tab", () => {
     expect(must("#copy-status").className).toContain("bad");
   });
 
-  it("moves between the three tabs with the arrow keys, Home and End", () => {
+  it("moves between the two tabs with the arrow keys, Home and End", () => {
     mount("civil-complaint");
-    click("#tab-bbcode");
-    key("#tab-bbcode", "ArrowRight");
+    click("#tab-preview");
+    key("#tab-preview", "ArrowRight");
     expect(must("#tab-discord").getAttribute("aria-selected")).toBe("true");
     expect(document.activeElement?.id).toBe("tab-discord");
     key("#tab-discord", "ArrowRight");

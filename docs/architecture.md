@@ -16,7 +16,7 @@ browser.
   title and browser tab (`appTitle()`, also `APP_TITLE` in `useRoute`), the app rail, the favicon
   (`iconHref()`: the logo, or scales in the firm's colours), the boot screen, the crash report and
   Help → About (`AboutDialog.tsx`, also the About section of Settings). The Classic desktop is the
-  firm's primary colour (navy, LP-24), set in `globals.css`. Court forms, the forum preview and
+  firm's primary colour (navy, LP-24), set in `globals.css`. Court forms, the preview and
   everything posted stay unbranded; `tests/branding.test.tsx` renders every form to check.
   Changing the firm means editing that file only (the backup format's `BACKUP_APP` id stays).
   The starting tab title is set by a head script (`titleScript()`), not
@@ -183,7 +183,7 @@ Lint (`eslint.config.mjs`, tested by `tests/import-rules.test.ts`) keeps the fol
   variable in `globals.css`: the colours, the bevels (`--bevel-raised`, `--bevel-sunken`…), the type
   scale (`--text-sm`…`--text-6xl`), radii and control sizes. A program's stylesheet uses only these;
   `tests/stylesheets.test.ts` fails on a hard-coded colour, font, font size, radius or bevel there,
-  and on any variable that isn't defined. The forum preview, the Discord message, the boot screen and
+  and on any variable that isn't defined. The preview, the Discord message, the boot screen and
   the print sheets keep fixed looks on purpose.
 - **The two looks** (LP-110). The 1990 values are on `:root` and stay the Classic look. The modern look
   (slate and brass, Dan's pick) overrides the same variables under `:root[data-look="modern"]`, with
@@ -195,8 +195,8 @@ Lint (`eslint.config.mjs`, tested by `tests/import-rules.test.ts`) keeps the fol
 
 ## From form to filing
 
-Every output starts from one HTML string, so the forum preview, BBCode, Discord and Word all say
-the same thing.
+Every output starts from one HTML string, so the preview, PDF, Discord and Word all say the same
+thing. (Forum and BBCode output went in LP-223.)
 
 ```mermaid
 flowchart LR
@@ -205,8 +205,7 @@ flowchart LR
   Ed -->|values| R[render]
   Tree --> R
   R --> H[Final HTML]
-  H --> P[Forum preview<br/>and Copy for forum]
-  H --> B[BBCode<br/>bbcode.ts]
+  H --> P[Preview<br/>and Download PDF]
   H --> D[Discord markdown<br/>discord.ts + discordSplit.ts]
   H --> W[".docx<br/>saveDocx.ts → htmlToDocx.ts, in the browser"]
 ```
@@ -224,9 +223,7 @@ flowchart LR
    rejects HTML that didn't come from a renderer (LP-5, see
    [Templates and forms](templates-and-forms.md#safehtml-the-compiler-checks-it-too-lp-5)).
 5. **Outputs**, all from that HTML:
-   - **Forum:** the live preview, and Copy for forum (HTML that keeps tables, with BBCode as the
-     plain-text fallback).
-   - **BBCode** (`src/lib/bbcode.ts`) for editors that only take plain text.
+   - **Preview and PDF:** the live preview, and Download PDF, which prints the same page.
    - **Discord** (`src/lib/discord/`, `discordSplit.ts`, `discordPreview.ts`): markdown split into
      messages of up to 2,000 characters (4,000 with Nitro), never inside formatting or a link.
    - **Word** (LP-37): `saveDocx` (`src/lib/docx/saveDocx.ts`) loads `htmlToDocx.ts` (the `docx`
@@ -441,7 +438,7 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
   downloaded by `reportCsv`, which defuses cells a spreadsheet would run as formulas.
   `lawapp_invoices` (up to 2,000) syncs per invoice by `updated` (`invoice:<id>`), like time
   entries. `invoiceHtml` renders the sheet once through the template engine (with the letterhead),
-  for the preview, Print, Copy for forum and Discord, and Download .docx. The sheet is paper in
+  for the preview, Print, Copy for Discord and Download .docx. The sheet is paper in
   every theme; Classic's is tractor-feed (`--invoice-*` tokens in `globals.css`).
 - **Find** (`src/lib/find.ts`, `src/programs/find/`, LP-95): `findIndex` turns cases, contacts,
   filings, exhibits, invoices and time entries into searchable text once per store change
@@ -485,9 +482,9 @@ Everything a user saves lives in the browser's IndexedDB (LP-36), one value per 
   - **From a form**: with a firm case for its case number, **Add dates to case** in the case bar
     lists the form's filled-in date fields (`formDates`), with computed ones (a case schedule's,
     `today+21`) and ones named like a hearing or deadline ticked.
-- **Filing history** (`src/lib/filings.ts`, LP-15). Each successful Copy for forum, Copy BBCode,
-  Discord copy or .docx download keeps a filing: the form, the active character, the case number
-  (and the firm case it matched), when and how, and the form's values. Not its HTML: **Copy again**
+- **Filing history** (`src/lib/filings.ts`, LP-15). Each successful Discord copy, .docx or PDF
+  download keeps a filing: the form, the active character, the case number
+  (and the firm case it matched), when and how, and the form's values. Not its HTML: its preview
   renders the values with today's template, which keeps entries small enough to sync. Copying the
   same values again refreshes the newest entry instead of adding one. The newest 150 are kept; if
   storage is full, the oldest go first.

@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { ALL_FORMS, getForm } from "@/data";
 import { COURTS } from "@/data/form-index";
 import { EXTRA_FORMS } from "@/data/extra-forms";
-import { fromHtml } from "@/lib/bbcode";
+import { toDiscord } from "@/lib/discord";
 import {
   DEFENDANT_LABELS,
   docketToForm,
@@ -140,18 +140,17 @@ describe("Additional Templates", () => {
         );
       });
 
-      it("renders top-level text values and the required headings (HTML and BBCode)", () => {
+      it("renders top-level text values and the required headings (HTML and Discord)", () => {
         const values: Values = {};
         for (const e of entries) if ("field" in e && e.field.type === "text") values[e.field.label] = "VALUE";
         const html = render(tree, values);
-        const bb = fromHtml(html, parse);
+        const dc = toDiscord(html, { parser: parse });
         expect(html).toContain("VALUE");
-        expect(bb).toContain("VALUE");
+        expect(dc).toContain("VALUE");
         for (const h of spec.headings) {
           expect(html, h).toContain(h);
-          expect(bb, h).toContain(h);
+          expect(dc, h).toContain(h);
         }
-        expect(bb).not.toContain("[table]");
       });
 
       it("uses the directory spoiler header", () => {

@@ -1,10 +1,9 @@
 // @vitest-environment jsdom
 // Everything typed reaches every output (LP-211): each typed field of every form gets its own value,
-// and each one the filing shows must also be in the BBCode, the Discord text and the .docx. Catches
-// a converter that drops a table cell or a block item, which no single converter's suite compares.
+// and each one the filing shows must also be in the Discord text and the .docx. Catches a converter
+// that drops a table cell or a block item, which neither converter's own suite compares.
 import { describe, expect, it } from "vitest";
 import { ALL_FORMS } from "@/data";
-import { fromHtml } from "@/lib/bbcode";
 import { toDiscord } from "@/lib/discord";
 import { htmlToDocx } from "@/lib/docx/htmlToDocx";
 import { compile, fields, render } from "@/lib/template";
@@ -41,14 +40,12 @@ describe("every typed value reaches every output (LP-211)", () => {
       const values = give(fixture(entries, "A"));
       const html = render(tree, values);
       const shown = [...new Set(html.match(/QZ\d+QZ/g) ?? [])];
-      const bbcode = fromHtml(html);
       const discord = toDiscord(html);
       const docx = readZipText(
         Buffer.from(await (await htmlToDocx(html, form.title)).arrayBuffer()),
         "word/document.xml",
       );
       for (const t of shown) {
-        expect(bbcode, `${form.id}: ${t} in BBCode`).toContain(t);
         expect(discord, `${form.id}: ${t} in Discord`).toContain(t);
         expect(docx, `${form.id}: ${t} in .docx`).toContain(t);
       }

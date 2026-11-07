@@ -1,6 +1,6 @@
 // Clipboard helpers for the output panes (FR7). Client only.
 //
-// copyRich puts HTML (keeps tables, bold, sizes) and BBCode on the clipboard in
+// copyRich puts HTML (keeps tables, bold, sizes) and plain text on the clipboard in
 // one go. Over plain http on the LAN `navigator.clipboard` doesn't exist, so
 // both helpers fall back to a selection plus execCommand("copy").
 
