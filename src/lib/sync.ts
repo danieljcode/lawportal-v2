@@ -25,7 +25,7 @@ import { cleanCheck, conflictLog, type ConflictCheck } from "./conflicts";
 import { cleanFiling, filingStore, type Filing } from "./filings";
 import { cleanEntry, timeStore, type TimeEntry } from "./ledger";
 import { cleanInvoice, invoiceStore, renumberClashes, type Invoice } from "./invoices";
-import { CODE_RE } from "./syncCode";
+import { CODE_RE, LOOKALIKE_HINT, normaliseCode } from "./syncCode";
 import { cleanDeposit, retainerStore, type Deposit } from "./retainers";
 import { cleanPrecedent, precedentStore, type Precedent } from "./precedents";
 import { docketStore } from "./dockets";
@@ -44,7 +44,7 @@ export const BASE_KEY = "lawapp_sync_base";
 /** This browser's versions of characters that lost the last merge ({at, characters}), for "Restore my version". */
 export const LOST_KEY = "lawapp_sync_lost";
 
-export { CODE_RE };
+export { CODE_RE, codeHint, LOOKALIKE_HINT } from "./syncCode";
 /** This server needs an invite word for a new code, and it wasn't given or isn't right (LP-178). */
 export const BAD_INVITE = "This server needs an invite word to turn on sync. Ask whoever runs it, then enter it below.";
 
@@ -837,10 +837,8 @@ export async function enable(invite = ""): Promise<string> {
 
 /** Use an existing code: fetch its data, fold in this browser's characters, apply, and upload the result. */
 export async function link(typed: string): Promise<void> {
-  const c = String(typed || "")
-    .trim()
-    .toUpperCase();
-  if (!CODE_RE.test(c)) throw new Error(BAD_CODE);
+  const c = normaliseCode(String(typed || ""));
+  if (!CODE_RE.test(c)) throw new Error(/[OI01]/.test(c.slice(3)) ? LOOKALIKE_HINT : BAD_CODE);
   const r = await request("GET", "data", undefined, c);
   const b = r.body || {};
   if (r.status === 404) throw new Error("No synced data for that code. Check it was typed correctly.");

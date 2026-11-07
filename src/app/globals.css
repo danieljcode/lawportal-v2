@@ -1685,6 +1685,13 @@ dialog.jump-box {
   width: auto;
   font-family: var(--mono);
 }
+.sync-code-hint {
+  font-family: var(--mono);
+}
+/* Kept for screen readers while empty, without taking room. */
+.sync-code-hint:empty {
+  margin: 0;
+}
 .sync-code-row {
   align-items: center;
 }

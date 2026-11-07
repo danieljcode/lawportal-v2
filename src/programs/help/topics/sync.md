@@ -13,7 +13,7 @@ Everything is saved in this browser. Nothing leaves your computer unless you tur
 Sync shares your characters, cases, filings, precedents and the rest between browsers and devices.
 
 1. In **Settings**, under **Sync across devices**, choose **Turn on sync**. You get a **sync code**. If the site asks for an invite word, get it from whoever runs it.
-2. On the other device, enter the same code to join.
+2. On the other device, enter the same code to join. Capitals, spaces and dashes don't matter, and the box shows the code as it will be used. Codes never use O, 0, I or 1.
 
 Anyone with the code can read and change that data, so keep it private. The dot in the top bar shows how sync is doing.
 
