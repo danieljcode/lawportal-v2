@@ -19,6 +19,15 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-11-07",
+    items: [
+      {
+        type: "new",
+        text: "A charge calculator on the Law Library's Penal Code page. Add charges from the list, as many of each as needed, to see the total time, its range and the total fine. Charges left to the judge are listed apart. Copy gives the charges and totals as text, and the list stays on this device until you clear it.",
+      },
+    ],
+  },
+  {
+    date: "2026-11-07",
     title: "Proven: install on your phone, and fixes from the audit",
     version: "0.6.0",
     items: [

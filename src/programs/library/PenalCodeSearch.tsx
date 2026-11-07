@@ -46,6 +46,8 @@ export interface PenalCodeSearchProps {
   onInsert?(c: Charge): void;
   /** Why Insert citation is off, when it is. */
   insertOff?: string;
+  /** Add the charge to the charge calculator (LP-218); the library page only. */
+  onAdd?(c: Charge): void;
   /** Ids prefix, so the page and the dialog don't clash. */
   idPrefix: string;
   /** The code to show (tests); the app's data file by default. */
@@ -59,6 +61,7 @@ export interface PenalCodeSearchProps {
 export default function PenalCodeSearch({
   onInsert,
   insertOff,
+  onAdd,
   idPrefix,
   code = PENAL_CODE,
   chapter: routeChapter,
@@ -189,6 +192,16 @@ export default function PenalCodeSearch({
                     <button type="button" className="mini" onClick={() => void copy(c)}>
                       Copy citation
                     </button>
+                    {onAdd && (
+                      <button
+                        type="button"
+                        className="mini"
+                        title={"Add " + chargeCitation(c) + " to the charge calculator"}
+                        onClick={() => onAdd(c)}
+                      >
+                        Add to calculator
+                      </button>
+                    )}
                   </span>
                 </div>
                 <p className="small precedent-meta">
