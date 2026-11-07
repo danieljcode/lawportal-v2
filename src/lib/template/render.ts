@@ -3,6 +3,7 @@
 import { trustAsSafeHtml, type SafeHtml } from "../safeHtml";
 import type { Field, Node, Tree, Values } from "../types";
 import { MONTH_NAMES, pad } from "../deadlines";
+import { exhibitLetter } from "../exhibits";
 import { escapeHtml } from "./escape";
 
 const NUMBER_WORDS = [
@@ -255,7 +256,7 @@ function renderPos(what: string, values: Values, index: number, defaultCount?: n
     case "WORD":
       return (NUMBER_WORDS[index] || String(index + 1)).toUpperCase();
     case "letter":
-      return String.fromCharCode(65 + index);
+      return exhibitLetter(index); // Z, then AA (LP-212)
     case "roman":
       return roman(index + 1);
   }

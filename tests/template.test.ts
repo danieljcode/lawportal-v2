@@ -259,6 +259,11 @@ describe("render()", () => {
     expect(out).toBe("A:a[OneaTwoz]B:[One]");
   });
 
+  it("letters past Z as AA, AB (LP-212)", () => {
+    const out = render(compile("{{#Items}}{{$letter}} {{/Items}}"), { "#Items": defaultItems(28) });
+    expect(out.trim().split(" ").slice(-3)).toEqual(["Z", "AA", "AB"]);
+  });
+
   it("renders each field type", () => {
     const r = (token: string, v: string | boolean) => render(compile(token), { X: v });
     expect(r("{{X:check}}", true)).toBe("[X]");
