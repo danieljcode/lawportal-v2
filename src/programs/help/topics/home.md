@@ -14,4 +14,8 @@ Overdue items come first, then the soonest. Court dates and actions show for the
 
 Below the work list are your **recent filings**, to open again, and your **recent cases**.
 
+## Quick add
+
+The round **+** at the bottom right, on the home screen and on an open case, adds something to a case in a couple of taps, without opening the Case File or the Ledger. Pick **Note**, **Time** or **Next action**, check the case (the one you have open, else the one changed last), fill it in and press **Add**. Notes and next actions go on the case as the character you're playing; time is logged for them today, in game time, so choose a character first. Add as many as you like, then close it.
+
 See also: [The Case File](#help/cases), [Characters](#help/characters).

@@ -2925,3 +2925,80 @@ body:has(.m-app) {
     grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
   }
 }
+
+/* ---------- quick add (LP-221): a round + above the taskbar or the phone's bottom bar ---------- */
+.quick-add-btn {
+  position: fixed;
+  right: 16px;
+  bottom: 44px;
+  z-index: 41;
+  width: 52px;
+  height: 52px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--primary-bg);
+  color: var(--primary-text);
+  box-shadow: var(--bevel-default);
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+}
+body:has(.m-app) .quick-add-btn {
+  bottom: 16px;
+}
+/* Room at the end of the page, so the + never covers the last thing on it. */
+body:has(.quick-add-btn) .layout,
+body:has(.quick-add-btn) .m-main {
+  padding-bottom: 72px;
+}
+@media (max-width: 760px) {
+  body:has(.m-app) .quick-add-btn {
+    bottom: 74px;
+  }
+  body:has(.quick-add-btn) .m-main {
+    padding-bottom: 134px;
+  }
+}
+@media print {
+  .quick-add-btn {
+    display: none;
+  }
+}
+.quick-add {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: min(360px, 80vw);
+}
+.quick-add .field,
+.quick-add select,
+.quick-add input[type="text"],
+.quick-add textarea {
+  width: 100%;
+}
+.quick-kinds,
+.quick-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.quick-kind {
+  flex: 1 1 0;
+  text-align: center;
+}
+.quick-kind input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.quick-kind:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.quick-row .field {
+  flex: 1 1 120px;
+  width: auto;
+}
+.quick-save {
+  min-height: 44px;
+}
