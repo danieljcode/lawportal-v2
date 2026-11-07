@@ -208,7 +208,8 @@ export default function FieldInput({
         key="today"
         type="button"
         className="mini"
-        onClick={() => onState((s) => todayDate(entries, s, path, f.label, now))}
+        // The time of the click, not the form's `now`: a form left open since another day (LP-206).
+        onClick={() => onState((s) => todayDate(entries, s, path, f.label, new Date()))}
       >
         Today
       </button>,
@@ -220,7 +221,7 @@ export default function FieldInput({
           type="button"
           className="mini"
           title={"Recalculate (" + f.prefill + ")"}
-          onClick={() => onState((s) => autoDate(entries, s, path, f.label, now))}
+          onClick={() => onState((s) => autoDate(entries, s, path, f.label, new Date()))}
         >
           Auto
         </button>,
