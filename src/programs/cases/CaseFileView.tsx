@@ -12,6 +12,7 @@ import { OUTCOME_LABELS } from "@/lib/outcomes";
 import type { Case, Character, OutcomeResult } from "@/lib/types";
 import CaseActions from "./CaseActions";
 import CaseNotes from "./CaseNotes";
+import CaseTimeline from "./CaseTimeline";
 import CaseBilling from "./CaseBilling";
 import CaseContacts from "./CaseContacts";
 import CaseDeadlines from "./CaseDeadlines";
@@ -247,7 +248,7 @@ function detailsStamp(c: Case): string {
 
 /**
  * A case's linked areas: its notes (LP-227), next actions (LP-170), billing (LP-173), deadlines (LP-18), contacts (LP-30),
- * filings (LP-15) and evidence (LP-12).
+ * filings (LP-15), evidence (LP-12) and all of it in date order (LP-219).
  */
 function CaseLinks({
   c,
@@ -302,6 +303,10 @@ function CaseLinks({
       <section className="case-empty" id="case-evidence" aria-labelledby="case-evidence-title">
         <h4 id="case-evidence-title">Evidence</h4>
         <CaseEvidence c={c} characters={characters} active={active} />
+      </section>
+      <section className="case-empty" id="case-timeline" aria-labelledby="case-timeline-title">
+        <h4 id="case-timeline-title">Timeline</h4>
+        <CaseTimeline c={c} filings={filings} characters={characters} />
       </section>
     </div>
   );

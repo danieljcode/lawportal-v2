@@ -107,7 +107,8 @@
 .case-links #case-notes,
 .case-links #case-actions,
 .case-links #case-billing,
-.case-links #case-deadlines {
+.case-links #case-deadlines,
+.case-links #case-timeline {
   grid-column: 1 / -1;
 }
 .case-billing {
@@ -464,4 +465,51 @@
 }
 .case-note-form textarea {
   width: 100%;
+}
+
+/* ---------- case timeline (LP-219) ---------- */
+.case-timeline-filter {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.case-timeline,
+.case-timeline ul {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.case-timeline-day h5 {
+  margin: 10px 0 2px;
+}
+.case-timeline-entry > a,
+.case-timeline-entry > button {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 6px;
+  align-items: baseline;
+  width: 100%;
+  margin: 0 0 4px;
+  padding: 4px 8px;
+  border: 0;
+  border-left: 3px solid var(--accent);
+  background: var(--field);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.case-timeline-entry > a:hover .case-timeline-title,
+.case-timeline-entry > button:hover .case-timeline-title {
+  text-decoration: underline;
+}
+.case-timeline-title,
+.case-timeline-detail {
+  flex-basis: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.case-timeline-detail {
+  white-space: pre-wrap;
 }
