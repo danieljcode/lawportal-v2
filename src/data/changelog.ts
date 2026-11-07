@@ -19,6 +19,8 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-11-07",
+    title: "Everyday helpers: a case timeline, calendar, quick add and more",
+    version: "0.7.0",
     items: [
       {
         type: "new",
