@@ -18,6 +18,8 @@ export function contentSecurityPolicy(nonce: string, dev = false): string {
     "font-src": ["'self'", "data:"],
     // Sync (/api) and Vercel Analytics (/_vercel/insights) are both on this origin.
     "connect-src": ["'self'"],
+    // The service worker, /sw.js (LP-51). Without this it falls back to script-src, where 'strict-dynamic' ignores 'self'.
+    "worker-src": ["'self'"],
     "object-src": ["'none'"],
     "base-uri": ["'self'"],
     "form-action": ["'self'"],

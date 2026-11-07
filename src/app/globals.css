@@ -1740,6 +1740,15 @@ dialog.jump-box {
 .set-aside-notice .mini {
   margin-left: auto;
 }
+.update-notice {
+  border-color: var(--link);
+}
+.update-notice strong {
+  color: inherit;
+}
+.update-notice .mini + .mini {
+  margin-left: 0;
+}
 .char-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

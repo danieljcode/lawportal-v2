@@ -21,6 +21,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     date: "2026-11-07",
     items: [
       {
+        type: "new",
+        text: "Install the app on your phone or computer: Add to Home Screen, or your browser's Install button. It opens in its own window and works without a connection once you've opened it online. When a new version is ready, a notice offers to reload into it, with a link to what's new.",
+      },
+      {
         type: "update",
         text: "Sync codes can be typed loosely: in lowercase, with spaces, or without the dashes. The box shows the code as it will be used, and says so if you type an O, 0, I or 1, which codes never use.",
       },
