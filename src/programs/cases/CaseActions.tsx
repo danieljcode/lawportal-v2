@@ -4,7 +4,7 @@
 // deadlines do.
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { cleanAction, doneActions, isOverdue, openActions } from "@/lib/actions";
+import { cleanAction, doneActions, isOverdue, openActions, setDone } from "@/lib/actions";
 import { caseStore } from "@/lib/cases";
 import { formatDay, gameToday, relativeDay } from "@/lib/deadlines";
 import type { Case, CaseAction, Character } from "@/lib/types";
@@ -63,7 +63,7 @@ export default function CaseActions({ c, characters }: { c: Case; characters: Ch
             type="checkbox"
             checked={!!a.done}
             aria-label={(a.done ? "Reopen: " : "Done: ") + a.title}
-            onChange={(e) => replace({ ...a, done: e.target.checked })}
+            onChange={(e) => replace(setDone(a, e.target.checked, gameToday()))}
           />
           <span>
             <strong>{a.title}</strong>

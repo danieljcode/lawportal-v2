@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "new",
+        text: "A Timeline on each case in the Case File: its filings, notes, deadlines and hearings, next actions done, evidence, time and invoices in date order, newest first, by game day. Show just one type, and click an entry to go to it.",
+      },
+      {
+        type: "new",
         text: "A charge calculator on the Law Library's Penal Code page. Add charges from the list, as many of each as needed, to see the total time, its range and the total fine. Charges left to the judge are listed apart. Copy gives the charges and totals as text, and the list stays on this device until you clear it.",
       },
       {

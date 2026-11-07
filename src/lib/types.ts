@@ -205,6 +205,8 @@ export interface CaseAction {
   /** In-game due date, YYYY-MM-DD (the 1990 calendar). */
   due?: string;
   done?: boolean;
+  /** In-game date it was ticked off (LP-219); absent for actions done before then. */
+  doneOn?: string;
 }
 
 /** A dated entry on a case (LP-18): an in-game date, a label and a note. */

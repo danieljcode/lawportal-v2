@@ -11,7 +11,8 @@ Each case has:
 - **deadlines and hearings**;
 - the **filings** made for it;
 - **contacts** from the Rolodex, each in a role such as client or witness;
-- its **evidence**: lettered exhibits (A, B, C…) with links and dates. Each exhibit has a **chain of custody** you can copy into a filing or print.
+- its **evidence**: lettered exhibits (A, B, C…) with links and dates. Each exhibit has a **chain of custody** you can copy into a filing or print;
+- a **timeline**: all of the above in date order, newest first and grouped by game day, to catch up on a case at a glance. **Show** picks one type, such as filings only. Click an entry to go to it; time and invoices open in the Ledger. A next action shows the day it was ticked off; ones ticked off before the timeline came in are under **No date**.
 
 **Upcoming** lists the next 14 days, overdue first. The Case File shows a dot when something is due within 48 hours.
 

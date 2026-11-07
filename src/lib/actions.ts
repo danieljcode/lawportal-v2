@@ -20,7 +20,14 @@ export function cleanAction(input: unknown): CaseAction | null {
     ...(isId(o.owner) ? { owner: o.owner } : {}),
     ...(typeof o.due === "string" && ISO_DATE_RE.test(o.due) ? { due: o.due } : {}),
     ...(o.done === true ? { done: true } : {}),
+    ...(o.done === true && typeof o.doneOn === "string" && ISO_DATE_RE.test(o.doneOn) ? { doneOn: o.doneOn } : {}),
   };
+}
+
+/** Tick an action off on game date `today` (kept for the case timeline, LP-219), or reopen it. */
+export function setDone(a: CaseAction, done: boolean, today: string): CaseAction {
+  const { done: _done, doneOn: _doneOn, ...rest } = a;
+  return done ? { ...rest, done: true, doneOn: today } : rest;
 }
 
 /** A case's actions, cleaned, without repeated ids, in the order they were added. */
