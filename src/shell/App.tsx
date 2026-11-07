@@ -38,7 +38,6 @@ import ProgramManager from "./ProgramManager";
 import { PROGRAMS, programFor, shown, titleIn } from "./registry";
 import type { Shell } from "./program";
 import Taskbar from "./Taskbar";
-import { registerServiceWorker } from "@/lib/pwa";
 import { S_SAVE_FAILED_HINT, S_SET_ASIDE, S_SET_ASIDE_HINT, S_UPDATE_READY } from "@/lib/strings";
 import { useDialogs } from "./useDialogs";
 import { CONTROL_TITLE, hashFor, navigate, pageTitle, SETTINGS_TITLE, useRoute } from "./useRoute";
@@ -124,7 +123,6 @@ export default function App() {
   const [saveFailedSeen, setSaveFailedSeen] = useState(0);
   /** Switches to a new version that has installed (LP-51), until the notice is dismissed. */
   const [applyUpdate, setApplyUpdate] = useState<(() => void) | null>(null);
-  useEffect(() => registerServiceWorker((apply) => setApplyUpdate(() => apply)), []);
 
   /* ---------- stores ---------- */
 
@@ -289,11 +287,13 @@ export default function App() {
   const visiblePrograms = PROGRAMS.filter((p) => shown(p, { commissioner }));
 
   // Once the browser is idle, fetch the code of every program this character can open, so opening
-  // one is instant (LP-122). A failed fetch is retried when the program is opened.
+  // one is instant (LP-122). A failed fetch is retried when the program is opened. The service worker
+  // (LP-51) starts then too, so its code isn't in the first load; it starts only once.
   useEffect(() => {
     const idle = window.requestIdleCallback ?? ((f: () => void) => window.setTimeout(f, 200));
     const id = idle(() => {
       for (const p of PROGRAMS) if (shown(p, { commissioner })) p.load().catch(() => {});
+      void import("@/lib/pwa").then((m) => m.registerServiceWorker((apply) => setApplyUpdate(() => apply)));
     });
     return () => (window.cancelIdleCallback ?? window.clearTimeout)(id);
   }, [commissioner]);
