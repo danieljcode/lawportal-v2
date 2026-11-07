@@ -122,7 +122,6 @@ async function main() {
   const data = {
     title: "State of San Andreas Penal Code",
     note: "Revised draft: subject to change until the server's staff sign it off.",
-    source: SHEET,
     updated: new Date().toISOString().slice(0, 10),
     charges,
   };

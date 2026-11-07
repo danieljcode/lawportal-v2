@@ -82,6 +82,10 @@ describe("the importer", () => {
 });
 
 describe("the penal code data file", () => {
+  it("doesn't carry the sheet's private address, which would ship to every browser (LP-208)", () => {
+    expect(Object.keys(PENAL_CODE)).not.toContain("source");
+  });
+
   it("has every charge once, with a title, chapter and known class, and a last-updated date", () => {
     expect(PENAL_CODE.charges.length).toBeGreaterThan(250);
     expect(PENAL_CODE.updated).toMatch(/^\d{4}-\d{2}-\d{2}$/);
