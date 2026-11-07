@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "new",
+        text: "Offers on each case: log every plea or settlement offer with its date, who made it and the terms, then mark it accepted, rejected or countered (and point to the counter-offer). Accepting one offers to close the case as a plea deal or settlement; it never closes it by itself.",
+      },
+      {
+        type: "new",
         text: "Copy brief on a case copies where it stands as one Discord message: case number, parties, status, who's on it, the next court date and the open next actions. Billing is only added if you tick Include billing.",
       },
       {

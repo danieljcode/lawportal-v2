@@ -475,6 +475,45 @@
   gap: 6px 12px;
 }
 
+/* ---------- offers (LP-229) ---------- */
+.offer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 6px 0;
+  padding: 0;
+  list-style: none;
+}
+.offer {
+  padding: 4px 8px;
+  border-left: 3px solid var(--shadow);
+  background: var(--field);
+}
+.offer-accepted {
+  border-left-color: var(--accent);
+}
+.offer p {
+  margin: 0;
+}
+.offer-terms {
+  overflow-wrap: anywhere;
+}
+.offer-controls {
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.offer-controls select {
+  max-width: 100%;
+}
+.offer-suggest {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0;
+}
+
 /* ---------- deadline calculator (LP-220) ---------- */
 .deadline-calc {
   margin: 8px 0 0;

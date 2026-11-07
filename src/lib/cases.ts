@@ -11,6 +11,7 @@ import { cleanActions, unionActions } from "./actions";
 import { cleanCaseNotes, legacyNote, unionCaseNotes } from "./caseNotes";
 import { cleanDeadlines, unionDeadlines } from "./deadlines";
 import { cleanExhibits, unionExhibits } from "./exhibits";
+import { cleanOffers, unionOffers } from "./offers";
 import { cleanOutcome } from "./outcomes";
 import { clean as cleanDocket, DOCKETS_PREFIX } from "./docketFields";
 import { parseRate } from "./ledger";
@@ -66,6 +67,7 @@ export function cleanCase(input: unknown): Case {
   const rate = parseRate(o.rate);
   const actions = cleanActions(o.actions);
   const outcome = cleanOutcome(o.outcome);
+  const offers = cleanOffers(o.offers);
   // A case saved before LP-227 has one notes box: it becomes the first note.
   const legacy = legacyNote(o.notes, created, lead);
   const caseNotes = cleanCaseNotes(o.caseNotes);
@@ -79,6 +81,7 @@ export function cleanCase(input: unknown): Case {
     exhibits: cleanExhibits(o.exhibits),
     ...(actions.length ? { actions } : {}),
     ...(notes.length ? { caseNotes: notes } : {}),
+    ...(offers.length ? { offers } : {}),
     ...(outcome ? { outcome } : {}),
     ...(rate !== null ? { rate } : {}),
   };
@@ -109,6 +112,8 @@ function combine(newer: Case, older: Case): Case {
   if (actions.length) out.actions = actions;
   const notes = unionCaseNotes(newer.caseNotes || [], older.caseNotes || []);
   if (notes.length) out.caseNotes = notes;
+  const offers = unionOffers(newer.offers || [], older.offers || []);
+  if (offers.length) out.offers = offers;
   return out;
 }
 
