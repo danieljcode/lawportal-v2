@@ -19,6 +19,8 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-11-07",
+    title: "Proven: install on your phone, and fixes from the audit",
+    version: "0.6.0",
     items: [
       {
         type: "new",
