@@ -39,8 +39,7 @@ npm run build && npm run start:lan  # or the production build, on 0.0.0.0
 ```
 
 Both set **`LAWAPP_ALLOW_LAN=1`**, which lets the app's server answer requests from other machines,
-not only `localhost`. Without it, sync and the `.docx` download only work on the computer running the
-app. [Development](docs/development.md) has the details and the other settings.
+not only `localhost`. Without it, sync only works on the computer running the app. [Development](docs/development.md) has the details and the other settings.
 
 ### Hosted (Vercel)
 

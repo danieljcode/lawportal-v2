@@ -5,8 +5,6 @@ import { CODE_RE } from "../syncCode";
 /** 32 symbols without the look-alikes I, O, 0 and 1. 256 is divisible by 32, so `byte & 31` has no bias. */
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
-export { CODE_RE };
-
 export function generateCode(): string {
   const bytes = randomBytes(20);
   const groups: string[] = [];
