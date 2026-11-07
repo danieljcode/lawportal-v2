@@ -55,6 +55,7 @@ export default function GameDateInput({ id, value, onChange, withTime, required,
   const wrap = useRef<HTMLSpanElement>(null);
   const opener = useRef<HTMLButtonElement>(null);
   const headingId = useId();
+  const errorId = useId();
 
   // A value set from outside (Today, a reset, another case) replaces what's typed; one this box
   // sent while you type doesn't, so "1990-10-2" isn't rewritten before you reach "29".
@@ -145,6 +146,7 @@ export default function GameDateInput({ id, value, onChange, withTime, required,
         required={required}
         aria-invalid={invalid || undefined}
         {...aria}
+        aria-describedby={[aria["aria-describedby"], invalid && errorId].filter(Boolean).join(" ") || undefined}
         value={text}
         onChange={(e) => type(e.target.value)}
         onBlur={tidy}
@@ -175,6 +177,12 @@ export default function GameDateInput({ id, value, onChange, withTime, required,
             if (date) send(date, e.target.value);
           }}
         />
+      )}
+      {/* What's typed isn't saved until it's a real date (LP-205): say so, and what's kept. */}
+      {invalid && (
+        <span className="error game-date-error" id={errorId} role="alert">
+          {"Not a real date. " + (date ? "Keeping " + formatDay(date) + "." : "No date is set.")}
+        </span>
       )}
       {focus && (
         <div className="game-date-pop" role="dialog" aria-labelledby={headingId} onKeyDown={popupKey}>

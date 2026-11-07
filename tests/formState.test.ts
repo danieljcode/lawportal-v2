@@ -318,6 +318,25 @@ describe("dockets ↔ form", () => {
     expect(next.autofilled["Plaintiff name"]).toBeUndefined();
   });
 
+  it("docketToForm clears what a second case leaves blank, so none of the first case stays (LP-207)", () => {
+    const entries = entriesOf("civil-complaint");
+    const s = openState(entries, null, char({ name: "Ann" }), NOW);
+    const a = docketToForm(entries, s, docket({ defendant: "Ann Lee", filed: "1990-01-01" })).state;
+    const b = docketToForm(entries, a, docket({ caseNumber: "90SCCC00148" })).state;
+    expect(b.values["Case number"]).toBe("90SCCC00148");
+    expect(b.values["Defendant name"]).toBe("");
+    expect(b.values["Action filed"]).toBe("");
+  });
+
+  it("docketToForm on the same case again keeps what was typed", () => {
+    const entries = entriesOf("civil-complaint");
+    const s = openState(entries, null, char({ name: "Ann" }), NOW);
+    const a = docketToForm(entries, s, docket({ plaintiff: "Ann" })).state;
+    const typed = { ...a, values: { ...a.values, "Defendant name": "Typed by hand" } };
+    const again = docketToForm(entries, typed, docket({ plaintiff: "Ann" })).state;
+    expect(again.values["Defendant name"]).toBe("Typed by hand");
+  });
+
   it("docketToForm fills division and party labels where present", () => {
     const entries = entriesOf("misc-order-decree");
     const { state: next, filled } = docketToForm(entries, state(), docket({ plaintiff: "A, B", defendant: "C" }));

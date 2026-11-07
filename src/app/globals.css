@@ -2414,8 +2414,19 @@ dialog.changelog {
   min-width: 0;
 }
 .game-date .game-date-text {
-  flex: 1;
+  flex: 1 1 0;
   min-width: 0;
+}
+/* An impossible date (LP-205): outlined, with its message on a line of its own. */
+.game-date:has(.game-date-error) {
+  flex-wrap: wrap;
+}
+.game-date .game-date-text[aria-invalid="true"] {
+  outline: 2px solid var(--bad);
+  outline-offset: -2px;
+}
+.game-date-error {
+  flex-basis: 100%;
 }
 .game-date-open {
   flex: none;
