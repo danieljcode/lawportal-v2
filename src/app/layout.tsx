@@ -15,7 +15,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   description:
     "Fill in San Andreas court petitions, preview them as a forum post, and copy them straight into the forum editor. Runs locally.",
-  icons: { icon: iconHref() },
+  icons: { icon: iconHref(), apple: "/icons/180" },
+  // Installed on an iPhone (LP-51): its own window, named like the manifest's short name.
+  appleWebApp: { capable: true, title: BRANDING.shortName },
 };
 
 export const viewport: Viewport = {

@@ -38,7 +38,8 @@ import ProgramManager from "./ProgramManager";
 import { PROGRAMS, programFor, shown, titleIn } from "./registry";
 import type { Shell } from "./program";
 import Taskbar from "./Taskbar";
-import { S_SAVE_FAILED_HINT, S_SET_ASIDE, S_SET_ASIDE_HINT } from "@/lib/strings";
+import { registerServiceWorker } from "@/lib/pwa";
+import { S_SAVE_FAILED_HINT, S_SET_ASIDE, S_SET_ASIDE_HINT, S_UPDATE_READY } from "@/lib/strings";
 import { useDialogs } from "./useDialogs";
 import { CONTROL_TITLE, hashFor, navigate, pageTitle, SETTINGS_TITLE, useRoute } from "./useRoute";
 import {
@@ -121,6 +122,9 @@ export default function App() {
   const [setAsideSeen, setSetAsideSeen] = useState(0);
   const saveFailedCount = useSaveFailedVersion();
   const [saveFailedSeen, setSaveFailedSeen] = useState(0);
+  /** Switches to a new version that has installed (LP-51), until the notice is dismissed. */
+  const [applyUpdate, setApplyUpdate] = useState<(() => void) | null>(null);
+  useEffect(() => registerServiceWorker((apply) => setApplyUpdate(() => apply)), []);
 
   /* ---------- stores ---------- */
 
@@ -416,6 +420,20 @@ export default function App() {
             onClick={() => setSaveFailedSeen(saveFailedCount)}
           >
             Dismiss
+          </button>
+        </div>
+      )}
+      {applyUpdate && (
+        <div className="set-aside-notice update-notice" id="update-notice" role="status">
+          <strong>{S_UPDATE_READY}</strong>
+          <button type="button" className="mini" id="update-whats-new" onClick={showChangelog}>
+            What&apos;s new
+          </button>
+          <button type="button" className="mini" id="update-reload" onClick={applyUpdate}>
+            Reload
+          </button>
+          <button type="button" className="mini" id="update-dismiss" onClick={() => setApplyUpdate(null)}>
+            Later
           </button>
         </div>
       )}

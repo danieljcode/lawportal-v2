@@ -26,6 +26,7 @@ describe("the Content-Security-Policy", () => {
     expect(directive(csp, "object-src")).toBe("'none'");
     expect(directive(csp, "default-src")).toBe("'self'");
     expect(directive(csp, "connect-src")).toBe("'self'");
+    expect(directive(csp, "worker-src")).toBe("'self'");
     expect(directive(csp, "img-src")).toBe("'self' data: blob: https:");
   });
 });

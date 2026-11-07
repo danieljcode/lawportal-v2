@@ -18,6 +18,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-11-07",
+    items: [
+      {
+        type: "new",
+        text: "Install the app on your phone or computer: Add to Home Screen, or your browser's Install button. It opens in its own window and works without a connection once you've opened it online. When a new version is ready, a notice offers to reload into it, with a link to what's new.",
+      },
+    ],
+  },
+  {
     date: "2026-11-03",
     title: "Daily work: next actions, the work list and case billing",
     version: "0.5.0",

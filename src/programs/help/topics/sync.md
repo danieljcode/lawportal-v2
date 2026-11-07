@@ -17,4 +17,12 @@ Sync shares your characters, cases, filings, precedents and the rest between bro
 
 Anyone with the code can read and change that data, so keep it private. The dot in the top bar shows how sync is doing.
 
+## Install and offline
+
+Install the app to use it like any other: on a phone, **Add to Home Screen** (Safari's Share menu, or Chrome's menu); on a computer, your browser's **Install** button in the address bar. It opens in its own window.
+
+Once you've opened it online, it opens without a connection too. Your work is saved in this browser as always. With sync on, the dot says **Offline**, and your changes are sent when you're back online.
+
+When a new version is ready, a notice says so. **Reload** switches to it; **What's new** shows what changed.
+
 See also: [Characters](#help/characters).

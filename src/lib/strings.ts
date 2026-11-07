@@ -57,6 +57,8 @@ export const S_SET_ASIDE_HINT =
 
 export const S_SAVE_FAILED_HINT = "Your latest changes are kept on screen. Use Export to keep a copy.";
 
+export const S_UPDATE_READY = "A new version is ready.";
+
 export const S_JAP_OFF = "Portfolios are saved in this browser. Turn on sync to keep them on this app's server too.";
 
 export const S_JAP_ON = "Saved in this browser and on this app's server.";

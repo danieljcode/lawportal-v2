@@ -101,6 +101,22 @@ npm run build && npm run start:lan
   context), so the app copies through a text selection instead.
 - Traffic is unencrypted: only use LAN mode on a network you trust. The sync API is rate limited
   (see [Sync](sync.md#server-storage)).
+- **Installing and offline (LP-51) need HTTPS**, except on `localhost`, and a built app: the service
+  worker (`/sw.js`, from `src/lib/serviceWorker.ts`) isn't registered under `next dev`. To install
+  on a phone from your own computer, put an HTTPS tunnel in front of `npm run start:lan`, such as
+  [Tailscale Serve](https://tailscale.com/kb/1312/serve) (`tailscale serve --bg 3000`, then open
+  `https://<computer>.<tailnet>.ts.net`). The live Vercel site needs nothing extra.
+
+## Installed app and offline (LP-51)
+
+- `src/app/manifest.ts` is the web app manifest; `src/app/icons/[size]` draws its PNG icons (and
+  Apple's) from the branding's favicon.
+- `/sw.js` (`src/app/sw.js/route.ts`) serves `src/lib/serviceWorker.ts` with the app's version in it,
+  so each release is a new worker. It keeps the page and its built files, and leaves `/api` alone.
+  `src/lib/pwa.ts` registers it and shows **A new version is ready** when the next one installs;
+  the new worker drops the old version's cache when it takes over.
+- To try it, `npm run build && npm start`, open `http://127.0.0.1:3000` once, then go offline in
+  the browser's developer tools and reload.
 
 ## Hosted on Vercel
 
