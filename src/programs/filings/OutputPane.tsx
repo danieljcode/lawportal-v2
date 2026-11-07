@@ -88,6 +88,7 @@ export default function OutputPane({
   const downloadPdf = () => {
     printAs(form.id, setPrinting);
     flash('To save it, pick "Save as PDF" as the printer.');
+    onFiled?.("pdf");
   };
 
   const downloadDocx = async () => {

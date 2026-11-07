@@ -16,7 +16,7 @@ export const FILINGS_KEY = "lawapp_filings";
 export const FILINGS_VERSION = 1;
 export const MAX_FILINGS = 150;
 
-export const VIAS = ["forum", "bbcode", "discord", "docx"] as const;
+export const VIAS = ["forum", "bbcode", "discord", "docx", "pdf"] as const;
 export type FilingVia = (typeof VIAS)[number];
 
 export const VIA_LABELS: Readonly<Record<FilingVia, string>> = {
@@ -24,6 +24,8 @@ export const VIA_LABELS: Readonly<Record<FilingVia, string>> = {
   bbcode: "Copied as BBCode",
   discord: "Copied for Discord",
   docx: "Downloaded as .docx",
+  // The browser doesn't say whether the print dialog was cancelled (LP-209).
+  pdf: "Printed or saved as PDF",
 };
 
 export interface Filing {

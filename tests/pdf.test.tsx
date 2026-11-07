@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import App from "@/shell/App";
+import { filingStore, VIA_LABELS } from "@/lib/filings";
 import { EMPTY_STATE, writeDraft } from "@/lib/formState";
 import { defaultKV } from "@/lib/storage";
 import * as sync from "@/lib/sync";
@@ -67,5 +68,9 @@ describe("Download PDF (LP-35)", () => {
     expect(printed[0].html).toContain("Ann Lee");
     expect(printed[0].html).not.toMatch(/<mark|class="unfilled/);
     expect(document.querySelector("#pdf-sheet")).toBeNull();
+    // Kept in Filing history like a copy or a .docx (LP-209).
+    const [kept] = filingStore().list();
+    expect(kept).toMatchObject({ formId: FORM, via: "pdf" });
+    expect(VIA_LABELS[kept.via]).toBe("Printed or saved as PDF");
   });
 });
