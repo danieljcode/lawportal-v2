@@ -12,7 +12,7 @@ import { MAX_CONTACTS } from "@/lib/contacts";
 import { MAX_INVOICES } from "@/lib/invoices";
 import { MAX_TIME_ENTRIES } from "@/lib/ledger";
 import { MAX_DEPOSITS } from "@/lib/retainers";
-import { MAX_CHECKLISTS } from "@/lib/checklists";
+import { MAX_CHECKLISTS } from "@/lib/checklistStore";
 import { MAX_PRECEDENTS } from "@/lib/precedents";
 import { isObject } from "@/lib/storage";
 

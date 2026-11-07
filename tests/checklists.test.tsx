@@ -10,11 +10,12 @@ import { characterStore } from "@/lib/characters";
 import {
   checklistFor,
   checklistsOrStarter,
-  checklistStore,
-  cleanChecklist,
+  resetChecklists,
+  saveChecklist,
   STARTER_CHECKLISTS,
   withChecklist,
 } from "@/lib/checklists";
+import { checklistStore, cleanChecklist } from "@/lib/checklistStore";
 import { resolve } from "@/lib/sync";
 import * as sync from "@/lib/sync";
 
@@ -23,7 +24,7 @@ import * as sync from "@/lib/sync";
 describe("checklists", () => {
   beforeEach(() => {
     localStorage.clear();
-    checklistStore().reset();
+    resetChecklists();
   });
 
   it("are cleaned: a name is needed, blank and repeated items go", () => {
@@ -47,13 +48,13 @@ describe("checklists", () => {
     expect(checklistFor(STARTER_CHECKLISTS, "Civil")!.name).toBe("Civil plaintiff");
     expect(checklistFor(STARTER_CHECKLISTS, "Nothing")!.name).toBe("Criminal defence");
 
-    checklistStore().save({ ...STARTER_CHECKLISTS[1], items: ["Only this"] });
+    saveChecklist({ ...STARTER_CHECKLISTS[1], items: ["Only this"] });
     const own = checklistStore().list();
     expect(own.map((l) => l.id)).toEqual(STARTER_CHECKLISTS.map((l) => l.id));
     expect(own[1].items).toEqual(["Only this"]);
-    expect(() => checklistStore().save({ name: " " })).toThrow("Give the checklist a name");
+    expect(() => saveChecklist({ name: " " })).toThrow("Give the checklist a name");
 
-    checklistStore().reset();
+    resetChecklists();
     expect(checklistStore().list()).toEqual([]);
   });
 
@@ -107,7 +108,7 @@ const titles = () => (caseStore().get("case0001")!.actions || []).map((a) => a.t
 describe("checklists in the app", () => {
   beforeEach(() => {
     localStorage.clear();
-    checklistStore().reset();
+    resetChecklists();
     vi.stubGlobal("requestAnimationFrame", () => 0);
     vi.stubGlobal("cancelAnimationFrame", () => {});
     vi.spyOn(sync, "init").mockResolvedValue(undefined);

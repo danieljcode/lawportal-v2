@@ -27,7 +27,7 @@ import { cleanEntry, timeStore, type TimeEntry } from "./ledger";
 import { cleanInvoice, invoiceStore, renumberClashes, type Invoice } from "./invoices";
 import { CODE_RE, LOOKALIKE_HINT, normaliseCode } from "./syncCode";
 import { cleanDeposit, retainerStore, type Deposit } from "./retainers";
-import { checklistStore, cleanChecklist, type Checklist } from "./checklists";
+import { checklistStore, cleanChecklist, type Checklist } from "./checklistStore";
 import { cleanPrecedent, precedentStore, type Precedent } from "./precedents";
 import { docketStore } from "./dockets";
 import { portfolioStore } from "./portfolio";

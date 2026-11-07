@@ -12,7 +12,7 @@ import { contactStore } from "@/lib/contacts";
 import { invoiceStore } from "@/lib/invoices";
 import { timeStore, timerStore } from "@/lib/ledger";
 import { retainerStore } from "@/lib/retainers";
-import { checklistStore } from "@/lib/checklists";
+import { checklistStore } from "@/lib/checklistStore";
 import { precedentStore } from "@/lib/precedents";
 import { filingStore } from "@/lib/filings";
 import { docketStore } from "@/lib/dockets";

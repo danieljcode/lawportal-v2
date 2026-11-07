@@ -4,7 +4,8 @@
 // firm's own; "Back to the starter lists" undoes every change.
 
 import { useState, type FormEvent } from "react";
-import { checklistsOrStarter, checklistStore, MAX_CHECKLIST_ITEMS, type Checklist } from "@/lib/checklists";
+import { checklistsOrStarter, removeChecklist, resetChecklists, saveChecklist } from "@/lib/checklists";
+import { checklistStore, MAX_CHECKLIST_ITEMS, type Checklist } from "@/lib/checklistStore";
 import { MATTERS } from "@/lib/firmRecord";
 import { useChecklistVersion } from "@/ui/useStore";
 
@@ -20,7 +21,7 @@ export default function ChecklistSettings() {
 
   const save = (input: Partial<Checklist>): Checklist | null => {
     try {
-      const c = checklistStore().save(input);
+      const c = saveChecklist(input);
       setError("");
       return c;
     } catch (err) {
@@ -164,7 +165,7 @@ export default function ChecklistSettings() {
           id="checklists-remove"
           onClick={() => {
             if (!window.confirm("Remove the " + list.name + " checklist?")) return;
-            checklistStore().remove(list.id);
+            removeChecklist(list.id);
             setPicked("");
           }}
         >
@@ -177,7 +178,7 @@ export default function ChecklistSettings() {
             id="checklists-reset"
             onClick={() => {
               if (!window.confirm("Go back to the starter checklists? Every change to them is lost.")) return;
-              checklistStore().reset();
+              resetChecklists();
               setPicked("");
             }}
           >

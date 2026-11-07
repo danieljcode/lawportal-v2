@@ -4,7 +4,8 @@
 
 import { useState } from "react";
 import { caseStore } from "@/lib/cases";
-import { checklistFor, checklistsOrStarter, checklistStore, withChecklist } from "@/lib/checklists";
+import { checklistFor, checklistsOrStarter, withChecklist } from "@/lib/checklists";
+import { checklistStore } from "@/lib/checklistStore";
 import { matterOf } from "@/lib/firmRecord";
 import type { Case } from "@/lib/types";
 import { useChecklistVersion } from "@/ui/useStore";
