@@ -28,6 +28,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "update",
         text: "Sync codes can be typed loosely: in lowercase, with spaces, or without the dashes. The box shows the code as it will be used, and says so if you type an O, 0, I or 1, which codes never use.",
       },
+      {
+        type: "fix",
+        text: "Changing character on the New client intake page no longer saves one character's unfinished intake over another's. Each character's intake is kept, and comes back when you switch to them.",
+      },
     ],
   },
   {
