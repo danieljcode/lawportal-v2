@@ -427,21 +427,21 @@ describe("dockets", () => {
       filed: "2026/01/01",
       nextDate: "2026-01-02",
       status: "Weird" as never,
-      notes: "n".repeat(5000),
+      plaintiff: "n".repeat(5000),
     })!;
     expect(d.link).toBeUndefined();
     expect(d.filed).toBeUndefined();
     expect(d.nextDate).toBe("2026-01-02");
     expect(d.status).toBe(STATUSES[0]);
-    expect(d.notes).toHaveLength(4000);
+    expect(d.plaintiff).toHaveLength(4000);
     expect(dockets.save(ID, { caseNumber: "X2", link: "https://example.com/x" })!.link).toBe("https://example.com/x");
   });
 
   it("upserts by case number keeping other fields", () => {
     const { dockets } = stores();
-    dockets.save(ID, { caseNumber: "90SCCC00042", plaintiff: "P", notes: "keep" });
+    dockets.save(ID, { caseNumber: "90SCCC00042", plaintiff: "P", nextEvent: "keep" });
     const u = dockets.upsert(ID, { caseNumber: "90sccc00042", defendant: "D" })!;
-    expect(u).toMatchObject({ plaintiff: "P", defendant: "D", notes: "keep" });
+    expect(u).toMatchObject({ plaintiff: "P", defendant: "D", nextEvent: "keep" });
     expect(dockets.list(ID)).toHaveLength(1);
     expect(dockets.findByCase(ID, " 90SCCC00042 ")?.id).toBe(u.id);
     dockets.upsert(ID, { caseNumber: "NEW" });

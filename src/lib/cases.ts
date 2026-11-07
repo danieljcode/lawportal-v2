@@ -8,6 +8,7 @@
 // and the J.A.P. read and write cases through dockets.ts.
 
 import { cleanActions, unionActions } from "./actions";
+import { cleanCaseNotes, legacyNote, unionCaseNotes } from "./caseNotes";
 import { cleanDeadlines, unionDeadlines } from "./deadlines";
 import { cleanExhibits, unionExhibits } from "./exhibits";
 import { cleanOutcome } from "./outcomes";
@@ -65,6 +66,10 @@ export function cleanCase(input: unknown): Case {
   const rate = parseRate(o.rate);
   const actions = cleanActions(o.actions);
   const outcome = cleanOutcome(o.outcome);
+  // A case saved before LP-227 has one notes box: it becomes the first note.
+  const legacy = legacyNote(o.notes, created, lead);
+  const caseNotes = cleanCaseNotes(o.caseNotes);
+  const notes = legacy ? unionCaseNotes(caseNotes, [legacy]) : caseNotes;
   return {
     ...d,
     lead,
@@ -73,6 +78,7 @@ export function cleanCase(input: unknown): Case {
     deadlines: cleanDeadlines(o.deadlines),
     exhibits: cleanExhibits(o.exhibits),
     ...(actions.length ? { actions } : {}),
+    ...(notes.length ? { caseNotes: notes } : {}),
     ...(outcome ? { outcome } : {}),
     ...(rate !== null ? { rate } : {}),
   };
@@ -86,16 +92,12 @@ function validList(raw: unknown): Case[] {
   });
 }
 
-/** Fields from `newer`, gaps filled from `older`; differing notes kept together. */
+/** Fields from `newer`, gaps filled from `older`; both copies' notes kept. */
 function combine(newer: Case, older: Case): Case {
   const out: Case = { ...newer };
   for (const [k, v] of Object.entries(older)) {
     const key = k as keyof Case;
     if (out[key] === undefined && v !== undefined) (out as unknown as Record<string, unknown>)[k] = v;
-  }
-  const notes = [newer.notes, older.notes].filter((n): n is string => !!n);
-  if (notes.length === 2 && notes[0] !== notes[1] && !notes[0].includes(notes[1])) {
-    out.notes = (notes[0] + "\n\n" + notes[1]).slice(0, 4000);
   }
   const all = [...members(newer), ...members(older)];
   out.lead = newer.lead ?? older.lead ?? null;
@@ -105,6 +107,8 @@ function combine(newer: Case, older: Case): Case {
   out.exhibits = unionExhibits(newer.exhibits, older.exhibits);
   const actions = unionActions(newer.actions || [], older.actions || []);
   if (actions.length) out.actions = actions;
+  const notes = unionCaseNotes(newer.caseNotes || [], older.caseNotes || []);
+  if (notes.length) out.caseNotes = notes;
   return out;
 }
 
@@ -152,6 +156,7 @@ export function casesFromDockets(byCharacter: Iterable<[string, unknown]>): Case
       if (!item || typeof item !== "object" || !(item as Docket).caseNumber) continue;
       const d = cleanDocket(item);
       if (!d.caseNumber) continue;
+      const note = legacyNote((item as Record<string, unknown>).notes, d.updated, charId);
       entries.push({
         ...d,
         id: caseIdFor(d.caseNumber),
@@ -160,6 +165,7 @@ export function casesFromDockets(byCharacter: Iterable<[string, unknown]>): Case
         created: d.updated,
         deadlines: [],
         exhibits: [],
+        ...(note ? { caseNotes: [note] } : {}),
       });
     }
   }

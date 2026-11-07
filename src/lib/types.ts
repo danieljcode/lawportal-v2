@@ -134,7 +134,6 @@ export interface Docket {
   nextDate?: string;
   /** http(s) only. */
   link?: string;
-  notes?: string;
   /** ISO timestamp. */
   updated: string;
 }
@@ -156,6 +155,8 @@ export interface Case extends Docket {
   exhibits: Exhibit[];
   /** Next actions (LP-170), in the order added. Absent when there are none. */
   actions?: CaseAction[];
+  /** Dated notes (LP-227), oldest first. Absent when there are none. */
+  caseNotes?: CaseNote[];
   /** How it ended (LP-92). Counts towards the Firm Record while the case is Closed. */
   outcome?: CaseOutcome;
   /** Hourly rate in dollars for everyone's time on this case, over their own (the Ledger, LP-32). */
@@ -186,6 +187,16 @@ export interface CaseOutcome {
 }
 
 /** A piece of everyday work on a case (LP-170), owned by a character or no one. */
+/** A dated note on a case (LP-227). */
+export interface CaseNote {
+  id: string;
+  text: string;
+  /** ISO time it was added (real; shown in game time). */
+  at: string;
+  /** The character who added it. */
+  by?: string;
+}
+
 export interface CaseAction {
   id: string;
   title: string;

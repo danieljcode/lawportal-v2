@@ -10,6 +10,7 @@
 //   deleted when nobody is left on it.
 // - A deleted character (removeAll) is taken off every case, which stay.
 
+import { legacyNote, unionCaseNotes } from "./caseNotes";
 import { caseStore, createCaseStore, isMember, type CaseStore } from "./cases";
 import { clean, compare, FIELDS } from "./docketFields";
 import { isId, type KV } from "./storage";
@@ -78,6 +79,9 @@ export function createDocketStore(source: CaseStore | KV): DocketStore {
       throw new Error(data.caseNumber + " is already on this docket.");
     }
     const same = mine.find((x) => x.id === data.id) || cases.byNumber(data.caseNumber);
+    // An entry from before LP-227 (an old character file) brings its notes box as a note.
+    const note = legacyNote((input as Record<string, unknown>).notes, data.updated, charId);
+    const caseNotes = note ? { caseNotes: unionCaseNotes(same?.caseNotes || [], [note]) } : {};
     let saved: Case;
     if (same) {
       // The character's own case, or the firm's case with this number: they join it.
@@ -85,12 +89,13 @@ export function createDocketStore(source: CaseStore | KV): DocketStore {
       saved = cases.save({
         ...same,
         ...data,
+        ...caseNotes,
         id: same.id,
         lead: same.lead ?? (joining ? charId : null),
         assigned: joining && same.lead ? [...same.assigned, charId] : same.assigned,
       });
     } else {
-      saved = cases.save({ ...data, lead: charId, assigned: [] });
+      saved = cases.save({ ...data, ...caseNotes, lead: charId, assigned: [] });
     }
     return toDocket(saved);
   }

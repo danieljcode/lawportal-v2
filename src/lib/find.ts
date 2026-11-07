@@ -70,8 +70,8 @@ export function findIndex(s: FindSources): FindItem[] {
           href: "#cases/" + c.id,
         },
         c.court,
-        c.notes,
         c.nextEvent,
+        ...(c.caseNotes || []).map((n) => n.text),
       ),
     ),
     ...s.contacts.map((c) =>

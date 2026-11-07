@@ -5,6 +5,7 @@ The **Case File** holds every firm case, with its lead and the characters workin
 Each case has:
 
 - its **details**;
+- **notes**: short dated entries, newest first, each with when it was added (in game time) and who added it. **+ Add note** adds one as the character you're playing; **Edit** changes one and **Delete** removes it after asking. A case's old single notes box is kept as its first note. [Find](#help/find) and conflict checks search every note;
 - **next actions**: the everyday work, like _Call the client_, each with who's doing it (or Unassigned) and an optional due date. Overdue ones are marked. Tick one off and it moves to **Done**, where you can reopen it; **Edit** changes it;
 - **billing**: the time logged, what isn't on an invoice yet, and what's been invoiced, paid and is still owed, from the [Ledger](#help/ledger). A client's retainer isn't counted, except what has paid an invoice on this case. **Log time**, **Invoices** and **Open in Ledger** open the Ledger for just this case, with a link back;
 - **deadlines and hearings**;

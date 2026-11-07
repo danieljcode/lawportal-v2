@@ -72,7 +72,7 @@ afterEach(() => {
 describe("deadlines on a case (LP-18)", () => {
   it("adds a deadline, ticks it off and removes it, keeping unsaved edits to the case", () => {
     mount("#cases/case0001");
-    setValue("#case-notes", "Not saved yet");
+    setValue("#case-nextEvent", "Not saved yet");
     setValue("#deadline-date", "1990-10-25");
     setValue("#deadline-label", "Response due");
     setValue("#deadline-note", "From the summons");
@@ -81,7 +81,7 @@ describe("deadlines on a case (LP-18)", () => {
       { date: "1990-10-25", label: "Response due", note: "From the summons" },
     ]);
     expect(must("#deadline-list").textContent).toContain("Sun 25 Oct 1990 (in 6 days)");
-    expect(must<HTMLTextAreaElement>("#case-notes").value).toBe("Not saved yet");
+    expect(must<HTMLInputElement>("#case-nextEvent").value).toBe("Not saved yet");
 
     act(() => must<HTMLInputElement>("#deadline-list input[type=checkbox]").click());
     expect(caseStore().get("case0001")!.deadlines[0].done).toBe(true);

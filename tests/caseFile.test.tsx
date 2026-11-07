@@ -128,7 +128,6 @@ describe("the Case File (LP-101)", () => {
     expect(must<HTMLInputElement>("#case-defendant").value).toBe("Dee");
     setValue("#case-plaintiff", "Eve");
     setValue("#case-status", "Awaiting arguments");
-    setValue("#case-notes", "Hearing moved.");
     setValue("#case-lead", "bob00001");
     act(() => must<HTMLInputElement>("#case-assigned input[type=checkbox]").click()); // Alice
     submit("#case-form");
@@ -136,7 +135,6 @@ describe("the Case File (LP-101)", () => {
       plaintiff: "Eve",
       defendant: "Dee",
       status: "Awaiting arguments",
-      notes: "Hearing moved.",
       lead: "bob00001",
       assigned: ["alice001"],
     });
@@ -144,14 +142,9 @@ describe("the Case File (LP-101)", () => {
     expect(document.querySelector("#case-needs-lead")).toBeNull();
   });
 
-  it("stops Notes at 4,000 characters and counts them near the limit (LP-151)", () => {
+  it("stops a case's details at 4,000 characters (LP-151)", () => {
     mount("#cases/case0003");
-    expect(must<HTMLTextAreaElement>("#case-notes").maxLength).toBe(4000);
     expect(must<HTMLInputElement>("#case-plaintiff").maxLength).toBe(4000);
-    setValue("#case-notes", "n".repeat(3500));
-    expect(document.querySelector("#case-notes-count")).toBeNull();
-    setValue("#case-notes", "n".repeat(3501));
-    expect(must("#case-notes-count").textContent).toBe("3,501 / 4,000");
   });
 
   it("making someone lead takes them off the others", () => {
