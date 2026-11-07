@@ -467,6 +467,29 @@
   width: 100%;
 }
 
+/* ---------- deadline calculator (LP-220) ---------- */
+.deadline-calc {
+  margin: 8px 0 0;
+  padding: 6px 8px 8px;
+  border: 1px solid var(--shadow);
+  min-width: 0;
+}
+.deadline-calc-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: flex-end;
+}
+.deadline-calc-row > * {
+  min-width: 0;
+}
+.deadline-calc-row input[type="number"] {
+  width: 6em;
+}
+.deadline-calc-result {
+  margin: 6px 0;
+}
+
 /* ---------- case timeline (LP-219) ---------- */
 .case-timeline-filter {
   display: flex;

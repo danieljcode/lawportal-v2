@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "new",
+        text: "Calculate on a case's deadlines works out a date for you: pick a start date (today in the game unless you change it), enter a number of days, and count calendar days or weekdays only. It shows the date with its weekday; Add as deadline puts it on the case.",
+      },
+      {
+        type: "new",
         text: "A Timeline on each case in the Case File: its filings, notes, deadlines and hearings, next actions done, evidence, time and invoices in date order, newest first, by game day. Show just one type, and click an entry to go to it.",
       },
       {

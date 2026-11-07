@@ -8,7 +8,7 @@ Each case has:
 - **notes**: short dated entries, newest first, each with when it was added (in game time) and who added it. **+ Add note** adds one as the character you're playing; **Edit** changes one and **Delete** removes it after asking. A case's old single notes box is kept as its first note. [Find](#help/find) and conflict checks search every note;
 - **next actions**: the everyday work, like _Call the client_, each with who's doing it (or Unassigned) and an optional due date. Overdue ones are marked. Tick one off and it moves to **Done**, where you can reopen it; **Edit** changes it;
 - **billing**: the time logged, what isn't on an invoice yet, and what's been invoiced, paid and is still owed, from the [Ledger](#help/ledger). A client's retainer isn't counted, except what has paid an invoice on this case. **Log time**, **Invoices** and **Open in Ledger** open the Ledger for just this case, with a link back;
-- **deadlines and hearings**;
+- **deadlines and hearings**. **Calculate** works a date out for you: pick the start date (today in the game unless you change it), enter a number of days, and count **Calendar days** or **Weekdays only** (Saturdays and Sundays skipped). It shows the date with its weekday, and **Add as deadline** puts it on the case with a name, such as _Response due_, and a note of how it was worked out;
 - the **filings** made for it;
 - **contacts** from the Rolodex, each in a role such as client or witness;
 - its **evidence**: lettered exhibits (A, B, C…) with links and dates. Each exhibit has a **chain of custody** you can copy into a filing or print;
