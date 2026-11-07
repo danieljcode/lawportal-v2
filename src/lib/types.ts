@@ -1,5 +1,6 @@
 // Shared types for the form engine, form data and the client stores.
 
+import type { Offer } from "./offers";
 import type { CustodyEntry } from "./custody";
 
 /** A directory or extra form: forum HTML with {{tokens}}. */
@@ -157,6 +158,8 @@ export interface Case extends Docket {
   actions?: CaseAction[];
   /** Dated notes (LP-227), oldest first. Absent when there are none. */
   caseNotes?: CaseNote[];
+  /** Plea and settlement offers (LP-229), newest first. Absent when there are none. */
+  offers?: Offer[];
   /** How it ended (LP-92). Counts towards the Firm Record while the case is Closed. */
   outcome?: CaseOutcome;
   /** Hourly rate in dollars for everyone's time on this case, over their own (the Ledger, LP-32). */

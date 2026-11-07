@@ -13,6 +13,7 @@ import type { Case, Character, OutcomeResult } from "@/lib/types";
 import CaseActions from "./CaseActions";
 import CaseBrief from "./CaseBrief";
 import CaseNotes from "./CaseNotes";
+import CaseOffers from "./CaseOffers";
 import CaseTimeline from "./CaseTimeline";
 import CaseBilling from "./CaseBilling";
 import CaseContacts from "./CaseContacts";
@@ -239,6 +240,7 @@ function detailsStamp(c: Case): string {
     deadlines: _deadlines,
     actions: _actions,
     caseNotes: _caseNotes,
+    offers: _offers,
     exhibits: _exhibits,
     updated: _updated,
     created: _created,
@@ -284,6 +286,10 @@ function CaseLinks({
       <section className="case-empty" id="case-deadlines" aria-labelledby="case-deadlines-title">
         <h4 id="case-deadlines-title">Deadlines and hearings</h4>
         <CaseDeadlines c={c} />
+      </section>
+      <section className="case-empty" id="case-offers" aria-labelledby="case-offers-title">
+        <h4 id="case-offers-title">Offers</h4>
+        <CaseOffers c={c} />
       </section>
       <section className="case-empty" id="case-contacts" aria-labelledby="case-contacts-title">
         <h4 id="case-contacts-title">Contacts</h4>
