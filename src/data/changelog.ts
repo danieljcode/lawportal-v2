@@ -48,6 +48,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "fix",
         text: "Download PDF now adds the filing to Filing history and its case, like a copy or a .docx. It's listed as Printed or saved as PDF, since the app can't tell if the print was cancelled.",
       },
+      {
+        type: "fix",
+        text: "A form's list lettered past Z now goes on to AA and AB, as exhibits in the Case File do. Before, the 27th item got \"[\".",
+      },
     ],
   },
   {
