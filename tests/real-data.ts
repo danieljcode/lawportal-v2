@@ -34,6 +34,7 @@ export const REAL_DATA_TESTS = [
   "tests/modernHome.test.tsx",
   "tests/modernShell.test.tsx",
   "tests/oneServer.test.tsx",
+  "tests/outputParity.test.ts",
   "tests/penalCode.test.tsx",
   "tests/precedents.test.tsx",
   "tests/preview.test.ts",
