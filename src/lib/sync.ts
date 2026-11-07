@@ -44,7 +44,7 @@ export const BASE_KEY = "lawapp_sync_base";
 /** This browser's versions of characters that lost the last merge ({at, characters}), for "Restore my version". */
 export const LOST_KEY = "lawapp_sync_lost";
 
-export { CODE_RE, codeHint, LOOKALIKE_HINT } from "./syncCode";
+export { codeHint, LOOKALIKE_HINT } from "./syncCode";
 /** This server needs an invite word for a new code, and it wasn't given or isn't right (LP-178). */
 export const BAD_INVITE = "This server needs an invite word to turn on sync. Ask whoever runs it, then enter it below.";
 

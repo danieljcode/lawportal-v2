@@ -7,12 +7,13 @@ import { eachField, type FormState, isItem, itemsOf, type ScopePath, updateAt, w
 
 /* ------------------------------------------------------------ update API */
 
-export function materialize(entries: Entry[], scope: Values): Values {
+/** Give every block that has no items array its default items (recursively). Returns `scope` when nothing changed. */
+export function materializeBlocks(entries: Entry[], scope: Values): Values {
   let out = scope;
   for (const e of entries) {
     if ("cond" in e) {
       // Conds don't create scopes; hidden bodies are still materialised.
-      out = materialize(e.fields, out);
+      out = materializeBlocks(e.fields, out);
     } else if ("block" in e) {
       const key = "#" + e.block.name;
       const current = out[key];
@@ -20,7 +21,7 @@ export function materialize(entries: Entry[], scope: Values): Values {
       let changed = items !== current;
       const next = items.map((item) => {
         const base = isItem(item) ? item : {};
-        const m = materialize(e.fields, base);
+        const m = materializeBlocks(e.fields, base);
         if (m !== item) changed = true;
         return m;
       });
@@ -28,11 +29,6 @@ export function materialize(entries: Entry[], scope: Values): Values {
     }
   }
   return out;
-}
-
-/** Give every block that has no items array its default items (recursively). Returns `values` when nothing changed. */
-export function materializeBlocks(entries: Entry[], values: Values): Values {
-  return materialize(entries, values);
 }
 
 /**
