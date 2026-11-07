@@ -1,9 +1,10 @@
 // The Court Filings program (LP-103, LP-105): the court forms as its navigation
 // pane, the open form (or the "pick a form" page) and its preview. The
 // output of the open form, and whether its panel crashed, live here; the form's
-// filing tools go up to the shell's Form menu.
+// filing tools go up to the shell's Form menu. The firm's own templates (LP-49)
+// list under My Templates and open in the template builder (#filings/edit/…).
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ALL_FORMS, getForm } from "@/data";
 import { EMPTY_HTML } from "@/lib/safeHtml";
 import EmptyState from "./EmptyState";
@@ -11,6 +12,9 @@ import ErrorBoundary from "@/ui/ErrorBoundary";
 import FormView, { type FormOutput } from "./FormView";
 import OutputPane from "./OutputPane";
 import Sidebar from "./Sidebar";
+import TemplateBuilder from "./TemplateBuilder";
+import { myTemplateForms } from "@/data/myTemplates";
+import { useTemplateVersion } from "@/ui/useStore";
 import { hashFor } from "@/shell/useRoute";
 import type { ProgramProps } from "@/shell/program";
 
@@ -25,7 +29,11 @@ const EMPTY_OUTPUT: FormOutput = {
 export default function CourtFilingsProgram({ shell }: ProgramProps) {
   const { active } = shell;
   // The shell knows the open form only by its index entry (LP-133); its template comes with this program.
-  const form = shell.form ? getForm(shell.form.id) || null : null;
+  const templates = useTemplateVersion();
+  const edit = shell.route.program === "filings" ? shell.route.edit : undefined;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- templates is the store's version
+  const forms = useMemo(() => [...myTemplateForms(), ...ALL_FORMS], [templates]);
+  const form = !edit && shell.form ? getForm(shell.form.id) || null : null;
   const [highlight, setHighlight] = useState(true);
   /** The last output FormView reported, with the form it belongs to (out is null when that template failed to compile). */
   const [output, setOutput] = useState<{ formId: string; out: FormOutput | null } | null>(null);
@@ -43,9 +51,13 @@ export default function CourtFilingsProgram({ shell }: ProgramProps) {
   return (
     // "with-output" adds the third grid column (the form's preview).
     <div className={"layout" + (showOutput ? " with-output" : "")}>
-      <Sidebar forms={ALL_FORMS} current={hashFor(shell.route).slice(1)} />
+      <Sidebar forms={forms} current={hashFor(shell.route).slice(1)} />
       <main className="editor" id={shell.visible ? "editor" : undefined}>
-        {form ? (
+        {edit ? (
+          <ErrorBoundary where="the template builder" resetKey={edit}>
+            <TemplateBuilder key={edit} edit={edit} />
+          </ErrorBoundary>
+        ) : form ? (
           <ErrorBoundary
             where="this form"
             resetKey={form.id}

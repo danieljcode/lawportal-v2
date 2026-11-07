@@ -1,3 +1,4 @@
+import { customInfo } from "@/lib/customTemplates";
 import type { FormInfo } from "@/lib/types";
 import index from "./form-index.json";
 
@@ -10,8 +11,9 @@ export const FORM_INDEX: FormInfo[] = index;
 
 const BY_ID = new Map(FORM_INDEX.map((f) => [f.id, f]));
 
+/** A form's index entry, the firm's own templates (LP-49) included. */
 export function formInfo(id: string): FormInfo | undefined {
-  return BY_ID.get(id);
+  return BY_ID.get(id) || customInfo(id);
 }
 
 /** Distinct directory courts in first-appearance order (feeds the docket court datalist). */

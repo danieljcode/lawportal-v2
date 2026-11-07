@@ -13,6 +13,7 @@ import { invoiceStore } from "@/lib/invoices";
 import { timeStore, timerStore } from "@/lib/ledger";
 import { retainerStore } from "@/lib/retainers";
 import { checklistStore } from "@/lib/checklistStore";
+import { templateStore } from "@/lib/customTemplates";
 import { precedentStore } from "@/lib/precedents";
 import { filingStore } from "@/lib/filings";
 import { docketStore } from "@/lib/dockets";
@@ -74,6 +75,8 @@ export const useInvoiceVersion = versionHook(invoiceStore);
 export const useRetainerVersion = versionHook(retainerStore);
 /** Bumps on every change to the firm's next-action checklists (LP-230). */
 export const useChecklistVersion = versionHook(checklistStore);
+/** Bumps on every change to the firm's own templates (LP-49). */
+export const useTemplateVersion = versionHook(templateStore);
 
 /** Counts values set aside as unreadable since the page loaded (0: none). */
 export function useSetAsideVersion(): number {

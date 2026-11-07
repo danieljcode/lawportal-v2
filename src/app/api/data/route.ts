@@ -13,6 +13,7 @@ import { MAX_INVOICES } from "@/lib/invoices";
 import { MAX_TIME_ENTRIES } from "@/lib/ledger";
 import { MAX_DEPOSITS } from "@/lib/retainers";
 import { MAX_CHECKLISTS } from "@/lib/checklistStore";
+import { MAX_TEMPLATES } from "@/lib/customTemplates";
 import { MAX_PRECEDENTS } from "@/lib/precedents";
 import { isObject } from "@/lib/storage";
 
@@ -35,6 +36,7 @@ const LISTS = {
   invoices: MAX_INVOICES,
   retainers: MAX_DEPOSITS,
   checklists: MAX_CHECKLISTS,
+  templates: MAX_TEMPLATES,
 };
 
 /** `{rev, data:{characters, …}}`: an integer rev ≥ 0 and each list (LISTS) an array of at most its limit of objects, else null. */

@@ -1,8 +1,10 @@
 // Court Filings' navigation pane: the searchable list of court forms grouped by court
 // and section (FR2, INV §a Sidebar), as an Explorer-style tree. Forms only (LP-105):
-// the firm's programs and the J.A.P. open from the Program Manager.
+// the firm's programs and the J.A.P. open from the Program Manager. The firm's own
+// templates (LP-49) come first, under My Templates, each with an Edit link.
 
 import { useMemo, useState } from "react";
+import { MY_PREFIX, MY_TEMPLATES } from "@/lib/customTemplates";
 import type { FormDef } from "@/lib/types";
 import { S_CREDIT, S_DISCLAIMER } from "@/lib/strings";
 
@@ -36,10 +38,10 @@ export default function Sidebar({ forms, current }: SidebarProps) {
   const q = query.trim().toLowerCase();
   const groups = useMemo(() => group(forms, q), [forms, q]);
 
-  const link = (href: string, text: string) => {
+  const link = (href: string, text: string, id?: string) => {
     const on = current === href.slice(1);
     return (
-      <a href={href} className={on ? "active" : undefined} aria-current={on ? "page" : undefined}>
+      <a href={href} id={id} className={on ? "active" : undefined} aria-current={on ? "page" : undefined}>
         {text}
       </a>
     );
@@ -55,6 +57,7 @@ export default function Sidebar({ forms, current }: SidebarProps) {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
+      <p className="new-template">{link("#filings/edit/new", "+ New template", "new-template")}</p>
       <div id="form-list" className="tree">
         {!groups.length && <p className="muted small">No forms match.</p>}
         {groups.map((g) => (
@@ -65,7 +68,18 @@ export default function Sidebar({ forms, current }: SidebarProps) {
                 {run.section && <p className="section-label">{run.section}</p>}
                 <ul>
                   {run.forms.map((f) => (
-                    <li key={f.id}>{link("#filings/" + f.id, f.title)}</li>
+                    <li key={f.id} className={g.court === MY_TEMPLATES ? "my-template" : undefined}>
+                      {link("#filings/" + f.id, f.title)}
+                      {g.court === MY_TEMPLATES && (
+                        <a
+                          className="tree-edit"
+                          href={"#filings/edit/" + f.id.slice(MY_PREFIX.length)}
+                          aria-label={"Edit template: " + f.title}
+                        >
+                          Edit
+                        </a>
+                      )}
+                    </li>
                   ))}
                 </ul>
               </div>

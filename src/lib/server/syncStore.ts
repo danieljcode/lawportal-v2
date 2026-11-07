@@ -31,6 +31,7 @@ export interface SyncRecord {
     invoices?: unknown[];
     retainers?: unknown[];
     checklists?: unknown[];
+    templates?: unknown[];
   };
 }
 

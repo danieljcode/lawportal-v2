@@ -20,4 +20,15 @@ Drafts save as you type. **Undo** and **Redo** step through your changes, and **
 
 Under a text box, **Insert exhibit** adds a case exhibit, such as "Exhibit C (Dashcam footage)".
 
+## Your own templates
+
+**+ New template** at the top of the forms list opens the template builder.
+
+1. Give the template a title, such as MOTION TO CONTINUE.
+2. Add blocks: a **Heading**, a **Paragraph** of fixed wording, a **Field** to fill in (short text, long text, a date or a number), a **Repeating list** (numbered items, add as many as you need) or a **Signature** (date, name, bar number, firm and role).
+3. **Up** and **Down** move a block, **Delete** removes it. The preview shows the filing as you go.
+4. **Save template**. It lists under **My Templates** and opens like any form.
+
+**Edit** beside a template opens it in the builder again, where **Delete template** removes it. Templates sync to the firm and are in the backup.
+
 When it's ready, see [Sending a filing](#help/sending).

@@ -199,3 +199,71 @@
   width: auto;
   max-width: 100%;
 }
+
+/* ---------- the firm's own templates (LP-49) ---------- */
+.new-template {
+  margin: 4px 0 0;
+}
+.new-template a {
+  display: block;
+  padding: 1px 4px;
+  color: var(--link);
+}
+.new-template a.active {
+  background: var(--select-bg);
+  color: var(--select-text);
+}
+.tree li.my-template {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.tree li.my-template > a:first-child {
+  flex: 1;
+  min-width: 0;
+}
+.tree li a.tree-edit {
+  flex: none;
+  font-size: var(--text-xs);
+  color: var(--link);
+  text-decoration: underline;
+}
+.tree li a.tree-edit::before {
+  content: none;
+}
+.tb-fields {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 6px 0;
+}
+.tb-fields textarea {
+  align-self: start;
+}
+.tb-blocks {
+  margin: 8px 0;
+  padding-left: 1.6em;
+}
+.tb-block {
+  margin: 6px 0;
+  padding: 6px 8px;
+  border: 1px solid var(--shadow);
+  background: var(--field);
+}
+.tb-block-head {
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+.tb-add,
+.tb-actions {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+@media (max-width: 700px) {
+  .tb-fields {
+    grid-template-columns: 1fr;
+  }
+}
