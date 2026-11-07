@@ -26,6 +26,7 @@ export default function SyncPanel({ autoEnable = false, onAutoEnableDone }: Sync
   const [busy, setBusy] = useState(false);
   const [copyLabel, setCopyLabel] = useState("Copy");
   const [typed, setTyped] = useState("");
+  const hint = sync.codeHint(typed);
   const [invite, setInvite] = useState("");
   const [askInvite, setAskInvite] = useState(false);
   /** A thrown error from enable/link/destroy; replaced by the next sync state. */
@@ -174,6 +175,10 @@ export default function SyncPanel({ autoEnable = false, onAutoEnableDone }: Sync
               Use code
             </button>
           </form>
+          {/* As it's typed (LP-53): the code as it will be used, or what's wrong with it. */}
+          <p className={"small sync-code-hint" + (hint.ok ? "" : " muted")} id="sync-code-hint" aria-live="polite">
+            {hint.text}
+          </p>
         </div>
       ) : (
         <div id="sync-on">

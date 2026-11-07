@@ -18,6 +18,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-11-07",
+    items: [
+      {
+        type: "update",
+        text: "Sync codes can be typed loosely: in lowercase, with spaces, or without the dashes. The box shows the code as it will be used, and says so if you type an O, 0, I or 1, which codes never use.",
+      },
+    ],
+  },
+  {
     date: "2026-11-03",
     title: "Daily work: next actions, the work list and case billing",
     version: "0.5.0",
