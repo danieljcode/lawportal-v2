@@ -337,6 +337,15 @@ describe("dockets ↔ form", () => {
     expect(again.values["Defendant name"]).toBe("Typed by hand");
   });
 
+  it("docketToForm treats the case number in other capitals as the same case (LP-232)", () => {
+    const entries = entriesOf("civil-complaint");
+    const s = openState(entries, null, char({ name: "Ann" }), NOW);
+    const a = docketToForm(entries, s, docket({ plaintiff: "Ann" })).state;
+    const typed = { ...a, values: { ...a.values, "Case number": " 90sccc00147 ", "Defendant name": "Typed by hand" } };
+    const again = docketToForm(entries, typed, docket({ plaintiff: "Ann" })).state;
+    expect(again.values["Defendant name"]).toBe("Typed by hand");
+  });
+
   it("docketToForm fills division and party labels where present", () => {
     const entries = entriesOf("misc-order-decree");
     const { state: next, filled } = docketToForm(entries, state(), docket({ plaintiff: "A, B", defendant: "C" }));

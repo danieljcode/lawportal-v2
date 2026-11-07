@@ -54,7 +54,8 @@ function toDocket(c: Case): Docket {
   return out as unknown as Docket;
 }
 
-const upper = (n: string) => n.trim().toUpperCase();
+/** A case number as the docket store matches it: trimmed, upper-case. */
+export const caseKey = (n: string) => n.trim().toUpperCase();
 
 /** A docket view over a case store, or over a fresh one on `kv` (tests). */
 export function createDocketStore(source: CaseStore | KV): DocketStore {
@@ -64,8 +65,8 @@ export function createDocketStore(source: CaseStore | KV): DocketStore {
   }
 
   function findOwn(charId: string, caseNumber: string): Case | null {
-    const wanted = upper(String(caseNumber || ""));
-    return own(charId).find((c) => upper(c.caseNumber) === wanted) || null;
+    const wanted = caseKey(String(caseNumber || ""));
+    return own(charId).find((c) => caseKey(c.caseNumber) === wanted) || null;
   }
 
   /** Save a docket entry as a case the character is on. */
@@ -73,7 +74,7 @@ export function createDocketStore(source: CaseStore | KV): DocketStore {
     const data = clean(input);
     if (!data.caseNumber) throw new Error("A docket needs a case number.");
     const mine = own(charId);
-    if (mine.some((x) => x.id !== data.id && upper(x.caseNumber) === upper(data.caseNumber))) {
+    if (mine.some((x) => x.id !== data.id && caseKey(x.caseNumber) === caseKey(data.caseNumber))) {
       throw new Error(data.caseNumber + " is already on this docket.");
     }
     const same = mine.find((x) => x.id === data.id) || cases.byNumber(data.caseNumber);

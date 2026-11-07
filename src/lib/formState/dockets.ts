@@ -1,7 +1,7 @@
 // Loading a docket case into a form, and a form's case into a docket.
 
 import { courthouseFor, DIVISION_COURTS, GENERAL_COURT } from "../courts";
-import { divisionFor } from "../dockets";
+import { caseKey, divisionFor } from "../dockets";
 import type { Docket, Entry, FormDef, Values } from "../types";
 import { DEFENDANT_LABELS, FILED_LABELS, type FormState, labelsOf, PLAINTIFF_LABELS, str, without } from "./state";
 
@@ -41,7 +41,7 @@ export function docketToForm(
   let cleared = false;
   // Another case than the one in the form (LP-207): what it leaves blank is cleared, not kept from the last.
   const was = str(s.values["Case number"]);
-  const switching = !!d.caseNumber && !!was && was !== d.caseNumber;
+  const switching = !!d.caseNumber && !!was && caseKey(was) !== caseKey(d.caseNumber);
   const put = (label: string, value: string | undefined) => {
     if (!have.has(label)) return;
     if (!value) {
