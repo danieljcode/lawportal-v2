@@ -21,6 +21,10 @@ export const CASES_KEY = "lawapp_cases";
 export const CASES_VERSION = 1;
 export const MAX_CASES = 2000;
 
+/** "Smith v. Jones", or the one side a case has (LP-214). */
+export const caseParties = (c: { plaintiff?: string; defendant?: string }): string =>
+  [c.plaintiff, c.defendant].filter(Boolean).join(" v. ");
+
 export const TOO_MANY_CASES = "The firm can keep up to 2,000 cases.";
 
 const upper = (n: string) => n.trim().toUpperCase();

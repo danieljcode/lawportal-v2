@@ -4,6 +4,7 @@
 // without its dashes. Records are turned into searchable text once (findIndex),
 // so searching as you type stays quick with thousands of them. Pure.
 
+import { caseParties } from "./cases";
 import type { Contact } from "./contacts";
 import { CONTACT_TYPE_LABELS } from "./contacts";
 import { formatDay } from "./deadlines";
@@ -55,8 +56,6 @@ const item = (o: Omit<FindItem, "text">, ...more: Array<string | undefined>): Fi
   return { ...o, text: all + "\n" + all.replace(/[-\s]+/g, "") };
 };
 
-const parties = (c: Pick<Case, "plaintiff" | "defendant">) => [c.plaintiff, c.defendant].filter(Boolean).join(" v. ");
-
 /** Every record as a FindItem, in group order. Build it once per change to the stores. */
 export function findIndex(s: FindSources): FindItem[] {
   const byId = new Map(s.cases.map((c) => [c.id, c]));
@@ -67,7 +66,7 @@ export function findIndex(s: FindSources): FindItem[] {
           id: "case-" + c.id,
           kind: "case",
           title: c.caseNumber,
-          detail: [parties(c), c.status].filter(Boolean).join(" · "),
+          detail: [caseParties(c), c.status].filter(Boolean).join(" · "),
           href: "#cases/" + c.id,
         },
         c.court,
