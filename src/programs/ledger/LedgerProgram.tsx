@@ -321,6 +321,11 @@ function LedgerView({ shell }: ProgramProps) {
   const [filter, setFilter] = useState<TimeFilter>(arrival ? { caseId: arrival.caseId } : {});
   const shown = useMemo(() => filterEntries(all, filter), [all, filter]);
   const [rows, setRows] = useState(ROWS);
+  // A new filter starts again at the first rows (LP-233), so Show more can't build up a slow list.
+  const filterBy = (f: TimeFilter) => {
+    setFilter(f);
+    setRows(ROWS);
+  };
   const values = shown.map(valueOf);
   const unpriced = values.filter((v) => v === null).length;
   const filteredCase = filter.caseId ? caseById.get(filter.caseId) : undefined;
@@ -333,7 +338,7 @@ function LedgerView({ shell }: ProgramProps) {
   if (route !== seenRoute) {
     setSeenRoute(route);
     if (arrival) {
-      setFilter({ caseId: arrival.caseId });
+      filterBy({ caseId: arrival.caseId });
       if (arrival.at === "log" && canLog) setEditing("new");
     }
   }
@@ -341,7 +346,7 @@ function LedgerView({ shell }: ProgramProps) {
   useEffect(() => {
     if (arriveAt) document.getElementById(arriveAt === "log" ? "time-form" : "invoices")?.scrollIntoView?.();
   }, [arriveAt, route]);
-  const setF = (k: keyof TimeFilter) => (v: string) => setFilter({ ...filter, [k]: v || undefined });
+  const setF = (k: keyof TimeFilter) => (v: string) => filterBy({ ...filter, [k]: v || undefined });
 
   const remove = (e: TimeEntry) => {
     if (confirm("Delete " + hoursText(e.hours) + " on " + formatDay(e.date) + "?")) timeStore().remove(e.id);

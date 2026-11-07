@@ -161,6 +161,11 @@ describe("the Ledger page (LP-32)", () => {
     click(must("#ledger-more"));
     expect(rows()).toBe(250);
     expect($("#ledger-more")).toBeNull();
+
+    // A new filter starts again at 100 rows (LP-233).
+    setValue("#ledger-case", "case0001");
+    expect(rows()).toBe(100);
+    expect(must("#ledger-more").textContent).toBe("Show more (150 left)");
   });
 
   it("times a case and logs it when stopped", () => {
