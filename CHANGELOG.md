@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.6.0](https://github.com/danieljcode/lawportal-v2/compare/v0.5.0...v0.6.0) (2026-11-07)
+
+
+### Features
+
+* **jap:** copy the portfolio for Discord [LP-224] ([#206](https://github.com/danieljcode/lawportal-v2/issues/206)) ([a147624](https://github.com/danieljcode/lawportal-v2/commit/a14762499c184348ea898df356717cbb0d98e061))
+* **shell:** install the app and open it offline [LP-51] ([#190](https://github.com/danieljcode/lawportal-v2/issues/190)) ([359ab97](https://github.com/danieljcode/lawportal-v2/commit/359ab9701059c68c6ea617522eea8393ec61f621))
+* **sync:** accept sync codes typed loosely [LP-53] ([#191](https://github.com/danieljcode/lawportal-v2/issues/191)) ([5e2d58f](https://github.com/danieljcode/lawportal-v2/commit/5e2d58f3971aaacbf8963b6cf4c794d993a5bc1e))
+
+
+### Fixes
+
+* **clients:** keep each character's intake when switching [LP-204] ([#193](https://github.com/danieljcode/lawportal-v2/issues/193)) ([d5de564](https://github.com/danieljcode/lawportal-v2/commit/d5de564d7310d452297dec4b14812f7b51468ad4))
+* **forms:** clear what a newly picked case leaves blank [LP-207] ([#196](https://github.com/danieljcode/lawportal-v2/issues/196)) ([1e39ee5](https://github.com/danieljcode/lawportal-v2/commit/1e39ee546c357cd4b3f029a33cd501b5c7bd2f68))
+* **forms:** date buttons use the time they're pressed [LP-206] ([#195](https://github.com/danieljcode/lawportal-v2/issues/195)) ([265f0bc](https://github.com/danieljcode/lawportal-v2/commit/265f0bc5b0d0ca10abc7476bb9db49761e5fba1c))
+* **forms:** keep filings saved as PDF in Filing history [LP-209] ([#198](https://github.com/danieljcode/lawportal-v2/issues/198)) ([3e63512](https://github.com/danieljcode/lawportal-v2/commit/3e635128147ca2376336678d9905eb7510c3583d))
+* **forms:** keep typed web addresses whole in Discord text [LP-210] ([#207](https://github.com/danieljcode/lawportal-v2/issues/207)) ([c4d6e53](https://github.com/danieljcode/lawportal-v2/commit/c4d6e5341d8706d8474d34356e69c788b72a6757))
+* **forms:** letter list items past Z as AA, AB [LP-212] ([#200](https://github.com/danieljcode/lawportal-v2/issues/200)) ([b8b9e2e](https://github.com/danieljcode/lawportal-v2/commit/b8b9e2e77f46f25fc6c0446ba5bb83a7439da499))
+* **forms:** show when a typed date doesn't exist [LP-205] ([#194](https://github.com/danieljcode/lawportal-v2/issues/194)) ([4249050](https://github.com/danieljcode/lawportal-v2/commit/42490502b50ae70d874e21e8a377ee84ae54b7cc))
+* **library:** stop shipping the penal code sheet's address [LP-208] ([#197](https://github.com/danieljcode/lawportal-v2/issues/197)) ([26a8fd5](https://github.com/danieljcode/lawportal-v2/commit/26a8fd54c1f556a122429ffe43c58d539ca4fe27))
+* **scripts:** run npm run penal-code from a path with spaces [LP-215] ([#202](https://github.com/danieljcode/lawportal-v2/issues/202)) ([83a485b](https://github.com/danieljcode/lawportal-v2/commit/83a485bfc7c2a30814d103eb14768df413e38832))
+
+
+### Performance
+
+* **ledger:** draw the newest 100 time rows first [LP-222] ([#204](https://github.com/danieljcode/lawportal-v2/issues/204)) ([8245844](https://github.com/danieljcode/lawportal-v2/commit/8245844fb14f33ec56bb859850ebda9d368ce242))
+
+
+### Docs
+
+* **changelog:** mark what's new for 0.5.0 [LP-199] ([#187](https://github.com/danieljcode/lawportal-v2/issues/187)) ([b729734](https://github.com/danieljcode/lawportal-v2/commit/b729734ffa4fa337ca2b9263eef220edad8c3737))
+
+
+### Chores
+
+* **release:** target the next release at 0.6.0 [LP-217] ([#189](https://github.com/danieljcode/lawportal-v2/issues/189)) ([47cf538](https://github.com/danieljcode/lawportal-v2/commit/47cf5382fc3f6d13f6eb8405ed28dcda0dfd3f37))
+
 ## [0.5.0](https://github.com/danieljcode/lawportal-v2/compare/v0.4.0...v0.5.0) (2026-11-03)
 
 
