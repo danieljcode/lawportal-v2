@@ -21,6 +21,8 @@ The round **+** adds a note, time or a next action to the open case in a couple 
 
 **Upcoming** lists the next 14 days, overdue first. The Case File shows a dot when something is due within 48 hours.
 
+**Calendar** shows a whole month in game time: open deadlines, hearings (a deadline named like a hearing, trial or arraignment) and next actions with a due date, each coloured by kind. **Previous**, **Next** and **Today** move between months; **My work** shows your cases' dates and the actions given to you, **All firm** everyone's. Click an entry to open its case. On a phone the month is a list of the days that have something on.
+
 **Firm Record** adds up how closed cases ended, with the win rate, for the firm and each lawyer. When you set a case to **Closed**, pick its outcome (won, lost, settled, dismissed, plea deal or withdrawn), with a date and an optional note; you can add one to an already closed case the same way. Filter by matter type and dates. **Print / PDF** prints it and **Copy summary** copies a few lines of text. Win rate is wins out of the cases won or lost, and **Closed with no outcome yet** lists what still needs one.
 
 **Court Docket** is for judges (a title such as Judge, Justice, Magistrate or Commissioner). It lists the cases before them, soonest next date first, each one **Pending**, **Scheduled**, **Under advisement** (the status is Awaiting judgement, so a ruling is owed) or **Closed**. Filter by those, and pick a judge template and **Start** to open it with the case's details filled in.

@@ -22,6 +22,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     items: [
       {
         type: "new",
+        text: "Calendar in the Case File: a month of deadlines, hearings and dated next actions, coloured by kind, in game time. Previous, Next and Today move it; My work or All firm picks whose; click an entry to open its case. On a phone it's a day-by-day list.",
+      },
+      {
+        type: "new",
         text: "Checklists: Add checklist under a case's next actions adds the routine jobs for that kind of case, like Criminal defence or Civil plaintiff, skipping any the case already has. The firm edits the lists in Settings, and they sync.",
       },
       {
