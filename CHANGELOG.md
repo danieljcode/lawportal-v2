@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.7.0](https://github.com/danieljcode/lawportal-v2/compare/v0.6.0...v0.7.0) (2026-11-07)
+
+
+### Features
+
+* **cases:** case notes as dated entries [LP-227] ([#213](https://github.com/danieljcode/lawportal-v2/issues/213)) ([226001b](https://github.com/danieljcode/lawportal-v2/commit/226001b2aeee5286d2bc6a4f41a3162b6586f515))
+* **cases:** case timeline in date order [LP-219] ([#214](https://github.com/danieljcode/lawportal-v2/issues/214)) ([2aa3466](https://github.com/danieljcode/lawportal-v2/commit/2aa34664cda106d2c04bcdf62bc6ccb916437cb0))
+* **cases:** copy a case brief for Discord [LP-228] ([#217](https://github.com/danieljcode/lawportal-v2/issues/217)) ([70ec1ad](https://github.com/danieljcode/lawportal-v2/commit/70ec1ad5e20180402c9820716ef7d274ddfa4c87))
+* **cases:** deadline calculator in game time [LP-220] ([#215](https://github.com/danieljcode/lawportal-v2/issues/215)) ([871e006](https://github.com/danieljcode/lawportal-v2/commit/871e006bc6a91776cab984495a29b74c74265486))
+* **cases:** month calendar of deadlines, hearings, actions [LP-231] ([#220](https://github.com/danieljcode/lawportal-v2/issues/220)) ([bb09326](https://github.com/danieljcode/lawportal-v2/commit/bb09326cf533826d2a069d8ef20c7badff988ad3))
+* **cases:** next-action checklists by matter type [LP-230] ([#219](https://github.com/danieljcode/lawportal-v2/issues/219)) ([737ac17](https://github.com/danieljcode/lawportal-v2/commit/737ac1752eeb36bba0ead53b6db477ba91b1ac2f))
+* **cases:** plea and settlement offers on a case [LP-229] ([#218](https://github.com/danieljcode/lawportal-v2/issues/218)) ([d90816b](https://github.com/danieljcode/lawportal-v2/commit/d90816b19af1a6a039b774110608439341b35cfa))
+* **home:** quick add for notes, actions and time [LP-221] ([#216](https://github.com/danieljcode/lawportal-v2/issues/216)) ([9a0af76](https://github.com/danieljcode/lawportal-v2/commit/9a0af76ea0496f8fa1ad4566a48e32b22f533760))
+* **library:** charge calculator for total time and fine [LP-218] ([#212](https://github.com/danieljcode/lawportal-v2/issues/212)) ([8311dae](https://github.com/danieljcode/lawportal-v2/commit/8311daedca424176b6442b649c5de51c49757b32))
+
+
+### Fixes
+
+* **forms:** match case numbers in any capitals on load [LP-232] ([#210](https://github.com/danieljcode/lawportal-v2/issues/210)) ([d71ac4e](https://github.com/danieljcode/lawportal-v2/commit/d71ac4e385e1105533d7f5c70df7d94d9b26599a))
+* **ledger:** start Show more again when the filter changes [LP-233] ([#211](https://github.com/danieljcode/lawportal-v2/issues/211)) ([742e338](https://github.com/danieljcode/lawportal-v2/commit/742e338b7f0ec1776bd760f65615275102de96c7))
+
+
+### Docs
+
+* **changelog:** mark what's new for 0.6.0 and target 0.7.0 [LP-235] ([#208](https://github.com/danieljcode/lawportal-v2/issues/208)) ([61af3a7](https://github.com/danieljcode/lawportal-v2/commit/61af3a798c162e5a2c0b1831d326da33790b85a9))
+
 ## [0.6.0](https://github.com/danieljcode/lawportal-v2/compare/v0.5.0...v0.6.0) (2026-11-07)
 
 
