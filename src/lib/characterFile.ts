@@ -5,7 +5,7 @@
 // portfolio inside it, the same shape as the sync document. This module adds
 // only what's about the file: its name, size limit and messages.
 
-import { exportCharacters, importCharacters, type CharacterStores } from "./services/characters";
+import { exportCharacters, type CharacterStores } from "./services/characters";
 
 export const EXPORT_FILENAME = "lawapp-characters.json";
 export const MAX_IMPORT_BYTES = 5 * 1024 * 1024;
@@ -22,11 +22,6 @@ export function exportText(stores?: Stores): string {
 /** Throws FILE_TOO_LARGE before the file is read. */
 export function checkFileSize(bytes: number): void {
   if (bytes > MAX_IMPORT_BYTES) throw new Error(FILE_TOO_LARGE);
-}
-
-/** Import characters (overwriting by id) and restore their dockets and J.A.P. Returns the count. */
-export function importText(text: string, stores?: Stores): number {
-  return importCharacters(text, stores);
 }
 
 /** "Imported 1 character." / "Imported <n> characters." */

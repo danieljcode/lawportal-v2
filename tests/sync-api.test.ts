@@ -5,7 +5,8 @@ import path from "node:path";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { DELETE, POST } from "@/app/api/account/route";
 import { GET, PUT } from "@/app/api/data/route";
-import { CODE_RE, generateCode, parseBearer } from "@/lib/server/code";
+import { generateCode, parseBearer } from "@/lib/server/code";
+import { CODE_RE } from "@/lib/syncCode";
 import { createOverall, resetLimits } from "@/lib/server/rateLimit";
 import { codeHash, fileFor, sweepUnused, UNUSED_TTL_MS, write } from "@/lib/server/syncStore";
 

@@ -40,7 +40,7 @@ browser.
   notice and the dialogs once, then draws one of two frames, picked by `lawapp_shell`
   (`src/lib/shell.ts`), the **theme** (LP-112: Settings → Appearance and the View menu).
   **Modern** (the default, `ModernFrame.tsx`): an app rail (Home and each visible
-  program; a bottom bar at phone width) and a top bar (the program or page name, the `MenuBar`, Dockets for a character who keeps one, the
+  program; a bottom bar at phone width) and a top bar (the program or page name, the `MenuBar`, the
   active character and the sync status, `SyncDot.tsx`, which links to Settings; LP-109). Characters,
   the theme, What's new and About are in the menus and Settings, and What's new's unread dot is on
   the Settings rail item. The page never
@@ -68,7 +68,7 @@ browser.
   open, so switching is instant (a loaded program renders without suspending). The penal code comes
   with the Law Library (and the form's Law Library dialog in Court Filings). The court forms'
   templates (`@/data`) come with Court Filings, or when Filing history first opens (LP-133): the
-  shell routes, titles the page, fills the jump box and the Dockets court list from
+  shell routes, titles the page and fills the jump box from
   `@/data/form-index` (id, court, section and title), and `Shell.form` is that index entry. A lint
   rule keeps `@/data` out of `src/shell`.
 - **Programs keep their place** (LP-126). Every program opened stays mounted inside React's
