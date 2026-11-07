@@ -28,6 +28,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "update",
         text: "Sync codes can be typed loosely: in lowercase, with spaces, or without the dashes. The box shows the code as it will be used, and says so if you type an O, 0, I or 1, which codes never use.",
       },
+      {
+        type: "fix",
+        text: "A date that doesn't exist, such as 31 Feb 1990, is now outlined in red with a note saying it isn't used and which date is kept. Before, the box showed it while the old date was quietly saved.",
+      },
     ],
   },
   {
