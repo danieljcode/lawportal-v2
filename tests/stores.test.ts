@@ -19,8 +19,7 @@ import {
   isCommissioner,
   levelFromTitle,
   LEVELS,
-  render,
-  topicTitle,
+  portfolioHtml,
 } from "@/lib/portfolio";
 import {
   __resetSetAsideForTests,
@@ -491,38 +490,43 @@ describe("dockets", () => {
 describe("portfolio", () => {
   const ID = "comm0001";
 
-  it("renders the reference header and topic title (AC 17)", () => {
-    const out = render("I", {}, "Jane Roe");
-    expect(out.startsWith("[divbox=transparent][br][/br][size=165][b][center]JUDICIAL ADVANCEMENT PORTFOLIO")).toBe(
-      true,
-    );
-    expect(out).toContain("[center]Jane Roe - Court Commissioner I[/center][hr]\n");
-    expect(out.endsWith("[/divbox]")).toBe(true);
-    expect(render("II", null)).toContain("[center]Firstname Lastname - Court Commissioner II[/center]");
-    expect(topicTitle("Jane Roe")).toBe("[J.A.P.] Jane Roe");
-    expect(topicTitle("  ")).toBe("[J.A.P.] Firstname Lastname");
+  it("renders the header with the name and level (AC 17)", () => {
+    const out = String(portfolioHtml("I", {}, "Jane Roe"));
+    expect(out.startsWith("<h2>JUDICIAL ADVANCEMENT PORTFOLIO</h2><p>Jane Roe - Court Commissioner I</p>")).toBe(true);
+    expect(String(portfolioHtml("II", null))).toContain("<p>Firstname Lastname - Court Commissioner II</p>");
   });
 
   it("pads required tasks with placeholder lines and fills entries", () => {
-    const out = render("I", {
-      "1.1": [{ num: "90SCCR00001", caption: "People v. X", link: "https://f.gta/1" }],
-      "2.1": [{ num: "AW-12345" }],
-      "3.1": [{ date: "2026-01-02", link: "https://f.gta/t" }],
-    });
-    expect(out).toContain(
-      "[b]1.1. Preside over two trials resolved through summary judgment.[/b]\n[list]\n[*][url=https://f.gta/1][90SCCR00001] People v. X[/url]\n[*][url=LINKTOCASE][XXSCCR00000] People of the State of San Andreas v. John Doe[/url]\n[/list]",
+    const out = String(
+      portfolioHtml("I", {
+        "1.1": [{ num: "90SCCR00001", caption: "People v. X", link: "https://f.gta/1" }],
+        "2.1": [{ num: "AW-12345" }],
+        "3.1": [{ date: "2026-01-02", link: "https://f.gta/t" }],
+      }),
     );
-    expect(out).toContain("[*][url=LINKTOWARRANT]AW-12345[/url]");
-    expect(out).toContain("[*][url=LINKTOWARRANT]SW-00000[/url]");
-    expect(out).toContain("[*][url=https://f.gta/t]02/JAN/2026[/url]");
-    expect(out).toContain(", [url=LINKTODISCORDMESSAGE]#courts-csb/#sadcr[/url]");
+    expect(out).toContain(
+      "<p><strong>1.1. Preside over two trials resolved through summary judgment.</strong></p><ul>" +
+        '<li><a href="https://f.gta/1">[90SCCR00001] People v. X</a></li>' +
+        "<li>[XXSCCR00000] People of the State of San Andreas v. John Doe (LINKTOCASE)</li></ul>",
+    );
+    expect(out).toContain("<li>AW-12345 (LINKTOWARRANT)</li>");
+    expect(out).toContain("<li>SW-00000 (LINKTOWARRANT)</li>");
+    expect(out).toContain('<li><a href="https://f.gta/t">02/JAN/2026</a></li>');
+    expect(out).toContain(", #courts-csb/#sadcr (LINKTODISCORDMESSAGE)");
+  });
+
+  it("escapes what's typed (LP-224)", () => {
+    const out = String(portfolioHtml("I", { "2.1": [{ num: "<b>x</b>" }] }, "<i>Jane</i>"));
+    expect(out).toContain("&lt;i&gt;Jane&lt;/i&gt;");
+    expect(out).toContain("&lt;b&gt;x&lt;/b&gt;");
+    expect(out).not.toContain("<b>x");
   });
 
   it("CC II texts differ from CC I", () => {
     expect(LEVELS.II.sections[1].tasks[0].text).toBe("Review five arrest warrants (include at least one denial).");
     expect(LEVELS.I.sections[1].tasks[0].text).toBe("Review five arrest warrants.");
-    expect(render("II", {})).toContain(
-      "[b]3.3. Draft an appellate opinion.[/b]\n[color=#444444]Reach out to your supervisor",
+    expect(String(portfolioHtml("II", {}))).toContain(
+      "<p><strong>3.3. Draft an appellate opinion.</strong></p><p><em>Reach out to your supervisor",
     );
   });
 

@@ -1928,21 +1928,6 @@ dialog.changelog {
   outline: 2px solid var(--bad);
   outline-offset: -2px;
 }
-.jap-topic {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
-}
-.jap-topic code {
-  font-family: var(--mono);
-  font-size: var(--text-base);
-  padding: 2px 6px;
-  background: var(--field);
-  color: var(--text);
-  box-shadow: var(--bevel-thin);
-}
 
 /* ---------- responsive (ported reference rules) ---------- */
 @media (max-width: 1200px) {

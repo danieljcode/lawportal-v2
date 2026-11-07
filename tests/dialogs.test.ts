@@ -268,10 +268,11 @@ describe("J.A.P.", () => {
     expect($("#jap-gate")).toBeNull();
     expect(must<HTMLSelectElement>("#jap-level").value).toBe("II");
     expect(must("#jap-server-text").textContent).toBe(S_JAP_OFF);
-    expect(must("#jap-topic").textContent).toBe("[J.A.P.] Jane Roe");
-    expect(must<HTMLTextAreaElement>("#jap-bbcode").value).toMatch(
-      /^\[divbox=transparent\]\[br\]\[\/br\]\[size=165\]\[b\]\[center\]JUDICIAL ADVANCEMENT PORTFOLIO/,
-    );
+    // The portfolio goes out as Discord messages, each with its own Copy button (LP-224).
+    const discord = () => must("#jap-output #discord-pane").textContent || "";
+    expect(discord()).toContain("JUDICIAL ADVANCEMENT PORTFOLIO");
+    expect(discord()).toContain("Jane Roe - Court Commissioner II");
+    expect(must("#jap-output #dc-copy-1").textContent).toBe("Copy part 1");
 
     // CC II 2.1 asks for five arrest warrants; the entry saves immediately.
     expect(document.querySelectorAll("[id^='jap-2-1-'][id$='-num']")).toHaveLength(5);
@@ -280,11 +281,11 @@ describe("J.A.P.", () => {
     expect(must("#jap-2-1-0-link").classList.contains("invalid")).toBe(true);
     type("#jap-2-1-0-link", "https://example.com/aw42");
     expect(portfolioStore().get(id)?.II["2.1"]).toEqual([{ num: "AW-00042", link: "https://example.com/aw42" }]);
-    expect(must<HTMLTextAreaElement>("#jap-bbcode").value).toContain("[*][url=https://example.com/aw42]AW-00042[/url]");
+    expect(must<HTMLAnchorElement>('#jap-output a[href="https://example.com/aw42"]').textContent).toBe("AW-00042");
 
     // CC I keeps its own list.
     choose("#jap-level", "I");
-    expect(must<HTMLTextAreaElement>("#jap-bbcode").value).not.toContain("AW-00042");
+    expect(discord()).not.toContain("AW-00042");
 
     choose("#active-character", "");
     expect($("#jap-gate")).not.toBeNull();

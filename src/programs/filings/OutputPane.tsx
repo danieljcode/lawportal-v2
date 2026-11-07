@@ -9,7 +9,7 @@ import type { SafeHtml } from "@/lib/safeHtml";
 import type { FormDef } from "@/lib/types";
 import Dialog from "@/ui/Dialog";
 import { printAs } from "@/ui/printAs";
-import DiscordPanel from "./DiscordPanel";
+import DiscordPanel from "@/ui/DiscordPanel";
 
 export interface OutputPaneProps {
   form: Pick<FormDef, "id" | "title">;
