@@ -8,7 +8,7 @@
 
 ## Taking on a client
 
-The intake takes you from first contact to an opened case. What you type is kept on this device, even after a refresh, until the case opens or you press **Discard**.
+The intake takes you from first contact to an opened case. What you type is kept on this device, even after a refresh, until the case opens or you press **Discard**. Each character has their own intake: change character and you see theirs.
 
 - **Run conflict check** checks the client and the opposing party against the firm's cases, right on the intake. Change either name and the result is marked out of date. If there are possible matches, tick that you've reviewed them before opening the case; they don't stop you. **Memo and details** opens the full result on the Conflict check page.
 - **The Rolodex** picks who the client is. A client with the same name is picked for you. If someone only might be them, you choose, so nobody is added twice.

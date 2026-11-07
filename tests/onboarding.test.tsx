@@ -249,6 +249,19 @@ describe("onboarding a client (LP-172)", () => {
     expect(must<HTMLInputElement>("#intake-clientName").value).toBe("");
   });
 
+  it("keeps each character's draft when the character changes on the page (LP-204)", async () => {
+    characterStore().save({ id: "bob00001", name: "Bob Counsel", title: "Attorney at Law" });
+    await mount();
+    setValue("#intake-clientName", "Alice's client");
+    act(() => characterStore().setActive("bob00001"));
+    expect(must<HTMLInputElement>("#intake-clientName").value).toBe("");
+    setValue("#intake-clientName", "Bob's client");
+    act(() => characterStore().setActive("alice001"));
+    expect(must<HTMLInputElement>("#intake-clientName").value).toBe("Alice's client");
+    act(() => characterStore().setActive("bob00001"));
+    expect(must<HTMLInputElement>("#intake-clientName").value).toBe("Bob's client");
+  });
+
   it("clears the draft once the case opens, so a refresh can't open it again", async () => {
     await mount();
     fill();
