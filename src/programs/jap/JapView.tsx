@@ -6,6 +6,7 @@
 // the portfolio store, which drops empty rows and cleans the rest.
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { caseParties } from "@/lib/cases";
 import { docketStore } from "@/lib/dockets";
 import {
   clean,
@@ -127,7 +128,7 @@ function nounFor(t: Task): string {
 }
 
 function docketLabel(d: Docket): string {
-  const parties = [d.plaintiff, d.defendant].filter(Boolean).join(" v. ");
+  const parties = caseParties(d);
   return d.caseNumber + (parties ? " · " + parties : "") + (d.status === "Closed" ? " (closed)" : "");
 }
 
@@ -188,7 +189,7 @@ function JapBody({ character, syncOn, syncState, onTurnOnSync }: BodyProps) {
         if (key === "num" && fieldsFor(t.kind).some((f) => f.key === "caption")) {
           const d = docketStore().findByCase(charId, value);
           if (d) {
-            const caption = [d.plaintiff, d.defendant].filter(Boolean).join(" v. ");
+            const caption = caseParties(d);
             if (caption && !next.caption) next.caption = caption;
             if (d.link && !next.link) next.link = d.link;
           }

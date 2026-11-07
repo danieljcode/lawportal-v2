@@ -5,7 +5,7 @@
 // it scoped to one case, from that case's billing summary (LP-173).
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { caseStore } from "@/lib/cases";
+import { caseParties, caseStore } from "@/lib/cases";
 import { formatDay, gameToday } from "@/lib/deadlines";
 import { billedEntries, invoiceStore } from "@/lib/invoices";
 import {
@@ -35,7 +35,10 @@ import Reports from "./Reports";
 import Retainers from "./Retainers";
 
 /** "90SCCR00147 Smith v. Jones". */
-const caseLabel = (c: Case) => [c.caseNumber, [c.plaintiff, c.defendant].filter(Boolean).join(" v. ")].join(" ").trim();
+/** Time rows drawn at first, newest first (LP-222): a full year is thousands, and drawing them all froze a phone. */
+const ROWS = 100;
+
+const caseLabel = (c: Case) => [c.caseNumber, caseParties(c)].join(" ").trim();
 
 interface Draft {
   caseId: string;
@@ -317,6 +320,7 @@ function LedgerView({ shell }: ProgramProps) {
   const canLog = shell.characters.length > 0;
   const [filter, setFilter] = useState<TimeFilter>(arrival ? { caseId: arrival.caseId } : {});
   const shown = useMemo(() => filterEntries(all, filter), [all, filter]);
+  const [rows, setRows] = useState(ROWS);
   const values = shown.map(valueOf);
   const unpriced = values.filter((v) => v === null).length;
   const filteredCase = filter.caseId ? caseById.get(filter.caseId) : undefined;
@@ -462,7 +466,7 @@ function LedgerView({ shell }: ProgramProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {shown.map((e, i) => {
+                  {shown.slice(0, rows).map((e, i) => {
                     const c = caseById.get(e.caseId);
                     return (
                       <tr key={e.id}>
@@ -493,6 +497,11 @@ function LedgerView({ shell }: ProgramProps) {
                 </tbody>
               </table>
             </div>
+          )}
+          {shown.length > rows && (
+            <button type="button" className="btn" id="ledger-more" onClick={() => setRows(rows + ROWS)}>
+              {"Show more (" + (shown.length - rows) + " left)"}
+            </button>
           )}
         </>
       )}

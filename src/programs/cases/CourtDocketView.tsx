@@ -4,7 +4,7 @@
 
 import { useMemo, useState } from "react";
 import { FORM_INDEX } from "@/data/form-index";
-import { caseStore } from "@/lib/cases";
+import { caseParties, caseStore } from "@/lib/cases";
 import { courtDocket, DOCKET_STANDINGS, type DocketStanding } from "@/lib/courtDocket";
 import { formatDay, gameToday, relativeDay } from "@/lib/deadlines";
 import type { Character } from "@/lib/types";
@@ -62,7 +62,7 @@ export default function CourtDocketView({ judge, onStartForm }: CourtDocketViewP
                 <a href={"#cases/" + c.id}>
                   <strong>{c.caseNumber}</strong>
                 </a>
-                {(c.plaintiff || c.defendant) && <span>{[c.plaintiff, c.defendant].filter(Boolean).join(" v. ")}</span>}
+                {caseParties(c) && <span>{caseParties(c)}</span>}
                 <span className="small muted">{awaitingRuling ? s + ": awaiting your ruling" : s}</span>
               </span>
               <StartTemplate caseNumber={c.caseNumber} onStart={(formId) => onStartForm(formId, c.id)} />

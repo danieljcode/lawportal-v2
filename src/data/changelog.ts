@@ -53,6 +53,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         text: "A form's list lettered past Z now goes on to AA and AB, as exhibits in the Case File do. Before, the 27th item got \"[\".",
       },
       {
+        type: "fix",
+        text: "The Ledger opens quickly with a lot of time logged: it shows the newest 100 entries, with Show more for the rest. The totals still count everything. With a year of time it took several seconds on a phone.",
+      },
+      {
         type: "update",
         text: "Filings now go out as a Word file, a PDF or Discord messages. Copy for forum, Copy BBCode and the BBCode tab are gone, and so are the forum copy on invoices and Filing history's Copy again. The preview stays, showing the filing as it will look on the page.",
       },

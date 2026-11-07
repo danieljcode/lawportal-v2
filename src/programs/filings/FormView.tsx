@@ -9,7 +9,7 @@
 
 import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { hasDocket } from "@/lib/characters";
-import { caseStore, filterCases, isMember } from "@/lib/cases";
+import { caseParties, caseStore, filterCases, isMember } from "@/lib/cases";
 import { addDeadlines, formatDay, formDates } from "@/lib/deadlines";
 import { contactStore } from "@/lib/contacts";
 import { docketStore } from "@/lib/dockets";
@@ -133,7 +133,7 @@ function saveCollapsed(id: string, names: string[]): void {
 }
 
 function docketLabel(d: Docket): string {
-  const parties = [d.plaintiff, d.defendant].filter(Boolean).join(" v. ");
+  const parties = caseParties(d);
   return d.caseNumber + (parties ? " · " + parties : "") + (d.status === "Closed" ? " (closed)" : "");
 }
 
