@@ -174,7 +174,7 @@ downloads only the shell; the court forms' templates come with Court Filings, an
 small index. **The home screen's first load may download at most 630 KiB of JavaScript** (uncompressed). A
 smoke test in `e2e/smoke.spec.ts` measures it on the production build and fails CI above that. It was 1,078 KiB
 before LP-122, 892 KiB after it and 612 KiB after LP-133; React and Next.js are about 460 KiB of it. LP-51 raised
-it from 650 KiB for the new-version notice (the service worker's code loads when the browser is idle), and LP-227 to 660 KiB for dated case notes, which the case store cleans on load, and LP-230 to 665 KiB for synced checklists (the sync client loads with the shell). LP-242 lowered it to 630 KiB: What's new loads the first time it opens, and the server gives the shell only its stamp for the unread dot, so new entries no longer grow the home screen. Raise the
+it from 650 KiB for the new-version notice (the service worker's code loads when the browser is idle), and LP-227 to 660 KiB for dated case notes, which the case store cleans on load, and LP-230 to 665 KiB for synced checklists (the sync client loads with the shell), and LP-239 to 666 KiB for a What's new line (all of What's new loaded with the shell, for its unread dot). LP-242 lowered it to 630 KiB: What's new loads the first time it opens, and the server gives the shell only its stamp for the unread dot, so new entries no longer grow the home screen. Raise the
 budget only on purpose, in the same pull request as the change that needs it.
 
 ## Contributing

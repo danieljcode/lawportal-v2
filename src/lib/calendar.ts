@@ -39,6 +39,7 @@ export function monthEntries(
   const out: CalendarEntry[] = [];
   const inMonth = (date: string) => date.slice(0, 7) === month;
   for (const c of cases) {
+    if (c.status === "Closed") continue; // as on the work list (LP-239)
     if (!charId || isMember(c, charId)) {
       for (const d of c.deadlines) {
         if (d.done || !inMonth(d.date)) continue;

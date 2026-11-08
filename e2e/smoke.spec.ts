@@ -289,7 +289,7 @@ test("Ctrl+K right after Esc opens the jump box again", async ({ page }) => {
   }
 });
 
-/** The first-load JavaScript budget for the home screen, uncompressed (README, "First-load budget"; LP-122, LP-133, LP-51, LP-227, LP-230, LP-242). */
+/** The first-load JavaScript budget for the home screen, uncompressed (README, "First-load budget"; LP-122, LP-133, LP-51, LP-227, LP-230, LP-239, LP-242). */
 const FIRST_LOAD_BUDGET_KIB = 630;
 
 test("the home screen's first load stays within the JavaScript budget", async ({ page }) => {
