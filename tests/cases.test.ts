@@ -239,6 +239,16 @@ describe("cases from two devices", () => {
     ...over,
   });
 
+  it("a field cleared on the newer copy stays cleared; a blank docket field is filled (LP-244)", () => {
+    const [one] = unifyCases(
+      [c({ plaintiff: "Ann", updated: T2 })],
+      [c({ defendant: "Bo", rate: 200, outcome: { result: "won", date: "1990-10-01" }, updated: T1 })],
+    );
+    expect(one.rate).toBeUndefined();
+    expect(one.outcome).toBeUndefined();
+    expect(one).toMatchObject({ plaintiff: "Ann", defendant: "Bo" });
+  });
+
   it("the same case number is one case: the newer copy's fields win, everyone stays on it", () => {
     const [one] = unifyCases(
       [c({ id: "aaaa1111", plaintiff: "Ann", updated: T1 })],

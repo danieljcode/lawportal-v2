@@ -14,7 +14,7 @@ import { cleanDeadlines, unionDeadlines } from "./deadlines";
 import { cleanExhibits, unionExhibits } from "./exhibits";
 import { cleanOffers, unionOffers } from "./offers";
 import { cleanOutcome } from "./outcomes";
-import { clean as cleanDocket, DOCKETS_PREFIX } from "./docketFields";
+import { clean as cleanDocket, DOCKETS_PREFIX, FIELDS } from "./docketFields";
 import { parseRate } from "./ledger";
 import { defaultKV, isId, isObject, ISO_TIME_RE, newId, setAside, uniqueById, type KV } from "./storage";
 import { createStore, unwrap, type Migration } from "./store";
@@ -99,12 +99,15 @@ function validList(raw: unknown): Case[] {
   });
 }
 
-/** Fields from `newer`, gaps filled from `older`; both copies' notes kept. */
+/**
+ * Fields from `newer`, its blank docket fields filled from `older`; both copies' notes kept. Other
+ * fields (rate, outcome…) come from `newer` only: missing there means cleared (LP-244).
+ */
 function combine(newer: Case, older: Case): Case {
   const out: Case = { ...newer };
-  for (const [k, v] of Object.entries(older)) {
-    const key = k as keyof Case;
-    if (out[key] === undefined && v !== undefined) (out as unknown as Record<string, unknown>)[k] = v;
+  for (const { key } of FIELDS) {
+    if (out[key] === undefined && older[key] !== undefined)
+      (out as unknown as Record<string, unknown>)[key] = older[key];
   }
   const all = [...members(newer), ...members(older)];
   out.lead = newer.lead ?? older.lead ?? null;
