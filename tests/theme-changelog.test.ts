@@ -2,7 +2,8 @@
 // The theme (AC 19, INV §e.6), the look (LP-110) and the changelog unread stamp (AC 18, INV §e.5).
 import { beforeEach, describe, expect, it } from "vitest";
 import { CHANGELOG, type ChangelogEntry } from "@/data/changelog";
-import { friendlyDate, isUnread, markSeen, SEEN_KEY, stamp } from "@/lib/changelog";
+import { friendlyDate, stamp } from "@/lib/changelog";
+import { isUnread, markSeen, SEEN_KEY } from "@/lib/changelogSeen";
 import { memoryKV } from "@/lib/storage";
 import { READABLE_FONT_KEY, SHELL_KEY } from "@/lib/shell";
 import { getTheme, setTheme, THEME_KEY, THEME_SCRIPT } from "@/lib/theme";
@@ -83,11 +84,12 @@ describe("changelog", () => {
 
   it("is unread until seen, and unread again after a new entry", () => {
     const kv = memoryKV();
-    expect(isUnread(kv)).toBe(true);
-    markSeen(kv);
+    expect(isUnread(stamp(), kv)).toBe(true);
+    markSeen(stamp(), kv);
     expect(kv.get(SEEN_KEY)).toBe(stamp());
-    expect(isUnread(kv)).toBe(false);
-    expect(isUnread(kv, added)).toBe(true);
+    expect(isUnread(stamp(), kv)).toBe(false);
+    expect(isUnread(stamp(added), kv)).toBe(true);
+    expect(isUnread("", memoryKV())).toBe(false);
   });
 
   it("formats dates in UTC", () => {

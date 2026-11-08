@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import App from "@/shell/App";
+import { stamp } from "@/lib/changelog";
 import { PROGRAMS, programFor } from "@/shell/registry";
 import { hashFor, parseHash, type Route } from "@/shell/useRoute";
 import { markBooted } from "@/lib/boot";
@@ -122,7 +123,7 @@ function mount(hash: string): void {
   container = document.createElement("div");
   document.body.appendChild(container);
   root = createRoot(container);
-  act(() => root!.render(createElement(App)));
+  act(() => root!.render(createElement(App, { changelogStamp: stamp() })));
 }
 
 function unmount(): void {
@@ -314,11 +315,11 @@ describe("the Program Manager (LP-104)", () => {
     expect(must("#pm-jap").getAttribute("href")).toBe("#jap");
   });
 
-  it("opens a program from its icon, and What's new as a dialog", () => {
+  it("opens a program from its icon, and What's new as a dialog", async () => {
     mount("");
     expect(must<HTMLAnchorElement>("#pm-library").getAttribute("href")).toBe("#library/penal-code");
     expect(must("#pm-changelog").getAttribute("aria-label")).toBe("What's new (unread)");
-    click("#pm-changelog");
+    await act(async () => must("#pm-changelog").click());
     expect(must<HTMLDialogElement>("#changelog-dialog").open).toBe(true);
   });
 

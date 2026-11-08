@@ -3,7 +3,7 @@
 // form, the What's new unread dot and the jump box (LP-128).
 
 import { useCallback, useState } from "react";
-import { isUnread, markSeen } from "@/lib/changelog";
+import { isUnread, markSeen } from "@/lib/changelogSeen";
 import type { DocketRequest } from "@/programs/filings";
 
 /** Which dialog is open (one at a time). */
@@ -32,9 +32,10 @@ export interface Dialogs {
   loadDocketInForm(docketId: string, formId?: string, values?: Record<string, string>): void;
 }
 
-export function useDialogs(): Dialogs {
+/** `changelogStamp`: What's new's stamp, for the unread dot. */
+export function useDialogs(changelogStamp: string): Dialogs {
   const [dialog, setDialog] = useState<DialogName>(null);
-  const [changelogUnread, setChangelogUnread] = useState(() => isUnread());
+  const [changelogUnread, setChangelogUnread] = useState(() => isUnread(changelogStamp));
   const [autoSync, setAutoSync] = useState(false);
   const [docketRequest, setDocketRequest] = useState<DocketRequest | null>(null);
 
@@ -57,9 +58,9 @@ export function useDialogs(): Dialogs {
   const openAbout = () => setDialog("about");
 
   const markChangelogSeen = useCallback(() => {
-    markSeen();
+    markSeen(changelogStamp);
     setChangelogUnread(false);
-  }, []);
+  }, [changelogStamp]);
 
   const openChangelog = () => {
     markChangelogSeen();

@@ -26,7 +26,6 @@ import { applyLook, getShell, setShell, type ShellMode } from "@/lib/shell";
 import { getTheme, LABELS, MODES, setTheme as saveTheme, type ThemeMode } from "@/lib/theme";
 import AboutDialog from "./AboutDialog";
 import BootScreen from "./BootScreen";
-import ChangelogDialog from "./ChangelogDialog";
 import CharactersDialog from "./CharactersDialog";
 import ErrorBoundary from "@/ui/ErrorBoundary";
 import JumpBox, { isFindKey, isJumpKey, jumpShortcut } from "./JumpBox";
@@ -58,8 +57,11 @@ import type { Route } from "./useRoute";
 const FilingsDialog = lazy(() => import("@/ui/FilingsDialog"));
 // Quick add (LP-221) loads the first time its button is pressed.
 const QuickAddDialog = lazy(() => import("@/ui/QuickAddDialog"));
+// What's new loads the first time it opens; the shell gets only its stamp (LP-242).
+const ChangelogDialog = lazy(() => import("./ChangelogDialog"));
 
-export default function App() {
+/** `changelogStamp`: What's new's stamp, worked out on the server (page.tsx); empty shows no unread dot. */
+export default function App({ changelogStamp = "" }: { changelogStamp?: string }) {
   const { route, form, goHome } = useRoute();
   const {
     dialog,
@@ -75,11 +77,14 @@ export default function App() {
     closeDialog,
     autoSyncDone,
     loadDocketInForm,
-  } = useDialogs();
+  } = useDialogs(changelogStamp);
   const [navOpen, setNavOpen] = useState(false);
   /** Filing history has been opened, so it stays mounted (and its open/close works as the other dialogs'). */
   const [filingsUsed, setFilingsUsed] = useState(false);
   if (dialog === "filings" && !filingsUsed) setFilingsUsed(true);
+  /** The same for What's new. */
+  const [changelogUsed, setChangelogUsed] = useState(false);
+  if (dialog === "changelog" && !changelogUsed) setChangelogUsed(true);
   /** Quick add (LP-221): open, and opened once (so it stays mounted). From home or an open case. */
   const [quickOpen, setQuickOpen] = useState(false);
   const [quickUsed, setQuickUsed] = useState(false);
@@ -574,7 +579,11 @@ export default function App() {
         />
       </ErrorBoundary>
       <ErrorBoundary where={"What's new"} variant="dialog" resetKey={dialog} onDismiss={closeDialog}>
-        <ChangelogDialog open={dialog === "changelog"} onClose={closeDialog} />
+        {changelogUsed && (
+          <Suspense fallback={null}>
+            <ChangelogDialog open={dialog === "changelog"} onClose={closeDialog} />
+          </Suspense>
+        )}
       </ErrorBoundary>
       <ErrorBoundary where="About" variant="dialog" resetKey={dialog} onDismiss={closeDialog}>
         <AboutDialog open={dialog === "about"} onClose={closeDialog} />
