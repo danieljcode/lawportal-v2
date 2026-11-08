@@ -6,7 +6,7 @@
 import { isMember } from "./cases";
 import { STATUSES } from "./docketFields";
 import { MONTH_NAMES } from "./deadlines";
-import { invoiceTotal, type Invoice } from "./invoices";
+import { invoiceTotal, sumMoney, type Invoice } from "./invoices";
 import { entryValue, filterEntries, formatMoney, totalHours, type TimeEntry } from "./ledger";
 import type { Case } from "./types";
 
@@ -27,7 +27,6 @@ export interface Report {
 }
 
 const inRange = (date: string, f: ReportFilter) => (!f.from || date >= f.from) && (!f.to || date <= f.to);
-const sumCents = (ns: number[]) => ns.reduce((t, n) => t + Math.round(n * 100), 0) / 100;
 
 /** Billable hours and their value per character, most hours first. */
 export function hoursReport(
@@ -42,7 +41,7 @@ export function hoursReport(
     .map(([id, list]) => ({
       name: nameOf(id),
       hours: totalHours(list),
-      value: sumCents(list.map((e) => entryValue(e, rateOf(e)) ?? 0)),
+      value: sumMoney(list.map((e) => entryValue(e, rateOf(e)) ?? 0)),
     }))
     .sort((a, b) => b.hours - a.hours || a.name.localeCompare(b.name));
   return {
@@ -73,7 +72,7 @@ export function revenueReport(invoices: readonly Invoice[], f: ReportFilter): Re
   }
   const rows = [...months]
     .sort(([a], [b]) => (a < b ? -1 : 1))
-    .map(([ym, m]) => ({ month: monthName(ym), billed: sumCents(m.billed), received: sumCents(m.received) }));
+    .map(([ym, m]) => ({ month: monthName(ym), billed: sumMoney(m.billed), received: sumMoney(m.received) }));
   return {
     title: "Revenue by month",
     columns: ["Month", "Billed", "Received"],

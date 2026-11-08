@@ -15,7 +15,7 @@ Sync shares your characters, cases, filings, precedents and the rest between bro
 1. In **Settings**, under **Sync across devices**, choose **Turn on sync**. You get a **sync code**. If the site asks for an invite word, get it from whoever runs it.
 2. On the other device, enter the same code to join. Capitals, spaces and dashes don't matter, and the box shows the code as it will be used. Codes never use O, 0, I or 1.
 
-Anyone with the code can read and change that data, so keep it private. The dot in the top bar shows how sync is doing.
+Anyone with the code can read and change that data, so keep it private. The dot in the top bar shows how sync is doing. A code nobody has used for 180 days is deleted from the server, with its data; the copies in your browsers stay.
 
 ## Install and offline
 

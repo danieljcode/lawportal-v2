@@ -107,15 +107,17 @@ async function readFile(file: string): Promise<SyncRecord | null> {
 
 /** How long a code that was never written to keeps its file (LP-8). */
 export const UNUSED_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+/** How long a code keeps its data after its last save (LP-245): each save starts it again. */
+export const WRITTEN_TTL_MS = 180 * 24 * 60 * 60 * 1000;
 
 const HASH_FILE = /^[0-9a-f]{64}\.json$/;
 
 /**
- * Delete files still at rev 0 (created, never written) that are older than
- * UNUSED_TTL_MS, so made-up codes can't hold the MAX_FILES cap forever.
- * Returns how many files are left. Unreadable files are kept and counted.
+ * Delete files still at rev 0 (created, never written) older than UNUSED_TTL_MS, and any not
+ * saved to for WRITTEN_TTL_MS (LP-245), so neither made-up nor abandoned codes hold the MAX_FILES
+ * cap forever. Returns how many files are left. Unreadable files are kept and counted.
  */
-export async function sweepUnused(now = Date.now()): Promise<number> {
+export async function sweepExpired(now = Date.now()): Promise<number> {
   const dir = syncDir();
   // The sync folder is runtime data, set by LAWAPP_SYNC_DIR: nothing for the build to trace.
   const names = (await fs.readdir(/* turbopackIgnore: true */ dir)).filter((n) => n.endsWith(".json"));
@@ -127,9 +129,10 @@ export async function sweepUnused(now = Date.now()): Promise<number> {
     const file = path.join(dir, hash + ".json");
     const gone = await withLock(hash, async () => {
       try {
-        if (now - (await fs.stat(file)).mtimeMs < UNUSED_TTL_MS) return false;
+        const age = now - (await fs.stat(file)).mtimeMs;
+        if (age < UNUSED_TTL_MS) return false;
         const record = await readFile(file);
-        if (!record || record.rev !== 0) return false;
+        if (!record || (record.rev !== 0 && age < WRITTEN_TTL_MS)) return false;
         await fs.unlink(file);
         return true;
       } catch {
@@ -150,7 +153,7 @@ export async function create(ip = "unknown"): Promise<{ code: string } | "full" 
   if (redisConfigured()) return createRedis(ip);
   const dir = syncDir();
   await fs.mkdir(dir, { recursive: true });
-  const existing = await sweepUnused();
+  const existing = await sweepExpired();
   if (existing >= MAX_FILES) return "full";
   const record: SyncRecord = { rev: 0, updated: new Date().toISOString(), data: { characters: [] } };
   for (let attempt = 1; ; attempt++) {
@@ -189,7 +192,7 @@ export function read(code: string): Promise<SyncRecord | null> {
 
 /** Optimistic write: only succeeds when the stored rev equals `expectedRev`. */
 export function write(code: string, expectedRev: number, data: SyncRecord["data"]): Promise<WriteResult> {
-  if (redisConfigured()) return redisWrite(codeHash(code), expectedRev, data);
+  if (redisConfigured()) return redisWrite(codeHash(code), expectedRev, data, WRITTEN_TTL_MS);
   return withLock(codeHash(code), async () => {
     const file = fileFor(code);
     const current = await readFile(file);

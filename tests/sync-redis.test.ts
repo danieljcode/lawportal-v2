@@ -2,7 +2,7 @@
 // UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN are set; use a throwaway database.
 import { randomBytes } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { redisConfigured, redisCreate, redisRemove } from "@/lib/server/syncRedis";
+import { redisConfigured, redisCreate, redisRead, redisRemove, redisWrite } from "@/lib/server/syncRedis";
 import { create, read, remove, write } from "@/lib/server/syncStore";
 
 const HOUR = 60 * 60 * 1000;
@@ -31,6 +31,15 @@ describe.skipIf(!redisConfigured())("sync store on Upstash Redis", () => {
     expect(await read(code)).toBeNull();
     expect(await remove(code)).toBe("missing");
     expect(await write(code, 1, data)).toBe("missing");
+  });
+
+  it("a written code expires when not saved to within its time (LP-245)", async () => {
+    const hash = hex();
+    expect(await redisCreate(hash, record, 1e6, 60_000, hex(), { overall: 1e6, perIp: 1e6 })).toBe("ok");
+    expect(await redisWrite(hash, 0, { characters: [] }, 1000)).toMatchObject({ record: { rev: 1 } });
+    await new Promise((r) => setTimeout(r, 1500));
+    expect(await redisRead(hash)).toBeNull();
+    await redisRemove(hash);
   });
 
   // Each call is its own request, as from separate instances: only Redis holds the counts.

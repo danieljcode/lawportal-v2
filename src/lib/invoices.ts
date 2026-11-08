@@ -97,7 +97,7 @@ const isDate = (v: unknown): v is string => typeof v === "string" && ISO_DATE_RE
 const isActivity = (v: unknown): v is Activity => typeof v === "string" && v in ACTIVITY_LABELS;
 const cents = (n: number) => Math.round(n * 100) / 100;
 /** Sums dollars in whole cents, so 0.1 + 0.2 is 0.3. */
-const sum = (ns: readonly number[]) => ns.reduce((t, n) => t + Math.round(n * 100), 0) / 100;
+export const sumMoney = (ns: readonly number[]) => ns.reduce((t, n) => t + Math.round(n * 100), 0) / 100;
 
 function cleanLine(raw: unknown): InvoiceLine | null {
   if (!raw || typeof raw !== "object") return null;
@@ -164,9 +164,10 @@ export function cleanInvoice(raw: unknown, now: string = new Date().toISOString(
   };
 }
 
-export const invoiceTotal = (inv: Pick<Invoice, "lines">) => sum(inv.lines.map((l) => l.amount));
-export const invoicePaid = (inv: Pick<Invoice, "payments">) => sum(inv.payments.map((p) => p.amount));
-export const invoiceBalance = (inv: Pick<Invoice, "lines" | "payments">) => sum([invoiceTotal(inv), -invoicePaid(inv)]);
+export const invoiceTotal = (inv: Pick<Invoice, "lines">) => sumMoney(inv.lines.map((l) => l.amount));
+export const invoicePaid = (inv: Pick<Invoice, "payments">) => sumMoney(inv.payments.map((p) => p.amount));
+export const invoiceBalance = (inv: Pick<Invoice, "lines" | "payments">) =>
+  sumMoney([invoiceTotal(inv), -invoicePaid(inv)]);
 
 /** The game date an invoice is due: INVOICE_TERMS_DAYS after it was issued. */
 export const invoiceDue = (inv: Pick<Invoice, "date">) => addDays(inv.date, INVOICE_TERMS_DAYS);
@@ -235,14 +236,14 @@ export function caseBilling(
   return {
     loggedHours: totalHours(logged),
     unbilledHours: totalHours(unbilled),
-    unbilledValue: sum(values.map((v) => v ?? 0)),
+    unbilledValue: sumMoney(values.map((v) => v ?? 0)),
     /** Unbilled entries with no rate, so left out of unbilledValue. */
     unpriced: values.filter((v) => v === null).length,
     invoiceCount: own.length,
-    invoiced: sum(own.map(invoiceTotal)),
-    paid: sum(own.map(invoicePaid)),
+    invoiced: sumMoney(own.map(invoiceTotal)),
+    paid: sumMoney(own.map(invoicePaid)),
     /** As Accounts receivable counts it: an overpaid invoice doesn't reduce another's balance. */
-    outstanding: sum(receivables(own).map(invoiceBalance)),
+    outstanding: sumMoney(receivables(own).map(invoiceBalance)),
   };
 }
 
