@@ -67,21 +67,27 @@ using the [reference data](templates-and-forms.md#reference-data) in `.agents/re
 
 ## CI
 
-`.github/workflows/ci.yml` runs on every push and pull request, on Node 22:
+`.github/workflows/ci.yml` runs on every push and pull request, on Node 22. Its jobs run at the same
+time (LP-243), so a run takes as long as the slowest one, not all of them added up:
 
-1. Checks out the code, and the reference data when the `REFERENCE_TOKEN` secret is set (a
-   read-only token for `danieljcode/lawportal-reference`). Pull requests from forks don't get the
-   secret, so they skip the parity tests.
-2. `npm ci`, then `npm audit --omit=dev --audit-level=high` (see [Dependencies](dependencies.md)),
-   `npm run lint` and `npm run format:check` (see [Development](development.md#code-style-and-editor-set-up)),
-   `npm test` (with `LAWAPP_REQUIRE_REFERENCE=1` when the data was checked out) and `npm run build`.
-3. The [end-to-end smoke tests](#end-to-end-smoke-tests-lp-6), [screenshot tests](#screenshot-tests-lp-117)
-   and [accessibility check](#accessibility-check-lp-118) against that build. If any fail, their
-   screenshots and traces (and a screenshot test's expected, actual and diff images) are
-   uploaded as the `e2e-failures` artefact on the run.
+- **checks:** `npm audit --omit=dev --audit-level=high` (see [Dependencies](dependencies.md)),
+  `npm run lint` and `npm run format:check` (see [Development](development.md#code-style-and-editor-set-up)),
+  and `npm test` (with `LAWAPP_REQUIRE_REFERENCE=1` when the data was checked out).
+- **e2e (1) and e2e (2):** `npm run build`, then half each (Playwright's `--shard`) of the
+  [end-to-end smoke tests](#end-to-end-smoke-tests-lp-6), [screenshot tests](#screenshot-tests-lp-117)
+  and [accessibility check](#accessibility-check-lp-118), with a worker per core. If any fail, their
+  screenshots and traces (and a screenshot test's expected, actual and diff images) are uploaded as
+  that shard's `e2e-failures-1` or `e2e-failures-2` artefact.
+- **test-and-build:** passes only when all of those did. It's the check `main` requires, named after
+  the single job CI used to be.
 
-The job runs in Playwright's Linux image (`mcr.microsoft.com/playwright`), which brings Chromium and
-its fonts. Keep its tag at the `@playwright/test` version in `package.json` when that's updated.
+Each job checks out the code, and the reference data when the `REFERENCE_TOKEN` secret is set (a
+read-only token for `danieljcode/lawportal-reference`); pull requests from forks don't get the
+secret, so they skip the parity tests. The shared steps are written once, as YAML anchors in the
+checks job.
+
+The e2e jobs run in Playwright's Linux image (`mcr.microsoft.com/playwright`), which brings Chromium
+and its fonts. Keep its tag at the `@playwright/test` version in `package.json` when that's updated.
 
 A second workflow, **Conventions** (`.github/workflows/conventions.yml`), runs on pull requests and
 checks every commit message and the PR title against the commit format (LP-84). It's covered by
@@ -123,7 +129,8 @@ an app already running on port 3210 is reused, without building, so stop it firs
 
 `e2e/a11y.spec.ts` runs [axe](https://github.com/dequelabs/axe-core) (`@axe-core/playwright`) on the
 same screens as the screenshot tests: the home screen and each program's start page, Modern and
-Classic, light and dark, at both sizes. It runs everywhere `npm run test:e2e` does.
+Classic, light at both sizes and dark at desktop size (the themes share the layout; LP-243). It runs
+everywhere `npm run test:e2e` does.
 
 - **Serious and critical** issues fail the test, listed with the elements they're on.
 - **Minor and moderate** ones are printed in the test output but don't fail.
@@ -179,7 +186,7 @@ Fonts render differently on each system, so the tests only run on Linux, where C
 Playwright's image; on Windows and macOS they skip. To change the approved screenshots on purpose:
 
 1. Push the change. CI fails the screenshots that differ (or are new) and uploads the new ones.
-2. Check the diff images in the run's `e2e-failures` artefact.
+2. Check the diff images in the run's `e2e-failures-1` and `e2e-failures-2` artefacts (one per shard).
 3. `npm run screenshots:accept` (needs the GitHub CLI, `gh`) copies them from the branch's latest
    failed run into `e2e/screenshots/`; pass a run id to pick another run. Commit them.
 
