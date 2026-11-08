@@ -157,6 +157,24 @@ describe("deleting a character (LP-4)", () => {
     expect(stores.dockets.list("bob00001")).toEqual([]);
     expect(stores.dockets.list("alice001")).toHaveLength(1);
   });
+
+  it("unassigns their next actions, also on cases they weren't on (LP-240)", () => {
+    const cases = createCaseStore(memoryKV());
+    const actions = [
+      { id: "act00001", title: "Bob's", owner: "bob00001" },
+      { id: "act00002", title: "Alice's", owner: "alice001" },
+    ];
+    cases.replaceAll([
+      { id: "case0001", caseNumber: "90SCCR00147", lead: "alice001", actions, updated: T1 },
+      { id: "case0002", caseNumber: "90SCCR00200", lead: "alice001", updated: T1 },
+    ]);
+    cases.unassign("bob00001");
+    const [one, two] = cases.list();
+    expect(one.actions).toEqual([{ id: "act00001", title: "Bob's" }, actions[1]]);
+    expect(one.updated).not.toBe(T1);
+    expect(one).toMatchObject({ lead: "alice001" });
+    expect(two.updated).toBe(T1);
+  });
 });
 
 describe("the docket view over cases", () => {

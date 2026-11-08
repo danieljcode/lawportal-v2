@@ -41,6 +41,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "fix",
         text: "A Closed case's deadlines and next actions no longer show on the home screen, in Upcoming, on the Calendar or in the due-soon dot. Reopen the case and they come back. Invoices it still owes stay on the work list.",
       },
+      {
+        type: "fix",
+        text: "Deleting a character no longer leaves their next actions with an Unknown character: they become unassigned, on every case.",
+      },
     ],
   },
   {

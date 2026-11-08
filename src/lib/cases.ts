@@ -234,6 +234,7 @@ export interface CaseStore {
   /**
    * A character was deleted (LP-4): take it off every case instead of deleting
    * them. A case it led keeps its other characters and is left with no lead.
+   * Next actions it owned, on any case, become unassigned (LP-240).
    */
   unassign(charId: string): void;
   /** Bring in the old per-character dockets once (see CASE_MIGRATIONS). */
@@ -282,12 +283,14 @@ export function createCaseStore(kv: KV): CaseStore {
       const now = new Date().toISOString();
       let changed = false;
       const list = store.get().map((c) => {
-        if (!isMember(c, charId)) return c;
+        const owns = c.actions?.some((a) => a.owner === charId);
+        if (!isMember(c, charId) && !owns) return c;
         changed = true;
         return {
           ...c,
           lead: c.lead === charId ? null : c.lead,
           assigned: c.assigned.filter((x) => x !== charId),
+          ...(owns ? { actions: c.actions!.map(({ owner, ...a }) => (owner === charId ? a : { ...a, owner })) } : {}),
           updated: now,
         };
       });
