@@ -90,6 +90,10 @@ export function memoryKV(initial?: Record<string, string>): KV {
 
 let defaultKv: KV | null = null;
 let defaultBackend: Backend = "local";
+let unopened = false;
+
+/** True when the saved data is in IndexedDB but couldn't be opened, so the app runs empty in memory (LP-248). */
+export const dataUnopened = (): boolean => unopened;
 
 /** The shared KV for the app: localStorage, or memory after a failed probe. Client only. */
 export function defaultKV(): KV {
@@ -111,17 +115,22 @@ export function backend(): Backend {
   return defaultBackend;
 }
 
-/** Make `kv` the app's storage, unless defaultKV() has already picked one this page. Returns whether it did. */
-export function setDefaultKV(kv: KV, b: Backend): boolean {
+/**
+ * Make `kv` the app's storage, unless defaultKV() has already picked one this page. Returns whether it
+ * did. `unopenedData`: the real data is elsewhere and couldn't be opened (LP-248).
+ */
+export function setDefaultKV(kv: KV, b: Backend, unopenedData = false): boolean {
   if (defaultKv) return false;
   defaultKv = kv;
   defaultBackend = b;
+  unopened = unopenedData;
   return true;
 }
 
 /** Test-only: let defaultKV() pick again. */
 export function __resetDefaultKVForTests(): void {
   defaultKv = null;
+  unopened = false;
 }
 
 const saveFailedChanges = createChannel();

@@ -7,6 +7,7 @@ Everything is saved in this browser. Nothing leaves your computer unless you tur
 - **Back up everything** saves one file with your characters, cases, filings, drafts and settings.
 - **Restore backup** puts a backup back, after showing what will change.
 - Anything damaged is set aside, never deleted, and can be downloaded.
+- If the browser can't open your saved data when the app starts, a notice says so and the app opens empty. Your data is still there: press **Reload** to try again. Anything you change before then isn't kept.
 
 ## Sync
 
