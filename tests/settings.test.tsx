@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import App from "@/shell/App";
+import { stamp } from "@/lib/changelog";
 import { BOOTED_KEY } from "@/lib/boot";
 import { characterStore } from "@/lib/characters";
 import { letterheadStore } from "@/lib/letterhead";
@@ -29,7 +30,7 @@ function mount(hash: string): void {
   container = document.createElement("div");
   document.body.appendChild(container);
   root = createRoot(container);
-  act(() => root!.render(createElement(App)));
+  act(() => root!.render(createElement(App, { changelogStamp: stamp() })));
 }
 
 function go(hash: string): void {

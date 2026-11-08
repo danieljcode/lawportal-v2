@@ -7,7 +7,7 @@ import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import App from "@/shell/App";
 import { CHANGELOG } from "@/data/changelog";
-import { LOG_TYPES } from "@/lib/changelog";
+import { LOG_TYPES, stamp } from "@/lib/changelog";
 import { APP_VERSION } from "@/lib/version";
 import { characterStore, CHARS_KEY } from "@/lib/characters";
 import { docketStore } from "@/lib/dockets";
@@ -69,7 +69,7 @@ beforeEach(() => {
   container = document.createElement("div");
   document.body.appendChild(container);
   root = createRoot(container);
-  act(() => root.render(createElement(App)));
+  act(() => root.render(createElement(App, { changelogStamp: stamp() })));
 });
 
 afterEach(() => {
@@ -294,10 +294,11 @@ describe("J.A.P.", () => {
 });
 
 describe("What's new", () => {
-  it("lists our entries and hides the unread dot once opened", () => {
+  it("lists our entries and hides the unread dot once opened", async () => {
     expect($("#changelog-dot")).not.toBeNull();
     click("#menu-help");
-    click("#menu-changelog");
+    // What's new loads the first time it opens (LP-242).
+    await act(async () => must("#menu-changelog").click());
     expect($("#changelog-dot")).toBeNull();
     expect(must("#app-version").textContent).toBe("Version " + APP_VERSION);
     expect(document.querySelectorAll("#changelog-list article.log-entry")).toHaveLength(CHANGELOG.length);

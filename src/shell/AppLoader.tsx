@@ -21,11 +21,11 @@ const App = dynamic(
   },
 );
 
-export default function AppLoader() {
+export default function AppLoader({ changelogStamp }: { changelogStamp: string }) {
   // The last line of defence (LP-88): each panel inside App has its own boundary too.
   return (
     <ErrorBoundary where="the app" variant="app">
-      <App />
+      <App changelogStamp={changelogStamp} />
     </ErrorBoundary>
   );
 }

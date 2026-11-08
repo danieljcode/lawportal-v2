@@ -70,7 +70,9 @@ browser.
   templates (`@/data`) come with Court Filings, or when Filing history first opens (LP-133): the
   shell routes, titles the page and fills the jump box from
   `@/data/form-index` (id, court, section and title), and `Shell.form` is that index entry. A lint
-  rule keeps `@/data` out of `src/shell`.
+  rule keeps `@/data` out of `src/shell`. What's new loads when it first opens, or with Settings (LP-242):
+  `page.tsx` works out its stamp (`stamp()` in `src/lib/changelog.ts`) on the server and passes it to
+  `App`, whose unread dot (`src/lib/changelogSeen.ts`) needs only that.
 - **Programs keep their place** (LP-126). Every program opened stays mounted inside React's
   `<Activity>`, hidden while another shows (App remembers each one's last route in `visited`), so
   coming back finds the same form, scroll position, searches and half-typed intake. A hidden
