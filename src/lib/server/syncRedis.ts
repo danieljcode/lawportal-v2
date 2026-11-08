@@ -4,8 +4,9 @@
 // One hash per code at lp:sync:<sha256 of code> with fields rev, updated and
 // data (the JSON of SyncRecord.data). Each operation is one Lua script, so it
 // runs atomically on the server and no in-process lock is needed. A code that
-// was never written expires after UNUSED_TTL_MS; the sorted set lp:sync:index
-// counts live codes for MAX_FILES, scored by expiry time (+inf once written).
+// was never written expires after UNUSED_TTL_MS, and one not saved to for
+// WRITTEN_TTL_MS after that (LP-245); the sorted set lp:sync:index counts live
+// codes for MAX_FILES, scored by expiry time.
 // New codes are counted per clock hour in lp:sync:created:<hour> and
 // lp:sync:created:ip:<sha256 of IP>:<hour>, so every instance shares the limits (LP-137).
 import type { SyncRecord, WriteResult } from "./syncStore";
@@ -100,20 +101,23 @@ if not cur[1] then return {'missing'} end
 if tonumber(cur[1]) ~= tonumber(ARGV[1]) then return {'conflict', cur[1], cur[2], cur[3]} end
 local rev = tonumber(cur[1]) + 1
 redis.call('HSET', KEYS[1], 'rev', rev, 'updated', ARGV[2], 'data', ARGV[3])
-redis.call('PERSIST', KEYS[1])
-redis.call('ZADD', KEYS[2], '+inf', ARGV[4])
+redis.call('PEXPIRE', KEYS[1], ARGV[5])
+redis.call('ZADD', KEYS[2], ARGV[6], ARGV[4])
 return {'ok', tostring(rev)}`;
 
+/** Optimistic write; the code then expires `ttlMs` after this save unless saved again. */
 export async function redisWrite(
   hash: string,
   expectedRev: number,
   data: SyncRecord["data"],
-  updated = new Date().toISOString(),
+  ttlMs: number,
+  now = Date.now(),
 ): Promise<WriteResult> {
+  const updated = new Date(now).toISOString();
   const out = (await evalScript(
     WRITE,
     [PREFIX + hash, INDEX],
-    [expectedRev, updated, JSON.stringify(data), hash],
+    [expectedRev, updated, JSON.stringify(data), hash, ttlMs, now + ttlMs],
   )) as string[];
   if (out[0] === "missing") return "missing";
   if (out[0] === "conflict") return { conflict: { rev: Number(out[1]), updated: out[2], data: JSON.parse(out[3]) } };
