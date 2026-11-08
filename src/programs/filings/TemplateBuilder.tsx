@@ -2,9 +2,11 @@
 // blocks (heading, paragraph, field, repeating list, signature) the firm adds,
 // moves and deletes, with a live preview of the filing. Saving keeps it under
 // My Templates in the forms list (synced, in the backup) and opens it as a form.
+// #filings/edit/copy/<formId> (LP-225) starts from a form: its wording as
+// paragraphs, the rest as fixed Original text blocks whose fields can be renamed.
 
-import { useMemo, useState, type FormEvent } from "react";
-import { templateHtml } from "@/data/myTemplates";
+import { Fragment, useMemo, useState, type FormEvent } from "react";
+import { copyOfForm, originalFields, originalGlimpse, templateHtml } from "@/data/myTemplates";
 import {
   MAX_BLOCKS,
   MY_PREFIX,
@@ -16,21 +18,22 @@ import {
 import { compile, render } from "@/lib/template";
 import { navigate } from "@/shell/useRoute";
 
-const ADD: Array<[BlockKind, string]> = [
+type AddKind = Exclude<BlockKind, "original">;
+const ADD: Array<[AddKind, string]> = [
   ["heading", "Heading"],
   ["paragraph", "Paragraph"],
   ["field", "Field"],
   ["list", "Repeating list"],
   ["signature", "Signature"],
 ];
-const KIND_NAME = Object.fromEntries(ADD) as Record<BlockKind, string>;
+const KIND_NAME = { ...Object.fromEntries(ADD), original: "Original text" } as Record<BlockKind, string>;
 const FIELD_TYPE_NAMES: Record<BlockFieldType, string> = {
   text: "Short text",
   textarea: "Long text",
   date: "Date",
   number: "Number",
 };
-const NEW_BLOCK: Record<BlockKind, TemplateBlock> = {
+const NEW_BLOCK: Record<AddKind, TemplateBlock> = {
   heading: { kind: "heading", text: "" },
   paragraph: { kind: "paragraph", text: "" },
   field: { kind: "field", text: "", type: "text" },
@@ -40,6 +43,13 @@ const NEW_BLOCK: Record<BlockKind, TemplateBlock> = {
 
 function BlockEditor({ b, i, set }: { b: TemplateBlock; i: number; set: (b: TemplateBlock) => void }) {
   const id = "tb-block-" + i;
+  if (b.kind === "original") {
+    return (
+      <p className="small muted tb-glimpse" id={id}>
+        {originalGlimpse(b)}
+      </p>
+    );
+  }
   const label = { heading: "Heading", paragraph: "Text", field: "Label", list: "Name", signature: "Role" }[b.kind];
   return (
     <div className="tb-fields">
@@ -83,24 +93,34 @@ function BlockEditor({ b, i, set }: { b: TemplateBlock; i: number; set: (b: Temp
 }
 
 export default function TemplateBuilder({ edit }: { edit: string }) {
-  const existing = edit === "new" ? undefined : templateStore().get(edit);
-  const [title, setTitle] = useState(existing ? existing.title : "");
-  const [blocks, setBlocks] = useState<TemplateBlock[]>(existing ? existing.blocks : []);
+  const copyFrom = edit.startsWith("copy/") ? edit.slice(5) : null;
+  const existing = edit === "new" || copyFrom ? undefined : templateStore().get(edit);
+  // useState keeps the first one, so the copy is only made once.
+  const [start] = useState(() => existing || (copyFrom ? copyOfForm(copyFrom) : undefined));
+  const [title, setTitle] = useState(start ? start.title : "");
+  const [blocks, setBlocks] = useState<TemplateBlock[]>(start ? start.blocks : []);
+  const [renames, setRenames] = useState<Record<string, string>>(start?.renames || {});
+  const source = start?.source;
   const [error, setError] = useState("");
+  const fields = useMemo(() => originalFields({ blocks }), [blocks]);
 
   const preview = useMemo(() => {
     try {
-      return render(compile(templateHtml({ title: title.trim() || "Untitled template", blocks })));
+      return render(compile(templateHtml({ title: title.trim() || "Untitled template", blocks, source, renames })));
     } catch {
       return null;
     }
-  }, [title, blocks]);
+  }, [title, blocks, source, renames]);
 
-  if (edit !== "new" && !existing) {
+  if (edit !== "new" && !start) {
     return (
       <section className="form-view" id="template-builder">
         <h2>Template builder</h2>
-        <p className="muted">That template is gone. It may have been deleted on another device.</p>
+        <p className="muted">
+          {copyFrom
+            ? "That form isn't available to copy."
+            : "That template is gone. It may have been deleted on another device."}
+        </p>
         <p>
           <a className="btn" href="#filings/edit/new">
             New template
@@ -119,7 +139,7 @@ export default function TemplateBuilder({ edit }: { edit: string }) {
   const save = (e: FormEvent) => {
     e.preventDefault();
     try {
-      const t = templateStore().save({ id: existing?.id, title, blocks });
+      const t = templateStore().save({ id: existing?.id, title, blocks, source, renames });
       navigate("#filings/" + MY_PREFIX + t.id);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -131,7 +151,7 @@ export default function TemplateBuilder({ edit }: { edit: string }) {
       <div className="form-head">
         <div>
           <p className="crumb muted">My Templates</p>
-          <h2 id="tb-title-head">{existing ? "Edit template" : "New template"}</h2>
+          <h2 id="tb-title-head">{existing ? "Edit template" : copyFrom ? "Make my own version" : "New template"}</h2>
         </div>
       </div>
       <form id="tb-form" noValidate onSubmit={save}>
@@ -188,6 +208,26 @@ export default function TemplateBuilder({ edit }: { edit: string }) {
         ) : (
           <p className="small muted">No blocks yet. Add a heading, some text and the fields to fill in.</p>
         )}
+        {fields.length > 0 && (
+          <fieldset className="tb-renames" id="tb-renames">
+            <legend>Fields in the original text</legend>
+            <p className="small muted">Rename a field here; it keeps how it fills in.</p>
+            <div className="tb-fields">
+              {fields.map((l, i) => (
+                <Fragment key={l}>
+                  <label htmlFor={"tb-rename-" + i}>{l}</label>
+                  <input
+                    id={"tb-rename-" + i}
+                    type="text"
+                    maxLength={80}
+                    value={renames[l] ?? l}
+                    onChange={(e) => setRenames({ ...renames, [l]: e.target.value })}
+                  />
+                </Fragment>
+              ))}
+            </div>
+          </fieldset>
+        )}
         {blocks.length < MAX_BLOCKS && (
           <p className="row tb-add" role="group" aria-label="Add a block">
             <span className="small muted">Add:</span>
@@ -208,7 +248,10 @@ export default function TemplateBuilder({ edit }: { edit: string }) {
           <button type="submit" className="btn primary" id="tb-save">
             Save template
           </button>
-          <a className="btn" href={existing ? "#filings/" + MY_PREFIX + existing.id : "#filings"}>
+          <a
+            className="btn"
+            href={existing ? "#filings/" + MY_PREFIX + existing.id : copyFrom ? "#filings/" + copyFrom : "#filings"}
+          >
             Cancel
           </a>
           {existing && (

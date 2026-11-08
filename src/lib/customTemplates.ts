@@ -1,7 +1,9 @@
 // The firm's own templates (LP-49) as stored: one list under lawapp_templates,
 // synced per template by `updated` and in the full backup. Each is a title and
 // a list of blocks the builder edits; myTemplateForm (src/data/myTemplates.ts)
-// turns them into token HTML for the template engine. Kept small because sync
+// turns them into token HTML for the template engine. A copy of a built-in form
+// (LP-225) points at that form's parts by number and hash: its HTML is never
+// stored or synced, only read from the app's own forms. Kept small because sync
 // and the shell's form lookup load it with the app shell.
 
 import { ISO_TIME_RE, defaultKV, isId, newId, text, uniqueById, type KV } from "./storage";
@@ -16,10 +18,18 @@ export const MAX_BLOCKS = 80;
 export const MY_TEMPLATES = "My Templates";
 export const MY_PREFIX = "my-";
 
-export const BLOCK_KINDS = ["heading", "paragraph", "field", "list", "signature"] as const;
+export const BLOCK_KINDS = ["heading", "paragraph", "field", "list", "signature", "original"] as const;
 export type BlockKind = (typeof BLOCK_KINDS)[number];
 export const FIELD_TYPES = ["text", "textarea", "date", "number"] as const;
 export type BlockFieldType = (typeof FIELD_TYPES)[number];
+
+/** Parts `part` to `part + count - 1` of a built-in form, as they were when copied (`hash`). */
+export interface FormPartRef {
+  form: string;
+  part: number;
+  count: number;
+  hash: string;
+}
 
 export interface TemplateBlock {
   kind: BlockKind;
@@ -27,13 +37,33 @@ export interface TemplateBlock {
   text: string;
   /** A field's kind of answer. */
   type?: BlockFieldType;
+  /** An "original" block's parts, or the part whose look a copied paragraph keeps (LP-225). */
+  from?: FormPartRef;
 }
 
 export interface CustomTemplate {
   id: string;
   title: string;
   blocks: TemplateBlock[];
+  /** The form it was copied from (LP-225); its own title then comes from the original's wording. */
+  source?: string;
+  /** New labels for the original's fields (old label → new). */
+  renames?: Record<string, string>;
   updated: string;
+}
+
+const FORM_ID = /^[a-z0-9-]{1,100}$/;
+const count = (v: unknown, max: number) =>
+  Number.isInteger(v) && (v as number) >= 0 && (v as number) <= max ? (v as number) : -1;
+
+function cleanRef(raw: unknown): FormPartRef | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const o = raw as Record<string, unknown>;
+  const part = count(o.part, 999);
+  const n = count(o.count, 999);
+  if (typeof o.form !== "string" || !FORM_ID.test(o.form) || part < 0 || n < 1) return undefined;
+  if (typeof o.hash !== "string" || !/^[0-9a-f]{8}$/.test(o.hash)) return undefined;
+  return { form: o.form, part, count: n, hash: o.hash };
 }
 
 function cleanBlock(raw: unknown): TemplateBlock | null {
@@ -42,8 +72,28 @@ function cleanBlock(raw: unknown): TemplateBlock | null {
   const kind = BLOCK_KINDS.find((k) => k === o.kind);
   if (!kind) return null;
   const t = text(o.text, kind === "paragraph" ? 4000 : 120) || "";
+  const from = kind === "original" || kind === "paragraph" ? cleanRef(o.from) : undefined;
+  if (kind === "original") return from ? { kind, text: "", from } : null;
+  if (from) return { kind, text: t, from };
   if (kind !== "field") return { kind, text: t };
   return { kind, text: t, type: FIELD_TYPES.find((x) => x === o.type) || "text" };
+}
+
+/** A label as it may go inside a token: letters, numbers, spaces and plain punctuation. */
+export const tokenLabel = (s: string) =>
+  s
+    .replace(/[^\p{L}\p{N} .,'()/-]/gu, "")
+    .trim()
+    .slice(0, 80);
+
+function cleanRenames(raw: unknown): Record<string, string> | undefined {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return undefined;
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(raw).slice(0, 200)) {
+    const to = typeof v === "string" ? tokenLabel(v) : "";
+    if (k.length <= 120 && to && to !== k) out[k] = to;
+  }
+  return Object.keys(out).length ? out : undefined;
 }
 
 /** Normalise an untrusted template; null without a title. */
@@ -52,6 +102,7 @@ export function cleanTemplate(raw: unknown, now: string = new Date().toISOString
   const o = raw as Record<string, unknown>;
   const title = text(o.title, 120);
   if (!title) return null;
+  const renames = cleanRenames(o.renames);
   return {
     id: isId(o.id) ? o.id : newId(),
     title,
@@ -59,6 +110,8 @@ export function cleanTemplate(raw: unknown, now: string = new Date().toISOString
       .map(cleanBlock)
       .filter((b): b is TemplateBlock => !!b)
       .slice(0, MAX_BLOCKS),
+    ...(typeof o.source === "string" && FORM_ID.test(o.source) ? { source: o.source } : {}),
+    ...(renames ? { renames } : {}),
     updated: typeof o.updated === "string" && ISO_TIME_RE.test(o.updated) ? o.updated : now,
   };
 }

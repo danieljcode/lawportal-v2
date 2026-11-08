@@ -588,6 +588,14 @@ export default function FormView({
           >
             Law Library
           </button>
+          <a
+            className="btn"
+            id="make-version"
+            href={"#filings/edit/copy/" + form.id}
+            title="Copy this form into the template builder and change its wording"
+          >
+            Make my own version
+          </a>
           <button className="btn danger-quiet" id="reset-form" type="button" onClick={clearForm} disabled={!tree}>
             Clear form
           </button>

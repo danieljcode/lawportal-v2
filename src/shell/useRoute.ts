@@ -1,7 +1,7 @@
 // Hash routing for the program shell (LP-103; from App.tsx in LP-7): which
 // program is open and where in it, the last place reopened on boot,
 // back/forward, the page title, and going home. Routes are prefixed by
-// program: #filings/<formId>, #filings/edit/<new|templateId>, #cases/<caseId>, #cases/upcoming, #cases/calendar, #cases/docket, #cases/record,
+// program: #filings/<formId>, #filings/edit/<new|templateId|copy/formId>,#cases/<caseId>, #cases/upcoming, #cases/calendar, #cases/docket, #cases/record,
 // #clients/intake, #clients/conflicts, #clients/rolodex, #library/penal-code,
 // #library/precedents, #ledger, #ledger/retainers/<contactId>, #ledger/case/<caseId>[/log|/invoices], #find, #help, #help/<topic>, #jap, #control. The old flat hashes (#cases, #upcoming,
 // #intake, #conflicts, #library, #jap, #<formId>) still open the same place
@@ -125,7 +125,7 @@ export function parseHash(hash: string): Route {
     case "":
       return { program: "home" };
     case "filings": {
-      const edit = /^edit\/(new|[a-z0-9]{4,32})$/.exec(rest);
+      const edit = /^edit\/(new|[a-z0-9]{4,32}|copy\/[a-z0-9-]{1,100})$/.exec(rest);
       if (edit) return { program: "filings", formId: null, edit: edit[1] };
       return { program: "filings", formId: rest && formInfo(rest) ? rest : null };
     }
