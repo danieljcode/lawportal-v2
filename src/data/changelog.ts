@@ -19,6 +19,16 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-11-07",
+    title: "Your own templates",
+    items: [
+      {
+        type: "new",
+        text: "Build your own templates: + New template in Court Filings opens a builder. Give it a title, then add headings, paragraphs, fields to fill in (short or long text, a date or a number), repeating lists and a signature, move them up or down and watch the preview. Saved templates list under My Templates, work like any form (preview, Word, PDF, Discord, drafts and filing history) and sync to the firm.",
+      },
+    ],
+  },
+  {
+    date: "2026-11-07",
     title: "Everyday helpers: a case timeline, calendar, quick add and more",
     version: "0.7.0",
     items: [

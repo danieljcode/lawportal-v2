@@ -28,6 +28,7 @@ import { cleanInvoice, invoiceStore, renumberClashes, type Invoice } from "./inv
 import { CODE_RE, LOOKALIKE_HINT, normaliseCode } from "./syncCode";
 import { cleanDeposit, retainerStore, type Deposit } from "./retainers";
 import { checklistStore, cleanChecklist, type Checklist } from "./checklistStore";
+import { cleanTemplate, templateStore, type CustomTemplate } from "./customTemplates";
 import { cleanPrecedent, precedentStore, type Precedent } from "./precedents";
 import { docketStore } from "./dockets";
 import { portfolioStore } from "./portfolio";
@@ -102,6 +103,8 @@ export interface SyncDoc {
   retainers?: Deposit[];
   /** The firm's next-action checklists (LP-230); absent in copies from before them. */
   checklists?: Checklist[];
+  /** The firm's own templates (LP-49); absent in copies from before them. */
+  templates?: CustomTemplate[];
 }
 
 interface ApiBody {
@@ -264,6 +267,7 @@ const timeOf = (doc: unknown) => listOf<TimeEntry>(doc, "time", cleanEntry);
 const invoicesOf = (doc: unknown) => listOf<Invoice>(doc, "invoices", cleanInvoice);
 const retainersOf = (doc: unknown) => listOf<Deposit>(doc, "retainers", cleanDeposit);
 const checklistsOf = (doc: unknown) => listOf<Checklist>(doc, "checklists", (x) => cleanChecklist(x));
+const templatesOf = (doc: unknown) => listOf<CustomTemplate>(doc, "templates", (x) => cleanTemplate(x));
 const contactsOf = (doc: unknown) => listOf<Contact>(doc, "contacts", cleanContact);
 const precedentsOf = (doc: unknown) => listOf<Precedent>(doc, "precedents", cleanPrecedent);
 const checksOf = (doc: unknown) => listOf<ConflictCheck>(doc, "conflictChecks", cleanCheck);
@@ -297,6 +301,7 @@ const LISTS: readonly SyncList[] = [
   syncList("invoices", invoicesOf, invoiceStore, "invoice:", (i) => i.updated),
   syncList("retainers", retainersOf, retainerStore, "deposit:", (d) => d.updated),
   syncList("checklists", checklistsOf, checklistStore, "checklist:", (c) => c.updated),
+  syncList("templates", templatesOf, templateStore, "template:", (t) => t.updated),
 ];
 
 /** A document's cases; one from before LP-4 has dockets inside its characters instead. */

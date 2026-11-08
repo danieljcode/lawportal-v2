@@ -1,7 +1,7 @@
 // Hash routing for the program shell (LP-103; from App.tsx in LP-7): which
 // program is open and where in it, the last place reopened on boot,
 // back/forward, the page title, and going home. Routes are prefixed by
-// program: #filings/<formId>, #cases/<caseId>, #cases/upcoming, #cases/calendar, #cases/docket, #cases/record,
+// program: #filings/<formId>, #filings/edit/<new|templateId>, #cases/<caseId>, #cases/upcoming, #cases/calendar, #cases/docket, #cases/record,
 // #clients/intake, #clients/conflicts, #clients/rolodex, #library/penal-code,
 // #library/precedents, #ledger, #ledger/retainers/<contactId>, #ledger/case/<caseId>[/log|/invoices], #find, #help, #help/<topic>, #jap, #control. The old flat hashes (#cases, #upcoming,
 // #intake, #conflicts, #library, #jap, #<formId>) still open the same place
@@ -21,7 +21,11 @@ export type LibraryPage = "penal-code" | "precedents";
 
 export type Route =
   | { program: "home" }
-  | { program: "filings"; formId: string | null }
+  | {
+      program: "filings";
+      formId: string | null;
+      /** The template builder (LP-49): "new" or a template's id. */ edit?: string;
+    }
   | {
       program: "cases";
       caseId: string | null;
@@ -44,6 +48,7 @@ export const JAP_TITLE = "Judicial Advancement Portfolio";
 export const CASES_TITLE = "Case File";
 export const UPCOMING_TITLE = "Upcoming";
 export const CALENDAR_TITLE = "Calendar";
+export const BUILDER_TITLE = "Template builder";
 export const DOCKET_TITLE = "Court Docket";
 export const RECORD_TITLE = "Firm Record";
 export const INTAKE_TITLE = "New client intake";
@@ -72,7 +77,7 @@ export function hashFor(r: Route): string {
     case "home":
       return "";
     case "filings":
-      return "#filings" + (r.formId ? "/" + r.formId : "");
+      return "#filings" + (r.edit ? "/edit/" + r.edit : r.formId ? "/" + r.formId : "");
     case "cases":
       return (
         "#cases" +
@@ -119,8 +124,11 @@ export function parseHash(hash: string): Route {
   switch (head) {
     case "":
       return { program: "home" };
-    case "filings":
+    case "filings": {
+      const edit = /^edit\/(new|[a-z0-9]{4,32})$/.exec(rest);
+      if (edit) return { program: "filings", formId: null, edit: edit[1] };
       return { program: "filings", formId: rest && formInfo(rest) ? rest : null };
+    }
     case "cases":
       if (rest === "upcoming") return { program: "cases", caseId: null, upcoming: true };
       if (rest === "calendar") return { program: "cases", caseId: null, calendar: true };
@@ -172,7 +180,7 @@ export function pageTitle(r: Route, form: FormInfo | null): string | null {
     case "home":
       return null;
     case "filings":
-      return form ? form.title : "Court Filings";
+      return r.edit ? BUILDER_TITLE : form ? form.title : "Court Filings";
     case "cases":
       return r.upcoming
         ? UPCOMING_TITLE
