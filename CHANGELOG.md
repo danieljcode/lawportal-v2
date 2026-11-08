@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.8.0](https://github.com/danieljcode/lawportal-v2/compare/v0.7.0...v0.8.0) (2026-11-08)
+
+
+### Features
+
+* **cases:** attach the charge calculator's list to a case [LP-236] ([#231](https://github.com/danieljcode/lawportal-v2/issues/231)) ([36ad4ad](https://github.com/danieljcode/lawportal-v2/commit/36ad4ad64ccdc6db64a137b483d8d69c203a8055))
+* **filings:** build your own templates in a template builder [LP-49] ([#223](https://github.com/danieljcode/lawportal-v2/issues/223)) ([c8b95c4](https://github.com/danieljcode/lawportal-v2/commit/c8b95c473705dd16fc5a059824f05723bb2a4c4a))
+* **filings:** make my own version of any form in the builder [LP-225] ([#224](https://github.com/danieljcode/lawportal-v2/issues/224)) ([5b78d37](https://github.com/danieljcode/lawportal-v2/commit/5b78d37a37eae7145d03457e09e226c9d385c7de))
+* **filings:** share own templates as .lawtpl.json files [LP-50] ([df2b61f](https://github.com/danieljcode/lawportal-v2/commit/df2b61fad083683ebe4cfb5c7141b58837c914a3))
+* **filings:** template fields fill from character and case [LP-226] ([#225](https://github.com/danieljcode/lawportal-v2/issues/225)) ([ef9f7d4](https://github.com/danieljcode/lawportal-v2/commit/ef9f7d4767e485398340bf86179fbed7f16016c9))
+
+
+### Fixes
+
+* **cases:** keep cleared case fields cleared when merging [LP-244] ([#232](https://github.com/danieljcode/lawportal-v2/issues/232)) ([e5f6531](https://github.com/danieljcode/lawportal-v2/commit/e5f653110f86e5ac66270636844bde67c00e5f9f))
+* **cases:** leave Closed cases off the work list and Calendar [LP-239] ([#227](https://github.com/danieljcode/lawportal-v2/issues/227)) ([73ca2c1](https://github.com/danieljcode/lawportal-v2/commit/73ca2c115533c9ce1d329ab20e9d17e320a0a8da))
+* **cases:** unassign a deleted character's next actions [LP-240] ([#228](https://github.com/danieljcode/lawportal-v2/issues/228)) ([69693b8](https://github.com/danieljcode/lawportal-v2/commit/69693b851bad57e4338743c6fdacb38e5c61cdc2))
+* **ledger:** show negative amounts as -$50.00 [LP-247] ([#235](https://github.com/danieljcode/lawportal-v2/issues/235)) ([918fc07](https://github.com/danieljcode/lawportal-v2/commit/918fc07a69a1e4aa3c357508be335f95793229b3))
+* **storage:** retry failed saves, flag unopened data [LP-248] [LP-249] ([#238](https://github.com/danieljcode/lawportal-v2/issues/238)) ([6ed42b0](https://github.com/danieljcode/lawportal-v2/commit/6ed42b0639874f1299b877ac043f44cd126f83ec))
+* **sync:** expire codes 180 days after their last save [LP-245] ([#233](https://github.com/danieljcode/lawportal-v2/issues/233)) ([09ea1d3](https://github.com/danieljcode/lawportal-v2/commit/09ea1d31001b77f2a2796b2264cc5655a6ad8e83))
+
+
+### Performance
+
+* **shell:** keep What's new out of the first load [LP-242] ([#229](https://github.com/danieljcode/lawportal-v2/issues/229)) ([dfe1e53](https://github.com/danieljcode/lawportal-v2/commit/dfe1e5329c4d0d5e0e38af802172a83f01b03cc1))
+
+
+### Docs
+
+* **changelog:** mark what's new for 0.7.0, target 0.8.0 [LP-238] ([#221](https://github.com/danieljcode/lawportal-v2/issues/221)) ([ffda6cb](https://github.com/danieljcode/lawportal-v2/commit/ffda6cb224296d30bf7241a1d2a94adc17c43119))
+
 ## [0.7.0](https://github.com/danieljcode/lawportal-v2/compare/v0.6.0...v0.7.0) (2026-11-07)
 
 
