@@ -81,9 +81,10 @@ export function rateLookup(
 /** "1.0 hour", "2.5 hours". */
 export const hoursText = (h: number) => h.toFixed(1) + (h === 1 ? " hour" : " hours");
 
-/** "$1,234.50". */
+/** "$1,234.50", or "-$50.00" for an overpaid balance (LP-247). */
 export function formatMoney(n: number): string {
-  return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const s = Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return (n < 0 && s !== "0.00" ? "-$" : "$") + s;
 }
 
 /** The message for a typed amount over MAX_PAYMENT, or null when it isn't over. */

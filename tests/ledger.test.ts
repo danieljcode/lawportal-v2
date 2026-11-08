@@ -122,6 +122,8 @@ describe("rates and values", () => {
     expect(entryValue({ hours: 0.1 }, 33.33)).toBe(3.33);
     expect(entryValue({ hours: 2 }, null)).toBeNull();
     expect(formatMoney(1234.5)).toBe("$1,234.50");
+    expect(formatMoney(-50)).toBe("-$50.00");
+    expect(formatMoney(-0.001)).toBe("$0.00");
   });
 
   it("keep a case's own rate, and drop a bad one", () => {
