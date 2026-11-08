@@ -14,6 +14,7 @@ import { docketStore } from "@/lib/dockets";
 import { portfolioStore } from "@/lib/portfolio";
 import { S_JAP_OFF, S_SET_ASIDE, S_STORAGE_LOCAL } from "@/lib/strings";
 import * as sync from "@/lib/sync";
+import { __resetDefaultKVForTests, memoryKV, reportSaveFailed, reportSaveRecovered, setDefaultKV } from "@/lib/storage";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -210,6 +211,28 @@ describe("Characters dialog", () => {
     click("#set-aside-dismiss");
     expect($("#set-aside-notice")).toBeNull();
     warn.mockRestore();
+  });
+
+  it("shows the couldn't-save notice until a save works again (LP-249)", () => {
+    act(() => reportSaveFailed());
+    expect($("#save-failed-notice")).not.toBeNull();
+    act(() => reportSaveRecovered());
+    expect($("#save-failed-notice")).toBeNull();
+  });
+
+  it("says so, with Reload, when the saved data couldn't be opened (LP-248)", () => {
+    expect($("#data-unopened-notice")).toBeNull();
+    act(() => root.unmount());
+    __resetDefaultKVForTests();
+    setDefaultKV(memoryKV(), "memory", true);
+    try {
+      root = createRoot(container);
+      act(() => root.render(createElement(App)));
+      expect(must("#data-unopened-notice").textContent).toContain("couldn't be opened");
+      expect($("#data-unopened-reload")).not.toBeNull();
+    } finally {
+      __resetDefaultKVForTests();
+    }
   });
 
   it("has the 13 fields, needs a name, and the docket box follows the title", () => {

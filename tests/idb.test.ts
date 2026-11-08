@@ -2,8 +2,16 @@
 // IndexedDB storage (LP-36): the move from localStorage, the in-memory copy, batched saves and fallbacks.
 import { IDBDatabase, IDBFactory } from "fake-indexeddb";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { IDB_MARKER, initStorage, openIdbKV } from "@/lib/idb";
-import { __resetDefaultKVForTests, backend, defaultKV, SAVE_FAILED, saveFailedVersion } from "@/lib/storage";
+import { IDB_MARKER, initStorage, openIdbKV, RETRY_MS } from "@/lib/idb";
+import {
+  __resetDefaultKVForTests,
+  backend,
+  dataUnopened,
+  defaultKV,
+  SAVE_FAILED,
+  saveFailedVersion,
+  saveFailing,
+} from "@/lib/storage";
 import { createKeyedStore, createStore } from "@/lib/store";
 import { THEME_KEY } from "@/lib/theme";
 
@@ -74,6 +82,36 @@ describe("IndexedDB storage (LP-36)", () => {
     expect(again.get("lawapp_cases")).toBe("[2]");
   });
 
+  it("a failed save is tried again by itself, once, and the notice clears when it works (LP-249)", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout"], shouldAdvanceTime: true });
+    try {
+      const kv = (await openIdbKV())!;
+      const spy = vi.spyOn(IDBDatabase.prototype, "transaction").mockImplementationOnce(() => {
+        throw new DOMException("busy", "UnknownError");
+      });
+      kv.set("lawapp_chars", "[1]");
+      await vi.advanceTimersByTimeAsync(30);
+      expect(saveFailing()).toBe(true);
+      expect((await openIdbKV())!.get("lawapp_chars")).toBeNull();
+
+      await vi.advanceTimersByTimeAsync(RETRY_MS + 30);
+      expect((await openIdbKV())!.get("lawapp_chars")).toBe("[1]");
+      expect(saveFailing()).toBe(false);
+
+      // Still failing on the retry: no more tries until the next change.
+      spy.mockImplementation(() => {
+        throw new DOMException("full", "QuotaExceededError");
+      });
+      const before = spy.mock.calls.length;
+      kv.set("lawapp_cases", "[2]");
+      await vi.advanceTimersByTimeAsync(RETRY_MS * 3);
+      expect(spy.mock.calls.length - before).toBe(2); // the save, then one retry
+      spy.mockRestore();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("settled waits until writes are really saved, and throws if one failed (LP-185)", async () => {
     const kv = (await openIdbKV())!;
     kv.set("lawapp_chars", "[1]");
@@ -135,6 +173,7 @@ describe("IndexedDB storage (LP-36)", () => {
     await initStorage();
     expect(backend()).toBe("local");
     expect(defaultKV().get("lawapp_chars")).toBe("[1]");
+    expect(dataUnopened()).toBe(false);
   });
 
   it("an IndexedDB that never opens times out to localStorage, and nothing is cleared", async () => {
@@ -151,5 +190,6 @@ describe("IndexedDB storage (LP-36)", () => {
     delete globalThis.indexedDB;
     await initStorage();
     expect(backend()).toBe("memory");
+    expect(dataUnopened()).toBe(true);
   });
 });

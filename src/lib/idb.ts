@@ -4,8 +4,8 @@
 // stay synchronous and the stores don't change. A write updates memory at once;
 // every write made in the same task is saved in one IndexedDB transaction, so a
 // multi-key change (a character and its docket) is saved whole or not at all. A
-// failed save keeps its writes for the next one and raises the save-failed
-// notice. Other tabs hear each saved change over a BroadcastChannel.
+// failed save keeps its writes, raises the save-failed notice and is tried once
+// more after RETRY_MS (LP-249); a save that works clears the notice. Other tabs hear each saved change over a BroadcastChannel.
 //
 // The first open moves localStorage's app data in, and clears it only once the
 // copy reads back the same. The keys read straight from localStorage before the
@@ -13,12 +13,23 @@
 
 import { BOOT_OFF_KEY } from "./boot";
 import { READABLE_FONT_KEY, SHELL_KEY } from "./shell";
-import { memoryKV, reportSaveFailed, SAVE_FAILED, setDefaultKV, whileOtherTab, type KV } from "./storage";
+import {
+  memoryKV,
+  reportSaveFailed,
+  reportSaveRecovered,
+  SAVE_FAILED,
+  setDefaultKV,
+  whileOtherTab,
+  type KV,
+} from "./storage";
 import { THEME_KEY } from "./theme";
 
 const DB = "lawapp";
 const STORE = "kv";
 const PREFIX = "lawapp_";
+
+/** How long after a failed save it's tried again, once (LP-249). */
+export const RETRY_MS = 2000;
 
 /** How long to wait for IndexedDB before the app starts without it. */
 export const OPEN_TIMEOUT_MS = 10_000;
@@ -90,6 +101,8 @@ export async function openIdbKV(gaveUp: () => boolean = () => false): Promise<KV
 function cachedKV(db: IDBDatabase, map: Map<string, string>, ls: Storage): KV {
   let pending = new Map<string, string | null>();
   let scheduled = false;
+  /** A retry is waiting or has failed: no more until the next change. */
+  let retried = false;
   let lastWrite: Promise<void> = Promise.resolve();
   const otherTabListeners: Array<(keys: string[]) => void> = [];
   const tabs = typeof BroadcastChannel === "function" ? new BroadcastChannel(DB) : null;
@@ -110,6 +123,11 @@ function cachedKV(db: IDBDatabase, map: Map<string, string>, ls: Storage): KV {
     console.warn("[storage] couldn't save to IndexedDB", err);
     for (const [k, v] of batch) if (!pending.has(k)) pending.set(k, v);
     reportSaveFailed();
+    if (retried) return;
+    retried = true;
+    setTimeout(() => {
+      if (pending.size && !scheduled) flush();
+    }, RETRY_MS);
   }
 
   function flush(): void {
@@ -129,13 +147,18 @@ function cachedKV(db: IDBDatabase, map: Map<string, string>, ls: Storage): KV {
       return;
     }
     lastWrite = done(tx).then(
-      () => tabs?.postMessage([...batch] satisfies Op[]),
+      () => {
+        tabs?.postMessage([...batch] satisfies Op[]);
+        retried = false;
+        reportSaveRecovered();
+      },
       (err: unknown) => failed(batch, err),
     );
   }
 
   function queue(key: string, value: string | null): void {
     pending.set(key, value);
+    retried = false;
     if (!scheduled) {
       scheduled = true;
       queueMicrotask(flush);
@@ -204,5 +227,5 @@ export async function initStorage(timeoutMs = OPEN_TIMEOUT_MS): Promise<void> {
   } finally {
     clearTimeout(timer);
   }
-  if (moved) setDefaultKV(memoryKV(), "memory");
+  if (moved) setDefaultKV(memoryKV(), "memory", true);
 }
