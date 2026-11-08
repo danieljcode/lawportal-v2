@@ -8,6 +8,7 @@
 // and the J.A.P. read and write cases through dockets.ts.
 
 import { cleanActions, unionActions } from "./actions";
+import { cleanChargeLines } from "./chargeLines";
 import { cleanCaseNotes, legacyNote, unionCaseNotes } from "./caseNotes";
 import { cleanDeadlines, unionDeadlines } from "./deadlines";
 import { cleanExhibits, unionExhibits } from "./exhibits";
@@ -68,6 +69,7 @@ export function cleanCase(input: unknown): Case {
   const actions = cleanActions(o.actions);
   const outcome = cleanOutcome(o.outcome);
   const offers = cleanOffers(o.offers);
+  const charges = cleanChargeLines(o.charges);
   // A case saved before LP-227 has one notes box: it becomes the first note.
   const legacy = legacyNote(o.notes, created, lead);
   const caseNotes = cleanCaseNotes(o.caseNotes);
@@ -82,6 +84,8 @@ export function cleanCase(input: unknown): Case {
     ...(actions.length ? { actions } : {}),
     ...(notes.length ? { caseNotes: notes } : {}),
     ...(offers.length ? { offers } : {}),
+    // Kept when emptied, so merging with an older copy doesn't bring removed charges back (LP-236).
+    ...(Array.isArray(o.charges) ? { charges } : {}),
     ...(outcome ? { outcome } : {}),
     ...(rate !== null ? { rate } : {}),
   };

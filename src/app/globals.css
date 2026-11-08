@@ -2391,6 +2391,21 @@ dialog.changelog {
   border-bottom: 1px solid var(--hilite);
 }
 
+/* ---------- charge totals (LP-218), in the Law Library and on a case (LP-236) ---------- */
+.charge-totals {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 2px 12px;
+  margin: 6px 0;
+}
+.charge-totals dt {
+  font-weight: bold;
+}
+.charge-totals dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
 /* ---------- game date picker (LP-159) ---------- */
 .game-date {
   position: relative;

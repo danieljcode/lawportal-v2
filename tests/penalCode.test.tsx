@@ -8,7 +8,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import App from "@/shell/App";
+import { caseStore } from "@/lib/cases";
 import { characterStore } from "@/lib/characters";
+import { readChargeList } from "@/lib/chargeList";
 import * as clipboard from "@/lib/clipboard";
 import { EMPTY_STATE, writeDraft } from "@/lib/formState";
 import {
@@ -174,6 +176,13 @@ function setValue(sel: string, value: string): void {
   });
 }
 
+function go(hash: string): void {
+  act(() => {
+    history.replaceState(null, "", hash);
+    window.dispatchEvent(new HashChangeEvent("hashchange"));
+  });
+}
+
 const click = (el: Element) => act(() => (el as HTMLElement).click());
 const button = (scope: ParentNode, text: string) =>
   [...scope.querySelectorAll("button")].find((b) => b.textContent === text)!;
@@ -268,6 +277,38 @@ describe("the Penal Code in the Law Library (LP-17)", () => {
     expect(document.querySelector("#charge-calc-discretion")).toBeNull();
     click(must("#charge-calc-clear"));
     expect(must("#charge-calc-empty")).toBeTruthy();
+  });
+
+  it("attaches the list to a case, which shows it, opens it in the calculator and removes it (LP-236)", () => {
+    caseStore().save({ id: "case0001", caseNumber: "90SCCR00147", defendant: "John Doe", lead: "alice001" });
+    mount("#library");
+    setValue("#code-q", "1001");
+    click(button(must("#code-list"), "Add to calculator"));
+    click(button(must("#code-list"), "Add to calculator"));
+    click(must("#charge-calc-attach"));
+    expect(must("#charge-calc").textContent).toContain("Pick a case.");
+    setValue("#charge-calc-case", "case0001");
+    click(must("#charge-calc-attach"));
+    expect(caseStore().get("case0001")!.charges).toEqual([{ section: "PC 1001", count: 2 }]);
+    expect(must("#charge-calc-open-case").getAttribute("href")).toBe("#cases/case0001");
+    click(must("#charge-calc-clear"));
+
+    // The Law Library stays mounted while hidden, and shows the list brought back from the case.
+    go("#cases/case0001");
+    expect(must("#case-charges-list").textContent).toBe("2 × PC 1001 Assault");
+    expect(must("#case-charges-time").textContent).toBe("20 months (range 16–26 months)");
+    expect(must("#case-charges-fine").textContent).toBe("$600");
+    click(must("#case-charges-open"));
+    act(() => window.dispatchEvent(new HashChangeEvent("hashchange")));
+    expect(location.hash).toBe("#library/penal-code");
+    expect(readChargeList()).toEqual([{ section: "PC 1001", count: 2 }]);
+    expect(must('[aria-label="Count of PC 1001 Assault"]').textContent).toBe("2 ×");
+
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    go("#cases/case0001");
+    click(must("#case-charges-remove"));
+    expect(caseStore().get("case0001")!.charges).toEqual([]);
+    expect(document.querySelector("#case-charges-list")).toBeNull();
   });
 
   it("opens from the home screen, not the forms list", () => {

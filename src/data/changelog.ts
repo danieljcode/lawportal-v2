@@ -18,6 +18,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-11-08",
+    title: "Charges on a case",
+    items: [
+      {
+        type: "new",
+        text: "Attach the charge calculator's list to a case: pick the case under the calculator in the Law Library and press Attach to case. The case shows the charges with their total time and fine, they sync with the case, and Copy brief includes them. Open in calculator brings them back to change them; Remove takes them off.",
+      },
+    ],
+  },
+  {
     date: "2026-11-07",
     title: "Your own templates",
     items: [

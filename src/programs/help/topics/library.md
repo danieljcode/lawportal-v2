@@ -9,6 +9,6 @@ The **Law Library** has two pages.
 
 ## Charge calculator
 
-On the Penal code page, **Add to calculator** puts a charge in the calculator at the top. Add a charge again, or use **+** and **−**, to count it more than once. The calculator shows the total time with its range, and the total fine. Charges with no set time, left to the judge, are listed apart and not added up. **Copy** gives the charges and totals as text for a filing or Discord. The list stays on this device until you **Clear** it.
+On the Penal code page, **Add to calculator** puts a charge in the calculator at the top. Add a charge again, or use **+** and **−**, to count it more than once. The calculator shows the total time with its range, and the total fine. Charges with no set time, left to the judge, are listed apart and not added up. **Copy** gives the charges and totals as text for a filing or Discord. The list stays on this device until you **Clear** it. To keep it with a case, pick the case and press **Attach to case**: the charges then show on the case in the [Case File](#help/cases) and sync with it. Attaching again replaces the case's charges, after asking.
 
 See also: [Writing a filing](#help/filings).

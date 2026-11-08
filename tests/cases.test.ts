@@ -10,6 +10,7 @@ import {
   CASES_KEY,
   caseStore,
   casesFromDockets,
+  cleanCase,
   createCaseStore,
   filterCases,
   needsLead,
@@ -251,6 +252,22 @@ describe("cases from two devices", () => {
       defendant: "Bo",
       updated: T2,
     });
+  });
+
+  it("attached charges (LP-236) are cleaned, and removing them on the newer copy sticks", () => {
+    expect(
+      cleanCase({
+        id: "abcd1234",
+        caseNumber: "1",
+        charges: [{ section: "PC 1001", count: 500 }, { section: "PC 1001" }, 7],
+      }).charges,
+    ).toEqual([{ section: "PC 1001", count: 99 }]);
+    expect(cleanCase({ id: "abcd1234", caseNumber: "1" }).charges).toBeUndefined();
+    const [one] = unifyCases(
+      [c({ charges: [], updated: T2 })],
+      [c({ charges: [{ section: "PC 1001", count: 2 }], updated: T1 })],
+    );
+    expect(one.charges).toEqual([]);
   });
 });
 
