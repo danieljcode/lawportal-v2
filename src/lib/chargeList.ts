@@ -1,18 +1,14 @@
 // The Law Library's charge calculator (LP-218): charges picked from the penal code, each with a
-// count, totalled into time and fine. The list is kept per device in localStorage (not synced).
+// count, totalled into time and fine. The list is kept per device in localStorage (not synced);
+// it can be attached to a case (LP-236), which syncs.
 // Charges with no set time (the judge's discretion) aren't added up; they're listed apart.
 
 import { chargeCitation, months, PENAL_CODE, type Charge, type PenalCode } from "./penalCode";
+import { clampCount, cleanChargeLines, type ChargeLine } from "./chargeLines";
 import { defaultKV, readJson, writeJson, type KV } from "./storage";
 
+export { MAX_COUNT, type ChargeLine } from "./chargeLines";
 export const CHARGE_LIST_KEY = "lawapp_charge_list";
-export const MAX_COUNT = 99;
-
-export interface ChargeLine {
-  /** "PC 1001". */
-  section: string;
-  count: number;
-}
 
 export interface ChargeTotals {
   /** Default time, then the range, in months, over the charges with set time. */
@@ -27,23 +23,9 @@ export interface ChargeTotals {
   discretion: Charge[];
 }
 
-const clampCount = (n: unknown) =>
-  typeof n === "number" && Number.isInteger(n) ? Math.min(Math.max(n, 1), MAX_COUNT) : 1;
-
 /** The saved list, keeping only charges still in the code, each once. */
 export function readChargeList(kv: KV = defaultKV(), code: PenalCode = PENAL_CODE): ChargeLine[] {
-  const raw = readJson<unknown>(kv, CHARGE_LIST_KEY);
-  if (!Array.isArray(raw)) return [];
-  const known = new Set(code.charges.map((c) => c.section));
-  const seen = new Set<string>();
-  const out: ChargeLine[] = [];
-  for (const x of raw as Array<Partial<ChargeLine>>) {
-    const section = x && typeof x.section === "string" ? x.section : "";
-    if (!known.has(section) || seen.has(section)) continue;
-    seen.add(section);
-    out.push({ section, count: clampCount(x.count) });
-  }
-  return out;
+  return cleanChargeLines(readJson<unknown>(kv, CHARGE_LIST_KEY), new Set(code.charges.map((c) => c.section)));
 }
 
 /** Save the list. False when the browser refused the write. */

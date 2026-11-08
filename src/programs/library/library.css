@@ -140,16 +140,3 @@
   min-width: 0;
   overflow-wrap: anywhere;
 }
-.charge-calc-totals {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: 2px 12px;
-  margin: 6px 0;
-}
-.charge-calc-totals dt {
-  font-weight: bold;
-}
-.charge-calc-totals dd {
-  margin: 0;
-  overflow-wrap: anywhere;
-}

@@ -1,9 +1,10 @@
 // A case brief for Discord (LP-228): where a case stands, in one message, to paste in the firm
-// channel. Typed text is escaped like other Discord output; dates are in game time. Billing only
-// when asked for. Pure: the caller passes names and billing.
+// channel. Typed text is escaped like other Discord output; dates are in game time. Charges when
+// attached (LP-236); billing only when asked for. Pure: the caller passes names and billing.
 
 import { openActions } from "./actions";
 import { caseParties } from "./cases";
+import { chargeListText } from "./chargeList";
 import { formatDay } from "./deadlines";
 import { escapeMarkdown } from "./discord/escape";
 import { formatMoney, hoursText } from "./ledger";
@@ -61,20 +62,24 @@ export function caseBrief(c: Case, o: BriefOptions): string {
     ...(c.court ? ["Court: " + safe(c.court)] : []),
     "Next date: " + nextDate(c, o.today),
   ];
+  const charges = chargeListText(c.charges || []);
   const b = o.billing;
-  const tail = b
-    ? [
-        "Billing: " +
-          hoursText(b.loggedHours) +
-          " logged · " +
-          formatMoney(b.invoiced) +
-          " invoiced, " +
-          formatMoney(b.paid) +
-          " paid, " +
-          formatMoney(b.outstanding) +
-          " owed",
-      ]
-    : [];
+  const tail = [
+    ...(charges ? [escapeMarkdown(charges)] : []),
+    ...(b
+      ? [
+          "Billing: " +
+            hoursText(b.loggedHours) +
+            " logged · " +
+            formatMoney(b.invoiced) +
+            " invoiced, " +
+            formatMoney(b.paid) +
+            " paid, " +
+            formatMoney(b.outstanding) +
+            " owed",
+        ]
+      : []),
+  ];
 
   const actions = openActions(c.actions || []).map((a) => {
     const who = a.owner ? o.nameOf(a.owner) : "";

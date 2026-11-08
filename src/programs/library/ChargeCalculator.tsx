@@ -1,20 +1,14 @@
 // The charge calculator on the Law Library's Penal Code page (LP-218): the charges added from the
-// search below, each with a count, and their total time and fine. Copy gives a plain-text summary.
+// search below, each with a count, and their total time and fine. Copy gives a plain-text summary;
+// Attach to case saves the list on a firm case (LP-236), replacing any list it had.
 
-import { useState } from "react";
-import {
-  chargeListText,
-  chargeTotals,
-  discretionText,
-  MAX_COUNT,
-  setCount,
-  timeText,
-  totalFineText,
-  withCharges,
-  type ChargeLine,
-} from "@/lib/chargeList";
+import { useMemo, useState } from "react";
+import { caseParties, caseStore, filterCases } from "@/lib/cases";
+import { chargeListText, MAX_COUNT, setCount, withCharges, type ChargeLine } from "@/lib/chargeList";
 import { copyText } from "@/lib/clipboard";
 import { chargeCitation, fineText, PENAL_CODE, sentenceText, type PenalCode } from "@/lib/penalCode";
+import ChargeTotals from "@/ui/ChargeTotals";
+import { useCaseVersion } from "@/ui/useStore";
 
 export default function ChargeCalculator({
   list,
@@ -25,16 +19,29 @@ export default function ChargeCalculator({
   onChange(list: ChargeLine[]): void;
   code?: PenalCode;
 }) {
-  const [status, setStatus] = useState<{ text: string; bad: boolean } | null>(null);
+  const [status, setStatus] = useState<{ text: string; bad: boolean; caseId?: string } | null>(null);
+  const [caseId, setCaseId] = useState("");
+  const version = useCaseVersion();
+  const cases = useMemo(() => (version >= 0 ? filterCases(caseStore().list(), {}) : []), [version]);
   const lines = withCharges(list, code);
-  const t = chargeTotals(list, code);
-  const time = timeText(t);
 
   const copy = async () => {
     const ok = await copyText(chargeListText(list, code));
     setStatus(
       ok ? { text: "Copied the charges and totals.", bad: false } : { text: "Copy failed: try again.", bad: true },
     );
+  };
+
+  const attach = () => {
+    const c = caseStore().get(caseId);
+    if (!c) return setStatus({ text: "Pick a case.", bad: true });
+    if (c.charges?.length && !window.confirm("Replace the charges already on " + c.caseNumber + "?")) return;
+    try {
+      caseStore().save({ ...c, charges: list });
+      setStatus({ text: "Attached to " + c.caseNumber + ".", bad: false, caseId: c.id });
+    } catch (err) {
+      setStatus({ text: err instanceof Error ? err.message : String(err), bad: true });
+    }
   };
 
   return (
@@ -85,22 +92,7 @@ export default function ChargeCalculator({
               );
             })}
           </ul>
-          <dl className="charge-calc-totals" id="charge-calc-totals">
-            {time && (
-              <>
-                <dt>Time</dt>
-                <dd id="charge-calc-time">{time}</dd>
-              </>
-            )}
-            <dt>Fine</dt>
-            <dd id="charge-calc-fine">{totalFineText(t)}</dd>
-            {t.discretion.length > 0 && (
-              <>
-                <dt>Judge&apos;s discretion</dt>
-                <dd id="charge-calc-discretion">{t.discretion.map(discretionText).join(", ")}</dd>
-              </>
-            )}
-          </dl>
+          <ChargeTotals list={list} idPrefix="charge-calc" code={code} />
           <div className="row">
             <button type="button" className="btn primary" id="charge-calc-copy" onClick={() => void copy()}>
               Copy
@@ -117,6 +109,26 @@ export default function ChargeCalculator({
               Clear
             </button>
           </div>
+          {cases.length > 0 && (
+            <div className="row">
+              <select
+                id="charge-calc-case"
+                aria-label="Case to attach the charges to"
+                value={caseId}
+                onChange={(e) => setCaseId(e.target.value)}
+              >
+                <option value="">Pick a case…</option>
+                {cases.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.caseNumber + (caseParties(c) ? " · " + caseParties(c) : "")}
+                  </option>
+                ))}
+              </select>
+              <button type="button" className="btn" id="charge-calc-attach" onClick={attach}>
+                Attach to case
+              </button>
+            </div>
+          )}
         </>
       ) : (
         <p className="small muted" id="charge-calc-empty">
@@ -125,6 +137,14 @@ export default function ChargeCalculator({
       )}
       <p className={"small" + (status?.bad ? " bad" : " good")} role="status">
         {status?.text || ""}
+        {status?.caseId && (
+          <>
+            {" "}
+            <a href={"#cases/" + status.caseId} id="charge-calc-open-case">
+              Open the case
+            </a>
+          </>
+        )}
       </p>
     </section>
   );

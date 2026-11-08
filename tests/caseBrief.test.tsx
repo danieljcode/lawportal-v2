@@ -50,6 +50,11 @@ describe("caseBrief", () => {
     );
   });
 
+  it("lists attached charges with their totals (LP-236)", () => {
+    const charged = cleanCase({ ...c, actions: [], charges: [{ section: "PC 1001", count: 2 }] });
+    expect(caseBrief(charged, opts)).toContain("Next actions: none\nCharges:\n2 × PC 1001 Assault\nTime: 20 months");
+  });
+
   it("marks an overdue court date, and says none when there's nothing", () => {
     expect(caseBrief(c, { ...opts, today: "1990-11-05" })).toContain(
       "Next date: Tue 3 Nov 1990, Arraignment (overdue)",

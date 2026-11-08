@@ -2,7 +2,7 @@
 
 The **Case File** holds every firm case, with its lead and the characters working it. Search and filter the list to find one.
 
-**Copy brief**, at the top of a case, copies where it stands as one Discord message for the firm channel: the case number and parties, status, lead and who else is on it, the next court date (the soonest open deadline or hearing, marked if overdue), and the open next actions. A long list ends with "…and n more" so it fits one message. Billing (hours, invoiced, paid and owed) is only added when you tick **Include billing**.
+**Copy brief**, at the top of a case, copies where it stands as one Discord message for the firm channel: the case number and parties, status, lead and who else is on it, the next court date (the soonest open deadline or hearing, marked if overdue), the open next actions, and any charges attached, with their totals. A long list ends with "…and n more" so it fits one message. Billing (hours, invoiced, paid and owed) is only added when you tick **Include billing**.
 
 Each case has:
 
@@ -13,6 +13,7 @@ Each case has:
 - **offers**: each plea or settlement offer, newest first, with its in-game date, who made it (prosecution, defence, plaintiff or defendant) and the terms in a sentence. Set what happened to it: **Pending**, **Accepted**, **Rejected** or **Countered**; a countered offer can point to its counter-offer, and **Go to counter-offer** jumps there. Accepting one asks whether to close the case as a plea deal (a criminal case) or settled; **Not now** leaves it open;
 - **deadlines and hearings**. **Calculate** works a date out for you: pick the start date (today in the game unless you change it), enter a number of days, and count **Calendar days** or **Weekdays only** (Saturdays and Sundays skipped). It shows the date with its weekday, and **Add as deadline** puts it on the case with a name, such as _Response due_, and a note of how it was worked out;
 - the **filings** made for it;
+- **charges** attached from the [Law Library's charge calculator](#help/library), with the same total time, fine and charges left to the judge. **Open in calculator** puts them back in the calculator to change them (attach them again to save the change); **Remove** takes them off the case;
 - **contacts** from the Rolodex, each in a role such as client or witness;
 - its **evidence**: lettered exhibits (A, B, C…) with links and dates. Each exhibit has a **chain of custody** you can copy into a filing or print;
 - a **timeline**: all of the above in date order, newest first and grouped by game day, to catch up on a case at a glance. **Show** picks one type, such as filings only. Click an entry to go to it; time and invoices open in the Ledger. A next action shows the day it was ticked off; ones ticked off before the timeline came in are under **No date**.

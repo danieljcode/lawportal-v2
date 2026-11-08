@@ -1,5 +1,6 @@
 // Shared types for the form engine, form data and the client stores.
 
+import type { ChargeLine } from "./chargeLines";
 import type { Offer } from "./offers";
 import type { CustodyEntry } from "./custody";
 
@@ -164,6 +165,8 @@ export interface Case extends Docket {
   outcome?: CaseOutcome;
   /** Hourly rate in dollars for everyone's time on this case, over their own (the Ledger, LP-32). */
   rate?: number;
+  /** The charge calculator's list, attached (LP-236). Absent, or empty once removed, when there is none. */
+  charges?: ChargeLine[];
 }
 
 /** A piece of evidence on a case (LP-12). */

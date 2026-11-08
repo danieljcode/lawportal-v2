@@ -12,6 +12,7 @@ import { OUTCOME_LABELS } from "@/lib/outcomes";
 import type { Case, Character, OutcomeResult } from "@/lib/types";
 import CaseActions from "./CaseActions";
 import CaseBrief from "./CaseBrief";
+import CaseCharges from "./CaseCharges";
 import CaseNotes from "./CaseNotes";
 import CaseOffers from "./CaseOffers";
 import CaseTimeline from "./CaseTimeline";
@@ -234,13 +235,14 @@ export default function CaseFileView({
   );
 }
 
-/** The case's details and who's on it, but not its deadlines, actions, notes, evidence or save times (LP-148). */
+/** The case's details and who's on it, but not its deadlines, actions, notes, offers, charges, evidence or save times (LP-148). */
 function detailsStamp(c: Case): string {
   const {
     deadlines: _deadlines,
     actions: _actions,
     caseNotes: _caseNotes,
     offers: _offers,
+    charges: _charges,
     exhibits: _exhibits,
     updated: _updated,
     created: _created,
@@ -250,7 +252,8 @@ function detailsStamp(c: Case): string {
 }
 
 /**
- * A case's linked areas: its notes (LP-227), next actions (LP-170), billing (LP-173), deadlines (LP-18), contacts (LP-30),
+ * A case's linked areas: its notes (LP-227), next actions (LP-170), billing (LP-173), deadlines (LP-18), offers (LP-229),
+ * charges (LP-236), contacts (LP-30),
  * filings (LP-15), evidence (LP-12) and all of it in date order (LP-219).
  */
 function CaseLinks({
@@ -290,6 +293,10 @@ function CaseLinks({
       <section className="case-empty" id="case-offers" aria-labelledby="case-offers-title">
         <h4 id="case-offers-title">Offers</h4>
         <CaseOffers c={c} />
+      </section>
+      <section className="case-empty" id="case-charges" aria-labelledby="case-charges-title">
+        <h4 id="case-charges-title">Charges</h4>
+        <CaseCharges c={c} />
       </section>
       <section className="case-empty" id="case-contacts" aria-labelledby="case-contacts-title">
         <h4 id="case-contacts-title">Contacts</h4>

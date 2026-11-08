@@ -6,7 +6,7 @@
 // shows both as tabs (LibraryTabs), where Insert citation puts the reference
 // into the form field last clicked in.
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { addCharge, readChargeList, writeChargeList, type ChargeLine } from "@/lib/chargeList";
 import { copyText } from "@/lib/clipboard";
 import { formatDay } from "@/lib/deadlines";
@@ -386,6 +386,9 @@ export default function LawLibraryView({
   // The charge calculator's list, kept on this device (LP-218).
   const [charges, setCharges] = useState<ChargeLine[]>(() => readChargeList());
   const [chargesUnsaved, setChargesUnsaved] = useState(false);
+  // Re-read on coming back (Activity re-runs effects): a case's Open in calculator replaces the list (LP-236).
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- the saved list may have changed while hidden
+  useEffect(() => setCharges(readChargeList()), []);
   const changeCharges = (list: ChargeLine[]) => {
     setCharges(list);
     setChargesUnsaved(!writeChargeList(list));
