@@ -6,6 +6,7 @@ import { IDB_MARKER, initStorage, openIdbKV, RETRY_MS } from "@/lib/idb";
 import {
   __resetDefaultKVForTests,
   backend,
+  dataUnopened,
   defaultKV,
   SAVE_FAILED,
   saveFailedVersion,
@@ -172,6 +173,7 @@ describe("IndexedDB storage (LP-36)", () => {
     await initStorage();
     expect(backend()).toBe("local");
     expect(defaultKV().get("lawapp_chars")).toBe("[1]");
+    expect(dataUnopened()).toBe(false);
   });
 
   it("an IndexedDB that never opens times out to localStorage, and nothing is cleared", async () => {
@@ -188,5 +190,6 @@ describe("IndexedDB storage (LP-36)", () => {
     delete globalThis.indexedDB;
     await initStorage();
     expect(backend()).toBe("memory");
+    expect(dataUnopened()).toBe(true);
   });
 });

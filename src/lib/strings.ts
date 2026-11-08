@@ -55,6 +55,9 @@ export const S_SET_ASIDE = "Some saved data couldn't be read and was set aside."
 export const S_SET_ASIDE_HINT =
   "Use Download damaged data in the Characters dialog to keep a copy you can fix by hand.";
 
+export const S_DATA_UNOPENED =
+  "Your saved data couldn't be opened, so the app is empty for now. Reload to try again: changes made now won't be kept.";
+
 export const S_SAVE_FAILED_HINT = "Your latest changes are kept on screen. Use Export to keep a copy.";
 
 export const S_UPDATE_READY = "A new version is ready.";
