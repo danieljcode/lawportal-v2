@@ -24,7 +24,7 @@ app runs on your own computer, it lives in files on that computer.
 - **Hosted (Vercel).** When `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` (or Vercel's
   `KV_REST_API_URL` and `KV_REST_API_TOKEN`) are set, records live in Upstash Redis instead
   (`src/lib/server/syncRedis.ts`): one hash per code at `lp:sync:<hash>`, each operation one Lua
-  script, so no locks or temp files. Unused codes expire through a Redis TTL, and the sorted set
+  script, so no locks or temp files. Unused and abandoned codes expire through a Redis TTL, and the sorted set
   `lp:sync:index` counts codes for the 1,000 cap. The API also needs `LAWAPP_ALLOW_LAN=1` there, or
   it only answers on `localhost`. `tests/sync-redis.test.ts` runs against a real database when
   those variables are set. The per-hash locks and atomic writes below are for the file store only.
@@ -72,7 +72,9 @@ app runs on your own computer, it lives in files on that computer.
 - **Unused codes expire.** A code that was made but never written to (still `rev` 0) is deleted
   after 7 days: by a Redis TTL on the hosted app, and in the file store by a check each time a new
   code is made. Turning sync on uploads straight away, so in
-  practice this only removes codes nobody used.
+  practice this only removes codes nobody used. A code that was written to is deleted 180 days after
+  its last save (`WRITTEN_TTL_MS`, LP-245), so abandoned codes free their place under the cap; each
+  save starts the 180 days again.
 - **Optimistic writes.** `PUT /api/data` sends the `rev` it last saw. If the stored `rev` is
   different, another device saved first: the server answers `409` with its copy instead of writing.
 

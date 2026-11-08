@@ -8,7 +8,7 @@ import { GET, PUT } from "@/app/api/data/route";
 import { generateCode, parseBearer } from "@/lib/server/code";
 import { CODE_RE } from "@/lib/syncCode";
 import { createOverall, resetLimits } from "@/lib/server/rateLimit";
-import { codeHash, fileFor, sweepUnused, UNUSED_TTL_MS, write } from "@/lib/server/syncStore";
+import { codeHash, fileFor, sweepExpired, UNUSED_TTL_MS, write, WRITTEN_TTL_MS } from "@/lib/server/syncStore";
 
 const BASE = "http://localhost:3000/api";
 const realDir = path.join(process.cwd(), "data", "sync");
@@ -478,10 +478,24 @@ describe("unused code cleanup (LP-8)", () => {
     age(fresh, UNUSED_TTL_MS - 60_000);
 
     const before = readdirSync(dir).length;
-    expect(await sweepUnused()).toBe(before - 1);
+    expect(await sweepExpired()).toBe(before - 1);
     expect(existsSync(fileFor(stale))).toBe(false);
     expect(existsSync(fileFor(written))).toBe(true);
     expect(existsSync(fileFor(fresh))).toBe(true);
+  });
+
+  it("deletes a written code not saved to for 180 days; a save starts the time again (LP-245)", async () => {
+    const abandoned = await newCode();
+    const kept = await newCode();
+    expect((await PUT(put(abandoned, { rev: 0, data: doc() }))).status).toBe(200);
+    expect((await PUT(put(kept, { rev: 0, data: doc() }))).status).toBe(200);
+    age(abandoned, WRITTEN_TTL_MS + 60_000);
+    age(kept, WRITTEN_TTL_MS + 60_000);
+    expect((await PUT(put(kept, { rev: 1, data: doc() }))).status).toBe(200);
+
+    await sweepExpired();
+    expect(existsSync(fileFor(abandoned))).toBe(false);
+    expect(existsSync(fileFor(kept))).toBe(true);
   });
 
   it("runs when a new code is made", async () => {
