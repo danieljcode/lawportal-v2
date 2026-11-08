@@ -33,13 +33,14 @@ describe("an outcome", () => {
     expect(cleanOutcome("won")).toBeNull();
   });
 
-  it("stays with its case, and a sync keeps it when the newer copy has none", () => {
+  it("stays with its case; one cleared on the newer copy stays cleared after a merge (LP-244)", () => {
     const c = kase({ id: "case0001", outcome: won() });
     expect(c.outcome).toEqual(won());
     expect(kase({})).not.toHaveProperty("outcome");
     const newer = { ...kase({ id: "case0001" }), updated: "2026-10-02T00:00:00.000Z" };
     const older = { ...c, updated: "2026-10-01T00:00:00.000Z" };
-    expect(unifyCases([newer], [older])[0].outcome).toEqual(won());
+    expect(unifyCases([newer], [older])[0].outcome).toBeUndefined();
+    expect(unifyCases([older], [{ ...newer, updated: "2026-09-30T00:00:00.000Z" }])[0].outcome).toEqual(won());
   });
 });
 
