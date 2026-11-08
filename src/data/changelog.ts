@@ -25,6 +25,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "new",
         text: "Build your own templates: + New template in Court Filings opens a builder. Give it a title, then add headings, paragraphs, fields to fill in (short or long text, a date or a number), repeating lists and a signature, move them up or down and watch the preview. Saved templates list under My Templates, work like any form (preview, Word, PDF, Discord, drafts and filing history) and sync to the firm.",
       },
+      {
+        type: "new",
+        text: "Make my own version on any form copies it into the template builder: change its wording, rename its fields, and move or delete its parts. The parts the builder can't break into blocks stay as Original text, exactly as in the form. The form itself never changes; your version is saved under My Templates.",
+      },
     ],
   },
   {

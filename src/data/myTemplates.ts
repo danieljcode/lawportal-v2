@@ -3,19 +3,42 @@
 // history and drafts work as for any other form. The firm's words are escaped and
 // braces become entities, so nothing typed can add HTML or a token; labels keep
 // only plain characters, since they sit inside tokens.
+//
+// A copy of a built-in form (LP-225) keeps references to that form's parts, and
+// their HTML is read from the app's own forms here, never from storage.
 
 import { escapeHtml } from "@/lib/template/escape";
 import {
   MY_PREFIX,
   MY_TEMPLATES,
   templateStore,
+  tokenLabel,
   type CustomTemplate,
+  type FormPartRef,
   type TemplateBlock,
 } from "@/lib/customTemplates";
 import type { FormDef } from "@/lib/types";
+import { EXTRA_FORMS } from "./extra-forms";
+import directoryForms from "./forms.json";
+import { fieldLabels, formParts, partHash, renameFields, WORDING_MARK, wordingOf } from "./formParts";
+
+// Not ALL_FORMS from "./index", which imports this file.
+const builtIn = (id: string) => (directoryForms as FormDef[]).find((f) => f.id === id) || EXTRA_FORMS.find((f) => f.id === id);
+
+/** The HTML a reference points at, or null when that form is gone or has changed since. */
+function partsOf(ref: FormPartRef): string | null {
+  const form = builtIn(ref.form);
+  if (!form) return null;
+  const html = formParts(form.html)
+    .slice(ref.part, ref.part + ref.count)
+    .join("");
+  return partHash(html) === ref.hash ? html : null;
+}
+
+const MISSING = "<p><em>[Part of the original form is missing: it has changed since this copy was made.]</em></p>\n";
 
 const words = (s: string) => escapeHtml(s).replace(/\{/g, "&#123;").replace(/\}/g, "&#125;");
-const label = (s: string, or: string) => s.replace(/[^\p{L}\p{N} .,'()/-]/gu, "").trim() || or;
+const label = (s: string, or: string) => tokenLabel(s) || or;
 const BLANK = "__________";
 
 const TYPE_TOKEN = { text: "", textarea: ":textarea", date: ":date:long", number: ":number" } as const;
@@ -39,14 +62,23 @@ const signature = (role: string) =>
   "}}</p>\n";
 
 /** A template's token HTML. Two lists with one name get " 2", " 3"…, since a list's name is its key. */
-export function templateHtml(t: Pick<CustomTemplate, "title" | "blocks">): string {
+export function templateHtml(t: Pick<CustomTemplate, "title" | "blocks" | "source" | "renames">): string {
   const lists = new Set<string>();
   const block = (b: TemplateBlock): string => {
     switch (b.kind) {
       case "heading":
         return b.text ? "<p><strong><u>" + words(b.text) + "</u></strong></p>\n" : "";
-      case "paragraph":
+      case "paragraph": {
+        const part = b.from && partsOf(b.from);
+        const was = part && wordingOf(part);
+        // Unchanged wording keeps the original exactly; changed wording keeps its look.
+        if (was) return was.text === b.text ? part : b.text ? was.shell.replace(WORDING_MARK, words(b.text)) : "";
         return b.text ? paragraph(b.text) : "";
+      }
+      case "original": {
+        const part = b.from && partsOf(b.from);
+        return part ? renameFields(part, t.renames) : MISSING;
+      }
       case "field":
         return "<p>{{" + label(b.text, "Field") + TYPE_TOKEN[b.type || "text"] + "|" + BLANK + "}}</p>\n";
       case "list": {
@@ -61,12 +93,68 @@ export function templateHtml(t: Pick<CustomTemplate, "title" | "blocks">): strin
         return signature(b.text);
     }
   };
-  return (
-    '<p style="text-align:center"><strong><span style="font-size:20px">' +
-    words(t.title) +
-    "</span></strong></p>\n" +
-    t.blocks.map(block).join("")
-  );
+  // A copy's own title is the original's wording.
+  const title = t.source
+    ? ""
+    : '<p style="text-align:center"><strong><span style="font-size:20px">' + words(t.title) + "</span></strong></p>\n";
+  return title + t.blocks.map(block).join("");
+}
+
+/** The fields in a template's original text (LP-225), by their labels in the original. */
+export function originalFields(t: Pick<CustomTemplate, "blocks">): string[] {
+  const html = t.blocks.map((b) => (b.kind === "original" && b.from && partsOf(b.from)) || "").join("");
+  return fieldLabels(html);
+}
+
+/** A short plain-text look at an original block, for the builder. */
+export function originalGlimpse(b: TemplateBlock): string {
+  const part = b.from && partsOf(b.from);
+  if (!part) return "Missing: the original form has changed since this copy was made.";
+  const text = part
+    .replace(/\{\{[\s\S]*?\}\}/g, " … ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;|&#160;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return text.length > 140 ? text.slice(0, 140) + "…" : text || "(spacing and layout)";
+}
+
+/**
+ * A new template made from a form (LP-225): a built-in form's wording as paragraphs and
+ * everything else as Original text blocks; an own template's blocks copied. Undefined when
+ * there's no such form.
+ */
+export function copyOfForm(formId: string): Omit<CustomTemplate, "id" | "updated"> | undefined {
+  if (formId.startsWith(MY_PREFIX)) {
+    const t = templateStore().get(formId.slice(MY_PREFIX.length));
+    return t && { title: (t.title + " (copy)").slice(0, 120), blocks: t.blocks, source: t.source, renames: t.renames };
+  }
+  const form = builtIn(formId);
+  if (!form) return undefined;
+  const blocks: TemplateBlock[] = [];
+  let run: string[] = [];
+  let runStart = 0;
+  const endRun = () => {
+    if (!run.length) return;
+    blocks.push({
+      kind: "original",
+      text: "",
+      from: { form: form.id, part: runStart, count: run.length, hash: partHash(run.join("")) },
+    });
+    run = [];
+  };
+  formParts(form.html).forEach((part, i) => {
+    const w = wordingOf(part);
+    if (!w) {
+      if (!run.length) runStart = i;
+      run.push(part);
+      return;
+    }
+    endRun();
+    blocks.push({ kind: "paragraph", text: w.text, from: { form: form.id, part: i, count: 1, hash: partHash(part) } });
+  });
+  endRun();
+  return { title: (form.title + " (my version)").slice(0, 120), blocks, source: form.id };
 }
 
 // The store parses on every read, so each template's form is kept until it's saved again

@@ -29,6 +29,8 @@ Under a text box, **Insert exhibit** adds a case exhibit, such as "Exhibit C (Da
 3. **Up** and **Down** move a block, **Delete** removes it. The preview shows the filing as you go.
 4. **Save template**. It lists under **My Templates** and opens like any form.
 
+**Make my own version** on any form copies it into the builder, so you can start from a form you already use. Its wording comes in as paragraphs you can change, keeping the form's look. Everything else, like the court heading and tables, comes in as **Original text** blocks: you can move or delete them but not edit them. **Fields in the original text** lets you rename their fields. The form itself never changes.
+
 **Edit** beside a template opens it in the builder again, where **Delete template** removes it. Templates sync to the firm and are in the backup.
 
 When it's ready, see [Sending a filing](#help/sending).
