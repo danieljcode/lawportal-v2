@@ -55,6 +55,8 @@ export function workItems({ cases, invoices, charId, today, days = UPCOMING_DAYS
     ...timing(deadline.date),
   }));
   for (const c of cases) {
+    // A Closed case's work is over (LP-239); what it's still owed shows below.
+    if (c.status === "Closed") continue;
     for (const action of c.actions || []) {
       if (action.done || !action.due || action.due > until || (charId && action.owner !== charId)) continue;
       out.push({ kind: "action", key: "action:" + c.id + ":" + action.id, case: c, action, ...timing(action.due) });

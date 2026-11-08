@@ -37,6 +37,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "new",
         text: "Share templates with other players: Share templates in Court Filings downloads the ones you tick as a .lawtpl.json file. Importing a file shows each template and a preview first; anything that fails the safety check is left out with the reason. If you already have a template with the same title, add it with a new name, replace yours or skip it.",
       },
+      {
+        type: "fix",
+        text: "A Closed case's deadlines and next actions no longer show on the home screen, in Upcoming, on the Calendar or in the due-soon dot. Reopen the case and they come back. Invoices it still owes stay on the work list.",
+      },
     ],
   },
   {
