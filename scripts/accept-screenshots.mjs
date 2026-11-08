@@ -1,7 +1,7 @@
 // Accept new screenshots for e2e/visual.spec.ts (LP-117, docs/testing.md).
 //
 // The approved screenshots must come from CI's Linux image, so this takes them from the current
-// branch's latest failed CI run: it downloads the run's e2e-failures artefact (GitHub CLI, `gh`)
+// branch's latest failed CI run: it downloads the run's e2e-failures-<shard> artefacts (GitHub CLI, `gh`)
 // and copies each `<name>-actual.png` over e2e/screenshots/<name>.png. Review and commit them.
 //
 // Usage: npm run screenshots:accept [run id]
@@ -29,7 +29,8 @@ if (!id) throw new Error(`No failed CI run on ${branch}.`);
 
 const tmp = mkdtempSync(path.join(tmpdir(), "lawapp-shots-"));
 try {
-  run("gh", ["run", "download", id, "--name", "e2e-failures", "--dir", tmp]);
+  // One artefact per end-to-end shard that failed (LP-243).
+  run("gh", ["run", "download", id, "--pattern", "e2e-failures-*", "--dir", tmp]);
   mkdirSync(dest, { recursive: true });
   const shots = readdirSync(tmp, { recursive: true }).filter((f) => f.endsWith("-actual.png"));
   for (const f of shots)

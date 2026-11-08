@@ -1,5 +1,5 @@
 // Accessibility check (LP-118): axe on the home screen and each program's main view, in the Modern and
-// Classic layouts, light and dark, at desktop and phone widths. Serious and critical issues fail;
+// Classic layouts, light at desktop and phone widths and dark at desktop. Serious and critical issues fail;
 // minor and moderate ones are printed. The full manual review is LP-29.
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
@@ -18,16 +18,23 @@ async function check(page: Page): Promise<void> {
   expect(list(failing)).toEqual([]);
 }
 
+// Dark at desktop size only (LP-243): the themes share the layout, and the phone's own controls are
+// checked in light. This halves the slowest part of CI.
+const darkOnPhone = (theme: string, project: string) =>
+  test.skip(theme === "dark" && project === "phone", "dark is checked at desktop size");
+
 for (const layout of LAYOUTS) {
   for (const theme of THEMES) {
     for (const [view, url] of VIEWS) {
-      test(`${view}, ${layout}, ${theme}`, async ({ page }) => {
+      test(`${view}, ${layout}, ${theme}`, async ({ page }, info) => {
+        darkOnPhone(theme, info.project.name);
         await openView(page, url, layout, theme);
         await check(page);
       });
     }
 
-    test(`date picker open, ${layout}, ${theme}`, async ({ page }) => {
+    test(`date picker open, ${layout}, ${theme}`, async ({ page }, info) => {
+      darkOnPhone(theme, info.project.name);
       await openView(page, "/#cases/case0001", layout, theme);
       await page.locator(".game-date-open").first().click();
       await expect(page.locator(".game-date-pop")).toBeVisible();

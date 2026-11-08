@@ -8,21 +8,18 @@ on:
 permissions:
   contents: read
 
+# Three jobs at once (LP-243): the checks, and the end-to-end tests split across two machines. The
+# test-and-build job at the end is the required check on main, and passes only when all of them do.
 jobs:
-  test-and-build:
+  checks:
     runs-on: ubuntu-latest
-    # Playwright's Linux image, with Chromium and its fonts, so the screenshot tests (LP-117) render the
-    # same every run. Keep the tag at the @playwright/test version in package.json.
-    container:
-      image: mcr.microsoft.com/playwright:v1.64.1-noble
-      options: --ipc=host
     steps:
-      - uses: actions/checkout@v7
-      # The container runs as root over files the runner owns; checkout trusts them only for its own step.
-      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - &checkout
+        uses: actions/checkout@v7
 
       # Later steps run package code, so they only learn whether the secret is there, never the secret (LP-196).
-      - name: Is the reference data available?
+      - &reference
+        name: Is the reference data available?
         id: reference
         env:
           # Read-only token for the private reference repo (docs/templates-and-forms.md, Reference data).
@@ -30,7 +27,8 @@ jobs:
         run: if [ -n "$REFERENCE_TOKEN" ]; then echo "available=1" >> "$GITHUB_OUTPUT"; fi
 
       # The parity tests need it; without the secret (forks) they skip with a note.
-      - name: Check out reference data
+      - &reference-checkout
+        name: Check out reference data
         if: steps.reference.outputs.available == '1'
         uses: actions/checkout@v7
         with:
@@ -39,12 +37,14 @@ jobs:
           path: .agents/reference/jsa
           persist-credentials: false
 
-      - uses: actions/setup-node@v7
+      - &node
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
 
-      - run: npm ci
+      - &install
+        run: npm ci
 
       # Fails on high or critical advisories in what ships (devDependencies are left
       # to Dependabot). See docs/dependencies.md.
@@ -59,17 +59,44 @@ jobs:
         env:
           # With the data checked out, a missing file fails the run instead of skipping.
           LAWAPP_REQUIRE_REFERENCE: ${{ steps.reference.outputs.available }}
-      - run: npm run build
 
-      # Real-browser smoke tests of the key journeys, at desktop and phone widths (LP-6), and the
-      # screenshot comparisons (LP-117). Chromium comes with the container image.
-      - name: End-to-end smoke and screenshot tests
-        run: npm run test:e2e
+  # Real-browser smoke tests of the key journeys, at desktop and phone widths (LP-6), the screenshot
+  # comparisons (LP-117) and the accessibility check (LP-118), half on each machine.
+  e2e:
+    runs-on: ubuntu-latest
+    # Playwright's Linux image, with Chromium and its fonts, so the screenshot tests (LP-117) render the
+    # same every run. Keep the tag at the @playwright/test version in package.json.
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+    steps:
+      - *checkout
+      # The container runs as root over files the runner owns; checkout trusts them only for its own step.
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - *reference
+      - *reference-checkout
+      - *node
+      - *install
+      - run: npm run build
+      - name: End-to-end smoke, screenshot and accessibility tests
+        run: npm run test:e2e -- --shard=${{ matrix.shard }}/2
       # A failed screenshot comparison leaves its expected, actual and diff images here.
       - name: Upload screenshots and traces of failed end-to-end tests
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: e2e-failures
+          name: e2e-failures-${{ matrix.shard }}
           path: test-results/
           retention-days: 14
+
+  # The required check on main: keeps its name from when CI was one job.
+  test-and-build:
+    needs: [checks, e2e]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: test "${{ needs.checks.result }}" = success && test "${{ needs.e2e.result }}" = success
