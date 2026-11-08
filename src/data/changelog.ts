@@ -19,17 +19,8 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-11-08",
-    title: "Charges on a case",
-    items: [
-      {
-        type: "new",
-        text: "Attach the charge calculator's list to a case: pick the case under the calculator in the Law Library and press Attach to case. The case shows the charges with their total time and fine, they sync with the case, and Copy brief includes them. Open in calculator brings them back to change them; Remove takes them off.",
-      },
-    ],
-  },
-  {
-    date: "2026-11-07",
-    title: "Your own templates",
+    title: "Your own templates, and charges on a case",
+    version: "0.8.0",
     items: [
       {
         type: "new",
@@ -48,12 +39,32 @@ export const CHANGELOG: ChangelogEntry[] = [
         text: "Share templates with other players: Share templates in Court Filings downloads the ones you tick as a .lawtpl.json file. Importing a file shows each template and a preview first; anything that fails the safety check is left out with the reason. If you already have a template with the same title, add it with a new name, replace yours or skip it.",
       },
       {
+        type: "new",
+        text: "Attach the charge calculator's list to a case: pick the case under the calculator in the Law Library and press Attach to case. The case shows the charges with their total time and fine, they sync with the case, and Copy brief includes them. Open in calculator brings them back to change them; Remove takes them off.",
+      },
+      {
         type: "fix",
         text: "A Closed case's deadlines and next actions no longer show on the home screen, in Upcoming, on the Calendar or in the due-soon dot. Reopen the case and they come back. Invoices it still owes stay on the work list.",
       },
       {
         type: "fix",
         text: "Deleting a character no longer leaves their next actions with an Unknown character: they become unassigned, on every case.",
+      },
+      {
+        type: "fix",
+        text: "Clearing a case's hourly rate or outcome now sticks when another device joins sync, instead of the old value coming back.",
+      },
+      {
+        type: "fix",
+        text: "A sync code nobody has saved to for 180 days is now deleted from the server, with its data, so old codes don't fill it up. The copies in your browsers stay.",
+      },
+      {
+        type: "fix",
+        text: "An overpaid invoice's balance now reads -$50.00 rather than $-50.00.",
+      },
+      {
+        type: "fix",
+        text: "If a save fails, the app tries again by itself, and the couldn't-save notice goes away once it works. If your saved data can't be opened when the app starts, a notice now says so, with Reload.",
       },
     ],
   },
