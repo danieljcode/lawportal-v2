@@ -227,5 +227,5 @@ export async function initStorage(timeoutMs = OPEN_TIMEOUT_MS): Promise<void> {
   } finally {
     clearTimeout(timer);
   }
-  if (moved) setDefaultKV(memoryKV(), "memory");
+  if (moved) setDefaultKV(memoryKV(), "memory", true);
 }

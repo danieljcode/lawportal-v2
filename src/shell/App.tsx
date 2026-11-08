@@ -19,7 +19,7 @@ import { draftHistory, hasContent } from "@/lib/draftHistory";
 import type { Filing } from "@/lib/filings";
 import type { JumpEntry } from "@/lib/jump";
 import { readDraft, writeDraft } from "@/lib/formState";
-import { defaultKV, SAVE_FAILED, saveFailing } from "@/lib/storage";
+import { dataUnopened, defaultKV, SAVE_FAILED, saveFailing } from "@/lib/storage";
 import { isCommissioner } from "@/lib/portfolio";
 import * as sync from "@/lib/sync";
 import { applyLook, getShell, setShell, type ShellMode } from "@/lib/shell";
@@ -37,7 +37,7 @@ import ProgramManager from "./ProgramManager";
 import { PROGRAMS, programFor, shown, titleIn } from "./registry";
 import type { Shell } from "./program";
 import Taskbar from "./Taskbar";
-import { S_SAVE_FAILED_HINT, S_SET_ASIDE, S_SET_ASIDE_HINT, S_UPDATE_READY } from "@/lib/strings";
+import { S_DATA_UNOPENED, S_SAVE_FAILED_HINT, S_SET_ASIDE, S_SET_ASIDE_HINT, S_UPDATE_READY } from "@/lib/strings";
 import { useDialogs } from "./useDialogs";
 import { CONTROL_TITLE, hashFor, navigate, pageTitle, SETTINGS_TITLE, useRoute } from "./useRoute";
 import {
@@ -414,6 +414,14 @@ export default function App({ changelogStamp = "" }: { changelogStamp?: string }
   const icon = program ? program.icon : "▦";
   const notice = (
     <>
+      {dataUnopened() && (
+        <div className="set-aside-notice" id="data-unopened-notice" role="alert">
+          <strong>{S_DATA_UNOPENED}</strong>
+          <button type="button" className="mini" id="data-unopened-reload" onClick={() => location.reload()}>
+            Reload
+          </button>
+        </div>
+      )}
       {setAsideCount > setAsideSeen && (
         <div className="set-aside-notice" id="set-aside-notice" role="alert">
           <strong>{S_SET_ASIDE}</strong> {S_SET_ASIDE_HINT}
