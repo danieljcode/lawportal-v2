@@ -279,6 +279,11 @@
 .tb-renames legend {
   font-weight: bold;
 }
+.share-list {
+  list-style: none;
+  margin: 4px 0;
+  padding: 0;
+}
 .tb-required {
   grid-column: 2;
 }

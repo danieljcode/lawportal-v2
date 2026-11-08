@@ -2,7 +2,8 @@
 // pane, the open form (or the "pick a form" page) and its preview. The
 // output of the open form, and whether its panel crashed, live here; the form's
 // filing tools go up to the shell's Form menu. The firm's own templates (LP-49)
-// list under My Templates and open in the template builder (#filings/edit/…).
+// list under My Templates and open in the template builder (#filings/edit/…);
+// #filings/edit/share exports and imports them (LP-50).
 
 import { useCallback, useMemo, useState } from "react";
 import { ALL_FORMS, getForm } from "@/data";
@@ -13,6 +14,7 @@ import FormView, { type FormOutput } from "./FormView";
 import OutputPane from "./OutputPane";
 import Sidebar from "./Sidebar";
 import TemplateBuilder from "./TemplateBuilder";
+import TemplateShare from "./TemplateShare";
 import { myTemplateForms } from "@/data/myTemplates";
 import { useTemplateVersion } from "@/ui/useStore";
 import { hashFor } from "@/shell/useRoute";
@@ -55,7 +57,7 @@ export default function CourtFilingsProgram({ shell }: ProgramProps) {
       <main className="editor" id={shell.visible ? "editor" : undefined}>
         {edit ? (
           <ErrorBoundary where="the template builder" resetKey={edit}>
-            <TemplateBuilder key={edit} edit={edit} />
+            {edit === "share" ? <TemplateShare /> : <TemplateBuilder key={edit} edit={edit} />}
           </ErrorBoundary>
         ) : form ? (
           <ErrorBoundary

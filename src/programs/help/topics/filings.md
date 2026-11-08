@@ -34,4 +34,6 @@ Under a text box, **Insert exhibit** adds a case exhibit, such as "Exhibit C (Da
 
 **Edit** beside a template opens it in the builder again, where **Delete template** removes it. Templates sync to the firm and are in the backup.
 
+**Share templates** under **+ New template** passes templates to other players. Tick the ones to send and **Download**: you get a `.lawtpl.json` file. To add someone else's, pick their file under **Import**. Each template shows its title and a **Preview** first. One that fails the safety check, or has parts this version of lawapp doesn't know, is left out with the reason. If you already have a template with that title, choose **Add it with a new name**, **Replace mine** or **Skip it**, then **Add**.
+
 When it's ready, see [Sending a filing](#help/sending).

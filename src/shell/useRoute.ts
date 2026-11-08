@@ -180,7 +180,7 @@ export function pageTitle(r: Route, form: FormInfo | null): string | null {
     case "home":
       return null;
     case "filings":
-      return r.edit ? BUILDER_TITLE : form ? form.title : "Court Filings";
+      return r.edit === "share" ? "Share templates" : r.edit ? BUILDER_TITLE : form ? form.title : "Court Filings";
     case "cases":
       return r.upcoming
         ? UPCOMING_TITLE

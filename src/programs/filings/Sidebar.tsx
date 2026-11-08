@@ -57,7 +57,10 @@ export default function Sidebar({ forms, current }: SidebarProps) {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
-      <p className="new-template">{link("#filings/edit/new", "+ New template", "new-template")}</p>
+      <p className="new-template">
+        {link("#filings/edit/new", "+ New template", "new-template")}
+        {link("#filings/edit/share", "Share templates", "share-templates")}
+      </p>
       <div id="form-list" className="tree">
         {!groups.length && <p className="muted small">No forms match.</p>}
         {groups.map((g) => (

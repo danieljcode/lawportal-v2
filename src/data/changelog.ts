@@ -33,6 +33,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "new",
         text: "Template fields can fill themselves: pick Fills from on a field for your name, title, bar number, phone, address or email, the case's number, plaintiff, defendant, court or date filed, or today's date. Fill from character and the case picker fill them as on any form. Tick Required on a field and the copy buttons warn while it's empty.",
       },
+      {
+        type: "new",
+        text: "Share templates with other players: Share templates in Court Filings downloads the ones you tick as a .lawtpl.json file. Importing a file shows each template and a preview first; anything that fails the safety check is left out with the reason. If you already have a template with the same title, add it with a new name, replace yours or skip it.",
+      },
     ],
   },
   {
