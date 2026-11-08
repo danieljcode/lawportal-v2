@@ -23,6 +23,9 @@ export type BlockKind = (typeof BLOCK_KINDS)[number];
 export const FIELD_TYPES = ["text", "textarea", "date", "number"] as const;
 export type BlockFieldType = (typeof FIELD_TYPES)[number];
 
+/** A field's Fills from key (LP-226): its meaning is FILLS in src/data/myTemplates.ts; an unknown one fills nothing. */
+const FILL_KEY = /^(char:[a-z]{1,20}|case:[a-z]{1,20}|today)$/;
+
 /** Parts `part` to `part + count - 1` of a built-in form, as they were when copied (`hash`). */
 export interface FormPartRef {
   form: string;
@@ -37,6 +40,10 @@ export interface TemplateBlock {
   text: string;
   /** A field's kind of answer. */
   type?: BlockFieldType;
+  /** Where a field fills itself from (a FILLS key, LP-226). */
+  fill?: string;
+  /** A field that must be filled before copying or downloading (LP-87). */
+  required?: boolean;
   /** An "original" block's parts, or the part whose look a copied paragraph keeps (LP-225). */
   from?: FormPartRef;
 }
@@ -76,7 +83,14 @@ function cleanBlock(raw: unknown): TemplateBlock | null {
   if (kind === "original") return from ? { kind, text: "", from } : null;
   if (from) return { kind, text: t, from };
   if (kind !== "field") return { kind, text: t };
-  return { kind, text: t, type: FIELD_TYPES.find((x) => x === o.type) || "text" };
+  const fill = typeof o.fill === "string" && FILL_KEY.test(o.fill) ? o.fill : undefined;
+  return {
+    kind,
+    text: t,
+    type: FIELD_TYPES.find((x) => x === o.type) || "text",
+    ...(fill ? { fill } : {}),
+    ...(o.required === true ? { required: true } : {}),
+  };
 }
 
 /** A label as it may go inside a token: letters, numbers, spaces and plain punctuation. */

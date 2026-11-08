@@ -43,6 +43,43 @@ const BLANK = "__________";
 
 const TYPE_TOKEN = { text: "", textarea: ":textarea", date: ":date:long", number: ":number" } as const;
 
+/**
+ * Where a field fills itself from (LP-226), named in plain words. A character field fills
+ * by its key (`@name`), like the built-in forms; a case field by the label Pick a case
+ * fills (src/lib/formState/dockets.ts), so its label is fixed; today by the game date.
+ * Kept here, with Court Filings, rather than in the shell's customTemplates.ts.
+ */
+export interface Fill {
+  name: string;
+  group: "Your character" | "The case" | "Date";
+  /** The character key it fills from. */
+  char?: string;
+  /** The label it must have (a case field), or the label it starts with. */
+  label: string;
+  fixedLabel?: boolean;
+  date?: boolean;
+  today?: boolean;
+}
+
+export const FILLS: Readonly<Record<string, Fill>> = {
+  "char:name": { name: "Your name", group: "Your character", char: "name", label: "Name" },
+  "char:title": { name: "Your title", group: "Your character", char: "title", label: "Title" },
+  "char:bar": { name: "Your bar number", group: "Your character", char: "bar", label: "Bar number" },
+  "char:phone": { name: "Your phone number", group: "Your character", char: "phone", label: "Phone number" },
+  "char:address": { name: "Your address", group: "Your character", char: "address", label: "Address" },
+  "char:email": { name: "Your email", group: "Your character", char: "email", label: "Email" },
+  "case:number": { name: "Case number", group: "The case", label: "Case number", fixedLabel: true },
+  "case:plaintiff": { name: "Plaintiff", group: "The case", label: "Plaintiff name", fixedLabel: true },
+  "case:defendant": { name: "Defendant", group: "The case", label: "Defendant name", fixedLabel: true },
+  "case:court": { name: "Court", group: "The case", label: "Court name", fixedLabel: true },
+  "case:filed": { name: "Date filed", group: "The case", label: "Action filed", fixedLabel: true, date: true },
+  today: { name: "Today's date (game time)", group: "Date", label: "Date", date: true, today: true },
+};
+
+/** A field's fill, or undefined for none or a key this version doesn't know. */
+export const fillOf = (b: TemplateBlock): Fill | undefined =>
+  b.fill && Object.prototype.hasOwnProperty.call(FILLS, b.fill) ? FILLS[b.fill] : undefined;
+
 function paragraph(s: string): string {
   return s
     .split(/\n\s*\n/)
@@ -79,8 +116,12 @@ export function templateHtml(t: Pick<CustomTemplate, "title" | "blocks" | "sourc
         const part = b.from && partsOf(b.from);
         return part ? renameFields(part, t.renames) : MISSING;
       }
-      case "field":
-        return "<p>{{" + label(b.text, "Field") + TYPE_TOKEN[b.type || "text"] + "|" + BLANK + "}}</p>\n";
+      case "field": {
+        const fill = fillOf(b);
+        const how = fill?.today ? "=today" : fill?.char ? "@" + fill.char : "";
+        const type = fill ? (fill.date ? TYPE_TOKEN.date : "") : TYPE_TOKEN[b.type || "text"];
+        return "<p>{{" + fieldLabel(b) + how + type + "|" + BLANK + "}}</p>\n";
+      }
       case "list": {
         let name = label(b.text, "List");
         for (let n = 2; lists.has(name); n++) name = label(b.text, "List") + " " + n;
@@ -168,9 +209,37 @@ export function myTemplateForm(formId: string): FormDef | undefined {
   if (!t) return undefined;
   const hit = forms.get(formId);
   if (hit && hit.updated === t.updated) return hit.form;
-  const form = { id: formId, court: MY_TEMPLATES, section: "", title: t.title, html: templateHtml(t) };
+  const required = requiredLabels(t);
+  const form: FormDef = {
+    id: formId,
+    court: MY_TEMPLATES,
+    section: "",
+    title: t.title,
+    html: templateHtml(t),
+    ...(required.length ? { required } : {}),
+  };
   forms.set(formId, { updated: t.updated, form });
   return form;
+}
+
+/** A field block's label in its token: a case field's is fixed, so Pick a case finds it. */
+export function fieldLabel(b: TemplateBlock): string {
+  const fill = fillOf(b);
+  return fill?.fixedLabel ? fill.label : label(b.text, fill ? fill.label : "Field");
+}
+
+/**
+ * The labels that must be filled (LP-87): ticked fields, and for a copy (LP-225) the original
+ * form's required fields that are still in it, under their new names.
+ */
+export function requiredLabels(t: Pick<CustomTemplate, "blocks" | "source" | "renames">): string[] {
+  const out = t.blocks.filter((b) => b.kind === "field" && b.required).map(fieldLabel);
+  const original = t.source ? builtIn(t.source)?.required : undefined;
+  if (original) {
+    const kept = new Set(originalFields(t));
+    for (const l of original) if (kept.has(l)) out.push(t.renames?.[l] || l);
+  }
+  return [...new Set(out)];
 }
 
 /** Every own template as a form, for the forms list. */

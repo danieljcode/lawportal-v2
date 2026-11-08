@@ -279,3 +279,11 @@
 .tb-renames legend {
   font-weight: bold;
 }
+.tb-required {
+  grid-column: 2;
+}
+@media (max-width: 700px) {
+  .tb-required {
+    grid-column: auto;
+  }
+}

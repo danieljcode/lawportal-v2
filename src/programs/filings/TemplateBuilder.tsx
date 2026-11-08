@@ -4,9 +4,11 @@
 // My Templates in the forms list (synced, in the backup) and opens it as a form.
 // #filings/edit/copy/<formId> (LP-225) starts from a form: its wording as
 // paragraphs, the rest as fixed Original text blocks whose fields can be renamed.
+// A field can fill itself from the character, the case or today's date, and be
+// required (LP-226).
 
 import { Fragment, useMemo, useState, type FormEvent } from "react";
-import { copyOfForm, originalFields, originalGlimpse, templateHtml } from "@/data/myTemplates";
+import { copyOfForm, FILLS, fillOf, originalFields, originalGlimpse, templateHtml } from "@/data/myTemplates";
 import {
   MAX_BLOCKS,
   MY_PREFIX,
@@ -33,6 +35,8 @@ const FIELD_TYPE_NAMES: Record<BlockFieldType, string> = {
   date: "Date",
   number: "Number",
 };
+const FILL_GROUPS = ["Your character", "The case", "Date"] as const;
+
 const NEW_BLOCK: Record<AddKind, TemplateBlock> = {
   heading: { kind: "heading", text: "" },
   paragraph: { kind: "paragraph", text: "" },
@@ -51,10 +55,45 @@ function BlockEditor({ b, i, set }: { b: TemplateBlock; i: number; set: (b: Temp
     );
   }
   const label = { heading: "Heading", paragraph: "Text", field: "Label", list: "Name", signature: "Role" }[b.kind];
+  const fill = b.kind === "field" ? fillOf(b) : undefined;
+  const setFill = (key: string) => {
+    const next = key ? FILLS[key] : undefined;
+    // A label still at the last choice's starting label follows the new choice.
+    const keep = b.text.trim() && b.text !== (fill ? fill.label : "");
+    set({ ...b, fill: key || undefined, text: keep ? b.text : next ? next.label : "" });
+  };
   return (
     <div className="tb-fields">
-      <label htmlFor={id}>{label}</label>
-      {b.kind === "paragraph" ? (
+      {b.kind === "field" && (
+        <>
+          <label htmlFor={id + "-fill"}>Fills from</label>
+          <select id={id + "-fill"} value={b.fill || ""} onChange={(e) => setFill(e.target.value)}>
+            <option value="">Nothing: typed in</option>
+            {FILL_GROUPS.map((g) => (
+              <optgroup key={g} label={g}>
+                {Object.entries(FILLS)
+                  .filter(([, x]) => x.group === g)
+                  .map(([key, x]) => (
+                    <option key={key} value={key}>
+                      {x.name}
+                    </option>
+                  ))}
+              </optgroup>
+            ))}
+          </select>
+        </>
+      )}
+      {fill?.fixedLabel ? (
+        <>
+          <span>{label}</span>
+          <span className="small muted" id={id}>
+            {fill.label + ": Pick a case fills it."}
+          </span>
+        </>
+      ) : (
+        <label htmlFor={id}>{label}</label>
+      )}
+      {fill?.fixedLabel ? null : b.kind === "paragraph" ? (
         <textarea
           id={id}
           rows={4}
@@ -72,7 +111,7 @@ function BlockEditor({ b, i, set }: { b: TemplateBlock; i: number; set: (b: Temp
           onChange={(e) => set({ ...b, text: e.target.value })}
         />
       )}
-      {b.kind === "field" && (
+      {b.kind === "field" && !fill && (
         <>
           <label htmlFor={id + "-type"}>Answer</label>
           <select
@@ -87,6 +126,17 @@ function BlockEditor({ b, i, set }: { b: TemplateBlock; i: number; set: (b: Temp
             ))}
           </select>
         </>
+      )}
+      {b.kind === "field" && (
+        <label className="tb-required">
+          <input
+            type="checkbox"
+            id={id + "-required"}
+            checked={!!b.required}
+            onChange={(e) => set({ ...b, required: e.target.checked || undefined })}
+          />{" "}
+          Required
+        </label>
       )}
     </div>
   );
