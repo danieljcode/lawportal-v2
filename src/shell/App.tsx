@@ -19,7 +19,7 @@ import { draftHistory, hasContent } from "@/lib/draftHistory";
 import type { Filing } from "@/lib/filings";
 import type { JumpEntry } from "@/lib/jump";
 import { readDraft, writeDraft } from "@/lib/formState";
-import { defaultKV, SAVE_FAILED } from "@/lib/storage";
+import { defaultKV, SAVE_FAILED, saveFailing } from "@/lib/storage";
 import { isCommissioner } from "@/lib/portfolio";
 import * as sync from "@/lib/sync";
 import { applyLook, getShell, setShell, type ShellMode } from "@/lib/shell";
@@ -422,7 +422,7 @@ export default function App({ changelogStamp = "" }: { changelogStamp?: string }
           </button>
         </div>
       )}
-      {saveFailedCount > saveFailedSeen && (
+      {saveFailedCount > saveFailedSeen && saveFailing() && (
         <div className="set-aside-notice" id="save-failed-notice" role="alert">
           <strong>{SAVE_FAILED}</strong> {S_SAVE_FAILED_HINT}
           <button
