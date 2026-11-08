@@ -15,6 +15,7 @@ import {
   PAYMENT_METHODS,
   receivables,
   sharedTime,
+  sumMoney,
   type Invoice,
   type PaymentMethod,
 } from "@/lib/invoices";
@@ -213,7 +214,7 @@ export default function Invoices({
         <>
           <h4 id="receivables-title">Accounts receivable</h4>
           <p className="small" id="receivables-total">
-            {formatMoney(owed.reduce((n, inv) => n + Math.round(invoiceBalance(inv) * 100), 0) / 100) +
+            {formatMoney(sumMoney(owed.map(invoiceBalance))) +
               " owed on " +
               owed.length +
               (owed.length === 1 ? " invoice" : " invoices") +
