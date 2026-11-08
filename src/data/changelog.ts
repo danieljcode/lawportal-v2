@@ -29,6 +29,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "new",
         text: "Make my own version on any form copies it into the template builder: change its wording, rename its fields, and move or delete its parts. The parts the builder can't break into blocks stay as Original text, exactly as in the form. The form itself never changes; your version is saved under My Templates.",
       },
+      {
+        type: "new",
+        text: "Template fields can fill themselves: pick Fills from on a field for your name, title, bar number, phone, address or email, the case's number, plaintiff, defendant, court or date filed, or today's date. Fill from character and the case picker fill them as on any form. Tick Required on a field and the copy buttons warn while it's empty.",
+      },
     ],
   },
   {

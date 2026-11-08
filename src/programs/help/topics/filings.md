@@ -26,6 +26,7 @@ Under a text box, **Insert exhibit** adds a case exhibit, such as "Exhibit C (Da
 
 1. Give the template a title, such as MOTION TO CONTINUE.
 2. Add blocks: a **Heading**, a **Paragraph** of fixed wording, a **Field** to fill in (short text, long text, a date or a number), a **Repeating list** (numbered items, add as many as you need) or a **Signature** (date, name, bar number, firm and role).
+   On a **Field**, **Fills from** fills it for you: from your character (name, title, bar number, phone, address, email), from the case you pick (case number, plaintiff, defendant, court, date filed) or with today's date. Tick **Required** and the copy buttons warn while it's empty.
 3. **Up** and **Down** move a block, **Delete** removes it. The preview shows the filing as you go.
 4. **Save template**. It lists under **My Templates** and opens like any form.
 
