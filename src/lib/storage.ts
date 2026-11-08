@@ -126,11 +126,23 @@ export function __resetDefaultKVForTests(): void {
 
 const saveFailedChanges = createChannel();
 
-/** Fires when a save already shown on screen fails afterwards (an IndexedDB write, LP-36). */
+let failing = false;
+
+/** Fires when a save already shown on screen fails afterwards (an IndexedDB write, LP-36), and when saving works again. */
 export const subscribeSaveFailed = saveFailedChanges.subscribe;
 export const saveFailedVersion = saveFailedChanges.version;
+/** True from a failed save until a later one succeeds (LP-249). */
+export const saveFailing = (): boolean => failing;
 
 export function reportSaveFailed(): void {
+  failing = true;
+  saveFailedChanges.emit();
+}
+
+/** A save worked after one failed: the notice can go (LP-249). */
+export function reportSaveRecovered(): void {
+  if (!failing) return;
+  failing = false;
   saveFailedChanges.emit();
 }
 
