@@ -98,4 +98,15 @@ describe("the work list", () => {
     expect(firm.at(-1)).not.toHaveProperty("case");
     expect(keys(workItems({ cases: [], invoices: orphan, charId: "alice001", today: TODAY }))).toEqual([]);
   });
+
+  it("leaves out a Closed case's deadlines and actions but keeps what it's still owed (LP-239)", () => {
+    const closed = cases.map((c) => (c.id === "case0001" ? { ...c, status: "Closed" as const } : c));
+    expect(keys(workItems({ cases: closed, invoices, charId: "alice001", today: TODAY }))).toEqual([
+      "action:case0002:ac000005",
+      "invoice:inv00001",
+    ]);
+    const firm = keys(workItems({ cases: closed, invoices, charId: null, today: TODAY }));
+    expect(firm.filter((k) => k.startsWith("deadline:case0001") || k.startsWith("action:case0001"))).toEqual([]);
+    expect(firm).toContain("invoice:inv00001");
+  });
 });

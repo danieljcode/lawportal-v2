@@ -183,8 +183,8 @@ export interface UpcomingItem {
 
 /**
  * Deadlines not done and due within `days` of today (overdue ones too), on the
- * character's cases (every case when no character is given). Overdue first,
- * then soonest.
+ * character's cases (every case when no character is given), Closed cases left
+ * out (LP-239). Overdue first, then soonest.
  */
 export function upcoming(
   cases: readonly Case[],
@@ -196,7 +196,7 @@ export function upcoming(
   const soonUntil = addDays(today, SOON_DAYS);
   const out: UpcomingItem[] = [];
   for (const c of cases) {
-    if (charId && c.lead !== charId && !c.assigned.includes(charId)) continue;
+    if (c.status === "Closed" || (charId && c.lead !== charId && !c.assigned.includes(charId))) continue;
     for (const d of c.deadlines) {
       if (d.done || d.date > until) continue;
       out.push({ case: c, deadline: d, overdue: d.date < today, soon: d.date <= soonUntil });

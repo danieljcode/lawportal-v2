@@ -52,6 +52,12 @@ describe("monthEntries", () => {
     expect(calendarKind("File the answer")).toBe("deadline");
   });
 
+  it("leaves out a Closed case's deadlines and actions (LP-239)", () => {
+    const cases = [cleanCase({ ...mine, status: "Closed" }), cleanCase(theirs)];
+    expect([...monthEntries(cases, null, "1990-10").keys()]).toEqual(["1990-10-25"]);
+    expect(monthEntries(cases, "alice001", "1990-10").size).toBe(0);
+  });
+
   it("has its own address", () => {
     expect(parseHash("#cases/calendar")).toEqual({ program: "cases", caseId: null, calendar: true });
     expect(hashFor({ program: "cases", caseId: null, calendar: true })).toBe("#cases/calendar");

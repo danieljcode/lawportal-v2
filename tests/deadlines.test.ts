@@ -141,6 +141,15 @@ describe("upcoming", () => {
     expect(dueSoonCount(cases, "bob00001", TODAY)).toBe(1);
     expect(dueSoonCount(cases, "carol001", TODAY)).toBe(0);
   });
+
+  it("leaves out Closed cases, and shows them again once reopened (LP-239)", () => {
+    const closed = cases.map((c) => (c.id === "case0001" ? { ...c, status: "Closed" as const } : c));
+    expect(upcoming(closed, "alice001", TODAY).map((i) => i.deadline.label)).toEqual(["Closings"]);
+    expect(upcoming(closed, null, TODAY).map((i) => i.deadline.label)).toEqual(["Trial", "Closings"]);
+    expect(dueSoonCount(closed, "alice001", TODAY)).toBe(0);
+    const reopened = closed.map((c) => (c.id === "case0001" ? { ...c, status: "Open" as const } : c));
+    expect(upcoming(reopened, "alice001", TODAY)).toEqual(upcoming(cases, "alice001", TODAY));
+  });
 });
 
 describe("dates from a form", () => {
