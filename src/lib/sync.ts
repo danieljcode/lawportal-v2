@@ -29,6 +29,7 @@ import { CODE_RE, LOOKALIKE_HINT, normaliseCode } from "./syncCode";
 import { cleanDeposit, retainerStore, type Deposit } from "./retainers";
 import { checklistStore, cleanChecklist, type Checklist } from "./checklistStore";
 import { cleanTemplate, templateStore, type CustomTemplate } from "./customTemplates";
+import { cleanNote, noteStore, type Note } from "./notes";
 import { cleanPrecedent, precedentStore, type Precedent } from "./precedents";
 import { docketStore } from "./dockets";
 import { portfolioStore } from "./portfolio";
@@ -105,6 +106,8 @@ export interface SyncDoc {
   checklists?: Checklist[];
   /** The firm's own templates (LP-49); absent in copies from before them. */
   templates?: CustomTemplate[];
+  /** Sticky notes (LP-55); absent in copies from before them. */
+  notes?: Note[];
 }
 
 interface ApiBody {
@@ -268,6 +271,7 @@ const invoicesOf = (doc: unknown) => listOf<Invoice>(doc, "invoices", cleanInvoi
 const retainersOf = (doc: unknown) => listOf<Deposit>(doc, "retainers", cleanDeposit);
 const checklistsOf = (doc: unknown) => listOf<Checklist>(doc, "checklists", (x) => cleanChecklist(x));
 const templatesOf = (doc: unknown) => listOf<CustomTemplate>(doc, "templates", (x) => cleanTemplate(x));
+const notesOf = (doc: unknown) => listOf<Note>(doc, "notes", (x) => cleanNote(x));
 const contactsOf = (doc: unknown) => listOf<Contact>(doc, "contacts", cleanContact);
 const precedentsOf = (doc: unknown) => listOf<Precedent>(doc, "precedents", cleanPrecedent);
 const checksOf = (doc: unknown) => listOf<ConflictCheck>(doc, "conflictChecks", cleanCheck);
@@ -302,6 +306,7 @@ const LISTS: readonly SyncList[] = [
   syncList("retainers", retainersOf, retainerStore, "deposit:", (d) => d.updated),
   syncList("checklists", checklistsOf, checklistStore, "checklist:", (c) => c.updated),
   syncList("templates", templatesOf, templateStore, "template:", (t) => t.updated),
+  syncList("notes", notesOf, noteStore, "note:", (n) => n.updated),
 ];
 
 /** A document's cases; one from before LP-4 has dockets inside its characters instead. */
