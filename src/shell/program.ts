@@ -45,6 +45,9 @@ export interface Shell {
   /** The theme (LP-112): Modern or Classic, which picks the frame round the programs (LP-125) and the look. */
   layout: ShellMode;
   setLayout(mode: ShellMode): void;
+  /** Classic's CRT mode (LP-58); kept when switching to Modern, which never shows it. */
+  crt: boolean;
+  setCrt(on: boolean): void;
   /** This program is the one showing; false while it's kept, hidden, for coming back to (LP-126). */
   visible: boolean;
 }

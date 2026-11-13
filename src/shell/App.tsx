@@ -22,7 +22,7 @@ import { readDraft, writeDraft } from "@/lib/formState";
 import { dataUnopened, defaultKV, SAVE_FAILED, saveFailing } from "@/lib/storage";
 import { isCommissioner } from "@/lib/portfolio";
 import * as sync from "@/lib/sync";
-import { applyLook, getShell, setShell, type ShellMode } from "@/lib/shell";
+import { applyLook, getCrt, getShell, setCrt as saveCrt, setShell, type ShellMode } from "@/lib/shell";
 import { getTheme, LABELS, MODES, setTheme as saveTheme, type ThemeMode } from "@/lib/theme";
 import AboutDialog from "./AboutDialog";
 import BootScreen from "./BootScreen";
@@ -106,6 +106,11 @@ export default function App({ changelogStamp = "" }: { changelogStamp?: string }
     setLayoutState(mode);
   };
   useEffect(() => applyLook(layout), [layout]);
+  const [crt, setCrtState] = useState(getCrt);
+  const setCrt = (on: boolean) => {
+    saveCrt(on);
+    setCrtState(on);
+  };
 
   /**
    * Open a filing as a new draft of its form (LP-15). The open form takes it as an undo step;
@@ -263,6 +268,8 @@ export default function App({ changelogStamp = "" }: { changelogStamp?: string }
     setTheme,
     layout,
     setLayout,
+    crt,
+    setCrt,
     visible: true,
   };
 
@@ -382,6 +389,7 @@ export default function App({ changelogStamp = "" }: { changelogStamp?: string }
           checked: layout === "classic",
           onSelect: () => setLayout(layout === "classic" ? "modern" : "classic"),
         },
+        { label: "CRT monitor", id: "menu-crt", checked: crt, onSelect: () => setCrt(!crt) },
         "-",
         ...MODES.map((m): MenuItem => ({
           label: LABELS[m],

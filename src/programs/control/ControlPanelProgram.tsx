@@ -177,6 +177,19 @@ export default function ControlPanelProgram({ shell }: ProgramProps) {
             )}
             {shell.layout === "classic" && (
               <li>
+                <label className="check">
+                  <input
+                    type="checkbox"
+                    id="crt-setting"
+                    checked={shell.crt}
+                    onChange={(e) => shell.setCrt(e.target.checked)}
+                  />
+                  <span>CRT monitor: scanlines and a soft glow</span>
+                </label>
+              </li>
+            )}
+            {shell.layout === "classic" && (
+              <li>
                 {/* The startup screen (LP-21); it was on the start page until the Program Manager (LP-104). */}
                 <label className="check boot-setting">
                   <input

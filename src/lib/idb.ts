@@ -12,7 +12,7 @@
 // app loads (the theme script, the boot screen) stay there: LOCAL_KEYS.
 
 import { BOOT_OFF_KEY } from "./boot";
-import { READABLE_FONT_KEY, SHELL_KEY } from "./shell";
+import { CRT_KEY, READABLE_FONT_KEY, SHELL_KEY } from "./shell";
 import {
   memoryKV,
   reportSaveFailed,
@@ -37,7 +37,13 @@ export const OPEN_TIMEOUT_MS = 10_000;
 /** In localStorage once its data has moved: from then on IndexedDB holds it (not a KV key, never backed up). */
 export const IDB_MARKER = "lawapp_idb";
 
-export const LOCAL_KEYS: ReadonlySet<string> = new Set([THEME_KEY, SHELL_KEY, READABLE_FONT_KEY, BOOT_OFF_KEY]);
+export const LOCAL_KEYS: ReadonlySet<string> = new Set([
+  THEME_KEY,
+  SHELL_KEY,
+  READABLE_FONT_KEY,
+  CRT_KEY,
+  BOOT_OFF_KEY,
+]);
 
 type Op = [key: string, value: string | null];
 

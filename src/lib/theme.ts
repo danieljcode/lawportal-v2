@@ -21,9 +21,9 @@ export const LABELS: Readonly<Record<ThemeMode, string>> = {
   auto: "System",
 };
 
-/** Inline <head> script: apply saved light/dark, the theme and the readable font before the first paint. */
+/** Inline <head> script: apply saved light/dark, the theme, the readable font and CRT mode before the first paint. */
 export const THEME_SCRIPT =
-  '(function(){var d=document.documentElement;d.dataset.look="modern";try{var l=localStorage,t=l.getItem("lawapp_theme");if(t==="light"||t==="dark")d.dataset.theme=t;if(l.getItem("lawapp_shell")==="classic")d.dataset.look="classic";if(l.getItem("lawapp_readable_font")==="1")d.dataset.font="readable"}catch(e){}})();';
+  '(function(){var d=document.documentElement;d.dataset.look="modern";try{var l=localStorage,t=l.getItem("lawapp_theme");if(t==="light"||t==="dark")d.dataset.theme=t;if(l.getItem("lawapp_shell")==="classic")d.dataset.look="classic";if(l.getItem("lawapp_readable_font")==="1")d.dataset.font="readable";if(l.getItem("lawapp_crt")==="1")d.dataset.crt="on"}catch(e){}})();';
 
 function isMode(v: unknown): v is ThemeMode {
   return typeof v === "string" && (MODES as readonly string[]).includes(v);

@@ -7,7 +7,7 @@ import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import App from "@/shell/App";
 import { characterStore } from "@/lib/characters";
-import { getShell, READABLE_FONT_KEY, setShell, SHELL_KEY } from "@/lib/shell";
+import { CRT_KEY, getShell, READABLE_FONT_KEY, setShell, SHELL_KEY } from "@/lib/shell";
 import * as sync from "@/lib/sync";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -224,5 +224,24 @@ describe("the modern shell (LP-125)", () => {
     act(() => box.click());
     expect(localStorage.getItem(READABLE_FONT_KEY)).toBeNull();
     expect(document.documentElement.hasAttribute("data-font")).toBe(false);
+  });
+
+  it("turns CRT mode on in Settings and off from the View menu, Classic only (LP-58)", () => {
+    mount("#control");
+    expect(document.querySelector("#crt-setting")).toBeNull();
+    unmount();
+    setShell("classic");
+    mount("#control");
+    const box = must<HTMLInputElement>("#crt-setting");
+    expect(box.checked).toBe(false);
+    act(() => box.click());
+    expect(localStorage.getItem(CRT_KEY)).toBe("1");
+    expect(document.documentElement.dataset.crt).toBe("on");
+    click("#menu-view");
+    expect(must("#menu-crt").getAttribute("aria-checked")).toBe("true");
+    click("#menu-crt");
+    expect(localStorage.getItem(CRT_KEY)).toBeNull();
+    expect(document.documentElement.hasAttribute("data-crt")).toBe(false);
+    expect(must<HTMLInputElement>("#crt-setting").checked).toBe(false);
   });
 });

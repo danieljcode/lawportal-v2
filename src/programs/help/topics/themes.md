@@ -3,7 +3,7 @@
 The app has two themes, and the programs work the same in both.
 
 - **Modern**, the default: clean and easy to read.
-- **Classic (1990)**: the programs in a Windows 3.x window, with a Program Manager, a taskbar and a startup screen. **Use a readable font** swaps in a modern font.
+- **Classic (1990)**: the programs in a Windows 3.x window, with a Program Manager, a taskbar and a startup screen. **Use a readable font** swaps in a modern font, and **CRT monitor** adds scanlines and a soft glow, as on an old screen. Both stay off in Modern.
 
 Light, dark or system is a separate choice, so it works with either theme.
 
