@@ -2655,6 +2655,114 @@ dialog.changelog {
   gap: 10px;
   padding: 10px;
   background: var(--desktop, #008080);
+  /* The whole desktop, down to the taskbar, so sticky notes can go anywhere on it. */
+  position: relative;
+  grid-row: 1 / -1;
+}
+
+/* ---------- sticky notes (LP-55): paper colours in every theme ---------- */
+.sticky {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  color: #222;
+  box-shadow: 2px 2px 0 rgb(0 0 0 / 0.35);
+}
+.sticky-yellow {
+  background: #fff7a8;
+}
+.sticky-pink {
+  background: #ffc8dd;
+}
+.sticky-blue {
+  background: #bde0fe;
+}
+.sticky-green {
+  background: #c7f0c2;
+}
+.sticky-text {
+  flex: 1;
+  min-height: 3.5em;
+  resize: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+.sticky-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.sticky-swatches {
+  display: flex;
+  gap: 3px;
+}
+.sticky-swatch {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 1px solid rgb(0 0 0 / 0.45);
+  cursor: pointer;
+}
+.sticky-swatch[aria-pressed="true"] {
+  outline: 2px solid #222;
+  outline-offset: 1px;
+}
+.sticky-case {
+  max-width: 8em;
+}
+.sticky-delete {
+  margin-left: auto;
+}
+.sticky-link {
+  color: #1a3d8f;
+}
+.notes-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.notes-list .sticky {
+  min-height: 120px;
+}
+/* Classic: a layer over the desktop that only the notes themselves take clicks on. */
+.desktop-notes {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.desktop-note {
+  position: absolute;
+  pointer-events: auto;
+  overflow: hidden;
+}
+.desktop-note.dragging {
+  opacity: 0.85;
+}
+.sticky-grip {
+  flex: none;
+  height: 12px;
+  margin: -6px -6px 0;
+  background: rgb(0 0 0 / 0.12);
+  cursor: move;
+  touch-action: none;
+}
+.sticky-resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 14px;
+  height: 14px;
+  background: linear-gradient(135deg, transparent 50%, rgb(0 0 0 / 0.35) 50%);
+  cursor: nwse-resize;
+  touch-action: none;
 }
 .pm-group {
   background: var(--field);

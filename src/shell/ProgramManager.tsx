@@ -3,10 +3,14 @@
 // active character can see; click or Enter opens one, and the arrow keys move
 // between icons. Badges: Case File shows a dot when something's due within 48
 // hours, and What's new when there's something unread. Movable group windows
-// come later (LP-28).
+// come later (LP-28). Sticky notes (LP-55) sit on the desktop on top of the
+// groups; New note in Main adds one.
 
-import type { KeyboardEvent, ReactNode } from "react";
+import { lazy, Suspense, type KeyboardEvent, type ReactNode } from "react";
+import { noteStore } from "@/lib/notes";
 import { GROUPS, PROGRAMS, shown, titleIn, type ProgramDef, type ProgramGroup } from "./registry";
+
+const DesktopNotes = lazy(() => import("@/ui/Notes").then((m) => ({ default: m.DesktopNotes })));
 
 export interface ProgramManagerProps {
   commissioner: boolean;
@@ -102,6 +106,11 @@ export default function ProgramManager({
         {icon("✎", "What's new", changelogUnread && <span className="pm-badge" />)}
       </button>
     </li>,
+    <li key="new-note">
+      <button type="button" className="pm-icon" id="pm-new-note" onClick={() => noteStore().add()}>
+        {icon("🗒", "New note")}
+      </button>
+    </li>,
   );
 
   return (
@@ -115,6 +124,9 @@ export default function ProgramManager({
             <ul className="pm-icons">{items}</ul>
           </section>
         ))}
+        <Suspense fallback={null}>
+          <DesktopNotes />
+        </Suspense>
       </main>
     </div>
   );

@@ -29,6 +29,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "new",
         text: "A screensaver: leave the app idle for 5 minutes and pixel-art gavels and briefcases fly across the screen, or pick the bouncing F&A. Any mouse move, tap or key brings the app back without clicking or typing into it. Change the wait or turn it off in Settings → Appearance. It never starts over an open dialog.",
       },
+      {
+        type: "new",
+        text: "Sticky notes: a Notes panel on Home for quick reminders like \"Call the DA about the plea\". Add one with + New note, pick yellow, pink, blue or green, and link it to a case to open it in one click. In the Classic theme the same notes sit on the desktop, where you can drag and resize them. Notes sync and are in your backups.",
+      },
     ],
   },
   {

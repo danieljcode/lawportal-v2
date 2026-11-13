@@ -14,6 +14,7 @@ import { timeStore, timerStore } from "@/lib/ledger";
 import { retainerStore } from "@/lib/retainers";
 import { checklistStore } from "@/lib/checklistStore";
 import { templateStore } from "@/lib/customTemplates";
+import { noteStore } from "@/lib/notes";
 import { precedentStore } from "@/lib/precedents";
 import { filingStore } from "@/lib/filings";
 import { docketStore } from "@/lib/dockets";
@@ -77,6 +78,8 @@ export const useRetainerVersion = versionHook(retainerStore);
 export const useChecklistVersion = versionHook(checklistStore);
 /** Bumps on every change to the firm's own templates (LP-49). */
 export const useTemplateVersion = versionHook(templateStore);
+/** Bumps on every change to the sticky notes (LP-55). */
+export const useNoteVersion = versionHook(noteStore);
 
 /** Counts values set aside as unreadable since the page loaded (0: none). */
 export function useSetAsideVersion(): number {

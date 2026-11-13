@@ -6,7 +6,7 @@
 // character you're filing as (the whole firm with no character). Classic keeps
 // the Program Manager (LP-104) as its home.
 
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { caseParties, caseStore, isMember } from "@/lib/cases";
 import { formatDay, gameToday, relativeDay, SOON_DAYS, upcoming } from "@/lib/deadlines";
 import { snapshotTime } from "@/lib/draftHistory";
@@ -17,6 +17,9 @@ import type { Case, Character } from "@/lib/types";
 import { workItems, type WorkItem } from "@/lib/work";
 import type { ProgramDef } from "./registry";
 import { useCaseVersion, useFilingVersion, useInvoiceVersion } from "@/ui/useStore";
+
+// The Notes panel (LP-55) loads after the rest of Home, outside the first-load budget.
+const NotesPanel = lazy(() => import("@/ui/Notes").then((m) => ({ default: m.NotesPanel })));
 
 /** How many recent filings and cases the home screen lists. */
 export const RECENT = 5;
@@ -213,6 +216,10 @@ export default function ModernHome({ programs, hrefFor, active, characters, onOp
               </p>
             )}
           </section>
+
+          <Suspense fallback={null}>
+            <NotesPanel />
+          </Suspense>
         </div>
       </main>
     </div>

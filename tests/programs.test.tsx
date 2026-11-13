@@ -308,7 +308,7 @@ describe("the Program Manager (LP-104)", () => {
     mount("");
     expect(groups()).toEqual([
       ["Court Work", ["Court Filings", "Case File", "Clients", "Law Library"]],
-      ["Main", ["Ledger", "Find", "Help", "Control Panel", "What's new"]],
+      ["Main", ["Ledger", "Find", "Help", "Control Panel", "What's new", "New note"]],
     ]);
     act(() => characterStore().setActive("carl0001"));
     expect(groups()[0][1]).toContain("J.A.P.");

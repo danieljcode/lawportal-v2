@@ -14,6 +14,12 @@ Overdue items come first, then the soonest. Court dates and actions show for the
 
 Below the work list are your **recent filings**, to open again, and your **recent cases**.
 
+## Notes
+
+**Notes** holds quick reminders, like "Call the DA about the plea", newest first. **+ New note** adds one: type in it, pick a colour, and choose a case to link it to (**Open** goes to the case). **×** deletes it after asking. Notes sync and are in your backups.
+
+In the Classic theme the same notes sit on the Program Manager's desktop: **New note** in the Main group adds one. Drag a note by its top strip, or focus the strip and use the arrow keys, and drag its bottom-right corner to resize it. Notes stay where you put them and always stay on the screen.
+
 ## Quick add
 
 The round **+** at the bottom right, on the home screen and on an open case, adds something to a case in a couple of taps, without opening the Case File or the Ledger. Pick **Note**, **Time** or **Next action**, check the case (the one you have open, else the one changed last), fill it in and press **Add**. Notes and next actions go on the case as the character you're playing; time is logged for them today, in game time, so choose a character first. Add as many as you like, then close it.

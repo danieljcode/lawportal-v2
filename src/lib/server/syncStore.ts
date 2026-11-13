@@ -32,6 +32,7 @@ export interface SyncRecord {
     retainers?: unknown[];
     checklists?: unknown[];
     templates?: unknown[];
+    notes?: unknown[];
   };
 }
 
