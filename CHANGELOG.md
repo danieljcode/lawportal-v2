@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.9.0](https://github.com/danieljcode/lawportal-v2/compare/v0.8.0...v0.9.0) (2026-11-13)
+
+
+### Features
+
+* **home:** sticky notes on home and the classic desktop [LP-55] ([#248](https://github.com/danieljcode/lawportal-v2/issues/248)) ([6092405](https://github.com/danieljcode/lawportal-v2/commit/60924054dc58495e7bd52b286322aaac211ff8fa))
+* **shell:** crt monitor mode for the classic theme [LP-58] ([#246](https://github.com/danieljcode/lawportal-v2/issues/246)) ([ca6c8c4](https://github.com/danieljcode/lawportal-v2/commit/ca6c8c484a4664607b16483ccb1551452ebfd045))
+* **shell:** idle screensaver with flying gavels [LP-60] ([#247](https://github.com/danieljcode/lawportal-v2/issues/247)) ([e87cfd3](https://github.com/danieljcode/lawportal-v2/commit/e87cfd3ebd6084e01101b619519239aa5f0de7c6))
+
+
+### Docs
+
+* **changelog:** mark what's new for 0.8.0, target 0.9.0 [LP-250] ([#239](https://github.com/danieljcode/lawportal-v2/issues/239)) ([70edb38](https://github.com/danieljcode/lawportal-v2/commit/70edb384e0b39c01d0f4c5d913e4be54a9c9cc02))
+
 ## [0.8.0](https://github.com/danieljcode/lawportal-v2/compare/v0.7.0...v0.8.0) (2026-11-08)
 
 
