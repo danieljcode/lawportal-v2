@@ -5,7 +5,7 @@ import { CHANGELOG, type ChangelogEntry } from "@/data/changelog";
 import { friendlyDate, stamp } from "@/lib/changelog";
 import { isUnread, markSeen, SEEN_KEY } from "@/lib/changelogSeen";
 import { memoryKV } from "@/lib/storage";
-import { READABLE_FONT_KEY, SHELL_KEY } from "@/lib/shell";
+import { CRT_KEY, READABLE_FONT_KEY, SHELL_KEY } from "@/lib/shell";
 import { getTheme, setTheme, THEME_KEY, THEME_SCRIPT } from "@/lib/theme";
 
 beforeEach(() => {
@@ -13,6 +13,7 @@ beforeEach(() => {
   document.documentElement.removeAttribute("data-theme");
   document.documentElement.removeAttribute("data-look");
   document.documentElement.removeAttribute("data-font");
+  document.documentElement.removeAttribute("data-crt");
 });
 
 describe("theme", () => {
@@ -63,13 +64,21 @@ describe("theme", () => {
     new Function(THEME_SCRIPT)();
     expect(document.documentElement.dataset.font).toBe("readable");
   });
+
+  it("THEME_SCRIPT applies Classic's CRT mode only when on (LP-58)", () => {
+    new Function(THEME_SCRIPT)();
+    expect(document.documentElement.hasAttribute("data-crt")).toBe(false);
+    localStorage.setItem(CRT_KEY, "1");
+    new Function(THEME_SCRIPT)();
+    expect(document.documentElement.dataset.crt).toBe("on");
+  });
 });
 
 describe("changelog", () => {
   const added: ChangelogEntry[] = [{ date: "2026-12-01", items: [{ type: "fix", text: "A fix." }] }, ...CHANGELOG];
 
   it("stamps the newest entry and the entry count", () => {
-    expect(stamp()).toBe("2026-11-08|Your own templates, and charges on a case|11|50");
+    expect(stamp()).toBe("2026-11-13|Retro extras|1|51");
     expect(stamp([])).toBe("");
   });
 

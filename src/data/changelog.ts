@@ -18,6 +18,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-11-13",
+    title: "Retro extras",
+    items: [
+      {
+        type: "new",
+        text: "CRT monitor mode for the Classic theme: faint scanlines, a curved-glass edge and a soft glow on the text, like a 1990 screen. Turn it on or off in Settings → Appearance or the View menu. It never touches the preview, printouts, downloads or Discord copies, and the flicker stops if your system asks for less motion.",
+      },
+    ],
+  },
+  {
     date: "2026-11-08",
     title: "Your own templates, and charges on a case",
     version: "0.8.0",
