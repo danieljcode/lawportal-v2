@@ -25,6 +25,10 @@ export const CHANGELOG: ChangelogEntry[] = [
         type: "new",
         text: "CRT monitor mode for the Classic theme: faint scanlines, a curved-glass edge and a soft glow on the text, like a 1990 screen. Turn it on or off in Settings → Appearance or the View menu. It never touches the preview, printouts, downloads or Discord copies, and the flicker stops if your system asks for less motion.",
       },
+      {
+        type: "new",
+        text: "A screensaver: leave the app idle for 5 minutes and pixel-art gavels and briefcases fly across the screen, or pick the bouncing F&A. Any mouse move, tap or key brings the app back without clicking or typing into it. Change the wait or turn it off in Settings → Appearance. It never starts over an open dialog.",
+      },
     ],
   },
   {

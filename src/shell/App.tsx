@@ -28,6 +28,7 @@ import AboutDialog from "./AboutDialog";
 import BootScreen from "./BootScreen";
 import CharactersDialog from "./CharactersDialog";
 import ErrorBoundary from "@/ui/ErrorBoundary";
+import IdleWatch from "./IdleWatch";
 import JumpBox, { isFindKey, isJumpKey, jumpShortcut } from "./JumpBox";
 import type { DraftRequest, FormTools } from "@/programs/filings";
 import MenuBar, { type Menu, type MenuItem } from "./MenuBar";
@@ -579,6 +580,7 @@ export default function App({ changelogStamp = "" }: { changelogStamp?: string }
           <BootScreen />
         </>
       )}
+      <IdleWatch />
       <datalist id="character-names">
         {characters.map((c) => (
           <option key={c.id} value={c.name} />

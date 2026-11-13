@@ -2317,6 +2317,30 @@ dialog.changelog {
   margin: 12px 0;
 }
 
+/* ---------- the screensaver (LP-60): a fixed 1990 picture in every theme ---------- */
+.screensaver {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483646;
+  background: #000;
+  cursor: none;
+}
+.screensaver canvas {
+  display: block;
+}
+/* Reduced motion: one still picture, fading slowly. */
+.screensaver.still {
+  animation: screensaver-fade 8s ease-in-out infinite alternate;
+}
+@keyframes screensaver-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.25;
+  }
+}
+
 /* ---------- About (LP-22) ---------- */
 .about-head {
   display: flex;

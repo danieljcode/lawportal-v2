@@ -6,5 +6,5 @@
 - **Sync** and backups. See [Sync and backups](#help/sync).
 - **Letterhead:** the firm's details on its letters and invoices.
 - **Checklists:** the routine next actions for each kind of case, used by **Add checklist** on a case. Pick a list to rename it, set its matter, and add, reorder or remove items; **New checklist** starts one. They sync. **Back to the starter lists** undoes every change.
-- **Appearance:** the theme, and light or dark. See [Themes](#help/themes).
+- **Appearance:** the theme, and light or dark. See [Themes](#help/themes). The **Screensaver** starts after the app sits idle for the time you pick (5 minutes unless you change it, or Off) and shows flying gavels and briefcases or the firm's bouncing initials. Any mouse move, tap or key brings the app back, and that tap or key does nothing else. It never starts while a dialog is open.
 - **What's new** and **About**.

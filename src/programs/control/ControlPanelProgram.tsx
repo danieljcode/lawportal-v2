@@ -8,6 +8,14 @@ import { useEffect, useState, type ReactNode } from "react";
 import { BRANDING } from "@/branding";
 import { bootEnabled, setBootEnabled } from "@/lib/boot";
 import { letterheadStore, MAX_LETTERHEAD_FIELD, type Letterhead } from "@/lib/letterhead";
+import {
+  type ScreensaverArt,
+  screensaverArt,
+  screensaverWait,
+  setScreensaverArt,
+  setScreensaverWait,
+  WAITS,
+} from "@/lib/screensaver";
 import { getReadableFont, setReadableFont, type ShellMode } from "@/lib/shell";
 import { LABELS, type ThemeMode, MODES } from "@/lib/theme";
 import { AboutContent } from "@/shell/AboutDialog";
@@ -88,6 +96,8 @@ function LetterheadSettings() {
 export default function ControlPanelProgram({ shell }: ProgramProps) {
   const [boot, setBoot] = useState(bootEnabled);
   const [readable, setReadable] = useState(getReadableFont);
+  const [wait, setWait] = useState(screensaverWait);
+  const [art, setArt] = useState(screensaverArt);
   const { visible, markChangelogSeen } = shell;
   // What's new is on the page, so seeing Settings reads it.
   useEffect(() => {
@@ -155,6 +165,43 @@ export default function ControlPanelProgram({ shell }: ProgramProps) {
                       {LABELS[m]}
                     </option>
                   ))}
+                </select>
+              </label>
+            </li>
+            {/* The screensaver (LP-60), in both themes. */}
+            <li>
+              <label className="control-theme">
+                <span>Screensaver</span>
+                <select
+                  id="screensaver-wait"
+                  value={wait}
+                  onChange={(e) => {
+                    setScreensaverWait(Number(e.target.value));
+                    setWait(Number(e.target.value));
+                  }}
+                >
+                  {WAITS.map((m) => (
+                    <option key={m} value={m}>
+                      {m ? `After ${m} minute${m === 1 ? "" : "s"} idle` : "Off"}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </li>
+            <li>
+              <label className="control-theme">
+                <span>Screensaver picture</span>
+                <select
+                  id="screensaver-art"
+                  value={art}
+                  disabled={!wait}
+                  onChange={(e) => {
+                    setScreensaverArt(e.target.value as ScreensaverArt);
+                    setArt(e.target.value as ScreensaverArt);
+                  }}
+                >
+                  <option value="flying">Flying gavels and briefcases</option>
+                  <option value="logo">{"Bouncing " + BRANDING.shortName}</option>
                 </select>
               </label>
             </li>
