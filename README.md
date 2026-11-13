@@ -171,10 +171,10 @@ called the Control Panel.
 
 Each program's code loads the first time it's opened (and when the browser is idle), so the home screen
 downloads only the shell; the court forms' templates come with Court Filings, and the shell lists them from a
-small index. **The home screen's first load may download at most 635 KiB of JavaScript** (uncompressed). A
+small index. **The home screen's first load may download at most 640 KiB of JavaScript** (uncompressed). A
 smoke test in `e2e/smoke.spec.ts` measures it on the production build and fails CI above that. It was 1,078 KiB
 before LP-122, 892 KiB after it and 612 KiB after LP-133; React and Next.js are about 460 KiB of it. LP-51 raised
-it from 650 KiB for the new-version notice (the service worker's code loads when the browser is idle), and LP-227 to 660 KiB for dated case notes, which the case store cleans on load, and LP-230 to 665 KiB for synced checklists (the sync client loads with the shell), and LP-239 to 666 KiB for a What's new line (all of What's new loaded with the shell, for its unread dot). LP-242 lowered it to 630 KiB: What's new loads the first time it opens, and the server gives the shell only its stamp for the unread dot, so new entries no longer grow the home screen. Next.js 16.4.5 (a security release) added about 3 KiB, so it rose to 635 KiB. Raise the
+it from 650 KiB for the new-version notice (the service worker's code loads when the browser is idle), and LP-227 to 660 KiB for dated case notes, which the case store cleans on load, and LP-230 to 665 KiB for synced checklists (the sync client loads with the shell), and LP-239 to 666 KiB for a What's new line (all of What's new loaded with the shell, for its unread dot). LP-242 lowered it to 630 KiB: What's new loads the first time it opens, and the server gives the shell only its stamp for the unread dot, so new entries no longer grow the home screen. Next.js 16.4.5 (a security release) added about 3 KiB, so it rose to 635 KiB, and LP-55 to 640 KiB for the Notes panel on Home (sticky notes). Raise the
 budget only on purpose, in the same pull request as the change that needs it.
 
 ## Contributing
